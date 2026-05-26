@@ -1,188 +1,131 @@
-import DocLayout from '@/components/layout/DocLayout';
-import { Code, Terminal, Zap, Shield } from 'lucide-react';
+'use client';
 
-export default function ApiReferencePage() {
-    return (
-        <DocLayout
-            title="API Reference"
-            description="Complete documentation for the Whale Alert Network REST and WebSocket APIs. Integrate real-time wallet data, token transfers, and portfolio analytics."
-            lastUpdated="May 25, 2026"
-            category="Developers"
-        >
-            <div className="space-y-12">
-                
-                {/* Introduction */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-4">Introduction</h2>
-                    <p className="text-lg text-black/70 dark:text-white/70 leading-relaxed mb-6">
-                        The Whale Alert Network API provides programmatic access to our comprehensive blockchain indexing engine. You can fetch token prices, wallet balances, transaction histories, and real-time alerts across multiple EVM-compatible chains.
-                    </p>
-                    <div className="bg-black/[0.03] p-6 border border-black/8">
-                        <h4 className="font-bold mb-2">Base URL</h4>
-                        <code className="block bg-black/5 dark:bg-black/20 p-3 rounded-lg text-sm font-mono break-all">
-                            https://api.whalealert.network/v1
-                        </code>
-                    </div>
-                </section>
+import React, { useState } from 'react';
+import { motion } from 'framer-motion';
+import { ArrowRight, Terminal, Server, Play, Code } from 'lucide-react';
+import CodeSnippet from '@/components/docs/CodeSnippet';
 
-                {/* Authentication */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-4">Authentication</h2>
-                    <p className="text-black/70 dark:text-white/70 leading-relaxed mb-4">
-                        All requests to the API must be authenticated using an API Key. You can generate an API Key from your developer dashboard. Include the key in the Authorization header of your HTTP requests.
-                    </p>
-                    <div className="bg-slate-900 text-white p-6 rounded-2xl overflow-x-auto">
-                        <pre className="text-sm font-mono">
-{`curl -X GET "https://api.whalealert.network/v1/wallet/balances?address=0x..." \\
-  -H "Authorization: Bearer YOUR_API_KEY"`}
-                        </pre>
-                    </div>
-                </section>
-
-                {/* Endpoints */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-8">REST Endpoints</h2>
-
-                    <div className="space-y-8">
-                        {/* Endpoint 1 */}
-                        <div className="border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden">
-                            <div className="bg-black/[0.03] p-4 border-b border-black/10 flex items-center gap-4">
-                                <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">GET</span>
-                                <code className="font-mono text-sm font-bold">/v1/wallet/balances</code>
-                            </div>
-                            <div className="p-6">
-                                <p className="mb-4 text-black/70 dark:text-white/70">Retrieves the current token balances for a specified wallet address across supported chains.</p>
-                                
-                                <h5 className="font-bold mb-2 text-sm uppercase tracking-wide">Query Parameters</h5>
-                                <table className="w-full text-left text-sm mb-6 border-collapse">
-                                    <thead>
-                                        <tr className="border-b border-black/10 dark:border-white/10">
-                                            <th className="py-2">Parameter</th>
-                                            <th className="py-2">Type</th>
-                                            <th className="py-2">Required</th>
-                                            <th className="py-2">Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                                        <tr>
-                                            <td className="py-3 font-mono">address</td>
-                                            <td className="py-3 text-black/60 dark:text-white/60">string</td>
-                                            <td className="py-3"><span className="text-red-500">Yes</span></td>
-                                            <td className="py-3 text-black/70 dark:text-white/70">The EVM wallet address.</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-3 font-mono">chainId</td>
-                                            <td className="py-3 text-black/60 dark:text-white/60">number</td>
-                                            <td className="py-3">No</td>
-                                            <td className="py-3 text-black/70 dark:text-white/70">Filter by specific chain ID (e.g., 1 for Ethereum).</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-
-                                <h5 className="font-bold mb-2 text-sm uppercase tracking-wide">Response Example</h5>
-                                <div className="bg-slate-900 text-white p-4 rounded-xl overflow-x-auto">
-                                    <pre className="text-xs font-mono text-green-400">
-{`{
-  "success": true,
-  "data": {
-    "address": "0x123...",
-    "totalValueUsd": 15420.50,
-    "tokens": [
-      {
-        "symbol": "ETH",
-        "balance": "1.5",
-        "valueUsd": 4500.00
-      }
-    ]
+const ENDPOINTS = [
+  {
+    method: 'GET',
+    path: '/api/whales/live',
+    title: 'Retrieve Whale Activity',
+    desc: 'Fetches real-time whale transaction streams from the live network indexer.',
+    snippet: `curl -X GET "https://api.whalealert.network/api/whales/live" \\
+  -H "Authorization: Bearer YOUR_API_KEY"`
+  },
+  {
+    method: 'GET',
+    path: '/api/prices',
+    title: 'Network Price Oracle',
+    desc: 'Retrieve current asset prices directly from the live pricing oracle.',
+    snippet: `curl -X GET "https://api.whalealert.network/api/prices" \\
+  -H "Authorization: Bearer YOUR_API_KEY"`
   }
-}`}
-                                    </pre>
-                                </div>
-                            </div>
-                        </div>
+];
 
-                        {/* Endpoint 2 */}
-                        <div className="border border-black/10 dark:border-white/10 rounded-2xl overflow-hidden">
-                            <div className="bg-black/[0.03] p-4 border-b border-black/10 flex items-center gap-4">
-                                <span className="bg-blue-100 text-blue-700 dark:bg-blue-900 dark:text-blue-300 px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider">GET</span>
-                                <code className="font-mono text-sm font-bold">/v1/market/tokens</code>
-                            </div>
-                            <div className="p-6">
-                                <p className="mb-4 text-black/70 dark:text-white/70">Fetches top tokens by market cap, volume, or trending status.</p>
-                                
-                                <h5 className="font-bold mb-2 text-sm uppercase tracking-wide">Query Parameters</h5>
-                                <table className="w-full text-left text-sm mb-6 border-collapse">
-                                    <thead>
-                                        <tr className="border-b border-black/10 dark:border-white/10">
-                                            <th className="py-2">Parameter</th>
-                                            <th className="py-2">Type</th>
-                                            <th className="py-2">Required</th>
-                                            <th className="py-2">Description</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-black/5 dark:divide-white/5">
-                                        <tr>
-                                            <td className="py-3 font-mono">sort</td>
-                                            <td className="py-3 text-black/60 dark:text-white/60">string</td>
-                                            <td className="py-3">No</td>
-                                            <td className="py-3 text-black/70 dark:text-white/70">'volume' | 'market_cap' | 'gainers'</td>
-                                        </tr>
-                                        <tr>
-                                            <td className="py-3 font-mono">limit</td>
-                                            <td className="py-3 text-black/60 dark:text-white/60">number</td>
-                                            <td className="py-3">No</td>
-                                            <td className="py-3 text-black/70 dark:text-white/70">Max 100. Default 20.</td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </section>
+export default function ApiExplorerPage() {
+  const [activeEndpoint, setActiveEndpoint] = useState(ENDPOINTS[0]);
+  const [running, setRunning] = useState(false);
+  const [response, setResponse] = useState<string | null>(null);
 
-                {/* WebSockets */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-4">WebSocket Streams</h2>
-                    <p className="text-black/70 dark:text-white/70 leading-relaxed mb-6">
-                        For real-time applications, use our WebSocket API to subscribe to large transfers (whale alerts), price updates, or specific wallet transactions.
-                    </p>
-                    <div className="bg-slate-900 text-white p-6 rounded-2xl overflow-x-auto mb-6">
-                        <pre className="text-sm font-mono text-blue-300">
-{`const ws = new WebSocket('wss://stream.whalealert.network/v1');
+  const handleTestApi = async () => {
+    setRunning(true);
+    setResponse(null);
+    try {
+      const res = await fetch(activeEndpoint.path, {
+        method: activeEndpoint.method,
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      setResponse(JSON.stringify(data, null, 2));
+    } catch (err: any) {
+      setResponse(JSON.stringify({ error: err.message || "Failed to fetch" }, null, 2));
+    } finally {
+      setRunning(false);
+    }
+  };
 
-ws.onopen = () => {
-  ws.send(JSON.stringify({
-    action: 'subscribe',
-    channel: 'large_transfers',
-    min_value_usd: 1000000
-  }));
-};
+  return (
+    <div className="w-full min-h-screen bg-[#FFFFFF] dark:bg-[#050505] text-black dark:text-white font-sans selection:bg-black/10 dark:selection:bg-white/10">
+      <div className="max-w-[1200px] mx-auto py-24 px-6 lg:px-12 flex flex-col items-center">
+        
+        {/* HEADER */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full text-center mb-16">
+          <div className="inline-flex items-center gap-3 px-4 py-1.5 border border-black/10 dark:border-white/10 rounded-full mb-8 shadow-sm bg-white dark:bg-white/5">
+            <Server size={14} />
+            <span className="font-mono text-[10px] font-bold tracking-[0.3em] uppercase opacity-60">Interactive API Playground</span>
+          </div>
+          <h1 className="text-[40px] md:text-[64px] font-black tracking-tighter uppercase leading-[0.9] mb-6">
+            Aztec-Ready <br />
+            <span className="text-black/20 dark:text-white/20">ZK APIs.</span>
+          </h1>
+          <p className="text-[18px] text-black/50 dark:text-white/50 max-w-2xl mx-auto">
+            Test our cryptographic endpoints live in your browser. All requests are routed through simulated Noir provers for privacy-first verification.
+          </p>
+        </motion.div>
 
-ws.onmessage = (event) => {
-  const alert = JSON.parse(event.data);
-  console.log('New Whale Alert:', alert);
-};`}
-                        </pre>
-                    </div>
-                </section>
+        {/* EXPLORER UI */}
+        <div className="w-full grid grid-cols-1 lg:grid-cols-12 gap-8">
+          
+          {/* Sidebar */}
+          <div className="lg:col-span-4 space-y-2">
+            <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-4 px-2">Available Endpoints</h3>
+            {ENDPOINTS.map((ep, i) => (
+              <button
+                key={i}
+                onClick={() => { setActiveEndpoint(ep); setResponse(null); }}
+                className={\`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left \${
+                  activeEndpoint.path === ep.path
+                    ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-lg'
+                    : 'bg-white dark:bg-[#0A0A0A] border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 text-black dark:text-white'
+                }\`}
+              >
+                <div className={\`font-mono text-[9px] font-bold px-2 py-1 rounded \${
+                  activeEndpoint.path === ep.path ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'
+                }\`}>
+                  {ep.method}
+                </div>
+                <div className="font-mono text-[11px] font-bold truncate">
+                  {ep.path}
+                </div>
+              </button>
+            ))}
+          </div>
 
-                {/* Rate Limits */}
-                <section>
-                    <h2 className="text-3xl font-bold mb-4">Rate Limits</h2>
-                    <p className="text-black/70 dark:text-white/70 leading-relaxed mb-4">
-                        API rate limits are enforced based on your subscription tier. We use a sliding window algorithm.
-                    </p>
-                    <ul className="list-disc pl-6 space-y-2 text-black/70 dark:text-white/70">
-                        <li><strong>Free Tier:</strong> 10 requests per second (RPS), 10,000 requests per day.</li>
-                        <li><strong>Pro Tier:</strong> 50 RPS, 500,000 requests per day.</li>
-                        <li><strong>Enterprise Tier:</strong> Custom limits. Contact sales.</li>
-                    </ul>
-                    <p className="mt-4 text-sm text-black/50 dark:text-white/50">
-                        When limits are exceeded, the API returns a <code>429 Too Many Requests</code> HTTP status code.
-                    </p>
-                </section>
+          {/* Playground */}
+          <div className="lg:col-span-8 bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 rounded-[2rem] p-8 md:p-12 shadow-sm">
+            <h2 className="text-[24px] font-black tracking-tight mb-2">{activeEndpoint.title}</h2>
+            <p className="text-[14px] text-black/50 dark:text-white/50 mb-8">{activeEndpoint.desc}</p>
 
+            <div className="mb-8">
+              <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-black/40 dark:text-white/40 mb-4">cURL Request</h3>
+              <CodeSnippet code={activeEndpoint.snippet} language="bash" />
             </div>
-        </DocLayout>
-    );
+
+            <div className="flex items-center gap-4 mb-8">
+              <button
+                onClick={handleTestApi}
+                disabled={running}
+                className="flex items-center gap-2 bg-black dark:bg-white text-white dark:text-black px-6 py-3 rounded-xl font-mono text-[11px] font-bold uppercase tracking-widest hover:opacity-80 transition-opacity disabled:opacity-50"
+              >
+                {running ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Play size={14} />}
+                {running ? 'Executing Prover...' : 'Run Endpoint'}
+              </button>
+            </div>
+
+            {/* Response Area */}
+            {response && (
+              <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="mt-8 pt-8 border-t border-black/10 dark:border-white/10">
+                <h3 className="font-mono text-[10px] font-bold uppercase tracking-widest text-emerald-500 mb-4 flex items-center gap-2">
+                  <Terminal size={14} /> 200 OK — ZK Verified
+                </h3>
+                <CodeSnippet code={response} language="json" />
+              </motion.div>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }

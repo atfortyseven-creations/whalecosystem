@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -90,6 +90,7 @@ export function ConnectWalletModal() {
     const handleMetaMask = () => connectViaExtension(['io.metamask', 'metaMaskSDK', 'metaMask']);
     const handleCoinbase = () => connectViaExtension(['coinbaseWalletSDK', 'coinbaseWallet']);
     const handleRainbow  = () => connectViaExtension(['rainbow', 'me.rainbow']);
+    const handleHumanityLedger = () => { window.location.href = "/sign-up"; };
 
     const handleMobileSync = async () => {
         setView('qr');
@@ -173,12 +174,13 @@ export function ConnectWalletModal() {
                                     </div>
 
                                     <div className="space-y-3 pt-2">
-                                        {/* QUICK ACCESS GRID  3 cols on mobile, compact */}
-                                        <div className="grid grid-cols-3 gap-2">
+                                        {/* QUICK ACCESS GRID  compact */}
+                                        <div className="grid grid-cols-2 gap-2">
                                             {[
                                                 { id: 'metamask', name: 'MetaMask', logo: '/wallets/metamask.svg', handler: handleMetaMask },
                                                 { id: 'coinbase', name: 'Coinbase', logo: '/wallets/coinbase.png', handler: handleCoinbase },
                                                 { id: 'rainbow', name: 'Rainbow', logo: '/wallets/rainbow.png', handler: handleRainbow },
+                                                { id: 'humanity', name: 'Humanity Ledger', logo: '/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png', handler: handleHumanityLedger },
                                             ].map((w) => (
                                                 <button 
                                                     key={w.id}

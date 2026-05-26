@@ -18,9 +18,7 @@ export function SystemsUtilityHeader() {
     const { disconnect } = useDisconnect();
     const router = useRouter();
 
-    const icons = [
-        { id: 'notifications', icon: Bell, label: 'Notifications' },
-    ];
+    const icons: any[] = [];
 
     const truncateAddress = (addr: string) => `${addr.slice(0, 6)}...${addr.slice(-4)}`;
 

@@ -24,6 +24,17 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
 
         setIsPhysicallyMobile(isUaMobile || (isTouchPrimary && isSmallScreen));
         setMounted(true);
+        
+        // Force login for all users when entering the landing page
+        try {
+            document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "system_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
+            localStorage.clear();
+            sessionStorage.clear();
+        } catch (e) {}
+
     }, []);
 
     // Fast-path: server already told us it's mobile  render immediately

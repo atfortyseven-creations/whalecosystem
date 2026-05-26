@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useCallback } from 'react';
 import { useDisconnect } from 'wagmi';
@@ -107,7 +107,7 @@ export function useSystemSignOut() {
         
         // Brief delay to ensure storage writes/clears are committed
         setTimeout(() => {
-            window.location.href = '/connect';
+            window.location.href = '/';
         }, 300);
 
     }, [disconnect]);

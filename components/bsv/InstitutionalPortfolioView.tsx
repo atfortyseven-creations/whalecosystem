@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useCallback, useEffect } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
     ArrowUpRight, ArrowDownLeft, Scan, Plus, Copy, Check,
@@ -14,8 +14,9 @@ import { useVIPStore } from '@/lib/vip-store';
 import { formatEther } from 'viem';
 import { SettingsView } from '@/components/settings/SettingsView';
 import { ethers } from 'ethers';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 
-type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS';
+type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS' | 'SWAP' | 'BRIDGE';
 
 const truncate = (str: string, len: number) => {
     if (!str) return '';
@@ -106,15 +107,21 @@ export function InstitutionalPortfolioView() {
                         onScan={() => setView('SCAN')}
                         onCreate={() => setView('CREATE')}
                         onBuy={() => setView('BUY')}
+                        onSwap={() => setView('SWAP')}
+                        onBridge={() => setView('BRIDGE')}
                         onNetworkClick={() => setView('NETWORK')}
                         onSettingsClick={() => setView('SETTINGS')}
+                        onAccountsClick={() => setView('ACCOUNTS')}
                         scannerBase={scannerBase}
                     />
                 )}
                 {view === 'NETWORK' && <NetworkView key="network" onBack={() => setView('HOME')} />}
                 {view === 'SETTINGS' && <SettingsView key="settings" onBack={() => setView('HOME')} />}
+                {view === 'ACCOUNTS' && <AccountsView key="accounts" onBack={() => setView('HOME')} address={address} />}
                 {view === 'SEND' && <SendView key="send" prefilledAddress={prefilledAddress} onBack={() => { setView('HOME'); setPrefilledAddress(''); }} />}
                 {view === 'BUY' && <BuyView key="buy" address={address} onBack={() => setView('HOME')} />}
+                {view === 'SWAP' && <SwapView key="swap" address={address} onBack={() => setView('HOME')} />}
+                {view === 'BRIDGE' && <BridgeView key="bridge" address={address} onBack={() => setView('HOME')} />}
                 {view === 'RECEIVE' && <ReceiveView key="receive" address={address} onBack={() => setView('HOME')} />}
                 {view === 'SCAN' && <ScanView key="scan" onBack={() => setView('HOME')} onResult={(addr: string) => { setView('SEND'); setPrefilledAddress(addr); }} />}
                 {view === 'CREATE' && <CreateWalletView key="create" onBack={() => setView('HOME')} onCreated={() => setView('HOME')} />}
@@ -123,10 +130,18 @@ export function InstitutionalPortfolioView() {
     );
 }
 
-function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, tokenBalances, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onNetworkClick, onSettingsClick, scannerBase }: any) {
+function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, loading, transactions, tokenBalances, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onSwap, onBridge, onNetworkClick, onSettingsClick, onAccountsClick, scannerBase }: any) {
     const [copied, setCopied] = useState(false);
+    const [isDisconnecting, setIsDisconnecting] = useState(false);
+    const [activeTab, setActiveTab] = useState<'TOKENS'|'NFTS'|'ACTIVITY'>('TOKENS');
     const { clearWallet, activeNetwork } = useWalletStore();
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
+    const { nuclearDisconnect } = useSystemSignOut();
+    
+    const handleDisconnect = async () => {
+        setIsDisconnecting(true);
+        await nuclearDisconnect();
+    };
 
     const copy = () => {
         if (!address) return;
@@ -138,6 +153,12 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
 
     return (
         <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col relative z-20 pb-20">
+            {isDisconnecting && (
+                <div className="fixed inset-0 z-[9999] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center">
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Purging Session...</p>
+                </div>
+            )}
             <header className="flex items-center justify-between px-8 py-6 border-b border-black/10">
                 <div className="flex flex-col">
                     <span className="text-[10px] uppercase tracking-[0.3em] font-bold text-black/40">Network Status</span>
@@ -151,10 +172,15 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
                         <button onClick={onRefresh} disabled={loading} className="text-black/40 hover:text-black transition-colors">
                             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                         </button>
-                        <button onClick={onSettingsClick} className="text-black/40 hover:text-black transition-colors">
+                        <button onClick={onSettingsClick} className="text-black/40 hover:text-black transition-colors" title="Settings">
                             <Settings size={14} />
                         </button>
-                        <button onClick={clearWallet} className="text-black/40 hover:text-black uppercase text-[10px] font-bold tracking-widest">
+                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/10 px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors group">
+                            <div className="w-4 h-4 rounded-full bg-gradient-to-tr from-black to-gray-400" />
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-black/60 group-hover:text-black">Account 1</span>
+                            <ChevronRight size={12} className="text-black/40 rotate-90" />
+                        </button>
+                        <button onClick={handleDisconnect} className="text-black/40 hover:text-black uppercase text-[10px] font-bold tracking-widest ml-2">
                             Disconnect
                         </button>
                     </div>
@@ -197,94 +223,112 @@ function HomeView({ address, balance, balanceFiat, qdBalance, entropyIndex, load
                     {/* Actions Panel */}
                     <div className="lg:col-span-4 space-y-4">
                         <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-2 mb-4">Operations</h4>
-                        <div className="grid grid-cols-2 gap-2">
+                        <div className="grid grid-cols-3 gap-2">
                             <ActionBtn icon={CreditCard} label="Deposit" onClick={onBuy} />
-                            <ActionBtn icon={ArrowUpRight} label="Transmit" onClick={onSend} />
+                            <ActionBtn icon={RefreshCw} label="Swap" onClick={onSwap} />
+                            <ActionBtn icon={GitMerge} label="Bridge" onClick={onBridge} />
+                            <ActionBtn icon={ArrowUpRight} label="Send" onClick={onSend} />
                             <ActionBtn icon={ArrowDownLeft} label="Receive" onClick={onReceive} />
-                            <ActionBtn icon={Scan} label="Scan QR" onClick={onScan} />
+                            <ActionBtn icon={Scan} label="Scan" onClick={onScan} />
                         </div>
                     </div>
 
                     {/* Quantum Details */}
                     <div className="lg:col-span-8 space-y-4">
-                        <h4 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-2 mb-4">Account Status</h4>
+                        <div className="flex items-center gap-4 border-b border-black/10">
+                            {['TOKENS', 'NFTS', 'ACTIVITY'].map(t => (
+                                <button 
+                                    key={t}
+                                    onClick={() => setActiveTab(t as any)}
+                                    className={`pb-2 text-[10px] font-bold uppercase tracking-widest transition-colors ${activeTab === t ? 'text-black border-b-2 border-black' : 'text-black/40 hover:text-black/70'}`}
+                                >
+                                    {t}
+                                </button>
+                            ))}
+                        </div>
                         
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                            <div className="border border-black p-6 bg-black text-white relative overflow-hidden group">
-                                <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:scale-110 transition-transform duration-1000"><Database size={100} /></div>
-                                <span className="text-[10px] uppercase tracking-widest text-white/50 block mb-2">Network Score (QDs)</span>
-                                <div className="text-3xl font-light tracking-tighter">{qdBalance}<span className="text-lg font-black ml-2 opacity-50 text-white">QDs</span></div>
-
-                            </div>
-                            
-                            <div className="border border-black/10 bg-white relative flex flex-col">
-                                <div className="p-4 border-b border-black/10 flex justify-between items-center bg-black/5">
-                                    <span className="text-[10px] uppercase tracking-widest font-bold">Verified ERC-20 Assets</span>
-                                </div>
-                                <div className="p-4 flex-1 flex flex-col gap-3 overflow-y-auto max-h-[150px]">
+                        {activeTab === 'TOKENS' && (
+                            <div className="border border-black/10 bg-white flex flex-col min-h-[300px]">
+                                <div className="p-4 flex-1 flex flex-col gap-3 overflow-y-auto">
                                     {tokenBalances && tokenBalances.length > 0 ? (
                                         tokenBalances.map((tb: any) => (
-                                            <div key={tb.address} className="flex justify-between items-center text-sm font-mono border-b border-black/5 pb-2 last:border-0">
-                                                <span>{tb.symbol}</span>
+                                            <div key={tb.address} className="flex justify-between items-center text-sm font-mono border-b border-black/5 pb-3 pt-1 last:border-0 hover:bg-black/5 px-2 transition-colors cursor-pointer">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center text-[10px] font-bold">{tb.symbol[0]}</div>
+                                                    <span className="font-bold">{tb.symbol}</span>
+                                                </div>
                                                 <span className="font-bold">{tb.balance}</span>
                                             </div>
                                         ))
                                     ) : (
-                                        <div className="text-xs text-black/40 text-center uppercase tracking-widest mt-4">
-                                            No tracked tokens
+                                        <div className="flex-1 flex flex-col items-center justify-center text-center p-8">
+                                            <Database size={24} className="text-black/20 mb-4" />
+                                            <p className="text-xs text-black/40 uppercase tracking-widest font-bold mb-2">No Tokens Found</p>
+                                            <p className="text-[10px] text-black/30">Your ERC-20 assets will appear here.</p>
+                                        </div>
+                                    )}
+                                </div>
+                                <button onClick={onSettingsClick} className="w-full mt-auto border-t border-black/10 py-4 text-[10px] font-bold uppercase tracking-widest text-black/60 hover:bg-black hover:text-white transition-colors">
+                                    + Import Tokens
+                                </button>
+                            </div>
+                        )}
+
+                        {activeTab === 'NFTS' && (
+                            <div className="border border-black/10 bg-white flex flex-col min-h-[300px] items-center justify-center p-8 text-center">
+                                <Box size={32} className="text-black/20 mb-4" />
+                                <p className="text-xs text-black/40 uppercase tracking-widest font-bold mb-2">No NFTs Found</p>
+                                <p className="text-[10px] text-black/30 mb-6">Learn more about non-fungible tokens and how to acquire them.</p>
+                                <button className="border border-black text-black px-6 py-2 text-[10px] font-bold uppercase tracking-widest hover:bg-black hover:text-white transition-colors">
+                                    Import NFT
+                                </button>
+                            </div>
+                        )}
+
+                        {activeTab === 'ACTIVITY' && (
+                            <div className="border border-black/10 bg-white min-h-[300px]">
+                                <div className="divide-y divide-black/10">
+                                    {transactions.length > 0 ? (
+                                        transactions.map((tx: any) => (
+                                            <a 
+                                                key={tx.hash} 
+                                                href={`${scannerBase}/tx/${tx.hash}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="flex items-center justify-between p-4 hover:bg-black/5 transition-colors group"
+                                            >
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-10 h-10 rounded-full border border-black flex items-center justify-center text-black bg-white">
+                                                        {tx.type === 'SEND' ? <ArrowUpRight size={14} /> : <ArrowDownLeft size={14} />}
+                                                    </div>
+                                                    <div>
+                                                        <span className="text-[10px] font-bold uppercase tracking-widest block mb-1">{tx.type}</span>
+                                                        <span className={`text-[9px] font-bold uppercase tracking-widest ${tx.status === 'SUCCESS' ? 'text-green-600' : 'text-red-600'}`}>
+                                                            {tx.status === 'SUCCESS' ? 'Confirmed' : 'Failed'}
+                                                        </span>
+                                                    </div>
+                                                </div>
+                                                <div className="text-right">
+                                                    <span className="text-xs font-bold block mb-1">
+                                                        {tx.type === 'SEND' ? '-' : '+'}{tx.fromAmount} {tx.fromToken}
+                                                    </span>
+                                                    <div className="flex items-center justify-end gap-1 text-black/40">
+                                                        <span className="text-[10px]">{truncate(tx.hash, 12)}</span>
+                                                        <ExternalLink size={10} />
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        ))
+                                    ) : (
+                                        <div className="p-16 text-center flex flex-col items-center">
+                                            <Activity size={24} className="text-black/20 mb-4" />
+                                            <p className="text-xs text-black/40 uppercase tracking-widest font-bold mb-2">No Transactions</p>
+                                            <p className="text-[10px] text-black/40 max-w-[200px]">Your activity will appear here when you interact with the network.</p>
                                         </div>
                                     )}
                                 </div>
                             </div>
-                        </div>
-
-                        {/* History & Receipts */}
-                        <div className="border border-black/10 bg-white">
-                            <div className="px-6 py-4 border-b border-black/10 flex justify-between items-center bg-black/5">
-                                <span className="text-[10px] font-bold uppercase tracking-widest">Transaction Receipts</span>
-                                <span className="text-[10px] uppercase tracking-widest text-black/40">{transactions.length} Records</span>
-                            </div>
-                            <div className="divide-y divide-black/10">
-                                {transactions.length > 0 ? (
-                                    transactions.map((tx: any) => (
-                                        <a 
-                                            key={tx.hash} 
-                                            href={`${scannerBase}/tx/${tx.hash}`}
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="flex items-center justify-between p-6 hover:bg-black/5 transition-colors group"
-                                        >
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 border border-black flex items-center justify-center text-black">
-                                                    {tx.type === 'SEND' ? <ArrowUpRight size={14} /> : <ArrowDownLeft size={14} />}
-                                                </div>
-                                                <div>
-                                                    <span className="text-[10px] font-bold uppercase tracking-widest block mb-1">{tx.type} TRANSFER</span>
-                                                    <div className="flex items-center gap-2 text-black/40">
-                                                        <Hash size={10} />
-                                                        <span className="text-[10px]">{truncate(tx.hash, 16)}</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <div className="text-right">
-                                                <span className="text-xs font-bold block mb-1">
-                                                    {tx.type === 'SEND' ? '-' : '+'}{tx.fromAmount} {tx.fromToken}
-                                                </span>
-                                                <span className={`text-[9px] font-bold uppercase tracking-widest ${tx.status === 'SUCCESS' ? 'text-black' : 'text-black/40 line-through'}`}>
-                                                    {tx.status === 'SUCCESS' ? 'VERIFIED' : 'REVERTED'}
-                                                </span>
-                                            </div>
-                                        </a>
-                                    ))
-                                ) : (
-                                    <div className="p-12 text-center flex flex-col items-center">
-                                        <GitMerge size={24} className="text-black/20 mb-4" />
-                                        <h5 className="text-[10px] font-bold uppercase tracking-[0.3em] text-black/40">Zero Telemetry</h5>
-                                        <p className="text-[10px] text-black/40 max-w-[200px] mt-2">No verifiable receipts found in the local ledger index.</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
+                        )}
                     </div>
                 </section>
             )}
@@ -306,7 +350,7 @@ function ActionBtn({ icon: Icon, label, onClick }: any) {
 
 function ModalView({ title, icon, onBack, children }: any) {
     return (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="flex flex-col max-w-xl mx-auto w-full pt-20 px-6 pb-20 font-mono">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="flex flex-col max-w-xl mx-auto w-full pt-8 px-6 pb-20 font-mono min-h-screen">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 border border-black flex items-center justify-center text-black">
@@ -422,23 +466,67 @@ function ReceiveView({ address, onBack }: any) {
 }
 
 function CreateWalletView({ onBack, onCreated }: any) {
-    const { createWallet } = useWalletStore();
+    const { createWallet, importWallet } = useWalletStore();
+    const [mode, setMode] = useState<'CREATE' | 'IMPORT'>('CREATE');
+    const [privateKeyInput, setPrivateKeyInput] = useState('');
+
+    const handleImport = () => {
+        if (!privateKeyInput) return;
+        try {
+            const success = importWallet(privateKeyInput);
+            if (success) {
+                toast.success("Wallet Imported Successfully");
+                onCreated();
+            } else {
+                toast.error("Invalid Private Key format");
+            }
+        } catch (e) {
+            toast.error("Failed to import wallet");
+        }
+    };
+
     return (
-        <ModalView title="Create Wallet" icon={<Plus />} onBack={onBack}>
-            <div className="text-center space-y-6 py-10 border border-black/10">
-                <div className="w-16 h-16 border border-black flex items-center justify-center mx-auto text-black">
-                    <Key size={24} />
-                </div>
-                <div className="px-6">
-                    <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Local Cryptographic Keypair</h3>
-                    <p className="text-black/50 text-xs leading-relaxed max-w-sm mx-auto">This initiates a strictly deterministic private key generation process on your local hardware. Keys will not be transmitted externally.</p>
-                </div>
-                <div className="px-6">
-                    <button onClick={() => { createWallet(); onCreated(); }} className="w-full py-4 bg-black text-white font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black/90 transition-colors">
-                        Execute Generation
-                    </button>
-                </div>
+        <ModalView title="Account Management" icon={<Key />} onBack={onBack}>
+            <div className="flex border-b border-black/10 mb-6">
+                <button onClick={() => setMode('CREATE')} className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors ${mode === 'CREATE' ? 'border-b-2 border-black text-black' : 'text-black/40 hover:text-black/70'}`}>Create New</button>
+                <button onClick={() => setMode('IMPORT')} className={`flex-1 py-3 text-[10px] font-bold uppercase tracking-widest transition-colors ${mode === 'IMPORT' ? 'border-b-2 border-black text-black' : 'text-black/40 hover:text-black/70'}`}>Import Existing</button>
             </div>
+
+            {mode === 'CREATE' ? (
+                <div className="text-center space-y-6 py-6">
+                    <div className="w-16 h-16 border border-black flex items-center justify-center mx-auto text-black">
+                        <Plus size={24} />
+                    </div>
+                    <div className="px-6">
+                        <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Generate New Seed</h3>
+                        <p className="text-black/50 text-xs leading-relaxed max-w-sm mx-auto">This initiates a deterministic private key generation on your local hardware. Keys are not transmitted externally.</p>
+                    </div>
+                    <div className="px-6">
+                        <button onClick={() => { createWallet(); onCreated(); }} className="w-full py-4 bg-black text-white font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black/90 transition-colors">
+                            Execute Generation
+                        </button>
+                    </div>
+                </div>
+            ) : (
+                <div className="text-center space-y-6 py-6">
+                    <div className="px-6 text-left">
+                        <label className="text-[10px] font-bold uppercase tracking-widest text-black/50 block mb-2">Private Key String</label>
+                        <input 
+                            type="password" 
+                            value={privateKeyInput} 
+                            onChange={e => setPrivateKeyInput(e.target.value)} 
+                            placeholder="0x..." 
+                            className="w-full border border-black/20 p-4 text-sm font-mono outline-none focus:border-black transition-colors" 
+                        />
+                        <p className="text-[10px] text-black/40 mt-3">Imported accounts will not be associated with your originally generated secret recovery phrase.</p>
+                    </div>
+                    <div className="px-6">
+                        <button onClick={handleImport} disabled={!privateKeyInput} className="w-full py-4 bg-black text-white font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black/90 disabled:opacity-30 transition-colors">
+                            Import Account
+                        </button>
+                    </div>
+                </div>
+            )}
         </ModalView>
     );
 }
@@ -447,21 +535,117 @@ function BuyView({ address, onBack }: any) {
     const onrampUrl = `https://buy.moonpay.com/?walletAddress=${address}&colorCode=%23000000`;
     return (
         <ModalView title="Capital Ingress" icon={<CreditCard />} onBack={onBack}>
-            <div className="h-[550px] border border-black/10">
+            <div className="w-full h-[70vh] min-h-[500px] border border-black/10">
                 <iframe src={onrampUrl} className="w-full h-full bg-white" />
             </div>
         </ModalView>
     );
 }
 
-function ScanView({ onBack, onResult }: any) {
+function SwapView({ address, onBack }: any) {
+    // Real Uniswap V3 Interface - no mock, no simulation
+    const swapUrl = `https://app.uniswap.org/swap?theme=light&exactField=input&exactAmount=&inputCurrency=ETH&outputCurrency=0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48`;
+
     return (
-        <ModalView title="Optical Recognition" icon={<Scan />} onBack={onBack}>
-             <div className="p-12 border border-black/10 text-center bg-black/5">
-                <Scan size={32} className="mx-auto mb-6 text-black/30" />
-                <p className="text-[10px] font-bold text-black/40 uppercase tracking-[0.2em]">Awaiting Visual Input</p>
-                <input type="text" placeholder="MANUAL OVERRIDE (PASTE)" onChange={e => onResult(e.target.value)} className="mt-8 w-full bg-transparent border-b border-black/20 p-3 text-xs outline-none focus:border-black text-center transition-colors placeholder:text-black/20 uppercase tracking-widest" />
-             </div>
+        <ModalView title="Token Swap" icon={<RefreshCw />} onBack={onBack}>
+            <div className="w-full rounded-none overflow-hidden border border-black/10" style={{ height: '68vh', minHeight: 480 }}>
+                <iframe
+                    src={swapUrl}
+                    height="100%"
+                    width="100%"
+                    style={{ border: 'none', display: 'block' }}
+                    title="Uniswap Swap Interface"
+                    allow="clipboard-write"
+                />
+            </div>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-black/30 text-center mt-3">
+                Live via Uniswap Protocol · All swaps execute on-chain
+            </p>
+        </ModalView>
+    );
+}
+
+function BridgeView({ onBack }: any) {
+    // Real Li.Fi Jumper cross-chain bridge - no mock, no simulation
+    return (
+        <ModalView title="Cross-Chain Bridge" icon={<GitMerge />} onBack={onBack}>
+            <div className="w-full rounded-none overflow-hidden border border-black/10" style={{ height: '68vh', minHeight: 500 }}>
+                <iframe
+                    src="https://jumper.exchange/?theme=light"
+                    height="100%"
+                    width="100%"
+                    style={{ border: 'none', display: 'block' }}
+                    title="Li.Fi Jumper Bridge Interface"
+                    allow="clipboard-write"
+                />
+            </div>
+            <p className="text-[9px] font-bold uppercase tracking-widest text-black/30 text-center mt-3">
+                Live via Li.Fi Protocol · Real cross-chain routes · Fees calculated on-chain
+            </p>
+        </ModalView>
+    );
+}
+
+function ScanView({ onBack, onResult }: any) {
+    const scannerRef = useRef<any>(null);
+    const [scannerStarted, setScannerStarted] = useState(false);
+    const [manualInput, setManualInput] = useState('');
+    const [scanError, setScanError] = useState<string | null>(null);
+
+    useEffect(() => {
+        let html5QrCode: any;
+        const startScanner = async () => {
+            try {
+                const { Html5Qrcode } = await import('html5-qrcode');
+                html5QrCode = new Html5Qrcode('qr-reader-portfolio');
+                scannerRef.current = html5QrCode;
+                await html5QrCode.start(
+                    { facingMode: 'environment' },
+                    { fps: 10, qrbox: { width: 220, height: 220 } },
+                    (decodedText: string) => {
+                        html5QrCode.stop();
+                        const addr = decodedText.startsWith('ethereum:') ? decodedText.replace('ethereum:', '').split('@')[0].split('?')[0] : decodedText;
+                        onResult(addr);
+                    },
+                    () => {}
+                );
+                setScannerStarted(true);
+            } catch (err: any) {
+                setScanError(err?.message || 'Camera access denied');
+            }
+        };
+        startScanner();
+        return () => { scannerRef.current?.stop?.().catch(() => {}); };
+    }, [onResult]);
+
+    const handleManual = () => {
+        if (manualInput.trim()) onResult(manualInput.trim());
+    };
+
+    return (
+        <ModalView title="QR Scanner" icon={<Scan />} onBack={onBack}>
+            <div className="space-y-4">
+                <div id="qr-reader-portfolio" className="w-full border border-black/10 bg-black/5 overflow-hidden" style={{ minHeight: 260 }} />
+                {!scannerStarted && !scanError && (
+                    <p className="text-[10px] font-bold text-black/40 uppercase tracking-widest text-center">Requesting camera access...</p>
+                )}
+                {scanError && (
+                    <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest text-center">{scanError}</p>
+                )}
+                <div className="flex items-center gap-2">
+                    <input
+                        type="text"
+                        value={manualInput}
+                        onChange={e => setManualInput(e.target.value)}
+                        onKeyDown={e => e.key === 'Enter' && handleManual()}
+                        placeholder="Paste address manually..."
+                        className="flex-1 bg-transparent border-b border-black/20 p-3 text-xs outline-none focus:border-black transition-colors placeholder:text-black/20 font-mono"
+                    />
+                    <button onClick={handleManual} className="px-4 py-3 bg-black text-white text-[10px] font-bold uppercase tracking-widest hover:bg-black/80 transition-colors">
+                        Go
+                    </button>
+                </div>
+            </div>
         </ModalView>
     );
 }
@@ -479,6 +663,36 @@ function NetworkView({ onBack }: any) {
                         <span className={`text-[10px] tracking-widest ${activeNetwork === id ? 'opacity-50' : 'opacity-30'}`}>{data.currency}</span>
                     </button>
                 ))}
+            </div>
+        </ModalView>
+    );
+}
+
+function AccountsView({ onBack, address }: any) {
+    return (
+        <ModalView title="Account Selection" icon={<Key />} onBack={onBack}>
+            <div className="space-y-2">
+                <button className="w-full flex items-center justify-between p-4 border border-black bg-black text-white transition-all">
+                    <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-white/20 to-white/60 border border-white/20" />
+                        <div className="text-left">
+                            <div className="text-[10px] font-bold uppercase tracking-widest">Account 1</div>
+                            <div className="text-[9px] font-mono opacity-50">{truncate(address || '0x0000000000000000', 12)}</div>
+                        </div>
+                    </div>
+                    <Check size={14} className="text-white" />
+                </button>
+                <button className="w-full flex items-center justify-between p-4 border border-black/10 hover:border-black hover:bg-black/5 bg-white text-black transition-all">
+                    <div className="flex items-center gap-4">
+                        <div className="w-8 h-8 rounded-full bg-black/10 flex items-center justify-center">
+                            <Plus size={14} className="text-black/50" />
+                        </div>
+                        <div className="text-left">
+                            <div className="text-[10px] font-bold uppercase tracking-widest">Add Account or Hardware Wallet</div>
+                            <div className="text-[9px] font-mono text-black/40">Import private key or connect Ledger</div>
+                        </div>
+                    </div>
+                </button>
             </div>
         </ModalView>
     );

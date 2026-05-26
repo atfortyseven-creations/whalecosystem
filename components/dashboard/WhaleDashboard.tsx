@@ -30,8 +30,7 @@ const Registry = {
   HumanityLedger: dynamic(() => import('@/components/dashboard/HumanityLedger'), { ssr: false, loading: LoadingPanel }),
   PortfolioDashboard: dynamic(() => import('@/components/dashboard/PortfolioDashboard'), { ssr: false, loading: LoadingPanel }),
   InstitutionalMarkets: dynamic(() => import('@/components/dashboard/InstitutionalMarkets').then(m => ({ default: m.InstitutionalMarkets })), { ssr: false, loading: LoadingPanel }),
-  WhaleChat: dynamic(() => import('@/components/dashboard/WhaleChat').then(m => ({ default: m.WhaleChat })), { ssr: false, loading: LoadingPanel }),
-  SystemForum: dynamic(() => import('@/components/dashboard/SystemForum'), { ssr: false, loading: LoadingPanel })
+  WhaleChat: dynamic(() => import('@/components/dashboard/WhaleChat').then(m => ({ default: m.WhaleChat })), { ssr: false, loading: LoadingPanel })
 } as const;
 
 import "@/app/dashboard/dashboard.css";
@@ -58,7 +57,6 @@ const RouteRenderer = React.memo(({ route, reconciliationKey }: RouteRendererPro
         'logs': <Registry.SessionLogsPanel />,
         'support': <Registry.WhaleSupport />,
         'community': <Registry.WhaleChat />,
-        'forum': <Registry.SystemForum />,
         'privacy': <Registry.SessionLogsPanel />
     };
 

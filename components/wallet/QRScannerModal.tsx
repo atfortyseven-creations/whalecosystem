@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -482,6 +482,7 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                       ref={videoRef}
                       className="absolute inset-0 w-full h-full object-cover"
                       style={{ display: status === 'error' || status === 'success' || status === 'signing' ? 'none' : 'block' }}
+                      autoPlay
                       playsInline
                       muted
                     />

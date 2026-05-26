@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React from 'react';
 import Link from 'next/link';
@@ -92,7 +92,7 @@ export default function DocsPage() {
               </h1>
               
               <p className="text-[18px] md:text-[22px] leading-relaxed text-black/60 dark:text-white/60 max-w-2xl">
-                  Everything you need to build with Whale Alert Network. Explore our APIs, integrate our data, and read our comprehensive guides.
+                  Everything you need to build with Whale Alert Network. Explore our APIs, integrate our data, and build privacy-first infrastructure with Aztec Network and Noir smart contracts.
               </p>
           </motion.div>
         </motion.div>

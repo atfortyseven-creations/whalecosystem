@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -51,17 +51,9 @@ export function GlobalSettingsModal() {
                                  </div>
                              </div>
                              <div className="flex items-center gap-4">
-                                {!confirmDisconnect ? (
-                                    <button onClick={() => setConfirmDisconnect(true)} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
-                                        <LogOut size={14} /> Sever Connection
-                                    </button>
-                                ) : (
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-[10px] font-bold text-red-500 uppercase tracking-widest">Confirm Disconnect?</span>
-                                        <button onClick={handleDisconnect} className="px-4 py-2 bg-red-500 text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-red-600">Yes</button>
-                                        <button onClick={() => setConfirmDisconnect(false)} className="px-4 py-2 border border-black/10 dark:border-white/10 text-black dark:text-white rounded-xl text-[10px] font-black uppercase tracking-widest hover:border-black dark:hover:border-white">No</button>
-                                    </div>
-                                )}
+                                <button onClick={handleDisconnect} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
+                                    <LogOut size={14} /> Sever Connection
+                                </button>
                                 <button onClick={() => setSettingsOpen(false)} className="p-2 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors bg-black/5 dark:bg-white/5 rounded-full"><X size={18} /></button>
                              </div>
                         </div>

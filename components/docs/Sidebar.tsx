@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -65,6 +65,7 @@ const NAV: NavSection[] = [
     title: 'REST API',
     tab: 'developer',
     items: [
+      { label: 'Interactive API Explorer', href: '/docs/api', badge: 'ZK VERIFIED' },
       { label: 'Reference Overview', href: '/docs/developer/rest/overview' },
       { label: 'Whale Alerts', href: '/docs/developer/rest/whale-alerts' },
       { label: 'Market Data', href: '/docs/developer/rest/market-data' },

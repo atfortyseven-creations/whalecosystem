@@ -19,7 +19,7 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
 
                 {/* Tabs */}
                 <div className="flex border-b border-black/10 mb-8 overflow-x-auto">
-                    {['SECURITY', 'GENERAL', 'NETWORKS', 'CONTACTS'].map((tab) => (
+                    {['SECURITY', 'GENERAL', 'NETWORKS', 'CONTACTS', 'SITES', 'SNAPS'].map((tab) => (
                         <button 
                             key={tab}
                             onClick={() => setActiveTab(tab as any)}
@@ -58,6 +58,12 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
                         addContact={addContact}
                         removeContact={removeContact}
                     />
+                )}
+                {activeTab === 'SITES' && (
+                    <ConnectedSitesTab />
+                )}
+                {activeTab === 'SNAPS' && (
+                    <SnapsTab />
                 )}
             </div>
         </div>
@@ -257,6 +263,88 @@ function ContactsTab({ contacts, addContact, removeContact }: any) {
                         </div>
                     ))
                 )}
+            </div>
+        </div>
+    );
+}
+
+function ConnectedSitesTab() {
+    const [sites, setSites] = useState([
+        { domain: 'app.uniswap.org', icon: '🦄', connectedAt: '2 days ago' },
+        { domain: 'polymarket.com', icon: '🔮', connectedAt: '5 hours ago' },
+        { domain: 'opensea.io', icon: '🌊', connectedAt: '1 week ago' }
+    ]);
+
+    const removeSite = (domain: string) => {
+        setSites(sites.filter(s => s.domain !== domain));
+        toast.success("Disconnected from " + domain);
+    };
+
+    return (
+        <div className="space-y-6">
+            <div className="border border-black/10 p-6 space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                    <Globe size={14} className="text-black/40" />
+                    <h3 className="text-[10px] font-bold uppercase tracking-widest text-black/40">Connected Sites</h3>
+                </div>
+                <p className="text-[10px] text-black/50 leading-relaxed mb-6">These are the external dApps and websites that currently have permission to view your account address and request signatures.</p>
+                
+                {sites.length === 0 ? (
+                    <div className="text-center py-8 border border-black/10 border-dashed text-black/30 text-[10px] uppercase tracking-widest">
+                        No connected sites
+                    </div>
+                ) : (
+                    <div className="space-y-2">
+                        {sites.map(site => (
+                            <div key={site.domain} className="flex items-center justify-between p-4 border border-black/10 hover:border-black/30 transition-colors">
+                                <div className="flex items-center gap-4">
+                                    <div className="w-8 h-8 rounded-full bg-black/5 flex items-center justify-center text-lg">
+                                        {site.icon}
+                                    </div>
+                                    <div>
+                                        <div className="text-xs font-bold text-black">{site.domain}</div>
+                                        <div className="text-[9px] uppercase tracking-widest text-black/40 mt-1">Connected {site.connectedAt}</div>
+                                    </div>
+                                </div>
+                                <button 
+                                    onClick={() => removeSite(site.domain)}
+                                    className="p-2 text-black/30 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                    title="Disconnect"
+                                >
+                                    <Trash2 size={14} />
+                                </button>
+                            </div>
+                        ))}
+                    </div>
+                )}
+            </div>
+        </div>
+    );
+}
+
+function SnapsTab() {
+    return (
+        <div className="space-y-6">
+            <div className="border border-black/10 p-6 space-y-4 bg-black/5 text-center">
+                <div className="w-12 h-12 rounded-full border border-black/20 bg-white mx-auto flex items-center justify-center text-lg mb-4">
+                    🧩
+                </div>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-black">Snaps & Plugins</h3>
+                <p className="text-[10px] text-black/50 leading-relaxed max-w-[280px] mx-auto">
+                    Extend your wallet's functionality with third-party Snaps. Add support for non-EVM chains, custom security insights, and new notifications.
+                </p>
+                <div className="pt-4">
+                    <button className="bg-black text-white px-6 py-3 text-[10px] font-bold uppercase tracking-widest hover:bg-black/90 transition-colors">
+                        Discover Snaps
+                    </button>
+                </div>
+            </div>
+
+            <div className="border border-black/10 p-4">
+                <h3 className="text-[10px] font-bold uppercase tracking-widest text-black/40 mb-4">Installed Snaps</h3>
+                <div className="text-center py-8 border border-black/10 border-dashed text-black/30 text-[10px] uppercase tracking-widest bg-white">
+                    No snaps installed
+                </div>
             </div>
         </div>
     );

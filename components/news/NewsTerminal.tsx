@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
@@ -70,6 +70,7 @@ export function NewsTerminal() {
 
   const LANGUAGES = [
     { code: 'EN', name: 'English' },
+    { code: 'ES', name: 'Español' },
     { code: 'FR', name: 'Français' },
     { code: 'DE', name: 'Deutsch' },
     { code: 'RU', name: 'Русский' },
@@ -77,6 +78,15 @@ export function NewsTerminal() {
     { code: 'BG', name: 'Български' },
     { code: 'PT', name: 'Português (BR)' }
   ];
+
+  const tFullAnalysis = currentLang === 'ES' ? 'Leer Análisis Completo' :
+                        currentLang === 'FR' ? 'Lire L\'analyse Complète' :
+                        currentLang === 'DE' ? 'Vollständige Analyse Lesen' :
+                        currentLang === 'RU' ? 'Читать Полный Анализ' :
+                        currentLang === 'ZH' ? '阅读完整分析' :
+                        currentLang === 'BG' ? 'Прочетете Пълния Анализ' :
+                        currentLang === 'PT' ? 'Ler Análise Completa' :
+                        'Read Full Analysis';
 
   const handleTranslate = async (code: string) => {
     setShowLangMenu(false);
@@ -370,7 +380,7 @@ export function NewsTerminal() {
                     {/* Call to Action */}
                     <div className="px-6 md:px-12 pb-24 max-w-4xl mx-auto text-center relative z-10">
                       <button onClick={openFullReport} className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white hover:bg-slate-800 transition-colors rounded-xl shadow-lg hover:shadow-xl">
-                        <span className="font-sans text-[12px] font-black uppercase tracking-[0.2em]">Read Full Analysis</span>
+                        <span className="font-sans text-[12px] font-black uppercase tracking-[0.2em]">{tFullAnalysis}</span>
                       </button>
                       <p className="mt-5 font-mono text-[9px] font-bold uppercase tracking-widest text-slate-400">
                         Comprehensive insights and breakdown.

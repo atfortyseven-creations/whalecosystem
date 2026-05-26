@@ -427,7 +427,40 @@ function ForumHomeContent() {
   useEffect(() => { loadData(); }, [loadData]);
 
   return (
-    <div className="flex-1 flex flex-col bg-white text-[#050505] w-full overflow-y-auto">
+    <div className="flex-1 flex flex-col bg-[#FAF9F6] dark:bg-[#050505] text-[#050505] dark:text-[#FFFFFF] w-full overflow-y-auto">
+
+      {/* ── Top Master Bar (WhaleProShell Style) ── */}
+      <header className="sticky top-0 border-b border-black/[0.06] dark:border-white/10 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300" style={{ minHeight: 'calc(56px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+          <button
+              onClick={() => setSearchOpen(true)}
+              className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0A0A0A] hover:bg-black/[0.02] dark:hover:bg-white/5 hover:border-black/20 dark:hover:border-white/20 hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
+          >
+              <Search size={12} className="text-[#AAAAAA] group-hover:text-[#555] transition-colors shrink-0" />
+              <span className="text-[10px] text-[#AAAAAA] group-hover:text-[#555] font-medium transition-colors hidden sm:block pr-1">Search</span>
+              <span className="hidden sm:flex items-center gap-1 ml-0.5">
+                  <kbd className="text-[9px] font-black font-mono text-[#AAAAAA] bg-black/[0.04] border border-black/[0.08] rounded px-1.5 py-0.5 leading-none">K</kbd>
+              </span>
+          </button>
+
+          <div className="flex-1 flex justify-center mx-4 overflow-hidden">
+             <div className="hidden lg:flex items-center gap-1 bg-black/5 dark:bg-white/5 p-1 rounded-2xl border border-black/5 dark:border-white/5">
+                 <Link href="/dashboard" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/10 rounded-xl transition-colors">Dashboard</Link>
+                 <Link href="/chat" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/10 rounded-xl transition-colors">Whale Chat</Link>
+                 <Link href="/status" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-white/60 hover:text-black dark:hover:text-white hover:bg-white dark:hover:bg-white/10 rounded-xl transition-colors">Status</Link>
+              </div>
+          </div>
+
+          <div className="flex items-center gap-4 shrink-0">
+              <button
+                onClick={() => setMenuOpen(v => !v)}
+                className={`flex items-center justify-center w-8 h-8 rounded-full border border-black/10 dark:border-white/10 transition-colors ${menuOpen ? 'bg-black text-white dark:bg-white dark:text-black' : 'bg-transparent hover:bg-black/5 dark:hover:bg-white/5 text-slate-500'}`}
+              >
+                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+                  <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
+                </svg>
+              </button>
+          </div>
+      </header>
 
       {/* ── Page Content ── */}
       <div className="w-full max-w-[1600px] mx-auto px-4 sm:px-8 lg:px-12 py-8 flex flex-col gap-8">
@@ -436,61 +469,14 @@ function ForumHomeContent() {
         <div className="flex flex-col gap-4">
           <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <Link href="/" className="hidden sm:flex items-center gap-3.5 group shrink-0">
-                  <motion.div
-                      whileHover={{ scale: 1.05 }}
-                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
-                      className="relative flex items-center justify-center rounded-xl border border-black/5 bg-black/5 overflow-hidden w-[58px] h-[36px]"
-                  >
-                      <Image
-                          src="/official-whale-monochrome.png"
-                          alt="Whale Alert Network"
-                          width={52}
-                          height={32}
-                          className="object-contain w-full h-full p-1 opacity-80 mix-blend-multiply"
-                          unoptimized={true}
-                      />
-                  </motion.div>
-              </Link>
               <div>
-                <h1 className="text-[24px] md:text-[32px] font-black tracking-tight text-slate-900 leading-none mb-1 uppercase">
+                <h1 className="text-[24px] md:text-[32px] font-black tracking-tight text-slate-900 dark:text-white leading-none mb-1 uppercase">
                   SystemForum
                 </h1>
                 <p className="text-[13px] text-slate-500 font-medium max-w-xl leading-relaxed hidden sm:block">
                   Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics.
                 </p>
               </div>
-            </div>
-            
-            <div className="flex flex-wrap items-center gap-2 shrink-0">
-              <div className="hidden lg:flex items-center gap-1 mr-2 bg-black/5 p-1 rounded-2xl border border-black/5">
-                 <Link href="/dashboard" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Dashboard</Link>
-                 <Link href="/chat" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Whale Chat</Link>
-                 <Link href="/portfolio" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Portfolio</Link>
-                 <Link href="/status" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Status</Link>
-              </div>
-
-              <button
-                onClick={() => setSearchOpen(true)}
-                className="flex items-center gap-2 px-3 py-2 rounded-xl border border-black/10 bg-white hover:bg-black/5 transition-colors text-slate-500 hover:text-slate-700 text-[12px] font-medium"
-                title="Search (⌘K)"
-              >
-                <Search size={13} />
-                <span className="hidden sm:block">⌘K Search</span>
-              </button>
-
-              <div className="hidden sm:block">
-                <SystemsUtilityHeader />
-              </div>
-
-              <button
-                onClick={() => setMenuOpen(v => !v)}
-                className={`flex items-center justify-center w-9 h-9 rounded-xl border border-black/10 transition-colors ${menuOpen ? 'bg-black text-white' : 'bg-white hover:bg-black/5 text-slate-500'}`}
-              >
-                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
-                  <line x1="3" y1="12" x2="21" y2="12" /><line x1="3" y1="6" x2="21" y2="6" /><line x1="3" y1="18" x2="21" y2="18" />
-                </svg>
-              </button>
             </div>
           </div>
 

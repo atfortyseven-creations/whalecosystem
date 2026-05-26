@@ -51,7 +51,6 @@ const SIDEBAR_ITEMS: NavItem[] = [
     { id: 'markets',         label: 'Markets',        icon: Icon.markets,  requiresZK: true },
     { id: 'inst-ledger',     label: 'Explorer',       icon: Icon.explorer, requiresZK: true },
     { id: 'humanity-ledger', label: 'Roadmap',        icon: Icon.roadmap },
-    { id: 'forum',           label: 'Forum',          icon: Icon.forum },
     { id: 'logs',            label: 'Logs',           icon: Icon.logs },
     { id: 'gold',            label: 'Identity',       icon: Icon.identity },
     { id: 'support',         label: 'Support',        icon: Icon.support },

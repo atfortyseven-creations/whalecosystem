@@ -62,15 +62,22 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
       setHasPermission(true);
 
       if (videoRef.current) {
-        videoRef.current.srcObject = stream;
-        videoRef.current.setAttribute('playsinline', 'true'); // Critical for iOS PWA/Safari
-        videoRef.current.setAttribute('muted', 'true');
-        videoRef.current.play().catch(e => {
-          console.error("Video play error:", e);
-          setTimeout(() => {
-            videoRef.current?.play().catch(() => {});
-          }, 300);
-        });
+        const video = videoRef.current;
+        video.srcObject = stream;
+        video.setAttribute('playsinline', 'true'); // Critical for iOS PWA/Safari
+        video.setAttribute('muted', 'true');
+        video.setAttribute('autoplay', 'true');
+        video.muted = true;
+        video.playsInline = true;
+
+        video.onloadedmetadata = () => {
+          video.play().catch(e => {
+            console.error("Video play error:", e);
+            setTimeout(() => {
+              video.play().catch(() => {});
+            }, 300);
+          });
+        };
       }
     } catch (err: any) {
       if (activeRequestRef.current === activeRequestId) {
