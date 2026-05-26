@@ -14,7 +14,6 @@ import SidebarNavigation from '@/components/chat/SidebarNavigation';
 import MessageEngine from '@/components/chat/MessageEngine';
 import ChatInput from '@/components/chat/ChatInput';
 import AdvancedSettingsModal from '@/components/chat/AdvancedSettingsModal';
-import { ethers } from 'ethers';
 
 // Real ENS resolution via Ethereum mainnet — zero mocks
 const ENS_PROVIDER = new ethers.JsonRpcProvider('https://cloudflare-eth.com');

@@ -75,15 +75,15 @@ export default function ApiExplorerPage() {
               <button
                 key={i}
                 onClick={() => { setActiveEndpoint(ep); setResponse(null); }}
-                className={\`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left \${
+                className={`w-full flex items-center gap-4 p-4 rounded-2xl border transition-all text-left ${
                   activeEndpoint.path === ep.path
                     ? 'bg-black text-white border-black dark:bg-white dark:text-black dark:border-white shadow-lg'
                     : 'bg-white dark:bg-[#0A0A0A] border-black/10 dark:border-white/10 hover:border-black/30 dark:hover:border-white/30 text-black dark:text-white'
-                }\`}
+                }`}
               >
-                <div className={\`font-mono text-[9px] font-bold px-2 py-1 rounded \${
+                <div className={`font-mono text-[9px] font-bold px-2 py-1 rounded ${
                   activeEndpoint.path === ep.path ? 'bg-white/20 dark:bg-black/20' : 'bg-black/5 dark:bg-white/10'
-                }\`}>
+                }`}>
                   {ep.method}
                 </div>
                 <div className="font-mono text-[11px] font-bold truncate">

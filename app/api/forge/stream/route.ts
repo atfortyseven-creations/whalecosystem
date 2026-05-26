@@ -1,6 +1,6 @@
 import { NextRequest } from 'next/server';
 import { createSubClient } from '@/lib/redis/client';
-import { FORGE_ENABLED } from '../../../../forge';
+import { FORGE_ENABLED } from '@/forge';
 
 export const dynamic = 'force-dynamic';
 
