@@ -285,7 +285,7 @@ export default function StatusPage() {
                         <span className="text-[10px] text-black/30 font-mono uppercase tracking-wider mt-0.5">latency</span>
                       </div>
                       {svc.accessible === false && (
-                        <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-amber-200 bg-amber-50 text-amber-700">
+                        <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-black/20 bg-white text-black/60">
                           <XCircle size={11} />
                           No access
                         </span>
