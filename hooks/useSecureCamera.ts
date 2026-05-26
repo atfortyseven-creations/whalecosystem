@@ -14,9 +14,13 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
   const streamRef = useRef<MediaStream | null>(null);
   const frameRafId = useRef<number>(0);
   const activeRequestRef = useRef<string | null>(null);
+  // Use a ref for the guard to avoid making startCamera unstable when isInitializing changes
+  const isInitializingRef = useRef(false);
 
   const startCamera = useCallback(async () => {
-    if (isInitializing) return;
+    // Use the ref guard — avoids startCamera getting a new reference on every state change
+    if (isInitializingRef.current) return;
+    isInitializingRef.current = true;
     setIsInitializing(true);
     setError(null);
     const activeRequestId = Math.random().toString();
@@ -83,14 +87,25 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
       if (activeRequestRef.current === activeRequestId) {
         console.error('Camera initialization failed:', err);
         setHasPermission(false);
-        setError(err.message || 'Camera access denied or unavailable.');
+        // Provide friendly messages for common iOS/Android permission errors
+        if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+          setError('Camera permission denied. Please allow camera access in your browser settings and try again.');
+        } else if (err.name === 'NotFoundError' || err.name === 'DevicesNotFoundError') {
+          setError('No camera found on this device.');
+        } else if (err.name === 'NotReadableError') {
+          setError('Camera is in use by another app. Close it and try again.');
+        } else {
+          setError(err.message || 'Camera access denied or unavailable.');
+        }
       }
     } finally {
       if (activeRequestRef.current === activeRequestId) {
+        isInitializingRef.current = false;
         setIsInitializing(false);
       }
     }
-  }, [facingMode, isInitializing]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [facingMode]); // IMPORTANT: isInitializing removed — it was causing infinite re-render loops
 
   const stopCamera = useCallback(() => {
     activeRequestRef.current = null;
@@ -99,6 +114,8 @@ export function useSecureCamera({ facingMode = 'user', onFrame }: UseSecureCamer
       streamRef.current = null;
     }
     cancelAnimationFrame(frameRafId.current);
+    isInitializingRef.current = false;
+    setIsInitializing(false);
   }, []);
 
   const captureFrame = useCallback((): string | null => {

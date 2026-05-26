@@ -6,7 +6,7 @@ import { NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 
 export function SettingsView({ onBack }: { onBack: () => void }) {
     const { address, privateKey, mnemonic, isLocked, passwordHash, setupPassword, lockVault, contacts, addContact, removeContact, activeNetwork, setNetwork, customRpcUrl, setCustomRpcUrl } = useWalletStore();
-    const [activeTab, setActiveTab] = useState<'GENERAL' | 'SECURITY' | 'NETWORKS' | 'CONTACTS'>('SECURITY');
+    const [activeTab, setActiveTab] = useState<'GENERAL' | 'SECURITY' | 'NETWORKS' | 'CONTACTS' | 'SITES' | 'SNAPS'>('SECURITY');
 
     return (
         <div className="fixed inset-0 z-[100] bg-white flex flex-col items-center pt-16 pb-12 overflow-y-auto selection:bg-black selection:text-white">

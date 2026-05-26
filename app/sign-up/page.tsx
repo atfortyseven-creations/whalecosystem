@@ -86,8 +86,10 @@ export default function SignUpPage() {
             setStatus("complete");
             setStep(2);
             
-            // Write highly secure session cookie with real Web3 signature
-            document.cookie = `system_handshake=${signature}; path=/; max-age=604800`;
+            // Write session cookie with the Ethereum address (NOT the signature).
+            // The middleware validates system_handshake against /^0x[a-fA-F0-9]{40}$/
+            // — storing the 132-char EIP-712 signature here caused an infinite redirect loop.
+            document.cookie = `system_handshake=${address}; path=/; max-age=604800; SameSite=Lax`;
             if (typeof localStorage !== 'undefined') {
                 localStorage.setItem('system_session_v2', JSON.stringify({ 
                     exp: Date.now() + 86400000 * 30,
@@ -100,7 +102,7 @@ export default function SignUpPage() {
             
             // Redirection as requested
             setTimeout(() => {
-                router.replace('/');
+                router.replace('/dashboard');
             }, 2000);
         } catch (error: any) {
             console.error("Cryptographic Anchor Failed:", error);

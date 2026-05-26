@@ -1,0 +1,18 @@
+components/bsv/InstitutionalPortfolioView.tsx(110,56): error TS2345: Argument of type '"ACCOUNTS"' is not assignable to parameter of type 'SetStateAction<View>'.
+components/bsv/InstitutionalPortfolioView.tsx(116,18): error TS2367: This comparison appears to be unintentional because the types 'View' and '"ACCOUNTS"' have no overlap.
+components/dashboard/PortfolioDashboard.tsx(177,53): error TS2322: Type '{ hidden: { opacity: number; y: number; }; show: { opacity: number; y: number; transition: { duration: number; ease: number[]; }; }; }' is not assignable to type 'Variants'.
+  Property 'show' is incompatible with index signature.
+    Type '{ opacity: number; y: number; transition: { duration: number; ease: number[]; }; }' is not assignable to type 'Variant'.
+      Type '{ opacity: number; y: number; transition: { duration: number; ease: number[]; }; }' is not assignable to type 'TargetAndTransition'.
+        Type '{ opacity: number; y: number; transition: { duration: number; ease: number[]; }; }' is not assignable to type '{ transition?: Transition<any> | undefined; transitionEnd?: ResolvedValues$1 | undefined; }'.
+          Types of property 'transition' are incompatible.
+            Type '{ duration: number; ease: number[]; }' is not assignable to type 'Transition<any> | undefined'.
+              Type '{ duration: number; ease: number[]; }' is not assignable to type 'TransitionWithValueOverrides<any>'.
+                Type '{ duration: number; ease: number[]; }' is not assignable to type 'ValueAnimationTransition<any>'.
+                  Types of property 'ease' are incompatible.
+                    Type 'number[]' is not assignable to type 'Easing | Easing[] | undefined'.
+                      Type 'number[]' is not assignable to type 'EasingFunction | Easing[]'.
+                        Type 'number[]' is not assignable to type 'Easing[]'.
+                          Type 'number' is not assignable to type 'Easing'.
+components/settings/SettingsView.tsx(62,18): error TS2367: This comparison appears to be unintentional because the types '"SECURITY" | "GENERAL" | "NETWORKS" | "CONTACTS"' and '"SITES"' have no overlap.
+components/settings/SettingsView.tsx(65,18): error TS2367: This comparison appears to be unintentional because the types '"SECURITY" | "GENERAL" | "NETWORKS" | "CONTACTS"' and '"SNAPS"' have no overlap.

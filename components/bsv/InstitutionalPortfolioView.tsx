@@ -16,7 +16,7 @@ import { SettingsView } from '@/components/settings/SettingsView';
 import { ethers } from 'ethers';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 
-type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS' | 'SWAP' | 'BRIDGE';
+type View = 'HOME' | 'SEND' | 'RECEIVE' | 'SCAN' | 'CREATE' | 'BUY' | 'NETWORK' | 'SETTINGS' | 'SWAP' | 'BRIDGE' | 'ACCOUNTS';
 
 const truncate = (str: string, len: number) => {
     if (!str) return '';
