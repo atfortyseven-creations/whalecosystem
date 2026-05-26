@@ -125,16 +125,33 @@ export function QrScanner({ className, mode = 'scan', onScanSuccess, projectValu
                     }
                 };
 
-                await scanner.start(
-                    { facingMode: "environment" },
-                    config,
-                    (decodedText) => {
-                        handleDecode(decodedText);
-                    },
-                    () => {
-                        // Ongoing scan, ignore errors
+                let started = false;
+                try {
+                    await scanner.start(
+                        { facingMode: "environment" },
+                        config,
+                        (decodedText) => { handleDecode(decodedText); },
+                        () => {} // ignore ongoing errors
+                    );
+                    started = true;
+                } catch (envErr) {
+                    console.warn("[Scanner] Environment camera failed, trying fallback...", envErr);
+                }
+
+                if (!started) {
+                    const cameras = await Html5Qrcode.getCameras();
+                    if (cameras && cameras.length > 0) {
+                        // Use the last camera in the list as fallback (often the back camera)
+                        await scanner.start(
+                            cameras[cameras.length - 1].id,
+                            config,
+                            (decodedText) => { handleDecode(decodedText); },
+                            () => {}
+                        );
+                    } else {
+                        throw new Error("No cameras found on device.");
                     }
-                );
+                }
             } catch (err: any) {
                 console.error("[Scanner] Start failure:", err);
                 setState('error');

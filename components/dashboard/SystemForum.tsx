@@ -15,6 +15,8 @@ import {
   BarChart2, Shield, Zap, Globe, Code, Bug, Radio, Activity,
   X, ArrowRight, Bookmark, Share2, MoreHorizontal, Layers
 } from 'lucide-react';
+import Image from 'next/image';
+import { SystemsUtilityHeader } from '@/components/shared/SystemsUtilityHeader';
 
 // ─── Category Metadata ────────────────────────────────────────────────────────
 const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string; bg: string; ring: string }> = {
@@ -432,16 +434,42 @@ function ForumHomeContent() {
 
         {/* Page Header */}
         <div className="flex flex-col gap-4">
-          <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-            <div>
-              <h1 className="text-[24px] md:text-[32px] font-black tracking-tight text-slate-900 leading-none mb-1">
-                Humanity Ledger Forum
-              </h1>
-              <p className="text-[13px] text-slate-500 font-medium max-w-xl leading-relaxed">
-                Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics.
-              </p>
+          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-4">
+            <div className="flex items-center gap-4">
+              <Link href="/" className="hidden sm:flex items-center gap-3.5 group shrink-0">
+                  <motion.div
+                      whileHover={{ scale: 1.05 }}
+                      transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+                      className="relative flex items-center justify-center rounded-xl border border-black/5 bg-black/5 overflow-hidden w-[58px] h-[36px]"
+                  >
+                      <Image
+                          src="/official-whale-monochrome.png"
+                          alt="Whale Alert Network"
+                          width={52}
+                          height={32}
+                          className="object-contain w-full h-full p-1 opacity-80 mix-blend-multiply"
+                          unoptimized={true}
+                      />
+                  </motion.div>
+              </Link>
+              <div>
+                <h1 className="text-[24px] md:text-[32px] font-black tracking-tight text-slate-900 leading-none mb-1 uppercase">
+                  SystemForum
+                </h1>
+                <p className="text-[13px] text-slate-500 font-medium max-w-xl leading-relaxed hidden sm:block">
+                  Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics.
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
+            
+            <div className="flex flex-wrap items-center gap-2 shrink-0">
+              <div className="hidden lg:flex items-center gap-1 mr-2 bg-black/5 p-1 rounded-2xl border border-black/5">
+                 <Link href="/dashboard" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Dashboard</Link>
+                 <Link href="/chat" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Whale Chat</Link>
+                 <Link href="/portfolio" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Portfolio</Link>
+                 <Link href="/status" className="px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-black/60 hover:text-black hover:bg-white rounded-xl transition-colors">Status</Link>
+              </div>
+
               <button
                 onClick={() => setSearchOpen(true)}
                 className="flex items-center gap-2 px-3 py-2 rounded-xl border border-black/10 bg-white hover:bg-black/5 transition-colors text-slate-500 hover:text-slate-700 text-[12px] font-medium"
@@ -450,6 +478,11 @@ function ForumHomeContent() {
                 <Search size={13} />
                 <span className="hidden sm:block">⌘K Search</span>
               </button>
+
+              <div className="hidden sm:block">
+                <SystemsUtilityHeader />
+              </div>
+
               <button
                 onClick={() => setMenuOpen(v => !v)}
                 className={`flex items-center justify-center w-9 h-9 rounded-xl border border-black/10 transition-colors ${menuOpen ? 'bg-black text-white' : 'bg-white hover:bg-black/5 text-slate-500'}`}

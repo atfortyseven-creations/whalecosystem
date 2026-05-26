@@ -333,8 +333,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
     pathname === '/vip' ||
     pathname === '/news' ||
     pathname === '/careers' ||
-    pathname === '/careers' ||
-    pathname.startsWith('/forum') ||
     pathname === '/';
 
   // /chat has its own full-screen header  never show the global one there
