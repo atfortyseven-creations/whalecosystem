@@ -13,7 +13,7 @@ export default function ChangelogPage() {
                 {/* Hero */}
                 <section className="bg-gradient-to-r from-green-600/20 to-blue-600/20 p-8 rounded-xl border border-white/10">
                     <h2 className="text-4xl font-bold mb-4">Changelog</h2>
-                    <p className="text-lg text-white/80">
+                    <p className="text-lg text-black/80">
                         Stay up-to-date with the latest features, improvements, and fixes across the WhaleAlert ID.fi platform.
                     </p>
                 </section>
@@ -25,7 +25,7 @@ export default function ChangelogPage() {
                             <h3 className="text-3xl font-bold">v2.1.0</h3>
                             <span className="bg-green-600/20 border border-green-500/30 px-3 py-1 rounded text-sm font-bold">LATEST</span>
                         </div>
-                        <p className="text-white/60 mb-6">February 7, 2026</p>
+                        <p className="text-black/60 mb-6">February 7, 2026</p>
 
                         <div className="space-y-4">
                             <div>
@@ -33,7 +33,7 @@ export default function ChangelogPage() {
                                     <Rocket className="text-green-400" size={20} />
                                     New Features
                                 </h4>
-                                <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                     <li><strong>Whale Tracker Premium Analytics:</strong> Advanced insights including P&L breakdown, smart contract interactions, and liquidity pool tracking</li>
                                     <li><strong>Multi-Chain Portfolio Dashboard:</strong> Real-time balance tracking across Ethereum, Base, Polygon, Arbitrum, and Optimism</li>
                                     <li><strong>Enhanced Authentication:</strong> Passkeys (WebAuthn) support for biometric login</li>
@@ -47,7 +47,7 @@ export default function ChangelogPage() {
                                     <TrendingUp className="text-blue-400" size={20} />
                                     Improvements
                                 </h4>
-                                <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                     <li>30% faster portfolio loading times via optimized Alchemy API calls</li>
                                     <li>Improved chart responsiveness with fluid typography (clamp-based sizing)</li>
                                     <li>Enhanced gas estimation accuracy for all supported networks</li>
@@ -60,7 +60,7 @@ export default function ChangelogPage() {
                                     <Bug className="text-red-400" size={20} />
                                     Bug Fixes
                                 </h4>
-                                <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                     <li>Fixed portfolio page "System Error" when wallet not connected</li>
                                     <li>Resolved landing page title overflow on different zoom levels</li>
                                     <li>Fixed chart flickering on timeframe switches</li>
@@ -79,7 +79,7 @@ export default function ChangelogPage() {
                         {/* v2.0.0 */}
                         <div className="border-l-4 border-blue-500 pl-6">
                             <h3 className="text-2xl font-bold mb-1">v2.0.0</h3>
-                            <p className="text-white/60 mb-4">January 15, 2026</p>
+                            <p className="text-black/60 mb-4">January 15, 2026</p>
 
                             <div className="space-y-3">
                                 <div>
@@ -87,7 +87,7 @@ export default function ChangelogPage() {
                                         <Rocket className="text-green-400" size={18} />
                                         New Features
                                     </h4>
-                                    <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                    <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                         <li><strong>Institutional Grid:</strong> Real-time charts, order book, and trade execution for 30+ pairs</li>
                                         <li><strong>Demo Trading Mode:</strong> Practice with virtual funds before risking real crypto</li>
                                         <li><strong>WebSocket Integration:</strong> Live market data with sub-100ms latency</li>
@@ -100,7 +100,7 @@ export default function ChangelogPage() {
                                         <TrendingUp className="text-blue-400" size={18} />
                                         Improvements
                                     </h4>
-                                    <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                    <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                         <li>Redesigned UI with Elite-grade aesthetics</li>
                                         <li>Optimized database queries for 50% faster page loads</li>
                                     </ul>
@@ -111,7 +111,7 @@ export default function ChangelogPage() {
                         {/* v1.5.0 */}
                         <div className="border-l-4 border-purple-500 pl-6">
                             <h3 className="text-2xl font-bold mb-1">v1.5.0</h3>
-                            <p className="text-white/60 mb-4">December 10, 2025</p>
+                            <p className="text-black/60 mb-4">December 10, 2025</p>
 
                             <div className="space-y-3">
                                 <div>
@@ -119,7 +119,7 @@ export default function ChangelogPage() {
                                         <Rocket className="text-green-400" size={18} />
                                         New Features
                                     </h4>
-                                    <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                    <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                         <li><strong>Whale Tracker (Basic):</strong> Monitor and analyze high-value wallets</li>
                                         <li><strong>Real-Time Alerts:</strong> Browser notifications for whale movements and price targets</li>
                                         <li><strong>Cross-Chain Bridge:</strong> Move assets between L1s and L2s seamlessly</li>
@@ -131,7 +131,7 @@ export default function ChangelogPage() {
                                         <Shield className="text-purple-400" size={18} />
                                         Security
                                     </h4>
-                                    <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                    <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                         <li>Implemented AML/CTF transaction monitoring</li>
                                         <li>Added sanctions screening for all wallet interactions</li>
                                         <li>Enhanced 2FA with backup codes</li>
@@ -143,15 +143,15 @@ export default function ChangelogPage() {
                         {/* v1.0.0 */}
                         <div className="border-l-4 border-yellow-500 pl-6">
                             <h3 className="text-2xl font-bold mb-1">v1.0.0</h3>
-                            <p className="text-white/60 mb-4">November 1, 2025</p>
+                            <p className="text-black/60 mb-4">November 1, 2025</p>
 
                             <div className="space-y-3">
                                 <div>
                                     <h4 className="font-bold mb-2 flex items-center gap-2">
-                                        <Sparkles className="text-yellow-400" size={18} />
+                                        <Sparkles className="text-black" size={18} />
                                         Initial Launch
                                     </h4>
-                                    <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                                    <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                         <li><strong>World ID Integration:</strong> Zero-knowledge identity verification</li>
                                         <li><strong>Multi-Chain Wallet:</strong> Support for Ethereum, Base, and Polygon</li>
                                         <li><strong>Send & Receive:</strong> Basic token transfers with ENS support</li>
@@ -169,14 +169,14 @@ export default function ChangelogPage() {
                 {/* Upcoming */}
                 <section>
                     <h2 className="text-3xl font-bold mb-6 flex items-center gap-2">
-                        <Zap className="text-yellow-400" />
+                        <Zap className="text-black" />
                         Coming Soon
                     </h2>
 
                     <div className="space-y-4">
-                        <div className="bg-yellow-600/10 border border-yellow-500/30 p-6 rounded-xl">
+                        <div className="bg-black/5 border border-black/10 p-6 rounded-xl">
                             <h3 className="font-bold mb-2">v2.2.0 - Q2 2026 (Planned)</h3>
-                            <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                            <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                 <li><strong>LEGEND Tier Launch:</strong> Premium features with API access</li>
                                 <li><strong>Public API (Beta):</strong> REST and WebSocket APIs for developers</li>
                                 <li><strong>AI Trading Assistant:</strong> Natural language market analysis</li>
@@ -187,7 +187,7 @@ export default function ChangelogPage() {
 
                         <div className="bg-blue-600/10 border border-blue-500/30 p-6 rounded-xl">
                             <h3 className="font-bold mb-2">v3.0.0 - Q3 2026 (Planned)</h3>
-                            <ul className="list-disc pl-6 space-y-1 text-sm text-white/70">
+                            <ul className="list-disc pl-6 space-y-1 text-sm text-black/70">
                                 <li><strong>Mobile Apps:</strong> Native iOS and Android applications</li>
                                 <li><strong>DeFi Yield Aggregator:</strong> Auto-compound yields across protocols</li>
                                 <li><strong>Social Trading:</strong> Copy trades from top performers</li>
@@ -200,7 +200,7 @@ export default function ChangelogPage() {
                 {/* Feedback */}
                 <section className="bg-gradient-to-r from-purple-600/20 to-blue-600/20 p-8 rounded-xl border border-white/10 text-center">
                     <h2 className="text-3xl font-bold mb-4">Have Feedback?</h2>
-                    <p className="text-lg text-white/80 mb-6">
+                    <p className="text-lg text-black/80 mb-6">
                         We'd love to hear your ideas for new features or improvements.
                     </p>
                     <div className="flex flex-wrap justify-center gap-4">
