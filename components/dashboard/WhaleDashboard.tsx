@@ -35,6 +35,8 @@ const Registry = {
 
 import "@/app/dashboard/dashboard.css";
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 // --- Route Renderer Strategy ---
 interface RouteRendererProps {
     route: string;
@@ -65,9 +67,20 @@ const RouteRenderer = React.memo(({ route, reconciliationKey }: RouteRendererPro
 
     return (
         <div className={PANEL_STYLE}>
-            <DashboardErrorBoundary key={strictKey}>
-                {targetComponent}
-            </DashboardErrorBoundary>
+            <AnimatePresence mode="wait">
+                <motion.div
+                    key={route}
+                    initial={{ opacity: 0, y: 10, filter: 'blur(4px)' }}
+                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+                    exit={{ opacity: 0, y: -10, filter: 'blur(4px)' }}
+                    transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                    className="w-full h-full flex flex-col"
+                >
+                    <DashboardErrorBoundary key={strictKey}>
+                        {targetComponent}
+                    </DashboardErrorBoundary>
+                </motion.div>
+            </AnimatePresence>
         </div>
     );
 });

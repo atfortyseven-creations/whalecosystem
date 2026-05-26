@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, Send, ArrowRight, Wallet, AlertCircle, Loader2, CheckCircle2, AlertTriangle, ChevronDown, Search } from "lucide-react";
-import { useSendTransaction, useWriteContract, useBalance, useAccount, useChainId, useConnect } from "wagmi";
+import { useSendTransaction, useWriteContract, useBalance, useAccount, useChainId, useConnect, useWaitForTransactionReceipt } from "wagmi";
 import { parseEther, parseUnits, isAddress, formatUnits } from "viem";
 import { toast } from "sonner";
 import { mainnet } from "wagmi/chains";
@@ -42,18 +42,25 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
     const {
         sendTransaction,
         isPending: isSendingNative,
-        isSuccess: isNativeSuccess,
-        data: nativeTxData,
+        data: nativeTxHash,
         error: nativeError
     } = useSendTransaction();
 
     const {
         writeContract,
         isPending: isWritingToken,
-        isSuccess: isTokenSuccess,
-        data: tokenTxData,
+        data: tokenTxHash,
         error: tokenError
     } = useWriteContract();
+
+    // STRICT ON-CHAIN REQUIREMENT: Wait for block confirmation
+    const { isSuccess: isNativeConfirmed, error: nativeConfirmError } = useWaitForTransactionReceipt({
+        hash: nativeTxHash,
+    });
+
+    const { isSuccess: isTokenConfirmed, error: tokenConfirmError } = useWaitForTransactionReceipt({
+        hash: tokenTxHash,
+    });
 
     // Balances
     const { data: nativeBalance } = useBalance({ address });
@@ -157,24 +164,24 @@ export default function SendModal({ isOpen, onClose }: SendModalProps) {
 
     // Handle Transaction Logic
     useEffect(() => {
-        if (isNativeSuccess && nativeTxData) {
+        if (isNativeConfirmed && nativeTxHash) {
             setStatus("SUCCESS");
-            setTxHash(nativeTxData);
-            setStatusMessage("Send completed successfully!");
+            setTxHash(nativeTxHash);
+            setStatusMessage("Send Confirmed On-Chain!");
         }
-        if (isTokenSuccess && tokenTxData) {
+        if (isTokenConfirmed && tokenTxHash) {
             setStatus("SUCCESS");
-            setTxHash(tokenTxData);
-            setStatusMessage("Send completed successfully!");
+            setTxHash(tokenTxHash);
+            setStatusMessage("Send Confirmed On-Chain!");
         }
-    }, [isNativeSuccess, isTokenSuccess, nativeTxData, tokenTxData]);
+    }, [isNativeConfirmed, isTokenConfirmed, nativeTxHash, tokenTxHash]);
 
     useEffect(() => {
-        if (nativeError || tokenError) {
+        if (nativeError || tokenError || nativeConfirmError || tokenConfirmError) {
             setStatus("ERROR");
-            setStatusMessage((nativeError || tokenError)?.message.split('\n')[0] || "A transaction error occurred.");
+            setStatusMessage((nativeError || tokenError || nativeConfirmError || tokenConfirmError)?.message.split('\n')[0] || "A transaction error occurred.");
         }
-    }, [nativeError, tokenError]);
+    }, [nativeError, tokenError, nativeConfirmError, tokenConfirmError]);
 
     // Actions
     const handleMax = () => {

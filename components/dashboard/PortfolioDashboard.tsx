@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,6 +14,22 @@ import { useChainId, useChains, useSwitchChain } from 'wagmi';
 import { toast } from 'sonner';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
+import { AnimatedCounter } from '@/components/ui/AnimatedCounter';
+
+const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1
+        }
+    }
+};
+
+const itemVariants = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { duration: 0.4, ease: [0.22, 1, 0.36, 1] } }
+};
 
 export default function PortfolioDashboard({ walletAddress }: { walletAddress?: string }) {
     const { open } = useAppKit();
@@ -99,17 +115,17 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                 <div className="w-full border-b border-slate-200/60 pb-8 mb-8">
                     <div className="flex items-center justify-between mb-4">
                         <span className="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Total Holdings</span>
-                        <button onClick={() => setIsEyesOff(!isEyesOff)} className="text-slate-400 hover:text-black transition-colors">
+                        <button onClick={() => setIsEyesOff(!isEyesOff)} className="text-slate-400 hover:text-black transition-colors active:scale-95">
                             <Eye size={14} />
                         </button>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-end gap-6">
                         <div className="text-5xl md:text-6xl font-black tracking-tighter text-black">
-                            {isEyesOff ? "*****" : `$${safeToLocaleString(totalValue, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                            {isEyesOff ? "*****" : <AnimatedCounter value={totalValue} isCurrency={true} />}
                         </div>
                         <div className="flex items-center gap-2 text-sm font-bold tracking-widest font-mono">
                             {isProfit ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
-                            {isEyesOff ? "***" : safeToFixed(Math.abs(totalChange24h), 2)}%
+                            {isEyesOff ? "***" : <><AnimatedCounter value={Math.abs(totalChange24h)} isCurrency={false} />%</>}
                         </div>
                     </div>
                     <div className="mt-4 font-mono text-[10px] uppercase tracking-widest text-slate-500 truncate">
@@ -122,7 +138,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     <button
                         onClick={() => setActiveTab('tokens')}
                         className={cn(
-                            "pb-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2",
+                            "pb-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2 relative",
                             activeTab === 'tokens' ? "text-black border-black" : "text-slate-400 border-transparent hover:text-black"
                         )}
                     >
@@ -131,7 +147,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     <button
                         onClick={() => setActiveTab('activity')}
                         className={cn(
-                            "pb-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2",
+                            "pb-3 text-[10px] font-black uppercase tracking-[0.2em] transition-all border-b-2 relative",
                             activeTab === 'activity' ? "text-black border-black" : "text-slate-400 border-transparent hover:text-black"
                         )}
                     >
@@ -144,9 +160,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     {activeTab === 'tokens' ? (
                         <motion.div
                             key="tokens"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
                             className="flex flex-col"
                         >
                             <div className="divide-y divide-slate-100">
@@ -155,12 +172,13 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                         <PortfolioSkeleton />
                                     </div>
                                 ) : (
-                                    uniqueAssets.map((asset, idx) => (
-                                        <div key={asset.symbol} className="py-6 flex items-center justify-between group">
+                                    <motion.div variants={containerVariants} initial="hidden" animate="show">
+                                    {uniqueAssets.map((asset, idx) => (
+                                        <motion.div variants={itemVariants} key={asset.symbol} className="py-6 flex items-center justify-between group">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center grayscale">
+                                                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105">
                                                     {asset.logoURI ? (
-                                                        <img src={asset.logoURI} alt={asset.symbol} className="w-6 h-6 grayscale" />
+                                                        <img src={asset.logoURI} alt={asset.symbol} className="w-6 h-6" />
                                                     ) : (
                                                         <Box size={16} className="text-slate-400" />
                                                     )}
@@ -171,15 +189,16 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                                 </div>
                                             </div>
                                             <div className="flex flex-col items-end">
-                                                <span className="font-black text-lg text-black tracking-tighter">
+                                                <span className="font-black text-lg text-black tracking-tighter group-hover:scale-105 transition-transform duration-300 origin-right">
                                                     {isEyesOff ? "***.**" : `$${safeToLocaleString(asset.valueUSD || 0, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                                                 </span>
                                                 <span className="font-mono text-[9px] font-bold text-slate-500 tracking-widest uppercase mt-0.5">
                                                     {isEyesOff ? "**" : safeToFixed(asset.balanceNumeric || asset.balance || 0, 6)} {asset.symbol}
                                                 </span>
                                             </div>
-                                        </div>
-                                    ))
+                                        </motion.div>
+                                    ))}
+                                    </motion.div>
                                 )}
 
                                 {uniqueAssets.length === 0 && !isLoading && (
@@ -192,9 +211,10 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     ) : (
                         <motion.div
                             key="activity"
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            exit={{ opacity: 0 }}
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -10 }}
+                            transition={{ duration: 0.3 }}
                         >
                             <TransactionHistory authUserId={effectiveAddress} />
                         </motion.div>

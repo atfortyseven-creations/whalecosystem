@@ -63,39 +63,42 @@ function SearchModal({ onClose }: { onClose: () => void }) {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-        className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-sm flex items-start justify-center pt-20 px-4"
+        initial={{ opacity: 0, backdropFilter: 'blur(0px)' }} 
+        animate={{ opacity: 1, backdropFilter: 'blur(8px)' }} 
+        exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+        transition={{ duration: 0.15 }}
+        className="fixed inset-0 z-[200] bg-black/40 flex items-start justify-center pt-20 px-4"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.div
           initial={{ opacity: 0, scale: 0.96, y: -10 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.96, y: -10 }}
-          transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="w-full max-w-[680px] bg-white rounded-2xl shadow-2xl overflow-hidden border border-slate-200"
+          transition={{ duration: 0.15, ease: [0.16, 1, 0.3, 1] }}
+          className="w-full max-w-[680px] bg-white/95 dark:bg-black/95 backdrop-blur-3xl rounded-2xl shadow-2xl overflow-hidden border border-black/10 dark:border-white/10"
         >
           {/* Search Input */}
-          <div className="flex items-center gap-3 px-5 py-4 border-b border-slate-100">
+          <div className="flex items-center gap-3 px-5 py-4 border-b border-black/5 dark:border-white/5">
             <Search size={18} className="text-slate-400 shrink-0" />
             <input
               ref={inputRef}
               value={query}
               onChange={e => setQuery(e.target.value)}
               placeholder="Search discussions, topics, categories…"
-              className="flex-1 text-[15px] text-slate-900 placeholder-slate-400 outline-none bg-transparent"
+              className="flex-1 text-[15px] text-slate-900 dark:text-white placeholder-slate-400 outline-none bg-transparent"
             />
             {query && (
-              <button onClick={() => setQuery('')} className="text-slate-400 hover:text-slate-600">
+              <button onClick={() => setQuery('')} className="text-slate-400 hover:text-slate-600 transition-colors">
                 <X size={16} />
               </button>
             )}
-            <button onClick={onClose} className="ml-1 text-slate-400 hover:text-slate-600 text-[11px] font-mono uppercase tracking-wider px-2 py-1 border border-slate-200 rounded">
+            <button onClick={onClose} className="ml-1 text-slate-400 hover:text-slate-600 text-[11px] font-mono uppercase tracking-wider px-2 py-1 border border-black/10 dark:border-white/10 rounded">
               Esc
             </button>
           </div>
 
           {/* Results */}
-          <div className="max-h-[420px] overflow-y-auto">
+          <div className="max-h-[420px] overflow-y-auto no-scrollbar">
             {loading ? (
               <div className="py-8 text-center text-slate-400 text-sm">Searching…</div>
             ) : results.length > 0 ? (
@@ -105,13 +108,13 @@ function SearchModal({ onClose }: { onClose: () => void }) {
                   <button
                     key={topic.id}
                     onClick={() => { router.push(`/forum/t/${topic.id}`); onClose(); }}
-                    className="w-full flex items-center gap-4 px-5 py-3 hover:bg-black/5 transition-colors text-left"
+                    className="w-full flex items-center gap-4 px-5 py-3 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-left"
                   >
-                    <div className="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-[11px] font-bold text-slate-500 shrink-0 uppercase">
+                    <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center text-[11px] font-bold text-slate-500 shrink-0 uppercase">
                       {topic.author?.walletAddress?.slice(2, 4) || '??'}
                     </div>
                     <div className="flex-1 min-w-0">
-                      <p className="text-[14px] font-medium text-slate-900 truncate">{topic.title}</p>
+                      <p className="text-[14px] font-medium text-slate-900 dark:text-white truncate">{topic.title}</p>
                       {topic.category && (
                         <p className="text-[12px] text-slate-400">{topic.category.name}</p>
                       )}
@@ -136,7 +139,7 @@ function SearchModal({ onClose }: { onClose: () => void }) {
                     { label: 'Top Topics', href: '/forum?filter=top', icon: <TrendingUp size={13} /> },
                   ].map(link => (
                     <Link key={link.label} href={link.href} onClick={onClose}
-                      className="flex items-center gap-2 p-3 rounded-xl border border-slate-100 hover:bg-black/5 transition-colors text-[13px] text-slate-600">
+                      className="flex items-center gap-2 p-3 rounded-xl border border-black/5 dark:border-white/5 hover:bg-black/5 dark:hover:bg-white/5 transition-colors text-[13px] text-slate-600 dark:text-slate-300">
                       <span className="text-slate-400">{link.icon}</span>
                       {link.label}
                     </Link>
@@ -147,7 +150,7 @@ function SearchModal({ onClose }: { onClose: () => void }) {
           </div>
 
           {/* Footer hint */}
-          <div className="px-5 py-3 border-t border-slate-100 flex items-center gap-4 bg-black/5/50">
+          <div className="px-5 py-3 border-t border-black/5 dark:border-white/5 flex items-center gap-4 bg-black/[0.02] dark:bg-white/[0.02]">
             <span className="text-[11px] text-slate-400 font-mono">@ to filter by author</span>
             <span className="text-[11px] text-slate-400 font-mono"># to filter by category</span>
           </div>
@@ -335,9 +338,14 @@ function TopicRow({ topic, mounted }: { topic: any; mounted: boolean }) {
     : '';
 
   return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+    >
     <Link
       href={`/forum/t/${topic.id}`}
-      className="group flex items-center justify-between py-4 border-b border-slate-100 last:border-0 hover:bg-black/5/60 transition-colors px-3 -mx-3 rounded-xl gap-4"
+      className="group flex items-center justify-between py-4 border-b border-slate-100 dark:border-white/5 last:border-0 hover:bg-black/5 dark:hover:bg-white/5 transition-colors px-3 -mx-3 rounded-xl gap-4"
     >
       {/* Left: avatar + info */}
       <div className="flex items-center gap-4 min-w-0 flex-1">
@@ -347,7 +355,7 @@ function TopicRow({ topic, mounted }: { topic: any; mounted: boolean }) {
         </div>
 
         <div className="flex flex-col min-w-0 gap-1">
-          <span className="font-medium text-[15px] text-slate-900 group-hover:text-slate-700 transition-colors truncate leading-tight">
+          <span className="font-medium text-[15px] text-slate-900 dark:text-white group-hover:text-slate-700 dark:group-hover:text-slate-300 transition-colors truncate leading-tight">
             {topic.title}
           </span>
           <div className="flex items-center gap-2">
@@ -369,11 +377,11 @@ function TopicRow({ topic, mounted }: { topic: any; mounted: boolean }) {
       {/* Right: stats */}
       <div className="flex items-center gap-5 shrink-0 text-slate-400">
         <div className="hidden sm:flex flex-col items-center min-w-[32px]">
-          <span className="text-[14px] font-bold text-slate-700 leading-none">{topic._count?.posts || 0}</span>
+          <span className="text-[14px] font-bold text-slate-700 dark:text-slate-300 leading-none">{topic._count?.posts || 0}</span>
           <span className="text-[10px] font-mono uppercase tracking-wider opacity-60">rep</span>
         </div>
         <div className="hidden md:flex flex-col items-center min-w-[32px]">
-          <span className="text-[14px] font-medium leading-none">{topic._count?.likes || topic.likeCount || 0}</span>
+          <span className="text-[14px] font-medium leading-none dark:text-slate-300">{topic._count?.likes || topic.likeCount || 0}</span>
           <span className="text-[10px] font-mono uppercase tracking-wider opacity-60">likes</span>
         </div>
         <div className="flex flex-col items-end min-w-[36px]">
@@ -381,6 +389,7 @@ function TopicRow({ topic, mounted }: { topic: any; mounted: boolean }) {
         </div>
       </div>
     </Link>
+    </motion.div>
   );
 }
 

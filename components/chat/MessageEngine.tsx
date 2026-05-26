@@ -38,6 +38,8 @@ export interface MessageEngineProps {
   settings?: ChatSettings;
 }
 
+import { motion, AnimatePresence } from 'framer-motion';
+
 //  Constants 
 
 const QUICK_REACTIONS = ['', '', '', '', '', '️', '', ''];
@@ -60,6 +62,7 @@ export default function MessageEngine({
 
   return (
     <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth" onClick={closeMenu}>
+      <AnimatePresence initial={false}>
       {(() => {
         let lastDate = '';
         return messages
@@ -70,7 +73,14 @@ export default function MessageEngine({
             lastDate = dateStr;
             const replyToMsg = msg.replyToId ? messages.find(m => m.id === msg.replyToId) : undefined;
             return (
-              <React.Fragment key={msg.id}>
+              <motion.div
+                key={msg.id}
+                initial={{ opacity: 0, y: 15, scale: 0.98 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
+                transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+                layout="position"
+              >
                 {showDate && (
                   <div className="flex justify-center my-6">
                     <div className="bg-black/[0.03] border border-black/[0.06] px-4 py-1.5 rounded-full shadow-sm">
@@ -85,10 +95,11 @@ export default function MessageEngine({
                   onReact={onReact}
                   settings={settings}
                 />
-              </React.Fragment>
+              </motion.div>
             );
           });
       })()}
+      </AnimatePresence>
       <div ref={bottomRef} />
 
       {/* Floating Context Menu */}
@@ -145,10 +156,10 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
         onContextMenu={onContextMenu}
         data-bubble-mine={msg.isMine ? '' : undefined}
         data-bubble-peer={!msg.isMine ? '' : undefined}
-        className={`relative group px-4 py-3 rounded-2xl cursor-default select-text transition-all ${
+        className={`relative group px-4 py-3 rounded-2xl cursor-default select-text transition-all backdrop-blur-md border ${
           msg.isMine
-            ? 'bg-black text-white rounded-br-sm'
-            : 'bg-black/[0.04] border border-black/8 text-black rounded-bl-sm'
+            ? 'bg-black/90 text-white border-black/20 rounded-br-sm shadow-[0_4px_24px_rgba(0,0,0,0.12)]'
+            : 'bg-white/80 dark:bg-black/20 border-black/10 dark:border-white/10 text-black dark:text-white rounded-bl-sm shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
         } ${msg.isDestructing ? 'opacity-60' : ''}`}
       >
         {/* Reply Quote preview inside bubble */}
@@ -156,7 +167,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
           <div className={`mb-2 pl-2 border-l-2 text-[11px] font-mono leading-snug rounded p-1.5 flex flex-col gap-0.5 max-w-[280px] ${
             msg.isMine 
               ? 'border-white/30 text-white/75 bg-white/10' 
-              : 'border-black/20 text-black/60 bg-black/[0.03]'
+              : 'border-black/20 dark:border-white/20 text-black/60 dark:text-white/60 bg-black/[0.03] dark:bg-white/[0.03]'
           }`}>
             <span className="font-bold text-[9px] uppercase tracking-wider opacity-60">
               {replyToMsg.isMine ? 'You' : 'Peer Address'}

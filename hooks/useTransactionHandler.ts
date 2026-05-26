@@ -1,5 +1,5 @@
 import { useAccount, useConfig, useChainId, useSwitchChain } from 'wagmi';
-import { estimateGas, sendTransaction } from '@wagmi/core';
+import { estimateGas, sendTransaction, waitForTransactionReceipt } from '@wagmi/core';
 import { parseEther, type Address } from 'viem';
 import { useState } from 'react';
 import { toast } from 'sonner';
@@ -61,7 +61,16 @@ export function useTransactionHandler() {
                 gas: (gas * 110n) / 100n, // 10% safety buffer
             });
 
-            toast.success("Transaction submitted!", { id });
+            toast.loading(`Awaiting block confirmation (Hash: ${hash.slice(0,6)}...)...`, { id });
+            
+            // 3. STRICT ON-CHAIN REQUIREMENT: Wait for actual block receipt
+            const receipt = await waitForTransactionReceipt(config, { hash });
+            
+            if (receipt.status !== 'success') {
+                throw new Error("Transaction reverted on-chain");
+            }
+
+            toast.success("Transaction Confirmed on Blockchain!", { id });
             return hash;
         } catch (error: any) {
             console.error("External Tx Error:", error);

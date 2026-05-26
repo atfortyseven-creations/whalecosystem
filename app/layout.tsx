@@ -12,7 +12,6 @@ import { ClientLayout } from "@/components/layout/ClientLayout";
 import { Toaster } from 'sonner'
 import { CookieProvider } from "@/components/privacy/CookieContext";
 import { CookieConsent } from "@/components/privacy/CookieConsent";
-import { InteractiveFluidGrid } from "@/components/landing/InteractiveFluidGrid";
 import { GoogleTagManager } from "@/components/privacy/GoogleTagManager";
 import { ErrorSuppressor } from "@/components/ui/ErrorSuppressor";
 import { ReactNode } from "react";

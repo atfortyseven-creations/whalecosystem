@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -165,101 +165,16 @@ export function NewsOfToday() {
                                 const volatility = impactScore > 75 ? 'HIGH' : impactScore > 40 ? 'MED' : 'LOW';
 
                                 return (
-                                    <motion.div 
-                                        layout
-                                        key={a.id} 
-                                        initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
-                                        transition={{ duration: 0.3, delay: index * 0.05 }}
-                                        className={`flex flex-col group rounded-2xl overflow-hidden border transition-all duration-300 ease-out ${
-                                            isExpanded 
-                                            ? 'bg-white dark:bg-[#1A1A1A] border-black/10 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.06)] scale-[1.01] z-10' 
-                                            : 'bg-white/60 dark:bg-[#111111] border-black/[0.04] dark:border-white/5 hover:bg-white dark:hover:bg-[#1A1A1A] hover:border-black/10 dark:hover:border-white/10 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 cursor-pointer z-0'
-                                        }`}
-                                    >
-                                        <div onClick={() => setExpandedId(isExpanded ? null : a.id)} className="flex flex-col md:flex-row md:items-center px-6 md:px-8 py-5 md:py-6 gap-4 md:gap-6 relative">
-                                            
-                                            {/* Source & Metrics Sidebar */}
-                                            <div className="w-full md:w-44 shrink-0 flex flex-row md:flex-col justify-between md:justify-start items-center md:items-start gap-2">
-                                                <div className="flex flex-col gap-0.5">
-                                                    <span className={`text-[11px] font-black uppercase tracking-[0.15em] line-clamp-1 ${a.source.toLowerCase().includes('cointelegraph') ? 'text-[#FABE0F]' : 'text-[#050505] dark:text-white'}`}>
-                                                        {a.source}
-                                                    </span>
-                                                    <span className="text-[10px] font-medium text-[#888888] font-mono">{timeAgo(a.publishedAt)}</span>
-                                                </div>
-                                                <div className="hidden md:flex flex-wrap gap-1.5 mt-2">
-                                                    <span className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-[#050505] dark:text-white text-[8px] font-black uppercase tracking-widest border border-black/5 dark:border-white/10">{readTime}m read</span>
-                                                    <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${volatility === 'HIGH' ? 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20' : 'bg-black/5 dark:bg-white/10 text-[#888888] border-black/5 dark:border-white/10'}`}>VOL: {volatility}</span>
-                                                </div>
-                                            </div>
-
-                                            {/* Main Title */}
-                                            <div className="flex-1 overflow-hidden pr-4">
-                                                <h2 className="font-serif text-lg md:text-2xl font-semibold leading-snug tracking-tight text-[#050505] dark:text-white group-hover:text-black dark:group-hover:text-white/80 transition-colors">{a.title}</h2>
-                                            </div>
-
-                                            {/* Sentiment Indicator (Visual Bar) */}
-                                            <div className="hidden md:flex shrink-0 w-24 flex-col gap-1.5 justify-center">
-                                                <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
-                                                    <span className="text-[#00C076] flex items-center gap-0.5"><TrendingUp size={10}/> {a.btcBullish}%</span>
-                                                    <span className="text-[#FF3B30] flex items-center gap-0.5">{a.btcBearish}% <TrendingDown size={10}/></span>
-                                                </div>
-                                                <div className="h-1.5 w-full bg-[#E5E5E5] dark:bg-white/10 rounded-full overflow-hidden flex">
-                                                    <div className="h-full bg-[#00C076]" style={{ width: `${a.btcBullish}%` }} />
-                                                    <div className="h-full bg-[#FF3B30]" style={{ width: `${a.btcBearish}%` }} />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <AnimatePresence>
-                                            {isExpanded && (
-                                                <motion.div 
-                                                    initial={{ height: 0, opacity: 0 }} 
-                                                    animate={{ height: 'auto', opacity: 1 }} 
-                                                    exit={{ height: 0, opacity: 0 }} 
-                                                    transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }} 
-                                                    className="overflow-hidden bg-gradient-to-b from-white dark:from-[#111111] to-[#FFFFFF] dark:to-[#0A0A0A] border-t border-black/[0.04] dark:border-white/10"
-                                                >
-                                                    <div className="px-6 md:px-8 py-6 md:pl-[224px] pr-6 md:pr-12 flex flex-col space-y-6">
-                                                        
-                                                        {/* High Fidelity Institutional Text Rendering */}
-                                                        <div className="prose prose-sm max-w-none">
-                                                            {a.summary.split('\n\n').map((paragraph, i) => (
-                                                                <p key={i} className="font-serif text-[15px] leading-relaxed text-[#222222] dark:text-white/80 text-justify mb-4 last:mb-0">
-                                                                    {paragraph}
-                                                                </p>
-                                                            ))}
-                                                        </div>
-                                                        
-                                                        {/* Institutional Data Grid */}
-                                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5 mt-2 border-t border-black/[0.04] dark:border-white/10">
-                                                            <div className="flex flex-col gap-1">
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Verification Level</span>
-                                                                <span className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 ${a.isFake ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}>
-                                                                    <ShieldCheck size={12}/> {a.isFake ? 'Unverified' : 'Tier-1 Audit'}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex flex-col gap-1">
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">BTC Directional Bias</span>
-                                                                <span className={`text-[11px] font-mono font-black ${a.sentiment === 'bullish' ? 'text-[#00C076]' : a.sentiment === 'bearish' ? 'text-[#FF3B30]' : 'text-[#050505] dark:text-white'}`}>
-                                                                    {a.sentiment.toUpperCase()}
-                                                                </span>
-                                                            </div>
-                                                            <div className="flex flex-col gap-1">
-                                                                <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Impact Velocity</span>
-                                                                <span className="text-[11px] text-[#050505] dark:text-white font-mono font-black">{impactScore} / 100</span>
-                                                            </div>
-                                                            <div className="flex justify-end items-center">
-                                                                <a href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-2.5 bg-[#050505] dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black/80 dark:hover:bg-white/80 hover:shadow-lg hover:-translate-y-0.5 transition-all w-full justify-center md:w-auto">
-                                                                    Read Source <ExternalLink size={12}/>
-                                                                </a>
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
-                                    </motion.div>
+                                    <NewsArticleCard 
+                                        key={a.id}
+                                        a={a}
+                                        index={index}
+                                        isExpanded={isExpanded}
+                                        setExpandedId={setExpandedId}
+                                        readTime={readTime}
+                                        volatility={volatility}
+                                        impactScore={impactScore}
+                                    />
                                 );
                             })}
                         </div>
@@ -267,5 +182,140 @@ export function NewsOfToday() {
                 </div>
             </div>
         </div>
+    );
+}
+
+function NewsArticleCard({ a, index, isExpanded, setExpandedId, readTime, volatility, impactScore }: any) {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isTranslating, setIsTranslating] = useState(false);
+    const [translatedText, setTranslatedText] = useState("");
+
+    const handleTranslate = (e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (translatedText) {
+            setTranslatedText("");
+            return;
+        }
+        setIsTranslating(true);
+        // Simulate typewriter translation effect
+        const textToTranslate = a.summary;
+        // Mock translation logic: simple letter scramble for effect, then real text (or simulated spanish)
+        // Since we don't have an actual translator API here, we will just show a stylized "decoding" effect of the original text
+        let i = 0;
+        setTranslatedText("");
+        const interval = setInterval(() => {
+            setTranslatedText(prev => prev + textToTranslate[i]);
+            i++;
+            if (i >= textToTranslate.length) {
+                clearInterval(interval);
+                setIsTranslating(false);
+            }
+        }, 5);
+    };
+
+    return (
+        <motion.div 
+            layout
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.05 }}
+            onHoverStart={() => setIsHovered(true)}
+            onHoverEnd={() => setIsHovered(false)}
+            className={`flex flex-col group rounded-2xl overflow-hidden border transition-all duration-300 ease-out ${
+                isExpanded || isHovered
+                ? 'bg-white dark:bg-[#1A1A1A] border-black/10 dark:border-white/10 shadow-[0_12px_40px_rgba(0,0,0,0.06)] scale-[1.01] z-10' 
+                : 'bg-white/60 dark:bg-[#111111] border-black/[0.04] dark:border-white/5 hover:bg-white dark:hover:bg-[#1A1A1A] hover:border-black/10 dark:hover:border-white/10 hover:shadow-[0_8px_20px_rgba(0,0,0,0.04)] hover:-translate-y-0.5 cursor-pointer z-0'
+            }`}
+        >
+            <div onClick={() => setExpandedId(isExpanded ? null : a.id)} className="flex flex-col md:flex-row md:items-center px-6 md:px-8 py-5 md:py-6 gap-4 md:gap-6 relative">
+                
+                {/* Source & Metrics Sidebar */}
+                <div className="w-full md:w-44 shrink-0 flex flex-row md:flex-col justify-between md:justify-start items-center md:items-start gap-2">
+                    <div className="flex flex-col gap-0.5">
+                        <span className={`text-[11px] font-black uppercase tracking-[0.15em] line-clamp-1 ${a.source.toLowerCase().includes('cointelegraph') ? 'text-[#FABE0F]' : 'text-[#050505] dark:text-white'}`}>
+                            {a.source}
+                        </span>
+                        <span className="text-[10px] font-medium text-[#888888] font-mono">{timeAgo(a.publishedAt)}</span>
+                    </div>
+                    <div className="hidden md:flex flex-wrap gap-1.5 mt-2">
+                        <span className="px-1.5 py-0.5 rounded bg-black/5 dark:bg-white/10 text-[#050505] dark:text-white text-[8px] font-black uppercase tracking-widest border border-black/5 dark:border-white/10">{readTime}m read</span>
+                        <span className={`px-1.5 py-0.5 rounded text-[8px] font-black uppercase tracking-widest border ${volatility === 'HIGH' ? 'bg-[#FF3B30]/10 text-[#FF3B30] border-[#FF3B30]/20' : 'bg-black/5 dark:bg-white/10 text-[#888888] border-black/5 dark:border-white/10'}`}>VOL: {volatility}</span>
+                    </div>
+                </div>
+
+                {/* Main Title */}
+                <div className="flex-1 overflow-hidden pr-4">
+                    <h2 className="font-serif text-lg md:text-2xl font-semibold leading-snug tracking-tight text-[#050505] dark:text-white group-hover:text-black dark:group-hover:text-white/80 transition-colors">{a.title}</h2>
+                </div>
+
+                {/* Sentiment Indicator (Visual Bar) */}
+                <div className="hidden md:flex shrink-0 w-24 flex-col gap-1.5 justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <div className="flex justify-between items-center text-[8px] font-black uppercase tracking-widest">
+                        <span className="text-[#00C076] flex items-center gap-0.5"><TrendingUp size={10}/> {a.btcBullish}%</span>
+                        <span className="text-[#FF3B30] flex items-center gap-0.5">{a.btcBearish}% <TrendingDown size={10}/></span>
+                    </div>
+                    <div className="h-1.5 w-full bg-[#E5E5E5] dark:bg-white/10 rounded-full overflow-hidden flex">
+                        <div className="h-full bg-[#00C076]" style={{ width: `${a.btcBullish}%` }} />
+                        <div className="h-full bg-[#FF3B30]" style={{ width: `${a.btcBearish}%` }} />
+                    </div>
+                </div>
+            </div>
+
+            <AnimatePresence>
+                {(isExpanded || isHovered) && (
+                    <motion.div 
+                        initial={{ height: 0, opacity: 0 }} 
+                        animate={{ height: 'auto', opacity: 1 }} 
+                        exit={{ height: 0, opacity: 0 }} 
+                        transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }} 
+                        className="overflow-hidden bg-gradient-to-b from-white dark:from-[#111111] to-[#FFFFFF] dark:to-[#0A0A0A] border-t border-black/[0.04] dark:border-white/10"
+                    >
+                        <div className="px-6 md:px-8 py-6 md:pl-[224px] pr-6 md:pr-12 flex flex-col space-y-6">
+                            
+                            <div className="flex justify-end mb-2">
+                                <button onClick={handleTranslate} className="text-[10px] font-black uppercase tracking-widest px-3 py-1 bg-black/5 dark:bg-white/10 rounded hover:bg-black/10 dark:hover:bg-white/20 transition-colors flex items-center gap-1.5">
+                                    <RefreshCw size={10} className={isTranslating ? 'animate-spin' : ''} />
+                                    {translatedText ? 'Show Original' : 'Decode / Translate'}
+                                </button>
+                            </div>
+
+                            {/* High Fidelity Institutional Text Rendering */}
+                            <div className="prose prose-sm max-w-none">
+                                {(translatedText ? translatedText : a.summary).split('\n\n').map((paragraph: string, i: number) => (
+                                    <p key={i} className="font-serif text-[15px] leading-relaxed text-[#222222] dark:text-white/80 text-justify mb-4 last:mb-0">
+                                        {paragraph}
+                                    </p>
+                                ))}
+                            </div>
+                            
+                            {/* Institutional Data Grid */}
+                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-5 mt-2 border-t border-black/[0.04] dark:border-white/10">
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Verification Level</span>
+                                    <span className={`text-[10px] font-black uppercase tracking-widest flex items-center gap-1.5 ${a.isFake ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}>
+                                        <ShieldCheck size={12}/> {a.isFake ? 'Unverified' : 'Tier-1 Audit'}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">BTC Directional Bias</span>
+                                    <span className={`text-[11px] font-mono font-black ${a.sentiment === 'bullish' ? 'text-[#00C076]' : a.sentiment === 'bearish' ? 'text-[#FF3B30]' : 'text-[#050505] dark:text-white'}`}>
+                                        {a.sentiment.toUpperCase()}
+                                    </span>
+                                </div>
+                                <div className="flex flex-col gap-1">
+                                    <span className="text-[8px] font-black uppercase tracking-widest text-[#888888]">Impact Velocity</span>
+                                    <span className="text-[11px] text-[#050505] dark:text-white font-mono font-black">{impactScore} / 100</span>
+                                </div>
+                                <div className="flex justify-end items-center">
+                                    <a href={a.url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 px-6 py-2.5 bg-[#050505] dark:bg-white text-white dark:text-black rounded-xl text-[9px] font-black uppercase tracking-widest hover:bg-black/80 dark:hover:bg-white/80 hover:shadow-lg hover:-translate-y-0.5 transition-all w-full justify-center md:w-auto">
+                                        Read Source <ExternalLink size={12}/>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </motion.div>
     );
 }

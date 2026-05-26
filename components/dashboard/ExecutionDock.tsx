@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
-import { useSendTransaction } from 'wagmi';
+import { useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
 import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { parseEther } from 'viem';
 import { ShieldAlert, Zap, Lock, Crosshair, AlertTriangle, Fingerprint, Activity, Ban } from 'lucide-react';
@@ -24,15 +24,28 @@ export default function ExecutionDock() {
   const isArmed = useSniperStore((state) => state.isArmed);
   const setArmed = useSniperStore((state) => state.setArmed);
   
-  const { isPending, sendTransaction, error: txError } = useSendTransaction();
-  const [isConfirming, setIsConfirming] = useState(false);
-  const [isConfirmed, setIsConfirmed] = useState(false);
+  const { isPending: isSendingTx, sendTransaction, data: txHash, error: txError } = useSendTransaction();
+  
+  const { isLoading: isConfirming, isSuccess: isConfirmed } = useWaitForTransactionReceipt({
+    hash: txHash,
+  });
+
   const [localHash, setLocalHash] = useState<string | null>(null);
 
   // HFT Anomalies polling
   const { data: mevData, isLoading: mevLoading } = useSWR('/api/execution/mev', fetcher, { refreshInterval: 5000 });
 
   const [isQuoting, setIsQuoting] = useState(false);
+
+  useEffect(() => {
+      if (txHash) setLocalHash(txHash);
+  }, [txHash]);
+
+  useEffect(() => {
+      if (isConfirmed && localHash) {
+          addExecutedTrade(localHash, 0, currentPrice);
+      }
+  }, [isConfirmed, localHash, currentPrice, addExecutedTrade]);
 
   const handleLethalExecution = async () => {
     if (!isConnected || !address) {
@@ -71,17 +84,6 @@ export default function ExecutionDock() {
         to: quote.to,
         data: quote.data,
         value: BigInt(quote.value), 
-      }, {
-        onSuccess: (hash) => {
-          setIsConfirming(true);
-          setTimeout(() => {
-             setIsConfirming(false);
-             setIsConfirmed(true);
-             setLocalHash(hash);
-             addExecutedTrade(hash, 0, currentPrice);
-          }, 800);
-        },
-        onError: () => setIsConfirming(false)
       });
       
       setArmed(false);
@@ -130,11 +132,11 @@ export default function ExecutionDock() {
              )}
          </div>
 
-         {isQuoting || isPending || isConfirming ? (
+         {isQuoting || isSendingTx || isConfirming ? (
              <div className="absolute inset-0 bg-[#050505]/90 backdrop-blur-md z-20 flex flex-col items-center justify-center">
                  <div className="flex items-center gap-3 text-[var(--aztec-orchid)] font-black uppercase tracking-[0.2em] text-xs">
                      <Activity size={16} className="animate-spin" /> 
-                     {isQuoting ? 'ROUTING DEX LIQUIDITY...' : isPending ? 'AWAITING WALLET SIGNATURE...' : 'BROADCASTING TO MEMPOOL...'}
+                     {isQuoting ? 'ROUTING DEX LIQUIDITY...' : isSendingTx ? 'AWAITING WALLET SIGNATURE...' : 'BROADCASTING TO MEMPOOL...'}
                  </div>
                  {localHash && <span className="text-[9px] font-mono font-black mt-3 text-[var(--aztec-orchid)]/60 bg-[var(--aztec-orchid)]/10 px-2 py-1 rounded-md border border-[var(--aztec-orchid)]/20">{localHash.slice(0, 10)}...{localHash.slice(-8)}</span>}
              </div>
@@ -179,7 +181,7 @@ export default function ExecutionDock() {
         <div className="grid grid-cols-[1fr_auto] gap-2 items-center">
             <button 
                 onClick={() => setArmed(!isArmed)}
-                disabled={isPending || isConfirming}
+                disabled={isSendingTx || isConfirming}
                 className={`py-5 px-6 rounded-[24px] text-[11px] font-black uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-3 border ${
                     isArmed 
                      ? 'bg-rose-500/10 text-rose-500 border-rose-500/30 shadow-[0_0_20px_rgba(244,63,94,0.3)]' 
@@ -191,9 +193,9 @@ export default function ExecutionDock() {
             </button>
             <button 
                 onClick={handleLethalExecution}
-                disabled={!isArmed || isQuoting || isPending || isConfirming}
+                disabled={!isArmed || isQuoting || isSendingTx || isConfirming}
                 className={`h-full px-8 relative group overflow-hidden rounded-[24px] transition-all border ${
-                    isArmed && !isQuoting && !isPending && !isConfirming
+                    isArmed && !isQuoting && !isSendingTx && !isConfirming
                      ? 'bg-[var(--aztec-orchid)] border-[var(--aztec-orchid)]/50 text-black cursor-crosshair hover:brightness-110 shadow-[0_0_30px_rgba(var(--aztec-orchid-rgb),0.4)] active:scale-95'
                      : 'bg-white/[0.01] border-white/5 text-white/10 cursor-not-allowed'
                 }`}

@@ -1,42 +1,33 @@
-"use client";
+'use client';
 
-import React, { useEffect, useRef } from "react";
-import { useInView, useMotionValue, useSpring } from "framer-motion";
+import React, { useEffect, useState } from 'react';
+import { animate } from 'framer-motion';
+import { safeToLocaleString } from '@/lib/utils/number-format';
 
-export function AnimatedCounter({
-  value,
-  duration = 1,
-  className = "",
-  format = (val: number) => val.toString(),
-  style,
-}: {
+interface AnimatedCounterProps {
   value: number;
+  isCurrency?: boolean;
   duration?: number;
-  className?: string;
-  style?: React.CSSProperties;
-  format?: (val: number) => string;
-}) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const isInView = useInView(ref, { once: true, margin: "-10%" });
-  const motionValue = useMotionValue(0);
-  const springValue = useSpring(motionValue, {
-    duration,
-    bounce: 0,
-  });
+}
+
+export function AnimatedCounter({ value, isCurrency = true, duration = 1.2 }: AnimatedCounterProps) {
+  const [displayValue, setDisplayValue] = useState(0);
 
   useEffect(() => {
-    if (isInView) {
-      motionValue.set(value);
-    }
-  }, [isInView, value, motionValue]);
-
-  useEffect(() => {
-    return springValue.on("change", (latest) => {
-      if (ref.current) {
-        ref.current.textContent = format(latest);
+    const controls = animate(displayValue, value, {
+      duration: duration,
+      ease: [0.22, 1, 0.36, 1],
+      onUpdate: (latest) => {
+        setDisplayValue(latest);
       }
     });
-  }, [springValue, format]);
 
-  return <span ref={ref} className={className} style={style}>{format(value)}</span>;
+    return () => controls.stop();
+  }, [value, duration]);
+
+  if (isCurrency) {
+    return <>{`$${safeToLocaleString(displayValue, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}</>;
+  }
+
+  return <>{safeToLocaleString(displayValue, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</>;
 }

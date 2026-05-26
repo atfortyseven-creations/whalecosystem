@@ -1377,6 +1377,18 @@ export function MobileLanding() {
 
               return (
                 <>
+                  {/* Humanity Ledger Native Login */}
+                  <WalletOption
+                    logo="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
+                    name="ACCEDER CON Humanity Ledger"
+                    badge="Native System Login"
+                    loading={connecting === 'humanity-ledger'}
+                    onClick={() => {
+                        window.location.href = "/sign-up";
+                    }}
+                    delay={0.1}
+                  />
+
                   {/* Universal WC v2 */}
                   <WalletOption
                     logo="/official-whale-monochrome.png"
@@ -1384,7 +1396,7 @@ export function MobileLanding() {
                     badge="Google, Email, Apple, Wallets"
                     loading={connecting === 'wc'}
                     onClick={() => openWalletModal('wc')}
-                    delay={0.1}
+                    delay={0.2}
                   />
                   <div className="w-full flex justify-center mt-4 mb-2">
                     <RemoteLottie path="system-shots/Paper airplane.json" className="w-full max-w-[200px] h-[120px] object-contain" />

@@ -77,25 +77,25 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
     return (
         <button
             onClick={onClick}
-            className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group select-none outline-none transition-all ${
+            className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group select-none outline-none transition-all duration-300 active:scale-95 ${
                 isActive 
-                    ? 'bg-[#050505] shadow-lg border border-[#1A1A1A]' 
-                    : 'bg-transparent border border-transparent hover:bg-black/[0.03]'
+                    ? 'bg-[#050505] shadow-md border border-[#1A1A1A]' 
+                    : 'bg-transparent border border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.04]'
             } ${isLocked ? 'opacity-70 grayscale' : ''}`}
         >
             <div className="relative flex items-center w-full">
                 {isActive && (
-                    <div className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#FFFFFF] rounded-r-full" />
+                    <motion.div layoutId="activeTabIndicator" className="absolute left-[-13px] top-1/2 -translate-y-1/2 w-[3px] h-[18px] bg-[#FFFFFF] rounded-r-full" />
                 )}
 
                 {item.icon && (
-                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#888888] group-hover:text-[#050505]'}`}>
+                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#888888] group-hover:text-[#050505] dark:group-hover:text-white'}`}>
                         {item.icon}
                     </span>
                 )}
 
                 {!isCollapsed && (
-                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#555555] group-hover:text-[#050505]'}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#555555] dark:text-[#AAAAAA] group-hover:text-[#050505] dark:group-hover:text-white'}`}>
                         {item.label}
                     </span>
                 )}

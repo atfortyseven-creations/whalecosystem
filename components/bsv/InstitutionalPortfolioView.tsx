@@ -86,10 +86,6 @@ export function InstitutionalPortfolioView() {
 
     return (
         <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[85vh] bg-white font-mono">
-            {/* Extremely Minimal Grid */}
-            <div className="absolute inset-0 pointer-events-none opacity-5"
-              style={{ backgroundImage: 'repeating-linear-gradient(0deg,#000 0,#000 1px,transparent 1px,transparent 40px),repeating-linear-gradient(90deg,#000 0,#000 1px,transparent 1px,transparent 40px)' }} />
-
             <AnimatePresence mode="wait">
                 {view === 'HOME' && (
                     <HomeView key="home"
@@ -350,7 +346,7 @@ function ActionBtn({ icon: Icon, label, onClick }: any) {
 
 function ModalView({ title, icon, onBack, children }: any) {
     return (
-        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="flex flex-col max-w-xl mx-auto w-full pt-8 px-6 pb-20 font-mono min-h-screen">
+        <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 10 }} className="flex flex-col max-w-xl mx-auto w-full pt-8 px-6 pb-20 font-mono min-h-full flex-1">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10">
                 <div className="flex items-center gap-4">
                     <div className="w-10 h-10 border border-black flex items-center justify-center text-black">
@@ -362,7 +358,7 @@ function ModalView({ title, icon, onBack, children }: any) {
                     <X size={20} />
                 </button>
             </div>
-            <div>
+            <div className="flex-1 flex flex-col min-h-0">
                 {children}
             </div>
         </motion.div>
@@ -548,11 +544,10 @@ function SwapView({ address, onBack }: any) {
 
     return (
         <ModalView title="Token Swap" icon={<RefreshCw />} onBack={onBack}>
-            <div className="w-full rounded-none overflow-hidden border border-black/10" style={{ height: '68vh', minHeight: 480 }}>
+            <div className="w-full rounded-none border border-black/10 flex-1 min-h-[600px] flex flex-col">
                 <iframe
                     src={swapUrl}
-                    height="100%"
-                    width="100%"
+                    className="flex-1 w-full"
                     style={{ border: 'none', display: 'block' }}
                     title="Uniswap Swap Interface"
                     allow="clipboard-write"
@@ -569,11 +564,10 @@ function BridgeView({ onBack }: any) {
     // Real Li.Fi Jumper cross-chain bridge - no mock, no simulation
     return (
         <ModalView title="Cross-Chain Bridge" icon={<GitMerge />} onBack={onBack}>
-            <div className="w-full rounded-none overflow-hidden border border-black/10" style={{ height: '68vh', minHeight: 500 }}>
+            <div className="w-full rounded-none border border-black/10 flex-1 min-h-[650px] flex flex-col">
                 <iframe
                     src="https://jumper.exchange/?theme=light"
-                    height="100%"
-                    width="100%"
+                    className="flex-1 w-full"
                     style={{ border: 'none', display: 'block' }}
                     title="Li.Fi Jumper Bridge Interface"
                     allow="clipboard-write"
