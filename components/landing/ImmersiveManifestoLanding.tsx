@@ -8,6 +8,7 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
 // Lottie cargado dinámicamente para evitar SSR issues
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
+const InteractiveHeroImage = dynamic(() => import('./InteractiveHeroImage').then(mod => mod.InteractiveHeroImage), { ssr: false });
 
 // ─── Nav Data ────────────────────────────────────────────────────────────────
 
@@ -283,89 +284,45 @@ function LandingNav() {
 // ─── Hero ─────────────────────────────────────────────────────────────────────
 
 function HeroSection() {
-  const ref = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start start", "end start"] });
-  const opacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
-  const y = useTransform(scrollYProgress, [0, 0.6], [0, 60]);
   const [mounted, setMounted] = useState(false);
-  const [lottieData, setLottieData] = useState<any>(null);
 
   useEffect(() => {
     setMounted(true);
-    // Load the dashboard loading Lottie (Browser Loading animation)
-    fetch("/lotties/Browser Loading.json")
-      .then((r) => r.json())
-      .then(setLottieData)
-      .catch(() => {
-        // Fallback to root public
-        fetch("/Browser Loading.json")
-          .then((r) => r.json())
-          .then(setLottieData)
-          .catch(() => null);
-      });
   }, []);
 
   return (
     <section
-      ref={ref}
-      className="relative w-full min-h-screen flex flex-col items-center justify-center bg-white overflow-hidden"
+      className="relative w-full h-[100vh] min-h-[700px] flex flex-col items-center justify-end overflow-hidden pt-14 bg-[#FAFAFA]"
     >
-      {/* Subtle dot grid */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: "radial-gradient(circle, rgba(0,0,0,0.06) 1px, transparent 1px)",
-          backgroundSize: "32px 32px",
-        }}
-      />
+      {/* 3D Interactive Background */}
+      {mounted && <InteractiveHeroImage />}
+
       {/* Bottom fade */}
-      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-white to-transparent pointer-events-none z-10" />
+      <div className="absolute inset-x-0 bottom-0 h-56 bg-gradient-to-t from-white via-white/80 to-transparent pointer-events-none z-10" />
 
-      <motion.div
-        style={{ opacity, y }}
-        className="relative z-20 flex flex-col items-center text-center px-6 w-full max-w-[880px] mx-auto pt-20"
-      >
+      <div className="relative z-20 flex flex-col items-center text-center px-6 w-full max-w-[880px] mx-auto pb-24">
         {mounted && (
-          <>
-            <motion.div
-              initial={{ opacity: 0, scale: 0.85 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.08 }}
-              className="relative w-full max-w-[500px] lg:max-w-[700px] aspect-video mb-8 shrink-0 flex items-center justify-center overflow-hidden rounded-xl border border-black/10"
+          <motion.div
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
+            className="flex flex-col sm:flex-row items-center gap-3"
+          >
+            <Link
+              href="/portfolio"
+              className="w-full sm:w-auto px-8 py-3.5 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors shadow-2xl"
             >
-              <img
-                src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
-                alt="Humanity Ledger Architecture"
-                className="w-full h-full object-cover mix-blend-darken"
-              />
-            </motion.div>
-
-            {/* Headline */}
-            {/* No headline/subtext as requested */}
-
-            {/* CTAs */}
-            <motion.div
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.44 }}
-              className="flex flex-col sm:flex-row items-center gap-3"
+              Open Application
+            </Link>
+            <Link
+              href="/developers/api-docs"
+              className="w-full sm:w-auto px-8 py-3.5 border border-black/20 bg-white/60 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white/90 transition-colors shadow-xl"
             >
-              <Link
-                href="/portfolio"
-                className="w-full sm:w-auto px-8 py-3.5 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors"
-              >
-                Open Application
-              </Link>
-              <Link
-                href="/developers/api-docs"
-                className="w-full sm:w-auto px-8 py-3.5 border border-black/15 text-black text-[13px] font-semibold hover:bg-black/[0.04] transition-colors"
-              >
-                Read Documentation
-              </Link>
-            </motion.div>
-          </>
+              Read Documentation
+            </Link>
+          </motion.div>
         )}
-      </motion.div>
+      </div>
 
       {/* Scroll cue */}
       <motion.div
