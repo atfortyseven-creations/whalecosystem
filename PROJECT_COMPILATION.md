@@ -221,7 +221,7 @@ BASE_TIMELOCK_ADDRESS # Deployed HumanTimeLock contract
 ---
 
 **[System Status: INSTITUTIONAL GRADE. Protocol v3.0.0 Active.]**  
-*Compiled by Antigravity Agent  April 2026  Phase 6 Complete*
+*Compiled by Whale Network Team  April 2026  Phase 6 Complete*
 
 ```
 npm run workers:start          # Start all detection workers

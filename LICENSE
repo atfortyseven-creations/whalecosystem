@@ -1,30 +1,21 @@
-# SOVEREIGN ARCHITECTURE PROPRIETARY LICENSE
-**Version 1.0.0  Cryptographically Enforced Edition**
+MIT License
 
-Copyright (c) 2026 System Network Architecture & Whale Ecosystem Corp.
-All Rights Reserved.
+Copyright (c) 2025-2026 Stefan Antonio Cirisanu / atfortyseven-creations / Whale Network / Humanity Ledger
 
-## PREAMBLE
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-The software architecture, algorithmic methodologies, and cryptographic protocols contained within this repository (hereinafter referred to as the "Software") constitute the zenith of institutional analytics and Web3 engineering. This Software is not merely code; it is a mathematically asserted framework of system trust. 
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-By accessing, copying, or interacting with this Software, you unequivocally acknowledge and submit to the uncompromising terms of this License.
-
-## 1. ABSOLUTE RESERVATION OF RIGHTS
-This is a strictly proprietary license. No rights are granted to the user to modify, distribute, sublicense, or commercially exploit this Software, in whole or in part, without the explicit, cryptographically signed authorization of the original authors. 
-
-## 2. PROHIBITION OF DERIVATIVE WORKS
-You are expressly prohibited from creating derivative works, reverse-engineering the Zero-Trust validation layers (TitaniumGate), or replicating the thermodynamic EVM anomaly detection algorithms (Whale Network). Any unauthorized bifurcation (forking) of this repository for public or commercial deployment is a direct violation of this intellectual property mandate.
-
-## 3. ZERO-SIMULATION COMPLIANCE
-Should you be granted exceptional access to deploy this Software in a localized environment, you are strictly bound by the Zero-Simulation Mandate. You shall not inject fabricated telemetry, mock data, or synthetic state representations into the grid. The integrity of the data must remain an unbroken reflection of the on-chain reality.
-
-## 4. DISCLAIMER OF LIABILITY (MATHEMATICAL ABSOLUTION)
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED. UNDER NO CIRCUMSTANCES SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES, LIQUIDATIONS, OR OTHER LIABILITIES RESULTING FROM THE DEPLOYMENT OF THIS SOFTWARE. 
-The algorithms operate on mathematical determinism; the user assumes absolute systemty and responsibility over their execution environment and capital risk.
-
-## 5. CRYPTOGRAPHIC ENFORCEMENT
-Any dispute arising from the violation of this license will be documented and stored as an immutable, non-repudiable payload. The architects reserve the right to cryptographically sever access to the System Data Feeds for any entity found in breach of these axioms.
-
----
-*End of License Terms.*
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
