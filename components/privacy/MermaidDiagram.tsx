@@ -7,6 +7,8 @@ type MermaidDiagramProps = {
   caption?: string;
 };
 
+let mermaidInitialized = false;
+
 export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
   const reactId = useId().replace(/:/g, '');
   const [svg, setSvg] = useState<string>('');
@@ -19,45 +21,77 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
     async function render() {
       try {
         const mermaid = (await import('mermaid')).default;
-        mermaid.initialize({
-          startOnLoad: false,
-          theme: 'base',
-          themeVariables: {
-            primaryColor: '#ffffff',
-            primaryTextColor: '#111111',
-            primaryBorderColor: 'rgba(0,0,0,0.18)',
-            secondaryColor: '#f5f5f5',
-            tertiaryColor: '#f9f9f9',
-            lineColor: '#555555',
-            fontFamily: '"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif',
-            fontSize: '12px',
-            nodeBorder: '1px solid rgba(0,0,0,0.2)',
-            clusterBkg: '#fafafa',
-            clusterBorder: 'rgba(0,0,0,0.12)',
-            edgeLabelBackground: '#ffffff',
-            nodeTextColor: '#111111',
-            labelTextColor: '#111111',
-          },
-          flowchart: {
-            curve: 'basis',
-            padding: 20,
-            htmlLabels: true,
-            diagramPadding: 16,
-            useMaxWidth: true,
-            rankSpacing: 60,
-            nodeSpacing: 40,
-          },
-          sequence: {
-            actorMargin: 50,
-            messageMargin: 35,
-            boxTextMargin: 6,
-            useMaxWidth: true,
-            mirrorActors: false,
-            showSequenceNumbers: false,
-          },
-          securityLevel: 'loose',
-          maxEdges: 500,
-        });
+
+        if (!mermaidInitialized) {
+          mermaid.initialize({
+            startOnLoad: false,
+            theme: 'base',
+            themeVariables: {
+              primaryColor: '#ffffff',
+              primaryTextColor: '#111111',
+              primaryBorderColor: 'rgba(0,0,0,0.22)',
+              secondaryColor: '#f5f5f5',
+              tertiaryColor: '#f9f9f9',
+              lineColor: '#444444',
+              fontFamily: '"Inter", ui-sans-serif, system-ui, -apple-system, sans-serif',
+              fontSize: '13px',
+              nodeBorder: '1px solid rgba(0,0,0,0.2)',
+              clusterBkg: '#fafafa',
+              clusterBorder: 'rgba(0,0,0,0.15)',
+              edgeLabelBackground: '#ffffff',
+              nodeTextColor: '#111111',
+              labelTextColor: '#111111',
+              // Sequence diagram
+              actorBorder: '#333333',
+              actorBkg: '#ffffff',
+              actorTextColor: '#111111',
+              actorLineColor: '#888888',
+              signalColor: '#333333',
+              signalTextColor: '#111111',
+              labelBoxBkgColor: '#f5f5f5',
+              labelBoxBorderColor: '#cccccc',
+              labelTextColorSignal: '#111111',
+              loopTextColor: '#111111',
+              noteBorderColor: '#cccccc',
+              noteBkgColor: '#fffde7',
+              noteTextColor: '#333333',
+              activationBorderColor: '#333333',
+              activationBkgColor: '#f0f0f0',
+            },
+            flowchart: {
+              curve: 'basis',
+              padding: 24,
+              htmlLabels: true,
+              diagramPadding: 20,
+              useMaxWidth: true,
+              rankSpacing: 70,
+              nodeSpacing: 50,
+            },
+            sequence: {
+              actorMargin: 60,
+              messageMargin: 40,
+              boxTextMargin: 8,
+              useMaxWidth: true,
+              mirrorActors: false,
+              showSequenceNumbers: false,
+              diagramMarginX: 30,
+              diagramMarginY: 20,
+              boxMargin: 10,
+              noteMargin: 10,
+              messageAlign: 'center',
+              rightAngles: false,
+            },
+            graph: {
+              diagramPadding: 20,
+              htmlLabels: true,
+              curve: 'basis',
+              useMaxWidth: true,
+            },
+            securityLevel: 'loose',
+            maxEdges: 500,
+          });
+          mermaidInitialized = true;
+        }
 
         const diagramId = `mermaid-${reactId}-${Math.random().toString(36).slice(2, 7)}`;
         const { svg: rendered } = await mermaid.render(diagramId, chart.trim());

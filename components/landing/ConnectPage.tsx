@@ -389,19 +389,25 @@ export default function ConnectPage() {
   const isVerified = mounted && isLinked;
 
   return (
-    <div className="w-full min-h-screen flex flex-col items-center bg-black relative overflow-hidden">
-      {/* Background Image — no zoom, object-contain so the full image is visible */}
+    <div className="w-full min-h-screen flex flex-col items-center bg-white relative overflow-hidden">
+      {/* Background Image — fills entire page, no black bands, no zoom */}
       <img
         src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
         alt="Architecture Background"
-        className="absolute inset-0 w-full h-full z-0"
-        style={{ objectFit: 'contain', objectPosition: 'center', opacity: 1 }}
+        className="absolute inset-0 z-0"
+        style={{
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'fill',
+          objectPosition: 'center center',
+          opacity: 1,
+        }}
       />
       
-      <div className="relative z-10 w-full flex-1 flex flex-col items-end justify-start px-4 pt-24 pr-8 sm:pr-16 max-w-[1400px] mx-auto min-h-0" style={{ pointerEvents: 'none' }}>
+      <div className="relative z-10 w-full flex-1 flex flex-col items-end justify-start px-4 pt-24 pr-4 sm:pr-8 max-w-[1600px] mx-auto min-h-0" style={{ pointerEvents: 'none' }}>
         
-        {/* Login Panel — positioned right-center just below AZTEC logo */}
-        <div className="w-full max-w-[340px] flex-shrink-0 flex flex-col bg-white rounded-[20px] border border-[#F0F0F0] shadow-[0_8px_40px_rgba(0,0,0,0.12)] p-5 z-20" style={{ pointerEvents: 'all', marginTop: '8vh' }}>
+        {/* Login Panel — positioned further right, slightly wider panel */}
+        <div className="w-full max-w-[460px] flex-shrink-0 flex flex-col bg-white/96 backdrop-blur-sm rounded-[20px] border border-[#F0F0F0] shadow-[0_8px_60px_rgba(0,0,0,0.18)] p-6 z-20" style={{ pointerEvents: 'all', marginTop: '6vh' }}>
           
           <div className="flex items-center gap-3 mb-8 pb-5 border-b border-black/5">
             <Lock size={16} strokeWidth={1.2} className="text-[#0A0A0A]" />

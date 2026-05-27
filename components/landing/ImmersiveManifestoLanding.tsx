@@ -308,7 +308,7 @@ function HeroSection() {
 
   return (
     <section
-      className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-14 bg-black"
+      className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-14 bg-white"
       style={{
         /* dvh for mobile chrome correction, fallback to vh */
         height: 'calc(var(--vh, 1vh) * 100)',
@@ -350,22 +350,16 @@ function HeroSection() {
         draggable="false"
         className="hero-pixel-img absolute inset-0 w-full h-full select-none"
         style={{
-          objectFit: 'cover',
           /*
-           * Desktop: centre the image horizontally; anchor to the top so
-           * the architectural skyline is always visible.
-           * Mobile: shift anchor slightly lower to reveal the street-level
-           * detail that makes the composition read well on portrait screens.
+           * fill = perfectly adjust to the screen size.
+           * By stretching it, we ensure NO zoom (unlike cover)
+           * and NO empty lateral bands (unlike contain).
+           * This perfectly matches the desktop viewport.
            */
+          width: '100vw',
+          height: '100vh',
+          objectFit: 'fill',
           objectPosition: 'center top',
-          /*
-           * Prevent any OS/GPU sub-pixel smoothing layer. Some browsers
-           * apply a hardware-accelerated bicubic pass on top of CSS
-           * image-rendering — will-change: transform forces the element
-           * onto its own compositing layer, bypassing that pass.
-           */
-          willChange: 'transform',
-          transform: 'translateZ(0)',
         }}
       />
 
@@ -400,7 +394,7 @@ function HeroSection() {
             </Link>
             <Link
               href="/developers/api-docs"
-              className="w-full sm:w-auto px-8 py-3.5 border border-white/30 bg-white/10 backdrop-blur-md text-white text-[13px] font-semibold hover:bg-white/20 transition-colors shadow-xl"
+              className="w-full sm:w-auto px-8 py-3.5 border border-black/30 bg-white/80 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white hover:border-black/60 transition-colors shadow-xl"
             >
               Read Documentation
             </Link>
@@ -415,7 +409,7 @@ function HeroSection() {
         transition={{ delay: 2.2, duration: 1 }}
         className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30 pointer-events-none"
       >
-        <div className="w-[1px] h-12 bg-gradient-to-b from-white/40 to-transparent" />
+        <div className="w-[1px] h-12 bg-gradient-to-b from-black/30 to-transparent" />
       </motion.div>
     </section>
   );

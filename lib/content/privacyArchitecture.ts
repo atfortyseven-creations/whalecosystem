@@ -26,23 +26,42 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Full System Macro Overview',
       chart: `graph TD
-  User([End User]) --> Client[Next.js Client Terminal]
-  Client --> Auth[Auth Layer / JWTs]
-  Client --> Portfolio[Portfolio Execution Vectors]
-  Client --> Analytics[Analytics Dashboard]
-  Client --> Chat[Whale Chat / XMTP]
-  Auth --> API[Humanity Ledger API]
-  Portfolio --> OnChain[(On-Chain Smart Contracts)]
-  Analytics --> Workers[Whale Worker Nodes]
-  Chat --> XMTP[XMTP Network]
-  Workers --> Neo4j[(Neo4j Graph DB)]
-  Workers --> Redis[(Redis Cache)]
-  API --> Postgres[(Postgres DB)]
-  OnChain --> Ethereum[(Ethereum L1)]
-  OnChain --> Aztec[(Aztec L2 ZK Rollup)]
-  style Client fill:#000,color:#fff
-  style OnChain fill:#1a1a2e,color:#fff
-  style Aztec fill:#2a1b4d,color:#fff`
+  User(["End User"])
+  Client["Next.js Client Terminal"]
+  Auth["Auth Layer / JWTs"]
+  Portfolio["Portfolio Execution Vectors"]
+  Analytics["Analytics Dashboard"]
+  Chat["Whale Chat / XMTP"]
+  API["Humanity Ledger API"]
+  OnChain["On-Chain Smart Contracts"]
+  Workers["Whale Worker Nodes"]
+  XMTPNet["XMTP Network"]
+  Neo4j[("Neo4j Graph DB")]
+  Redis[("Redis Cache")]
+  Postgres[("Postgres DB")]
+  Ethereum[("Ethereum L1")]
+  Aztec[("Aztec L2 ZK Rollup")]
+  User --> Client
+  Client --> Auth
+  Client --> Portfolio
+  Client --> Analytics
+  Client --> Chat
+  Auth --> API
+  Portfolio --> OnChain
+  Analytics --> Workers
+  Chat --> XMTPNet
+  Workers --> Neo4j
+  Workers --> Redis
+  API --> Postgres
+  OnChain --> Ethereum
+  OnChain --> Aztec
+  style Client fill:#000000,color:#ffffff,stroke:#000000
+  style OnChain fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e
+  style Aztec fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
+  style Auth fill:#f5f5ff,stroke:#333333
+  style Portfolio fill:#f5fff5,stroke:#333333
+  style Analytics fill:#fff5f0,stroke:#333333
+  style Chat fill:#f0f5ff,stroke:#333333`
     },
     callout: {
       title: 'Legal Privacy Policy',
@@ -63,25 +82,38 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Thermodynamic Data Ingestion and Local Processing Pipeline',
       chart: `graph TD
-  subgraph PublicEco["Public Ecosystem"]
-    RPC["RPC Node Clusters"] -->|Raw Block Data| Mem["Mempool Streams"]
+  subgraph PublicEco ["Public Ecosystem"]
+    RPC["RPC Node Clusters"]
+    Mem["Mempool Streams"]
+    RPC -->|"Raw Block Data"| Mem
   end
-  subgraph VaultProcessing["Localized Vault Processing"]
-    Mem --> WW["Whale Worker Node"]
-    WW -->|Z-Score Analysis| Neo["Neo4j Graph DB"]
-    WW -->|Tx Vitals Stream| Redis["Redis / Upstash"]
-    WW -->|Persistent State| PG["Prisma / Postgres"]
-    Neo --> AE["Analytics Engine"]
-    Redis --> AE
+  subgraph VaultProcessing ["Localized Vault Processing"]
+    WW["Whale Worker Node"]
+    Neo["Neo4j Graph DB"]
+    RedisDB["Redis / Upstash"]
+    PG["Prisma / Postgres"]
+    AE["Analytics Engine"]
+    Mem --> WW
+    WW -->|"Z-Score Analysis"| Neo
+    WW -->|"Tx Vitals Stream"| RedisDB
+    WW -->|"Persistent State"| PG
+    Neo --> AE
+    RedisDB --> AE
     PG --> AE
   end
-  subgraph SecureDelivery["Secure Client Delivery"]
-    AE -->|Encrypted WebSocket| UI["Next.js Client Terminal"]
-    UI -.->|ZK Circuit Delegation| AZ["Aztec Shielded Pool"]
+  subgraph SecureDelivery ["Secure Client Delivery"]
+    UI["Next.js Client Terminal"]
+    AZ["Aztec Shielded Pool"]
+    AE -->|"Encrypted WebSocket"| UI
+    UI -.->|"ZK Circuit Delegation"| AZ
   end
-  style WW fill:#fff,stroke:#000,stroke-width:2px
-  style UI fill:#000,color:#fff
-  style AZ fill:#2a1b4d,color:#fff`
+  style WW fill:#ffffff,stroke:#000000,stroke-width:2px
+  style UI fill:#000000,color:#ffffff,stroke:#000000
+  style AZ fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
+  style AE fill:#f0f0ff,stroke:#333366
+  style Neo fill:#e8f5e9,stroke:#2e7d32
+  style RedisDB fill:#fff3e0,stroke:#e65100
+  style PG fill:#e3f2fd,stroke:#1565c0`
     }
   },
 
@@ -96,8 +128,8 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Native Portfolio Component Architecture and Smart Contract Execution',
       chart: `flowchart TD
-  subgraph UI["Next.js Native Portfolio UI"]
-    Store(("Zustand Wallet Store"))
+  subgraph UI ["Next.js Native Portfolio UI"]
+    Store(["Zustand Wallet Store"])
     Buy["NativeBuyView"]
     Swap["NativeSwapView"]
     Bridge["NativeBridgeView"]
@@ -105,32 +137,34 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     Store --> Swap
     Store --> Bridge
   end
-  subgraph Protocols["Decentralized Protocol Layer"]
-    Moonpay(("Fiat On-Ramp Gateway"))
-    UniV2(("Uniswap V2 Router"))
-    UniV3(("Uniswap V3 Router"))
-    LZ(("LayerZero Endpoints"))
+  subgraph Protocols ["Decentralized Protocol Layer"]
+    Moonpay(["Fiat On-Ramp Gateway"])
+    UniV2(["Uniswap V2 Router"])
+    UniV3(["Uniswap V3 Router"])
+    LZ(["LayerZero Endpoints"])
   end
-  subgraph Ledgers["Immutable Ledgers"]
+  subgraph Ledgers ["Immutable Ledgers"]
     ETH[("Ethereum Mainnet")]
     ARB[("Arbitrum Rollup")]
     POL[("Polygon PoS")]
     OPT[("Optimism Rollup")]
     BASE[("Base L2")]
   end
-  Buy -.->|Secure Popup Redirect| Moonpay
-  Swap -->|ethers.Contract call| UniV2
-  Swap -->|ethers.Contract call| UniV3
-  Bridge -->|Cross-Chain Message| LZ
-  Moonpay -->|Settlement| ETH
-  UniV2 -->|ERC20 Transfer| ETH
-  UniV3 -->|ERC20 Transfer| ETH
-  LZ -->|Relayer| ARB
-  LZ -->|Relayer| POL
-  LZ -->|Relayer| OPT
-  LZ -->|Relayer| BASE
-  style Store fill:#000,color:#fff
-  style UI fill:#f9f9f9,stroke:#000`
+  Buy -.->|"Secure Popup Redirect"| Moonpay
+  Swap -->|"ethers.Contract call"| UniV2
+  Swap -->|"ethers.Contract call"| UniV3
+  Bridge -->|"Cross-Chain Message"| LZ
+  Moonpay -->|"Settlement"| ETH
+  UniV2 -->|"ERC20 Transfer"| ETH
+  UniV3 -->|"ERC20 Transfer"| ETH
+  LZ -->|"Relayer"| ARB
+  LZ -->|"Relayer"| POL
+  LZ -->|"Relayer"| OPT
+  LZ -->|"Relayer"| BASE
+  style Store fill:#000000,color:#ffffff,stroke:#000000
+  style UI fill:#f9f9f9,stroke:#000000
+  style Protocols fill:#fff8f0,stroke:#996600
+  style Ledgers fill:#f0f0ff,stroke:#2a1b4d`
     },
     bullets: [
       'Slippage tolerance is configurable per-swap at the component level.',
@@ -150,15 +184,15 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Zero-Knowledge Authentication and Sybil Resistance Sequence',
       chart: `sequenceDiagram
-  participant User
+  participant User as End User
   participant Wallet as Client Wallet
   participant BB as Barretenberg Wasm
   participant Verifier as Network Validator
   User->>Wallet: Request Shielded Access
   Wallet->>User: Sign Challenge EIP-191
-  User->>Wallet: Signed Message
+  User->>Wallet: Signed Message Returned
   Wallet->>BB: Compile Noir Circuit with Witness Inputs
-  note over Wallet,BB: Private Key Scalar + Nullifier Logic<br/>Never Leave Browser
+  note over BB: Private Key Scalar + Nullifier Logic never leave the browser
   BB->>Wallet: Emit zk-SNARK + Public Nullifier Hash
   Wallet->>Verifier: Submit Proof Bundle
   Verifier-->>Verifier: Pairing Curve Verification
@@ -179,34 +213,45 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Wallet Connect and Tripartite Session Registration',
       chart: `flowchart TB
-  subgraph mobile["Mobile PWA or Browser"]
-    M1["Open App"] --> M2["WalletConnect / AppKit"]
-    M2 --> M3["Wallet App Approves"]
-    M3 --> M4["Address Captured in Browser"]
+  subgraph mobile ["Mobile PWA or Browser"]
+    M1["Open App"]
+    M2["WalletConnect / AppKit"]
+    M3["Wallet App Approves"]
+    M4["Address Captured in Browser"]
+    M1 --> M2
+    M2 --> M3
+    M3 --> M4
   end
-  subgraph desktop["Desktop Browser"]
+  subgraph desktop ["Desktop Browser"]
     D1["Injected Extension MetaMask / Coinbase"]
     D2["Wagmi Resolves Address"]
     D1 --> D2
   end
-  subgraph qr["QR Desktop Bridge"]
+  subgraph qr ["QR Desktop Bridge"]
     Q1["/connect QR Mode"]
     Q2["Phone Scans QR"]
-    Q1 --> Q2 --> D2
+    Q1 --> Q2
+    Q2 --> D2
   end
-  subgraph api["Humanity Ledger Auth API"]
+  subgraph api ["Humanity Ledger Auth API"]
     V["POST /api/auth/system-verify"]
-    JWT["Mint whale_session JWT - HTTP Only"]
-    JWT2["Mint human_session JWT - HTTP Only"]
-    HS["Mint system_handshake - JS Readable"]
+    JWT["Mint whale_session JWT — HTTP Only"]
+    JWT2["Mint human_session JWT — HTTP Only"]
+    HS["Mint system_handshake — JS Readable"]
     V --> JWT
     V --> JWT2
     V --> HS
   end
+  App["Protected Routes and Portfolio"]
   M4 --> V
   D2 --> V
-  JWT --> App["Protected Routes and Portfolio"]
-  HS --> App`
+  JWT --> App
+  HS --> App
+  style V fill:#000000,color:#ffffff,stroke:#000000
+  style App fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
+  style JWT fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e
+  style JWT2 fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e
+  style HS fill:#333333,color:#ffffff,stroke:#333333`
     },
     bullets: [
       'MobileLanding and ConnectPage both call system-verify after a wallet address is known.',
@@ -226,19 +271,20 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'System-Verify and Full Cookie Architecture',
       chart: `sequenceDiagram
-  participant Browser
+  participant Browser as Browser Client
   participant Verify as POST /system-verify
   participant DB as User Database
   participant MW as Middleware / All APIs
   Browser->>Verify: Wallet address in JSON body
   Verify->>DB: Upsert user row by address
-  Verify->>Browser: Set whale_session HTTP-Only JWT
-  Verify->>Browser: Set human_session HTTP-Only JWT
-  Verify->>Browser: Set system_handshake Readable Cookie
+  DB-->>Verify: User record confirmed
+  Verify->>Browser: Set whale_session — HTTP-Only JWT
+  Verify->>Browser: Set human_session — HTTP-Only JWT
+  Verify->>Browser: Set system_handshake — Readable Cookie
   Browser->>MW: Subsequent requests include all cookies
   MW->>MW: Decode and verify JWT signature
   alt JWT Valid
-    MW->>Browser: 200 OK - Serve protected content
+    MW->>Browser: 200 OK — Serve protected content
   else JWT Expired or Missing
     MW->>Browser: 401 Redirect to /connect
   end`
@@ -267,7 +313,7 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
   participant API as Auth APIs
   participant Redis as Volatile Cache TTL 60s
   Desktop->>Desktop: Generate X25519 keypair + UUID + Expiry
-  Desktop->>QR: Encode UUID, PubKey, Expiry
+  Desktop->>QR: Encode UUID + PubKey + Expiry
   Phone->>QR: Camera Scan
   Phone->>Phone: Generate Mobile X25519 Keypair
   Phone->>Phone: Derive Shared ECDH Secret
@@ -276,12 +322,12 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
   loop Poll Every 1 Second
     Desktop->>API: GET /api/auth/qr-poll?uuid
     API->>Redis: Read payload
-    Redis->>API: Return Encrypted Bundle or null
-    API->>Desktop: Encrypted Bundle or 204 No Content
+    Redis-->>API: Return Encrypted Bundle or null
+    API-->>Desktop: Encrypted Bundle or 204 No Content
   end
   Desktop->>Desktop: Decrypt Bundle with Local Private Key
   Desktop->>API: POST /api/auth/qr-hydrate
-  API->>Desktop: whale_session + human_session + handshake
+  API-->>Desktop: whale_session + human_session + handshake
   Desktop-->>Phone: ACK Connection Established`
     }
   },
@@ -297,26 +343,30 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'End-to-End Encrypted XMTP Message Architecture',
       chart: `flowchart LR
-  subgraph YourBrowser["Your Browser"]
+  subgraph YourBrowser ["Your Browser"]
     W["Wallet Signs XMTP Install Message"]
     C["XMTP Client Singleton Cached"]
     IDB[("IndexedDB Ciphertexts")]
-    PIN["PIN Gate Optional Lockout"]
+    PIN["PIN Gate — Optional Lockout"]
+    W --> C
+    C <-->|"Persist and Retrieve"| IDB
+    PIN -.->|"Blocks UI Access"| C
   end
-  subgraph XMTPNet["XMTP Decentralized Network"]
+  subgraph XMTPNet ["XMTP Decentralized Network"]
     N["Encrypted Envelope Topics"]
   end
-  subgraph PeerBrowser["Counterparty Browser"]
+  subgraph PeerBrowser ["Counterparty Browser"]
     P["Their Wallet + XMTP Client"]
     PIDB[("Their IndexedDB")]
+    P <-->|"Persist and Retrieve"| PIDB
   end
-  W --> C
-  C -->|Publish Encrypted Envelope| N
-  N -->|Subscribe + Decrypt| P
-  C <-->|Persist and Retrieve| IDB
-  P <-->|Persist and Retrieve| PIDB
-  PIN -.->|Blocks UI Access| C
-  style XMTPNet fill:#f5f5f5,stroke:#ccc,stroke-dasharray:5 5`
+  C -->|"Publish Encrypted Envelope"| N
+  N -->|"Subscribe + Decrypt"| P
+  style XMTPNet fill:#f5f5f5,stroke:#cccccc,stroke-dasharray:5 5
+  style YourBrowser fill:#f0fff0,stroke:#006600
+  style PeerBrowser fill:#f0f0ff,stroke:#000066
+  style C fill:#000000,color:#ffffff,stroke:#000000
+  style N fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d`
     },
     bullets: [
       'Environment: NEXT_PUBLIC_XMTP_ENV defaults to production network.',
@@ -343,22 +393,22 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Comprehensive Data Boundary and Storage Classification',
       chart: `flowchart TB
-  subgraph OnDevice["On Your Device Only"]
+  subgraph OnDevice ["On Your Device Only"]
     KEYS["Wallet Private Keys and Seed"]
     XMTP["XMTP IndexedDB Ciphertexts"]
     CONTACTS["Chat Contacts and Block Lists"]
-    WIT["ZK Witness Inputs Barretenberg"]
-    WC["WalletConnect Session Local Storage"]
+    WIT["ZK Witness Inputs — Barretenberg"]
+    WC["WalletConnect Session — Local Storage"]
     VAULT["Local Vault Encrypted Ciphertext"]
   end
-  subgraph OurServers["Humanity Ledger Servers"]
+  subgraph OurServers ["Humanity Ledger Servers"]
     USER["User Row: Address + Tier"]
     SESS["JWT Session Cookies"]
     FORUM["Forum Posts and API Content"]
-    QRT["QR Bridge Token Redis TTL 60s"]
+    QRT["QR Bridge Token — Redis TTL 60s"]
     LOGS["Anonymized Interaction Telemetry"]
   end
-  subgraph NeverStored["Never Stored Anywhere by Us"]
+  subgraph NeverStored ["Never Stored Anywhere by Us"]
     NK1["Private Keys or Seed Phrases"]
     NK2["Decrypted XMTP Message Archive"]
     NK3["Local Portfolio Vault Ciphertext"]
@@ -366,7 +416,12 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
   end
   style NeverStored fill:#fff8f8,stroke:#cc0000,stroke-dasharray:4 4
   style OnDevice fill:#f8fff8,stroke:#006600
-  style OurServers fill:#f8f8ff,stroke:#000066`
+  style OurServers fill:#f8f8ff,stroke:#000066
+  style KEYS fill:#ffe0e0,stroke:#cc0000
+  style NK1 fill:#ffcccc,stroke:#cc0000
+  style NK2 fill:#ffcccc,stroke:#cc0000
+  style NK3 fill:#ffcccc,stroke:#cc0000
+  style NK4 fill:#ffcccc,stroke:#cc0000`
     }
   },
 
@@ -381,31 +436,33 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Client-Side Proving to Aztec Rollup and Ethereum L1',
       chart: `flowchart LR
-  subgraph ClientBrowser["Your Browser"]
+  subgraph ClientBrowser ["Your Browser"]
     WIT2["Build Witness from Private Inputs"]
     NOIR["Noir Circuit Compilation"]
     BB2["Barretenberg Proof Generation"]
+    WIT2 --> NOIR
+    NOIR --> BB2
   end
-  subgraph AztecRollup["Aztec Network"]
+  subgraph AztecRollup ["Aztec Network"]
     VER["Proof Verifier Batch"]
     NOTES["Private Note Tree Updates"]
     NULL["Nullifier Set"]
+    VER --> NOTES
+    VER --> NULL
   end
-  subgraph L1["Ethereum L1"]
+  subgraph L1 ["Ethereum L1"]
     ROOT2["Anchored State Root Commitment"]
     VERIFY["L1 Verifier Contract"]
+    ROOT2 --> VERIFY
   end
-  WIT2 --> NOIR
-  NOIR --> BB2
-  BB2 -->|Proof Only No Witness| VER
-  VER --> NOTES
-  VER --> NULL
+  BB2 -->|"Proof Only — No Witness"| VER
   NOTES --> ROOT2
   NULL --> ROOT2
-  ROOT2 --> VERIFY
   style ClientBrowser fill:#f8fff8,stroke:#006600
-  style AztecRollup fill:#2a1b4d,color:#fff
-  style L1 fill:#1a1a2e,color:#fff`
+  style AztecRollup fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
+  style L1 fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e
+  style BB2 fill:#ccffcc,stroke:#006600
+  style VER fill:#5533aa,color:#ffffff,stroke:#5533aa`
     },
     bullets: [
       'Private notes use commitments and nullifiers so each note is spent exactly once.',
@@ -431,18 +488,35 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Universal Mobile Scan Payload Router',
       chart: `flowchart TD
-  CAM["Mobile Camera or Gallery Input"] --> PARSER["Scan Payload Parser"]
-  PARSER -->|UUID + X25519 PubKey| SESS["Desktop Session QR Handler"]
-  PARSER -->|0x Ethereum Address| WALLET["Wallet Address QR Handler"]
-  PARSER -->|humanidfi.com/passport slug| PASS["Passport Page Handler"]
-  PARSER -->|GS1 Digital Link| GS1["GS1 Resolver Handler"]
-  PARSER -->|Unknown Format| ERR["Error + Help Link"]
-  SESS --> QR["POST qr-mobile-link"]
-  WALLET --> CHAT2["Open Whale Chat to Peer"]
-  PASS --> VIEW["Public Passport Page"]
-  GS1 --> RESOLVE["GET /api/passport/resolve"]
+  CAM["Mobile Camera or Gallery Input"]
+  PARSER["Scan Payload Parser"]
+  SESS["Desktop Session QR Handler"]
+  WALLET["Wallet Address QR Handler"]
+  PASS["Passport Page Handler"]
+  GS1["GS1 Resolver Handler"]
+  ERR["Error + Help Link"]
+  QR["POST qr-mobile-link"]
+  CHAT2["Open Whale Chat to Peer"]
+  VIEW["Public Passport Page"]
+  RESOLVE["GET /api/passport/resolve"]
+  HYDRATE["Desktop Session Hydrated"]
+  CAM --> PARSER
+  PARSER -->|"UUID + X25519 PubKey"| SESS
+  PARSER -->|"0x Ethereum Address"| WALLET
+  PARSER -->|"humanidfi.com/passport slug"| PASS
+  PARSER -->|"GS1 Digital Link"| GS1
+  PARSER -->|"Unknown Format"| ERR
+  SESS --> QR
+  WALLET --> CHAT2
+  PASS --> VIEW
+  GS1 --> RESOLVE
   RESOLVE --> VIEW
-  QR --> HYDRATE["Desktop Session Hydrated"]`
+  QR --> HYDRATE
+  style CAM fill:#000000,color:#ffffff,stroke:#000000
+  style PARSER fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
+  style HYDRATE fill:#006600,color:#ffffff,stroke:#006600
+  style ERR fill:#cc0000,color:#ffffff,stroke:#cc0000
+  style VIEW fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e`
     },
     bullets: [
       'All format matching is deterministic and evaluated client-side only.',
@@ -462,26 +536,26 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Smart Contract Interaction and Token Flow Architecture',
       chart: `graph TD
-  subgraph UserWallet["User Wallet Layer"]
+  subgraph UserWallet ["User Wallet Layer"]
     PK["Private Key Signer"]
     ETH_W["ETH Balance"]
     ERC20_W["ERC20 Token Balances"]
   end
-  subgraph CoreContracts["Core Smart Contracts"]
+  subgraph CoreContracts ["Core Smart Contracts"]
     CoreLedger["Core Ledger Contract"]
     PassportAnchor["Passport Anchor Registry"]
     TransferReceipt["transferWithReceipt Logic"]
     CoreLedger --> PassportAnchor
     CoreLedger --> TransferReceipt
   end
-  subgraph DEX["Decentralized Exchange Layer"]
+  subgraph DEX ["Decentralized Exchange Layer"]
     UniV2R["Uniswap V2 Router 02"]
     UniV3R["Uniswap V3 Router"]
     UniPool["Liquidity Pools"]
     UniV2R --> UniPool
     UniV3R --> UniPool
   end
-  subgraph Bridge["Cross-Chain Bridge"]
+  subgraph BridgeLayer ["Cross-Chain Bridge"]
     STG["Stargate Finance"]
     LZEndpoint["LayerZero Endpoint"]
     STG --> LZEndpoint
@@ -493,10 +567,12 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
   ERC20_W --> UniV2R
   ETH_W --> LZEndpoint
   UniPool --> ERC20_W
-  TransferReceipt -->|PASSPORT memo| PassportAnchor
+  TransferReceipt -->|"PASSPORT memo"| PassportAnchor
   style CoreContracts fill:#f0f0ff,stroke:#2a1b4d
   style DEX fill:#fff8f0,stroke:#996600
-  style Bridge fill:#f0fff0,stroke:#006600`
+  style BridgeLayer fill:#f0fff0,stroke:#006600
+  style PK fill:#000000,color:#ffffff,stroke:#000000
+  style CoreLedger fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d`
     }
   },
 
@@ -511,38 +587,44 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Threat Mitigation, Rate Limiting and Circuit Breaker Topology',
       chart: `graph TD
-  subgraph EdgePerimeter["Edge Perimeter"]
+  subgraph EdgePerimeter ["Edge Perimeter"]
     WAF["Web Application Firewall"]
     RATE["Vercel Edge Rate Limiter"]
     DDOS["DDoS Mitigation Layer"]
+    DDOS --> WAF
+    WAF --> RATE
   end
-  subgraph APILayer["Backend API Layer"]
-    MW2["Auth Middleware JWT Verify"]
+  subgraph APILayer ["Backend API Layer"]
+    MW2["Auth Middleware — JWT Verify"]
     INV["Contract Invariant Monitor"]
     ANOMALY["Anomaly Detection Engine"]
+    MW2 --> INV
+    INV -->|"Invariant Violation"| ANOMALY
   end
-  subgraph CircuitBreaker["Active Defense System"]
-    CB(("Global Circuit Breaker"))
+  subgraph CircuitBreaker ["Active Defense System"]
+    CB(["Global Circuit Breaker"])
     LOCK["Capital Operations Lockdown"]
     OPS["Ops Alert Dispatch"]
     AUDIT["Audit Log Write"]
+    CB --> LOCK
+    CB --> OPS
+    CB --> AUDIT
   end
-  subgraph Recovery["Recovery Path"]
+  subgraph Recovery ["Recovery Path"]
     HEALTH["Health Check API"]
     RESTORE["Manual Restore Endpoint"]
+    HEALTH --> RESTORE
   end
-  EdgePerimeter --> MW2
-  MW2 --> INV
-  INV -->|Invariant Violation| ANOMALY
-  ANOMALY -->|Threshold Exceeded| CB
-  CB --> LOCK
-  CB --> OPS
-  CB --> AUDIT
-  LOCK -.->|Post Recovery| HEALTH
-  HEALTH --> RESTORE
-  style CB fill:#cc0000,color:#fff,stroke:#fff
-  style LOCK fill:#ff4444,color:#fff
-  style EdgePerimeter fill:#f0f0ff,stroke:#0000cc`
+  RATE --> MW2
+  ANOMALY -->|"Threshold Exceeded"| CB
+  LOCK -.->|"Post Recovery"| HEALTH
+  style CB fill:#cc0000,color:#ffffff,stroke:#cc0000
+  style LOCK fill:#ff4444,color:#ffffff,stroke:#ff4444
+  style EdgePerimeter fill:#f0f0ff,stroke:#0000cc
+  style APILayer fill:#fff5f5,stroke:#cc3333
+  style CircuitBreaker fill:#fff0f0,stroke:#cc0000
+  style Recovery fill:#f0fff0,stroke:#006600
+  style OPS fill:#ff6600,color:#ffffff,stroke:#ff6600`
     }
   },
 
@@ -557,28 +639,43 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Cloud Infrastructure, Deployment Pipeline and Service Topology',
       chart: `flowchart TD
-  DEV["Developer Push to GitHub main"] --> CI["GitHub Actions CI Pipeline"]
-  CI -->|Lint + Type Check| BUILD["Next.js Build"]
-  BUILD --> RAILWAY["Railway Deployment"]
-  BUILD --> VERCEL_EDGE["Vercel Edge Network"]
-  RAILWAY --> NEXTSERVER["Next.js App Server"]
-  RAILWAY --> POSTGRES2["Postgres via Railway"]
-  RAILWAY --> REDIS2["Upstash Redis"]
+  DEV["Developer Push to GitHub main"]
+  CI["GitHub Actions CI Pipeline"]
+  BUILD["Next.js Build"]
+  RAILWAY["Railway Deployment"]
+  VERCEL_EDGE["Vercel Edge Network"]
+  NEXTSERVER["Next.js App Server"]
+  POSTGRES2["Postgres via Railway"]
+  REDIS2["Upstash Redis"]
+  PRISMA2["Prisma ORM Layer"]
+  RPC2["Alchemy / Infura RPC"]
+  XMTP2["XMTP Production Network"]
+  DEV --> CI
+  CI -->|"Lint + Type Check"| BUILD
+  BUILD --> RAILWAY
+  BUILD --> VERCEL_EDGE
+  RAILWAY --> NEXTSERVER
+  RAILWAY --> POSTGRES2
+  RAILWAY --> REDIS2
   VERCEL_EDGE --> NEXTSERVER
-  NEXTSERVER --> PRISMA2["Prisma ORM Layer"]
+  NEXTSERVER --> PRISMA2
   PRISMA2 --> POSTGRES2
   NEXTSERVER --> REDIS2
-  NEXTSERVER --> RPC2["Alchemy / Infura RPC"]
-  NEXTSERVER --> XMTP2["XMTP Production Network"]
-  subgraph Monitoring["Observability Stack"]
+  NEXTSERVER --> RPC2
+  NEXTSERVER --> XMTP2
+  subgraph Monitoring ["Observability Stack"]
     LOGS2["Railway Logs"]
     METRICS["Performance Metrics"]
     ALERTS2["Error Alerting"]
   end
   RAILWAY --> Monitoring
-  style CI fill:#f0f0f0,stroke:#333
-  style RAILWAY fill:#7B2FBE,color:#fff
-  style POSTGRES2 fill:#336791,color:#fff`
+  style CI fill:#f0f0f0,stroke:#333333
+  style RAILWAY fill:#7B2FBE,color:#ffffff,stroke:#7B2FBE
+  style POSTGRES2 fill:#336791,color:#ffffff,stroke:#336791
+  style VERCEL_EDGE fill:#000000,color:#ffffff,stroke:#000000
+  style NEXTSERVER fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e
+  style REDIS2 fill:#cc0000,color:#ffffff,stroke:#cc0000
+  style Monitoring fill:#f5fff5,stroke:#006600`
     },
     bullets: [
       'Zero-downtime deployments via Railway rolling releases.',
@@ -598,22 +695,38 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Provenance Passport Creation, Anchoring and Verification Flow',
       chart: `flowchart TD
-  ISSUER["Issuer with Connected Wallet"] --> STUDIO["Provenance Studio"]
-  STUDIO --> FORM["Fill Passport Fields"]
-  FORM --> SAVE["Save to Humanity Ledger DB"]
-  SAVE --> QR2["Generate QR Label"]
-  FORM -.->|Optional| ANCHOR["On-Chain Anchoring"]
-  ANCHOR --> CORETX["Core Ledger: transferWithReceipt"]
-  CORETX -->|PASSPORT memo| CHAIN["Ethereum State"]
-  CHAIN --> ENTROPY["Store TxHash + Core Entropy"]
+  ISSUER["Issuer with Connected Wallet"]
+  STUDIO["Provenance Studio"]
+  FORM["Fill Passport Fields"]
+  SAVE["Save to Humanity Ledger DB"]
+  QR2["Generate QR Label"]
+  ANCHOR["On-Chain Anchoring"]
+  CORETX["Core Ledger: transferWithReceipt"]
+  CHAIN["Ethereum State"]
+  ENTROPY["Store TxHash + Core Entropy"]
+  PRINT["Physical Product Label"]
+  SCAN2["Consumer Scans QR"]
+  PUBVIEW["Public Passport View Page"]
+  ISSUER --> STUDIO
+  STUDIO --> FORM
+  FORM --> SAVE
+  SAVE --> QR2
+  FORM -.->|"Optional"| ANCHOR
+  ANCHOR --> CORETX
+  CORETX -->|"PASSPORT memo"| CHAIN
+  CHAIN --> ENTROPY
   ENTROPY --> SAVE
-  QR2 --> PRINT["Physical Product Label"]
-  PRINT --> SCAN2["Consumer Scans QR"]
-  SCAN2 --> PUBVIEW["Public Passport View Page"]
-  PUBVIEW -->|Read DB| SAVE
-  PUBVIEW -.->|Verify Anchor| CHAIN
+  QR2 --> PRINT
+  PRINT --> SCAN2
+  SCAN2 --> PUBVIEW
+  PUBVIEW -->|"Read DB"| SAVE
+  PUBVIEW -.->|"Verify Anchor"| CHAIN
   style ANCHOR fill:#f0fff0,stroke:#006600
-  style CHAIN fill:#1a1a2e,color:#fff`
+  style CHAIN fill:#1a1a2e,color:#ffffff,stroke:#1a1a2e
+  style CORETX fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
+  style ENTROPY fill:#336791,color:#ffffff,stroke:#336791
+  style ISSUER fill:#000000,color:#ffffff,stroke:#000000
+  style PUBVIEW fill:#f0f0ff,stroke:#2a1b4d`
     }
   }
 ];
