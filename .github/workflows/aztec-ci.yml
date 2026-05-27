@@ -1,4 +1,4 @@
-name: Sovereign Aztec CI
+name: Private Aztec CI
 
 on:
   push:

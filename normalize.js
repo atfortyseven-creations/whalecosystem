@@ -37,7 +37,7 @@ function traverse(dir) {
             if (file === 'node_modules' || file === '.git' || file === '.next') continue;
             traverse(fullPath);
         } else {
-            if (fullPath.endsWith('.md') || fullPath.endsWith('.nr') || fullPath.endsWith('.ts') || fullPath.endsWith('.tsx') || fullPath.endsWith('.sol')) {
+            if (fullPath.endsWith('.md') || fullPath.endsWith('.nr') || fullPath.endsWith('.ts') || fullPath.endsWith('.tsx') || fullPath.endsWith('.sol') || fullPath.endsWith('.toml') || fullPath.endsWith('.yml') || fullPath.endsWith('.yaml')) {
                 processFile(fullPath);
             }
         }
