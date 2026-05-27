@@ -9,6 +9,7 @@ import {
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
 import { useUIStore } from '@/lib/store/ui-store';
+import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import {
     useAccount,
     useBlockNumber,
@@ -211,8 +212,8 @@ export default function SignUpPage() {
             });
 
             setTimeout(() => {
-                window.location.replace('/dashboard');
-            }, 2200);
+                window.location.replace('/portfolio');
+            }, 3000);
 
         } catch (err: unknown) {
             const msg = err instanceof Error ? err.message : 'Signature rejected';
@@ -469,9 +470,13 @@ export default function SignUpPage() {
                                     initial={{ scale: 0.5, opacity: 0 }}
                                     animate={{ scale: 1, opacity: 1 }}
                                     transition={{ type: 'spring', stiffness: 200, damping: 18, delay: 0.1 }}
-                                    className="w-20 h-20 mb-7 rounded-full bg-[#00C076]/10 border border-[#00C076]/30 flex items-center justify-center"
+                                    className="w-32 h-32 mb-4 -mt-4 flex items-center justify-center"
                                 >
-                                    <CheckCircle size={36} className="text-[#00C076]" />
+                                    <RemoteLottie
+                                        path="/system-shots/Transaction Complete.json"
+                                        loop={false}
+                                        className="w-full h-full drop-shadow-md"
+                                    />
                                 </motion.div>
 
                                 <h2 className="text-2xl font-light tracking-widest uppercase mb-2 text-[#00C076]">
