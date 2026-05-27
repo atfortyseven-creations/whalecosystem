@@ -19,7 +19,7 @@ export default function ArchitecturePage() {
                             Welcome to the Whale Alert Network Architecture Guide. This document provides a transparent, in-depth explanation of the technological infrastructure that powers our ecosystem. Unlike traditional web applications that rely on centralized databases to manage user identities and data, our platform is built on decentralized protocols, cryptographic verification, and local execution environments.
                         </p>
                         <p>
-                            Here, you will learn exactly how your wallet connects to our systems, how we manage sessions securely without passwords, how our cross-device QR synchronization works, and precisely what data never leaves your personal device.
+                            Whale Alert Network operates as a <strong>non-custodial</strong> browser and mobile interface, available as a Progressive Web App (PWA) and as native iOS and Android applications. We never hold, custody, or have access to your private keys at any point. Here, you will learn exactly how your wallet connects to our systems, how we manage sessions securely without passwords, how our cross-device QR synchronization works, and precisely what data never leaves your personal device.
                         </p>
                     </div>
                 </section>
@@ -97,6 +97,9 @@ export default function ArchitecturePage() {
                         <p>
                             When you initialize Whale Chat, you sign a payload that generates your XMTP identity keys. These keys are used to encrypt messages locally on your device before they are broadcasted to the decentralized XMTP network. We merely provide the interface; we cannot read, censor, or modify your communications.
                         </p>
+                        <p>
+                            At the on-chain layer, Whale Chat leverages <strong>Aztec Network's encrypted logs and private state variables</strong>. Only the sender and recipient, holding the corresponding viewing keys, can decrypt the message payloads stored on-chain, ensuring absolute communication confidentiality beyond what the transport layer alone provides.
+                        </p>
                     </div>
                 </section>
 
@@ -155,20 +158,29 @@ export default function ArchitecturePage() {
                     </div>
                 </section>
 
-                {/* 8. Aztec private state */}
+                {/* 8. Aztec Private State & Open Source Noir Integrations */}
                 <section className="bg-white p-10 md:p-14 rounded-3xl border border-black/5">
                     <div className="flex items-center gap-4 mb-6">
                         <div className="w-12 h-12 bg-white rounded-xl shadow-sm flex items-center justify-center text-[#050505]">
                             <Cpu size={24} />
                         </div>
-                        <h2 className="text-3xl font-black tracking-tight m-0">8. Aztec Private State (High Level)</h2>
+                        <h2 className="text-3xl font-black tracking-tight m-0">8. Aztec Private State & Open Source Noir Integrations</h2>
                     </div>
                     <div className="prose prose-lg max-w-none text-[#050505]/70 space-y-6">
                         <p>
-                            We are currently implementing integration with the Aztec Network to introduce profound privacy to smart contract interactions. Aztec operates on a dual-state architecture, allowing contracts to read and write both public state (visible to everyone) and private state (encrypted and only accessible to authorized users).
+                            As an entirely <strong>open-source</strong> public good, we are deeply integrating with the Aztec Network to introduce profound privacy to our smart contract interactions. We employ Aztec’s Noir framework to write custom zero-knowledge circuits that facilitate private state transitions across our core modules.
                         </p>
                         <p>
-                            Through Zero-Knowledge Proofs (ZKPs), you can execute transactions or interact with DeFi protocols on our platform while your inputs, outputs, and internal state remain completely encrypted. The network only verifies the cryptographic proof of correctness, ensuring that your financial strategies and portfolio balances are shielded from public ledger surveillance.
+                            <strong>Whale Chat:</strong> Our wallet-to-wallet messaging utilizes Aztec’s encrypted logs and private state variables. Only the sender and recipient, holding the corresponding viewing keys, can decrypt the message payloads, ensuring absolute communication confidentiality on-chain.
+                        </p>
+                        <p>
+                            <strong>Humanity Ledger:</strong> Functions as a highly secure, private block explorer and portfolio tracker. By interacting with our custom Aztec account contracts, users can privately view their balances and transaction history without exposing their financial footprint to the public network.
+                        </p>
+                        <p>
+                            <strong>QR-Code Synchronization:</strong> We are developing custom Aztec account contracts that natively support our multi-device synchronization. This allows users to initiate a secure session on a desktop, authenticated by a mobile device, without exposing private keys over the network, utilizing ZK proofs for session validation.
+                        </p>
+                        <p>
+                            All Aztec integrations are developed and tested locally using the <strong>Aztec Sandbox</strong>, which replicates the full Aztec network environment on a developer machine, enabling rigorous testing of private state transitions before any testnet deployment.
                         </p>
                     </div>
                 </section>

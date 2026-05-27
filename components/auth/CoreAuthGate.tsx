@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -224,13 +224,14 @@ function SecureStepPanel({ t, onBack, onProceed }: { t: any; onBack: () => void;
   );
 }
 
-export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
+export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; startAt?: 'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting' }) {
   const [lang, setLang] = useState<LangKey>('en');
   const t = LANGS[lang];
 
   //  Determine initial step 
-  // If the user already has a system_keystore we go straight to 'login'
-  // so they never see the "Create / Login" choice screen again.
+  // If startAt is provided externally (e.g. from sign-up page), use it directly.
+  // Otherwise: if the user already has a system_keystore, go straight to 'login';
+  // otherwise show 'home' (create/login choice).
   const getInitialStep = (): 'home' | 'login' => {
     if (typeof window === 'undefined') return 'home';
     try {
@@ -244,7 +245,7 @@ export function CoreAuthGate({ onComplete }: { onComplete: () => void }) {
     }
   };
 
-  const [step, setStep] = useState<'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>(getInitialStep);
+  const [step, setStep] = useState<'home' | 'login' | 'mnemonic' | 'password' | 'generating_wallet' | 'transaction_complete' | 'secure' | 'reveal' | 'verify' | 'encrypting'>(startAt ?? getInitialStep);
   const [hasKeystore, setHasKeystore] = useState(false);
   const [accounts, setAccounts] = useState<SystemAccount[]>([]);
   const [selectedAccountId, setSelectedAccountId] = useState<string | null>(null);

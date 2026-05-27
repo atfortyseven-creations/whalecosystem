@@ -95,6 +95,7 @@ export default function SecurityArchitecturePage() {
             <ul className="space-y-3 pl-5">
               {[
                 'zk-SNARKs (Groth16 and PLONK variants) for zero-knowledge identity proofs and verifiable computation.',
+                'Noir — Aztec Network\'s domain-specific language for writing auditable, custom zero-knowledge circuits deployed on the Aztec rollup.',
                 'ECDSA and EdDSA elliptic curve signatures for transaction authentication on supported blockchain networks.',
                 'AES-256-GCM for symmetric encryption of all data at rest across our storage infrastructure.',
                 'TLS 1.3 with Perfect Forward Secrecy (PFS) for all data in transit.',

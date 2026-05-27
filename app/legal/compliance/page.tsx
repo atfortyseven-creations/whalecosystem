@@ -199,6 +199,7 @@ export default function RegulatoryCompliancePage() {
                 { label: 'SOC 2 Type II', desc: 'Annual audit of security, availability, and confidentiality controls.' },
                 { label: 'ISO 27001', desc: 'Information Security Management System certification.' },
                 { label: 'Smart Contract Audits', desc: 'Pre-deployment audits by tier-1 blockchain security firms.' },
+                { label: 'Noir Circuit Audits', desc: 'Independent security review of our custom Aztec Noir zero-knowledge circuits prior to testnet and mainnet deployment.' },
               ].map(({ label, desc }) => (
                 <div key={label} className="border border-black/10 rounded-xl p-5 text-center">
                   <p className="font-black text-black text-[15px] mb-2">{label}</p>

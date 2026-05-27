@@ -5,7 +5,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ATOM_PNGTREE } from '@/lib/constants/systemAssets';
 import { PRIVACY_ARCHITECTURE_SECTIONS, PRIVACY_TOC } from '@/lib/content/privacyArchitecture';
-import { MermaidDiagram } from '@/components/privacy/MermaidDiagram';
+
 
 export function PrivacyArchitecturePage() {
   const [activeId, setActiveId] = useState<string>(PRIVACY_TOC[0]?.id ?? 'overview');
@@ -150,9 +150,7 @@ export function PrivacyArchitecturePage() {
                   </ul>
                 )}
 
-                {section.diagram && (
-                  <MermaidDiagram chart={section.diagram.chart} caption={section.diagram.caption} />
-                )}
+
 
                 {section.callout && (
                   <div className="mt-8 p-6 md:p-8 border-l-2 border-black bg-white">

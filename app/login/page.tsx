@@ -131,6 +131,20 @@ function ConnectPanel() {
   const { isConnected, address } = useAccount();
   const router = useRouter();
   const [showLocalLogin, setShowLocalLogin] = useState(false);
+  const [hasLocalWallet, setHasLocalWallet] = useState<boolean | null>(null);
+
+  // Detect if user has an existing Humanity Ledger local wallet
+  useEffect(() => {
+    try {
+      const accs = localStorage.getItem("system_accounts");
+      if (accs && JSON.parse(accs).length > 0) { setHasLocalWallet(true); return; }
+      const ks = localStorage.getItem("system_keystore");
+      const vault = localStorage.getItem("system_vault_v1");
+      setHasLocalWallet(!!(ks || vault));
+    } catch {
+      setHasLocalWallet(false);
+    }
+  }, []);
 
   const handleRedirect = useCallback(() => {
      const urlParams = new URLSearchParams(window.location.search);
@@ -219,7 +233,7 @@ function ConnectPanel() {
                 Conecta tu Wallet
               </h2>
               <p className="text-white/50 text-[13px] leading-relaxed">
-                Autenticación no custodial. Tu firma criptográfica es tu identidad  sin contraseñas, sin cuentas.
+                Autenticación no custodial. Tu firma criptográfica es tu identidad — sin contraseñas, sin cuentas.
               </p>
             </div>
 
@@ -258,13 +272,27 @@ function ConnectPanel() {
                   <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
                 </button>
 
-                <button
-                  onClick={() => setShowLocalLogin(true)}
-                  className="w-full h-14 rounded-[1.2rem] font-black uppercase tracking-[0.15em] text-[11px] transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 group border border-white/10 hover:bg-white/5 hover:border-white/20 text-white/70 hover:text-white"
-                >
-                  <Key size={14} className="text-white/40 group-hover:text-white/70" />
-                  Acceder con Cuenta Local
-                </button>
+                {/* Humanity Ledger button — only shown if user already has a local wallet */}
+                {hasLocalWallet === true && (
+                  <button
+                    onClick={() => setShowLocalLogin(true)}
+                    className="w-full h-14 rounded-[1.2rem] font-black uppercase tracking-[0.15em] text-[11px] transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 group border border-white/10 hover:bg-white/5 hover:border-white/20 text-white/70 hover:text-white"
+                  >
+                    <Key size={14} className="text-white/40 group-hover:text-white/70" />
+                    Acceder con Humanity Ledger
+                  </button>
+                )}
+
+                {/* No local wallet — offer to create one */}
+                {hasLocalWallet === false && (
+                  <button
+                    onClick={() => router.push("/sign-up")}
+                    className="w-full h-14 rounded-[1.2rem] font-black uppercase tracking-[0.15em] text-[11px] transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 group border border-white/[0.08] hover:bg-white/[0.04] hover:border-white/15 text-white/45 hover:text-white/70"
+                  >
+                    <Key size={14} className="text-white/25 group-hover:text-white/50" />
+                    Crear Wallet Humanity Ledger
+                  </button>
+                )}
               </div>
             )}
 

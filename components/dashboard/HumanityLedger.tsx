@@ -71,9 +71,10 @@ function RoadmapCanvas() {
 
   const onMouseMove = useCallback((e: React.MouseEvent) => {
     if (!dragging || !dragStart.current) return;
-    const dx = e.clientX - dragStart.current.mx;
-    const dy = e.clientY - dragStart.current.my;
-    setTransform(t => ({ ...t, x: dragStart.current!.tx + dx, y: dragStart.current!.ty + dy }));
+    const { mx, my, tx, ty } = dragStart.current;
+    const dx = e.clientX - mx;
+    const dy = e.clientY - my;
+    setTransform(t => ({ ...t, x: tx + dx, y: ty + dy }));
   }, [dragging]);
 
   const onMouseUp = useCallback(() => {
@@ -112,9 +113,10 @@ function RoadmapCanvas() {
 
   const onTouchMove = useCallback((e: React.TouchEvent) => {
     if (!dragging || !dragStart.current) return;
-    const dx = e.touches[0].clientX - dragStart.current.mx;
-    const dy = e.touches[0].clientY - dragStart.current.my;
-    setTransform(t => ({ ...t, x: dragStart.current!.tx + dx, y: dragStart.current!.ty + dy }));
+    const { mx, my, tx, ty } = dragStart.current;
+    const dx = e.touches[0].clientX - mx;
+    const dy = e.touches[0].clientY - my;
+    setTransform(t => ({ ...t, x: tx + dx, y: ty + dy }));
   }, [dragging]);
 
   const onTouchEnd = useCallback(() => {

@@ -10,6 +10,7 @@ const TOC: TocItem[] = [
   { id: 'leadership', label: 'Leadership' },
   { id: 'global-reach', label: 'Global Reach & ESG' },
   { id: 'technology', label: 'Technology Stack' },
+  { id: 'open-source-aztec', label: 'Open Source & Aztec Integration' },
 ];
 
 const VALUES = [
@@ -39,7 +40,7 @@ const STACK = [
   },
   {
     title: 'Blockchain Integration',
-    items: ['EVM-compatible, deeply audited smart contract infrastructure', 'Viem & Wagmi for resilient, agnostic wallet connection layers', 'Enterprise-tier node providers (Alchemy, Infura) for uptime', 'Advanced real-time mempool monitoring and transaction simulation'],
+    items: ['EVM-compatible, deeply audited smart contract infrastructure', 'Viem & Wagmi for resilient, agnostic wallet connection layers', 'Enterprise-tier node providers (Alchemy, Infura) for uptime', 'Advanced real-time mempool monitoring and transaction simulation', 'Aztec Network (programmable ZK rollup) for private on-chain state transitions', 'Noir — domain-specific language for writing custom zero-knowledge circuits'],
   },
 ];
 
@@ -69,10 +70,13 @@ export default function AboutPage() {
               A specialised group of passionate software engineers, financial analysts, and user experience designers came together to bridge this growing gap. We set out to build a holistic platform that strips away the daunting complexity of blockchain technology, presenting users with a clean, intuitive, and highly professional interface that rivals the best consumer applications in the world.
             </p>
             <p>
+              The result is a comprehensive Web3 dashboard that seamlessly integrates nine core modules — including the Humanity Ledger (a real-time on-chain scanner and private portfolio tracker) and Whale Chat (end-to-end encrypted wallet-to-wallet messaging) — accessible across devices via a frictionless, cryptographically secure QR-code session synchronisation.
+            </p>
+            <p>
               From our early days developing simple portfolio trackers, we have rapidly evolved into a comprehensive global ecosystem. Today, we offer real-time market analysis, secure end-to-end encrypted communication channels, advanced asset management tools, and institutional-grade charting — all packaged into an accessible web application. Our fundamental commitment to never compromising on user privacy has guided every architectural decision we have made since day one.
             </p>
             <p>
-              We have grown from a small collective into a globally distributed organisation, serving hundreds of thousands of users across continents. Our core mission remains unchanged: to empower individuals with the best financial tools available, in the most secure, transparent, and accessible way possible.
+              We maintain 100% operational status across our distributed node infrastructure with zero reported outages, demonstrating a proven track record of shipping complex features without compromising security or uptime.
             </p>
           </div>
         </section>
@@ -141,13 +145,17 @@ export default function AboutPage() {
                 />
                 <p className="mt-3 text-[13px] font-bold text-black text-center">Stefan Antonio Cirisanu</p>
                 <p className="text-[11px] text-black/45 text-center font-mono uppercase tracking-wider mt-0.5">CEO & Founder</p>
+                <div className="flex flex-col items-center gap-1 mt-2">
+                  <a href="https://x.com/whalecosystem" target="_blank" rel="noopener noreferrer" className="text-[11px] text-black/50 hover:text-black/80 transition-colors font-mono">@whalecosystem</a>
+                  <a href="https://www.linkedin.com/in/stefan-antonio-cirisanu-40116140b/" target="_blank" rel="noopener noreferrer" className="text-[11px] text-black/50 hover:text-black/80 transition-colors font-mono">LinkedIn</a>
+                </div>
               </div>
               <div className="space-y-3">
                 <p>
-                  The team behind Whale Alert Network is a diverse, globally distributed group of professionals. Our leadership brings together decades of combined experience from top-tier technology companies, traditional financial institutions, and leading blockchain research organisations. We operate in a flat, meritocratic structure where the best ideas win, regardless of who proposes them.
+                  The team behind Whale Alert Network is a diverse, globally distributed group of professionals. Our leadership brings together extensive experience from top-tier technology companies, traditional financial institutions, and leading blockchain research organisations. We operate in a flat, meritocratic structure where the best ideas win, regardless of who proposes them.
                 </p>
                 <p>
-                  We foster a culture of radical candour, continuous learning, and intense focus on user experience. Our team is united by a shared passion for decentralisation and a profound respect for individual privacy.
+                  We foster a culture of continuous learning and intense focus on user experience. Our team is united by a shared passion for decentralisation and a profound respect for individual privacy.
                 </p>
                 <p>
                   Our corporate governance employs an independent board of advisors composed of legal experts, cybersecurity veterans, and macroeconomists who rigorously audit our strategic direction. This ensures that every technological deployment strictly aligns with our foundational manifesto of user empowerment and ethical financial indexing.
@@ -196,6 +204,38 @@ export default function AboutPage() {
                 </ul>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Open Source & Aztec Integration */}
+        <section id="open-source-aztec">
+          <h2 className="text-[1.1rem] font-bold uppercase tracking-[0.08em] text-black mb-6 pb-3 border-b border-black/10">
+            Open Source &amp; Aztec Integration
+          </h2>
+          <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
+            <p>
+              Whale Alert Network is entirely <strong>Open Source</strong>. We believe that true financial sovereignty and privacy can only be achieved when the underlying code is fully transparent, auditable, and verifiable by the community. We do not commercialise the system; our goal is to provide a robust, production-ready public good for the decentralised ecosystem.
+            </p>
+            <p>
+              We are deeply integrated with the <strong>Aztec Network</strong>, a programmable zero-knowledge (ZK) rollup. By leveraging Aztec’s Noir circuits and confidential execution environments, we obscure sensitive user interactions:
+            </p>
+            <ul className="space-y-2 pl-5">
+              <li className="flex items-start gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                <span><strong>Whale Chat:</strong> Utilises Aztec’s encrypted logs and private state variables to ensure wallet-to-wallet messages remain absolutely confidential on-chain.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                <span><strong>Humanity Ledger:</strong> Acts as a secure, private block explorer. Through custom Aztec account contracts, users can privately view balances and history without exposing their financial footprint to the public network.</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="mt-2 w-1.5 h-1.5 rounded-full bg-black/30 shrink-0" />
+                <span><strong>QR Session Sync:</strong> Employs ZK proofs for session validation across mobile and desktop, authenticated via Aztec account contracts without exposing private keys over the network.</span>
+              </li>
+            </ul>
+            <p>
+              This open-source initiative, spearheaded by our founder Stefan Antonio Cirisanu, is actively seeking support through the Aztec Network grant program to fund rigorous security auditing of our custom Noir circuits and facilitate our full deployment to the Aztec ecosystem.
+            </p>
           </div>
         </section>
 
