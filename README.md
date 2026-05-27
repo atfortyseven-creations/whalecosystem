@@ -23,8 +23,8 @@ A high-frequency analytics engine that detects coordinated capital movements acr
 
 ### 2. Whale Chat & Private Forums
 A decentralized coordination layer for verified network participants.
-- Authenticated strictly via cryptographically proven wallet ownership (EIP-191 signatures).
-- Sybil-resistant design integrated with WorldID verifiable credentials to ensure 1-to-1 human participation without doxing personal data.
+- Authenticated strictly via cryptographically proven wallet ownership (EIP-191 signatures) and Aztec private state primitives.
+- Sybil-resistant design utilizing verifiable credentials to ensure 1-to-1 human participation without doxing personal data.
 
 ### 3. Non-Custodial Dashboard
 A Next.js 15 (App Router) based Progressive Web App (PWA).
@@ -66,4 +66,4 @@ We are committed to building transparent, sustainable infrastructure for the Web
 
 **Author:** Stefan Antonio Cirisanu (@whalecosystem)  
 **Website:** [humanidfi.com](https://humanidfi.com)  
-**Grant Proposal:** [Link to Aztec Forum Post - To Be Added]
+**Grant Proposal:** [Pending publication on Aztec Forum]

@@ -559,6 +559,90 @@ function DocumentationSection() {
   );
 }
 
+// ─── Product Showcase ─────────────────────────────────────────────────────────
+
+function ProductShowcaseSection() {
+  return (
+    <section className="w-full bg-[#050505] text-white py-28 md:py-40 overflow-hidden relative">
+      <div className="w-full max-w-[1200px] mx-auto px-6 relative z-10">
+        <div className="text-center mb-20">
+          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
+            Platform Capabilities
+          </span>
+          <h2 className="mt-4 text-[36px] sm:text-[52px] font-black tracking-tighter leading-[0.93] text-white">
+            Built for Institutional Operators.
+          </h2>
+        </div>
+
+        {/* Dashboard Mockup */}
+        <div className="flex flex-col lg:flex-row gap-12 items-center mb-32">
+          <div className="w-full lg:w-1/2">
+            <h3 className="text-[28px] font-black tracking-tight mb-4">Mempool Telemetry</h3>
+            <p className="text-[15px] text-white/60 leading-[1.75] mb-6">
+              Track multi-hop capital flows, flash loans, and coordinated institutional positioning before they settle on the public ledger. Our local-first Neo4j engine graphs relationships instantly.
+            </p>
+            <ul className="flex flex-col gap-3">
+               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Z-Score anomaly detection</li>
+               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Real-time EIP-1153 heuristics</li>
+            </ul>
+          </div>
+          <div className="w-full lg:w-1/2 relative">
+             <div className="w-full aspect-[4/3] bg-black border border-white/10 rounded-lg shadow-2xl overflow-hidden flex flex-col">
+                <div className="h-8 border-b border-white/10 flex items-center px-4 gap-2 bg-white/5">
+                   <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
+                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
+                   <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
+                   <span className="ml-auto font-mono text-[10px] text-white/30">Whale_Scanner_Terminal</span>
+                </div>
+                <div className="p-5 flex-1 font-mono text-[11px] text-green-400/80 flex flex-col gap-2 overflow-hidden relative">
+                   <div className="flex justify-between border-b border-white/5 pb-2 mb-2"><span className="text-white/40">TX HASH</span><span className="text-white/40">VALUE</span><span className="text-white/40">TYPE</span></div>
+                   <div className="flex justify-between hover:bg-white/5 p-1"><span className="text-blue-400">0x8f...32a1</span><span className="text-white">12,500 ETH</span><span className="text-yellow-400">CEX OUTFLOW</span></div>
+                   <div className="flex justify-between hover:bg-white/5 p-1"><span className="text-blue-400">0x2a...99b2</span><span className="text-white">5,000,000 USDC</span><span className="text-purple-400">DEX SWAP</span></div>
+                   <div className="flex justify-between hover:bg-white/5 p-1"><span className="text-blue-400">0x11...4c3d</span><span className="text-white">450 WBTC</span><span className="text-green-400">BRIDGE L2</span></div>
+                   <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent"></div>
+                </div>
+             </div>
+          </div>
+        </div>
+
+        {/* Whale Chat Mockup */}
+        <div className="flex flex-col lg:flex-row-reverse gap-12 items-center">
+          <div className="w-full lg:w-1/2">
+            <h3 className="text-[28px] font-black tracking-tight mb-4">Whale Chat (E2EE)</h3>
+            <p className="text-[15px] text-white/60 leading-[1.75] mb-6">
+              Coordinate strategies in a fully encrypted, Sybil-resistant environment. Authenticate via EIP-191 wallet signatures and communicate using Aztec's zero-knowledge state primitives.
+            </p>
+             <ul className="flex flex-col gap-3">
+               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-white rounded-full"></span> Cryptographic Wallet Ownership Proofs</li>
+               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-white rounded-full"></span> Unobservable P2P Network Metadata</li>
+            </ul>
+          </div>
+          <div className="w-full lg:w-1/2 relative">
+             <div className="w-full aspect-[4/3] bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl overflow-hidden flex flex-col">
+                <div className="h-12 border-b border-white/10 flex items-center px-5 gap-4 bg-white/[0.02]">
+                   <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500"></div>
+                   <div>
+                      <div className="text-[12px] font-bold text-white">0xAlpha...</div>
+                      <div className="text-[10px] text-green-400 font-mono">EIP-191 Verified</div>
+                   </div>
+                </div>
+                <div className="p-5 flex-1 flex flex-col gap-4 font-sans text-[13px] overflow-hidden">
+                   <div className="self-start max-w-[80%] bg-white/10 text-white/90 p-3 rounded-2xl rounded-tl-sm shadow-sm border border-white/5">
+                      Has the mempool anomaly on mainnet been verified?
+                   </div>
+                   <div className="self-end max-w-[80%] bg-white text-black p-3 rounded-2xl rounded-tr-sm shadow-sm">
+                      Yes. Z-score is 4.5. Committing the multi-sig payload to the Noir circuit now.
+                   </div>
+                </div>
+             </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  );
+}
+
 // ─── Final CTA (DownPage) — with video background ─────────────────────────────
 
 function FinalCTASection() {
@@ -656,6 +740,7 @@ export function ImmersiveManifestoLanding(_props: ImmersiveManifestoLandingProps
       <HeroSection />
       <StatStrip />
       <WhaleNetworkSection />
+      <ProductShowcaseSection />
       <DocumentationSection />
       <FinalCTASection />
     </div>
