@@ -350,10 +350,8 @@ function HeroSection() {
         draggable="false"
         className="hero-pixel-img absolute inset-0 w-full h-full select-none"
         style={{
-          width: '100vw',
-          height: '100vh',
           objectFit: 'contain',
-          objectPosition: 'center center',
+          objectPosition: 'center',
         }}
       />
 

@@ -93,8 +93,18 @@ export function NativeBridgeView({ address, onBack }: any) {
     }, [amount, fromChain, toChain]);
 
     const executeBridge = async () => {
-        if (!address || !amount || !privateKey) {
-            toast.error("Vault Locked or Invalid Amount");
+        if (!amount || parseFloat(amount) <= 0) {
+            toast.error("INVALID VECTOR EXECUTION", { description: "Mathematical amount must be strictly greater than 0 to calculate cross-chain state transition." });
+            return;
+        }
+
+        if (!privateKey) {
+            toast.error("READ-ONLY NODE ACTIVE", { description: "Cryptographic private key not found. Please initialize your Quantum Vault to sign cross-chain transactions." });
+            return;
+        }
+
+        if (!address) {
+            toast.error("System Uninitialized", { description: "Cryptographic identity missing." });
             return;
         }
 
@@ -189,11 +199,11 @@ export function NativeBridgeView({ address, onBack }: any) {
                     <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-3 block flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-red-500 block"></span> SOURCE LEDGER
                     </label>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <select 
                             value={fromChain}
                             disabled
-                            className="bg-transparent font-black uppercase tracking-widest text-sm outline-none cursor-not-allowed text-black/50 dark:text-white/50"
+                            className="w-full sm:w-auto bg-transparent font-black uppercase tracking-widest text-sm outline-none cursor-not-allowed text-black/50 dark:text-white/50"
                         >
                             {CHAINS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
@@ -220,11 +230,11 @@ export function NativeBridgeView({ address, onBack }: any) {
                     <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-3 block flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-500 block"></span> DESTINATION LEDGER
                     </label>
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <select 
                             value={toChain}
                             onChange={(e) => setToChain(e.target.value)}
-                            className="bg-white dark:bg-black border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:border-black/30 dark:hover:border-white/30 text-black dark:text-white"
+                            className="w-full sm:w-auto bg-white dark:bg-black border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:border-black/30 dark:hover:border-white/30 text-black dark:text-white"
                         >
                             {CHAINS.map(c => <option key={c.id} value={c.id} className="bg-white dark:bg-black">{c.name}</option>)}
                         </select>

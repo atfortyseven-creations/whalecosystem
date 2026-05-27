@@ -82,31 +82,25 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     diagram: {
       caption: 'Thermodynamic Data Ingestion and Local Processing Pipeline',
       chart: `graph TD
-  subgraph PublicEco ["Public Ecosystem"]
-    RPC["RPC Node Clusters"]
-    Mem["Mempool Streams"]
-    RPC -->|"Raw Block Data"| Mem
-  end
-  subgraph VaultProcessing ["Localized Vault Processing"]
-    WW["Whale Worker Node"]
-    Neo["Neo4j Graph DB"]
-    RedisDB["Redis / Upstash"]
-    PG["Prisma / Postgres"]
-    AE["Analytics Engine"]
-    Mem --> WW
-    WW -->|"Z-Score Analysis"| Neo
-    WW -->|"Tx Vitals Stream"| RedisDB
-    WW -->|"Persistent State"| PG
-    Neo --> AE
-    RedisDB --> AE
-    PG --> AE
-  end
-  subgraph SecureDelivery ["Secure Client Delivery"]
-    UI["Next.js Client Terminal"]
-    AZ["Aztec Shielded Pool"]
-    AE -->|"Encrypted WebSocket"| UI
-    UI -.->|"ZK Circuit Delegation"| AZ
-  end
+  RPC["RPC Node Clusters"]
+  Mem["Mempool Streams"]
+  WW["Whale Worker Node"]
+  Neo["Neo4j Graph DB"]
+  RedisDB["Redis / Upstash"]
+  PG["Prisma / Postgres"]
+  AE["Analytics Engine"]
+  UI["Next.js Client Terminal"]
+  AZ["Aztec Shielded Pool"]
+  RPC --> Mem
+  Mem --> WW
+  WW --> Neo
+  WW --> RedisDB
+  WW --> PG
+  Neo --> AE
+  RedisDB --> AE
+  PG --> AE
+  AE --> UI
+  UI -.-> AZ
   style WW fill:#ffffff,stroke:#000000,stroke-width:2px
   style UI fill:#000000,color:#ffffff,stroke:#000000
   style AZ fill:#2a1b4d,color:#ffffff,stroke:#2a1b4d
@@ -347,18 +341,18 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
     W["Wallet Signs XMTP Install Message"]
     C["XMTP Client Singleton Cached"]
     IDB[("IndexedDB Ciphertexts")]
-    PIN["PIN Gate — Optional Lockout"]
+    PIN["PIN Gate"]
     W --> C
-    C <-->|"Persist and Retrieve"| IDB
-    PIN -.->|"Blocks UI Access"| C
+    C <-->|"Persist / Retrieve"| IDB
+    PIN -.->|"Blocks UI"| C
   end
   subgraph XMTPNet ["XMTP Decentralized Network"]
     N["Encrypted Envelope Topics"]
   end
   subgraph PeerBrowser ["Counterparty Browser"]
-    P["Their Wallet + XMTP Client"]
+    P["Their XMTP Client"]
     PIDB[("Their IndexedDB")]
-    P <-->|"Persist and Retrieve"| PIDB
+    P <-->|"Persist / Retrieve"| PIDB
   end
   C -->|"Publish Encrypted Envelope"| N
   N -->|"Subscribe + Decrypt"| P
@@ -503,7 +497,7 @@ export const PRIVACY_ARCHITECTURE_SECTIONS: PrivacyArchitectureSection[] = [
   CAM --> PARSER
   PARSER -->|"UUID + X25519 PubKey"| SESS
   PARSER -->|"0x Ethereum Address"| WALLET
-  PARSER -->|"humanidfi.com/passport slug"| PASS
+  PARSER -->|"humanidfi.com/passport"| PASS
   PARSER -->|"GS1 Digital Link"| GS1
   PARSER -->|"Unknown Format"| ERR
   SESS --> QR

@@ -162,8 +162,18 @@ export function NativeSwapView({ address, onBack }: any) {
     };
 
     const executeSwap = async () => {
-        if (!address || !amountIn || !privateKey) {
-            toast.error("Vault Locked or Invalid Amount");
+        if (!amountIn || parseFloat(amountIn) <= 0) {
+            toast.error("INVALID VECTOR EXECUTION", { description: "Mathematical amount must be strictly greater than 0 to calculate state transition." });
+            return;
+        }
+
+        if (!privateKey) {
+            toast.error("READ-ONLY NODE ACTIVE", { description: "Cryptographic private key not found. Please initialize your Quantum Vault to sign L1/L2 state transitions." });
+            return;
+        }
+
+        if (!address) {
+            toast.error("System Uninitialized", { description: "Cryptographic identity missing." });
             return;
         }
 
@@ -264,18 +274,18 @@ export function NativeSwapView({ address, onBack }: any) {
                     <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-3 block flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-red-500 block"></span> SELL
                     </label>
-                    <div className="flex items-center justify-between gap-4">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                         <input 
                             type="number" 
                             value={amountIn}
                             onChange={(e) => setAmountIn(e.target.value)}
                             placeholder="0.00"
-                            className="bg-transparent text-4xl font-light outline-none w-2/3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black dark:text-white"
+                            className="bg-transparent text-4xl font-light outline-none w-full sm:w-2/3 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black dark:text-white"
                         />
                         <select 
                             value={fromToken}
                             onChange={(e) => setFromToken(e.target.value)}
-                            className="bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:bg-black/10 dark:hover:bg-white/10 text-black dark:text-white"
+                            className="w-full sm:w-auto bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:bg-black/10 dark:hover:bg-white/10 text-black dark:text-white"
                         >
                             {Object.keys(TOKENS).map(t => <option key={t} value={t} className="bg-white dark:bg-black text-black dark:text-white">{t}</option>)}
                         </select>
@@ -296,8 +306,8 @@ export function NativeSwapView({ address, onBack }: any) {
                     <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-3 block flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-500 block"></span> BUY
                     </label>
-                    <div className="flex items-center justify-between gap-4">
-                        <div className="text-4xl font-light w-2/3 truncate text-black/80 dark:text-white/80 flex items-center">
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                        <div className="text-4xl font-light w-full sm:w-2/3 truncate text-black/80 dark:text-white/80 flex items-center">
                             {isCalculating ? (
                                 <motion.span initial={{opacity:0.3}} animate={{opacity:1}} transition={{repeat:Infinity, duration:0.5}} className="text-black/20 dark:text-white/20 font-mono text-2xl tracking-widest">CALCULATING...</motion.span>
                             ) : amountOut || "0.00"}
@@ -305,7 +315,7 @@ export function NativeSwapView({ address, onBack }: any) {
                         <select 
                             value={toToken}
                             onChange={(e) => setToToken(e.target.value)}
-                            className="bg-white dark:bg-black border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:border-black/30 text-black dark:text-white"
+                            className="w-full sm:w-auto bg-white dark:bg-black border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:border-black/30 text-black dark:text-white"
                         >
                             {Object.keys(TOKENS).map(t => <option key={t} value={t} className="bg-white dark:bg-black text-black dark:text-white">{t}</option>)}
                         </select>

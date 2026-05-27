@@ -439,7 +439,7 @@ export const useWalletStore = create<WalletState>()(
       sendTransaction: async (to: string, amount: string, gasPriority: 'low'|'medium'|'high' = 'medium') => {
         const { privateKey, activeNetwork, activeProtocol, isLocked } = get();
         if (isLocked || !privateKey) {
-          toast.error("Vault Locked", { description: "Please unlock your vault to sign transactions." });
+          toast.error("READ-ONLY NODE ACTIVE", { description: "Cryptographic private key not found. Please initialize your Quantum Vault to sign transactions." });
           return null;
         }
 

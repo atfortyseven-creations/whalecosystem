@@ -139,14 +139,14 @@ export function NativeBuyView({ address, onBack }: any) {
                 {/* Amount Input */}
                 <div className="border border-black/10 dark:border-white/10 p-6 bg-white dark:bg-[#0a0a0a] transition-colors group">
                     <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-4 block">Fiat Allocation</label>
-                    <div className="flex items-center gap-4">
-                        <span className="text-2xl font-light tracking-widest text-black/40 dark:text-white/40">$</span>
+                    <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+                        <span className="hidden sm:block text-2xl font-light tracking-widest text-black/40 dark:text-white/40">$</span>
                         <input 
                             type="number" 
                             value={fiatAmount}
                             onChange={(e) => setFiatAmount(e.target.value)}
                             placeholder="1000"
-                            className="bg-transparent text-5xl font-light outline-none w-full [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black dark:text-white transition-colors"
+                            className="bg-transparent text-5xl font-light outline-none w-full sm:flex-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black dark:text-white transition-colors"
                         />
                         <span className="text-lg font-bold tracking-widest text-black/40 dark:text-white/40">USD</span>
                     </div>

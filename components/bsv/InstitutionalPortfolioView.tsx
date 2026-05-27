@@ -154,8 +154,8 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Purging Session...</p>
                 </div>
             )}
-            <header className="flex items-center justify-between px-8 py-6 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#050505] relative z-10 shadow-none transition-colors">
-                <div className="flex flex-col gap-1 w-1/3">
+            <header className="flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-6 gap-6 md:gap-0 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#050505] relative z-10 shadow-none transition-colors">
+                <div className="flex flex-col gap-1 w-full md:w-1/3">
                     <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 dark:text-white/40 flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-500 animate-pulse block"></span> 
                         EXECUTION SUBNET
@@ -178,8 +178,8 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     </div>
                 </div>
 
-                <div className="flex flex-col items-center justify-center w-1/3">
-                    <div className="h-8 w-64 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-full flex items-center px-4 overflow-hidden relative">
+                <div className="flex flex-col items-start md:items-center justify-center w-full md:w-1/3">
+                    <div className="h-8 w-full max-w-[280px] md:w-64 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-full flex items-center px-4 overflow-hidden relative">
                         <div className="absolute top-0 left-0 h-full bg-black/10 dark:bg-white/10" style={{ width: `${Math.random() * 100}%`, transition: 'width 1s linear' }}></div>
                         <span className="text-[8px] font-black tracking-[0.2em] uppercase text-black/50 dark:text-white/50 relative z-10">L1/L2 MEMPOOL SYNC</span>
                         <span className="text-[8px] font-mono text-black dark:text-white ml-auto relative z-10">{Math.random().toFixed(2)} ms</span>
@@ -187,7 +187,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 </div>
 
                 {address && (
-                    <div className="flex gap-4 items-center justify-end w-1/3">
+                    <div className="flex flex-wrap gap-2 md:gap-4 items-center md:justify-end w-full md:w-1/3 mt-2 md:mt-0">
                         <button onClick={onRefresh} disabled={loading} className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 px-3 py-1.5 rounded">
                             {loading ? 'SYNCING...' : 'REFRESH'}
                         </button>
@@ -204,17 +204,17 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 )}
             </header>
 
-            <section className="px-8 pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-white dark:bg-[#050505] transition-colors border-b border-black/5 dark:border-white/5">
+            <section className="px-4 md:px-8 pt-8 md:pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-white dark:bg-[#050505] transition-colors border-b border-black/5 dark:border-white/5">
                 <div className="absolute inset-0 pointer-events-none opacity-[0.02] dark:opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at center, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
                 
                 <div className="relative inline-flex items-baseline justify-center mb-4">
                     <h1 className="font-light tracking-tighter text-black dark:text-white drop-shadow-sm" style={{ fontSize: 'clamp(4rem, 12vw, 7rem)' }}>
                         {balance}
                     </h1>
-                    <span className="absolute left-full text-3xl ml-4 font-black uppercase tracking-[0.2em] text-black/30 dark:text-white/30 bottom-8">{networkInfo.currency}</span>
+                    <span className="absolute left-full text-2xl md:text-3xl ml-2 md:ml-4 font-black uppercase tracking-[0.2em] text-black/30 dark:text-white/30 bottom-6 md:bottom-8">{networkInfo.currency}</span>
                 </div>
-                <div className="flex items-center gap-4 mb-12">
-                    <p className="text-black/60 dark:text-white/60 text-[12px] tracking-[0.2em] font-mono uppercase border border-black/10 dark:border-white/10 bg-white dark:bg-black px-6 py-2 shadow-sm">{balanceFiat} USD</p>
+                <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-8 md:mb-12 w-full max-w-2xl mx-auto">
+                    <p className="text-black/60 dark:text-white/60 text-[12px] tracking-[0.2em] font-mono uppercase border border-black/10 dark:border-white/10 bg-white dark:bg-black px-6 py-2 shadow-sm whitespace-nowrap">{balanceFiat} USD</p>
                     <span className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
                         <span className="w-1.5 h-1.5 bg-[#00FF41] rounded-full animate-pulse block"></span>
                         LIVE ON-CHAIN
@@ -233,7 +233,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                             </div>
                             <span className="text-[10px] uppercase font-black tracking-[0.2em] opacity-50 group-hover:opacity-100 bg-white/10 dark:bg-black/10 px-3 py-1 rounded">{copied ? 'COPIED' : 'COPY'}</span>
                         </button>
-                        <div className="flex gap-3 w-full">
+                        <div className="flex flex-col sm:flex-row gap-3 w-full">
                             <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="flex-1 border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all">
                                 INSPECT EXPLORER
                             </a>
@@ -262,7 +262,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                             <h4 className="text-[10px] font-black uppercase tracking-[0.3em] text-black border-b border-black/10 pb-3 mb-4">
                                 Execution Vectors
                             </h4>
-                            <div className="flex flex-col gap-2">
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:flex lg:flex-col gap-2">
                                 <ActionBtn label="Deposit" onClick={onBuy} />
                                 <ActionBtn label="Swap" onClick={onSwap} />
                                 <ActionBtn label="Bridge" onClick={onBridge} />
@@ -339,7 +339,14 @@ function SendView({ prefilledAddress, onBack }: any) {
     const [isSigning, setIsSigning] = useState(false);
 
     const handleSend = async () => {
-        if (!toAddress || !amount) return;
+        if (!amount || parseFloat(amount) <= 0) {
+            toast.error("INVALID VECTOR EXECUTION", { description: "Mathematical amount must be strictly greater than 0 to calculate transfer state transition." });
+            return;
+        }
+        if (!toAddress) {
+            toast.error("INVALID TARGET", { description: "Cryptographic destination required." });
+            return;
+        }
         setIsSigning(true);
         try {
             let finalAddress = toAddress;
@@ -414,8 +421,8 @@ function ReceiveView({ address, onBack }: any) {
                 <div className="w-full">
                     <button onClick={() => { navigator.clipboard.writeText(address); setCopied(true); setTimeout(() => setCopied(false), 2000); }} className="w-full group text-left">
                         <span className="text-[9px] font-bold uppercase tracking-[0.3em] text-black/40 block mb-2">Target Address</span>
-                        <div className="border border-black/20 p-4 text-xs flex items-center justify-between group-hover:border-black transition-colors bg-white">
-                            <span className="truncate max-w-[300px]">{address || 'OFFLINE_STATE'}</span>
+                        <div className="border border-black/20 p-4 text-xs flex flex-col sm:flex-row items-start sm:items-center justify-between group-hover:border-black transition-colors bg-white gap-2 sm:gap-0">
+                            <span className="truncate w-full max-w-[200px] sm:max-w-[300px] text-left">{address || 'OFFLINE_STATE'}</span>
                             <span className="text-[9px] uppercase font-bold text-black/40">{copied ? 'COPIED' : 'COPY'}</span>
                         </div>
                     </button>
