@@ -394,9 +394,9 @@ export default function ConnectPage() {
       <img
         src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
         alt="Architecture Background"
-        className="absolute inset-0 z-0 w-full h-full pointer-events-none"
+        className="absolute inset-0 z-0 w-full h-full pointer-events-none scale-[1.05] translate-x-[2%]"
         style={{
-          objectFit: 'contain',
+          objectFit: 'cover',
           objectPosition: 'center',
           opacity: 1,
         }}
@@ -405,7 +405,7 @@ export default function ConnectPage() {
       <div className="relative z-10 w-full flex-1 flex flex-col items-center justify-center px-4 pt-0 mx-auto min-h-0" style={{ pointerEvents: 'none' }}>
         
         {/* Login Panel — positioned further right, slightly wider panel */}
-        <div className="w-full max-w-[460px] flex-shrink-0 flex flex-col bg-white/96 backdrop-blur-sm rounded-[20px] border border-[#F0F0F0] shadow-[0_8px_60px_rgba(0,0,0,0.18)] p-6 z-20" style={{ pointerEvents: 'all' }}>
+        <div className="w-full max-w-[540px] flex-shrink-0 flex flex-col bg-white/96 backdrop-blur-sm rounded-[24px] border border-[#F0F0F0] shadow-[0_8px_60px_rgba(0,0,0,0.18)] p-8 z-20 translate-x-[10%]" style={{ pointerEvents: 'all' }}>
           
           <div className="flex items-center gap-3 mb-8 pb-5 border-b border-black/5">
             <Lock size={16} strokeWidth={1.2} className="text-[#0A0A0A]" />
@@ -574,9 +574,9 @@ export default function ConnectPage() {
                 ))}
                 <button
                   onClick={() => openAppKit({ view: 'Connect' })}
-                  className="w-full flex items-center justify-center gap-4 py-8 mt-2 rounded-xl border-2 border-[#0A0A0A] bg-white font-black uppercase tracking-[0.2em] text-[20px] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-all shadow-md"
+                  className="w-full flex items-center justify-center gap-4 py-10 mt-4 rounded-xl border-2 border-[#0A0A0A] bg-white font-black uppercase tracking-[0.2em] text-[24px] text-[#0A0A0A] hover:bg-[#0A0A0A] hover:text-[#FFFFFF] transition-all shadow-xl hover:scale-[1.02]"
                 >
-                  <ScanLine size={24} />
+                  <ScanLine size={28} />
                   WalletConnect
                 </button>
               </div>
