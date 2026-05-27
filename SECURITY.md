@@ -30,8 +30,4 @@ The application edge employs a distributed rate limiter (Upstash) and an OWASP-c
 - **CSP & Anti-Tampering:** A dynamic, nonce-based Content Security Policy (CSP) restricts `script-src` and `frame-src`. All inline scripts and `eval()` are strictly prohibited.
 - **Replay Protection:** All state-mutating POST requests require a cryptographic nonce and timestamp (`x-system-nonce`, `x-system-timestamp`) enforced within a 60-second validity window.
 
-## 4. Bug Bounty
 
-We operate a continuous bug bounty program. Vulnerabilities in our Noir circuits or Aztec integration layers are eligible for bounties up to $250,000 USD, paid in ETH or QDs. 
-
-Please report critical vulnerabilities to `security@humanidfi.com`. Do NOT disclose exploits publicly until they have been patched.
