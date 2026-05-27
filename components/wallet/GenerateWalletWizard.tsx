@@ -1,11 +1,13 @@
-﻿"use client";
+"use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Key, Shield, Zap, CheckCircle2, Copy, MoveRight, EyeOff, Lock } from 'lucide-react';
+import { Key, Zap, CheckCircle2, Copy, MoveRight, EyeOff, Lock, AlertTriangle } from 'lucide-react';
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { encryptWithPassword } from '@/lib/wallet-security';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 interface GenerateWalletWizardProps {
   onComplete: (privateKey: string, address: string) => void;
@@ -19,6 +21,12 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
   const [loadingProgress, setLoadingProgress] = useState(0);
   const [showTransactionComplete, setShowTransactionComplete] = useState(false);
   const [saved, setSaved] = useState(false);
+  
+  const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [isEncrypting, setIsEncrypting] = useState(false);
+  
+  const { importWallet } = useWalletStore();
 
   const generateIdentity = async () => {
     setIsGenerating(true);
@@ -60,6 +68,58 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
     });
   };
 
+  const handleSecureAndProceed = async () => {
+    if (password.length < 8) {
+        toast.error('Password must be at least 8 characters');
+        return;
+    }
+    if (password !== confirmPassword) {
+        toast.error('Passwords do not match');
+        return;
+    }
+    if (!wallet) return;
+
+    setIsEncrypting(true);
+    // Yield to React to show spinner
+    await new Promise(r => setTimeout(r, 50));
+
+    try {
+        const encryptedBlob = await encryptWithPassword(wallet.mnemonic, password);
+        
+        let accounts: any[] = [];
+        try {
+            const stored = localStorage.getItem('system_accounts');
+            if (stored) accounts = JSON.parse(stored);
+        } catch {}
+
+        const newAccount = {
+            id: Date.now().toString(),
+            name: `Wallet ${accounts.length + 1}`,
+            address: wallet.address,
+            encryptedBlob,
+            createdAt: Date.now()
+        };
+
+        const updatedAccounts = [...accounts, newAccount];
+        localStorage.setItem('system_accounts', JSON.stringify(updatedAccounts));
+        localStorage.setItem('system_keystore', encryptedBlob);
+        
+        // Sync with global store memory
+        importWallet(wallet.privateKey, 'System Main');
+        
+        try {
+            sessionStorage.setItem('portfolio_unlocked', 'true');
+            sessionStorage.setItem('system_wallet_addr', wallet.address.toLowerCase());
+        } catch {}
+
+        setIsEncrypting(false);
+        setStep(4);
+    } catch (e: any) {
+        toast.error('Encryption failed', { description: e.message });
+        setIsEncrypting(false);
+    }
+  };
+
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#FFFFFF]/80 dark:bg-black/80 backdrop-blur-md">
       <motion.div
@@ -72,8 +132,8 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
         <div className="absolute top-0 left-0 w-full h-1 bg-black/5 dark:bg-white/5">
             <motion.div 
                 className="h-full bg-indigo-500"
-                initial={{ width: '33%' }}
-                animate={{ width: `${(step / 3) * 100}%` }}
+                initial={{ width: '25%' }}
+                animate={{ width: `${(step / 4) * 100}%` }}
                 transition={{ duration: 0.5, ease: 'easeInOut' }}
             />
         </div>
@@ -142,7 +202,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-48 h-48 mb-6">
                 <RemoteLottie path="/system-shots/Transaction Complete.json" speed={1.15} />
               </div>
-              <h3 className="text-xl font-black uppercase tracking-tight text-emerald-500">Wallet Created</h3>
+              <h3 className="text-xl font-black uppercase tracking-tight text-emerald-500">Identity Verified</h3>
             </motion.div>
           )}
 
@@ -207,7 +267,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                 disabled={!saved}
                 className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               >
-                Proceed to Dashboard <MoveRight size={16} />
+                Continue to Security <MoveRight size={16} />
               </button>
             </motion.div>
           )}
@@ -215,6 +275,72 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
           {step === 3 && wallet && (
             <motion.div
               key="step3"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 20 }}
+              className="flex flex-col pt-4"
+            >
+              <div className="flex items-center gap-3 mb-6 border-b border-black/5 dark:border-white/5 pb-4">
+                 <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center">
+                    <Lock size={14} />
+                 </div>
+                 <div>
+                     <h2 className="text-lg font-black uppercase tracking-tight">Secure Wallet</h2>
+                     <p className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40 font-bold">AES-GCM Encryption</p>
+                 </div>
+              </div>
+
+              <div className="space-y-4 mb-8">
+                  <p className="text-sm text-black/60 dark:text-white/60 mb-2 font-medium">
+                      Set a password to encrypt your recovery phrase on this device. Whale Alert cannot recover this password if you lose it.
+                  </p>
+                  
+                  <div className="space-y-3">
+                      <input 
+                        type="password" 
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        placeholder="New Password (8+ characters)"
+                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-5 py-4 text-black dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500 transition-all placeholder:font-medium placeholder:text-black/30 dark:placeholder:text-white/30"
+                      />
+                      <input 
+                        type="password" 
+                        value={confirmPassword}
+                        onChange={e => setConfirmPassword(e.target.value)}
+                        placeholder="Confirm Password"
+                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-5 py-4 text-black dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500 transition-all placeholder:font-medium placeholder:text-black/30 dark:placeholder:text-white/30"
+                      />
+                  </div>
+                  
+                  <div className="flex items-start gap-2 mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg border border-amber-200 dark:border-amber-500/20">
+                      <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
+                      <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-tight font-medium">
+                          Without this password, you will need your 12-word phrase to restore access.
+                      </p>
+                  </div>
+              </div>
+
+              <button
+                onClick={handleSecureAndProceed}
+                disabled={password.length < 8 || password !== confirmPassword || isEncrypting}
+                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+              >
+                {isEncrypting ? (
+                  <>
+                    <Lock size={16} className="animate-pulse" /> Encrypting...
+                  </>
+                ) : (
+                  <>
+                    Encrypt & Save <MoveRight size={16} />
+                  </>
+                )}
+              </button>
+            </motion.div>
+          )}
+
+          {step === 4 && wallet && (
+            <motion.div
+              key="step4"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               className="flex flex-col items-center text-center pt-4 pb-4"
@@ -223,7 +349,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-full h-56 pointer-events-none mb-0">
                 <RemoteLottie path="/system-shots/Whale Mission.json" className="w-full h-full object-contain" />
               </div>
-              <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">Wallet Created</h2>
+              <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">Wallet Secured</h2>
               {/* Address directly below whale  zero gap = "pegada" */}
               <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-2xl border border-black/5 dark:border-white/5 mb-8">
                 <p className="text-[11px] font-mono font-bold text-black/70 dark:text-white/70 break-all">
