@@ -398,16 +398,16 @@ export default function ConnectPage() {
         style={{
           width: '100vw',
           height: '100vh',
-          objectFit: 'fill',
+          objectFit: 'contain',
           objectPosition: 'center center',
           opacity: 1,
         }}
       />
       
-      <div className="relative z-10 w-full flex-1 flex flex-col items-end justify-start px-4 pt-24 pr-4 sm:pr-8 max-w-[1600px] mx-auto min-h-0" style={{ pointerEvents: 'none' }}>
+      <div className="relative z-10 w-full flex-1 flex flex-col items-end justify-center px-4 pt-0 pr-4 sm:pr-16 max-w-[1600px] mx-auto min-h-0" style={{ pointerEvents: 'none' }}>
         
         {/* Login Panel — positioned further right, slightly wider panel */}
-        <div className="w-full max-w-[460px] flex-shrink-0 flex flex-col bg-white/96 backdrop-blur-sm rounded-[20px] border border-[#F0F0F0] shadow-[0_8px_60px_rgba(0,0,0,0.18)] p-6 z-20" style={{ pointerEvents: 'all', marginTop: '6vh' }}>
+        <div className="w-full max-w-[460px] flex-shrink-0 flex flex-col bg-white/96 backdrop-blur-sm rounded-[20px] border border-[#F0F0F0] shadow-[0_8px_60px_rgba(0,0,0,0.18)] p-6 z-20" style={{ pointerEvents: 'all' }}>
           
           <div className="flex items-center gap-3 mb-8 pb-5 border-b border-black/5">
             <Lock size={16} strokeWidth={1.2} className="text-[#0A0A0A]" />

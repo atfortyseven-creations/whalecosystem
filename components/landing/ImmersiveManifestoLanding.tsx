@@ -308,7 +308,7 @@ function HeroSection() {
 
   return (
     <section
-      className="relative w-full flex flex-col items-center justify-end overflow-hidden pt-14 bg-white"
+      className="relative w-full flex flex-col items-center justify-center overflow-hidden pt-14 bg-white"
       style={{
         /* dvh for mobile chrome correction, fallback to vh */
         height: 'calc(var(--vh, 1vh) * 100)',
@@ -350,16 +350,10 @@ function HeroSection() {
         draggable="false"
         className="hero-pixel-img absolute inset-0 w-full h-full select-none"
         style={{
-          /*
-           * fill = perfectly adjust to the screen size.
-           * By stretching it, we ensure NO zoom (unlike cover)
-           * and NO empty lateral bands (unlike contain).
-           * This perfectly matches the desktop viewport.
-           */
           width: '100vw',
           height: '100vh',
-          objectFit: 'fill',
-          objectPosition: 'center top',
+          objectFit: 'contain',
+          objectPosition: 'center center',
         }}
       />
 
@@ -378,7 +372,7 @@ function HeroSection() {
       />
 
       {/* ── CTA buttons ─────────────────────────────────────────────────── */}
-      <div className="relative z-20 flex flex-col items-center text-center px-6 w-full max-w-[880px] mx-auto pb-24">
+      <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full max-w-[880px] mx-auto pb-0">
         {mounted && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}

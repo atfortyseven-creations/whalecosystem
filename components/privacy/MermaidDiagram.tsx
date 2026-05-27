@@ -61,7 +61,7 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
             flowchart: {
               curve: 'basis',
               padding: 24,
-              htmlLabels: true,
+              htmlLabels: false,
               diagramPadding: 20,
               useMaxWidth: true,
               rankSpacing: 70,
@@ -83,7 +83,7 @@ export function MermaidDiagram({ chart, caption }: MermaidDiagramProps) {
             },
             graph: {
               diagramPadding: 20,
-              htmlLabels: true,
+              htmlLabels: false,
               curve: 'basis',
               useMaxWidth: true,
             },
