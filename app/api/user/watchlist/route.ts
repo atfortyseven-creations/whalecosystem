@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { validateSecureRequest } from '@/lib/security/premium-security';
 
 //  Zero Synthetic Price Engine 
-async function fetchLiveMarketData(symbols: string[]) {
+async function fetchActiveMarketData(symbols: string[]) {
     try {
         const res = await fetch('https://api.binance.com/api/v3/ticker/24hr', { cache: 'no-store' });
         if (!res.ok) return new Map();
@@ -78,7 +78,7 @@ export async function GET(req: NextRequest) {
         ]);
 
         const symbols = rawTokens.map(t => t.symbol);
-        const pricesMap = await fetchLiveMarketData(symbols);
+        const pricesMap = await fetchActiveMarketData(symbols);
 
         return NextResponse.json({
             tokens:  rawTokens.map(t => enrichToken(t, pricesMap)),
@@ -116,7 +116,7 @@ export async function POST(req: NextRequest) {
                     chain: chain || 'ethereum',
                 },
             });
-            const pricesMap = await fetchLiveMarketData([token.symbol]);
+            const pricesMap = await fetchActiveMarketData([token.symbol]);
             return NextResponse.json(enrichToken(token, pricesMap));
         }
 

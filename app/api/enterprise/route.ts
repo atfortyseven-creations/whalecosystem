@@ -13,7 +13,7 @@
  *   COMMUNITY    Open-source, self-hosted, no SLA
  *   PRO          $99/mo. API key, email support, 48h response
  *   ENTERPRISE   Custom pricing. SLA 99.9%, Slack channel, 4h response
- *   SOVEREIGN    Air-gapped deployment, on-site audit, phone+Slack
+ *   Private    Air-gapped deployment, on-site audit, phone+Slack
  */
 
 import { NextRequest, NextResponse } from 'next/server';
@@ -89,7 +89,7 @@ const EDITION_MATRIX = {
             'Priority Dune query assistance',
         ],
     },
-    SOVEREIGN: {
+    Private: {
         price:          'Custom (strategic partnership)',
         sourceCode:     true,
         apiMarketplace: true,

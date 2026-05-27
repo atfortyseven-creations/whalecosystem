@@ -103,7 +103,7 @@ export function MegalodonWhalePulse() {
                 </div>
                 <div className="flex items-center gap-2">
                    <div className="px-3 py-1 bg-indigo-500/10 border border-indigo-500/20 rounded-full">
-                       <span className="text-indigo-400 text-[9px] font-bold uppercase tracking-widest">Live · SSE Stream</span>
+                       <span className="text-indigo-400 text-[9px] font-bold uppercase tracking-widest">Active · SSE Stream</span>
                    </div>
                 </div>
             </div>

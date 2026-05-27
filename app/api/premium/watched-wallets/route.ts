@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
 
     // Cast to any to bypass stale prisma client type overlap error if present
     const userTier = (user?.tier as any);
-    const isPremium = userTier === 'SOVEREIGN' || userTier === 'HUMAN';
+    const isPremium = userTier === 'Private' || userTier === 'HUMAN';
     
     if (!isPremium) {
         const walletCount = await prisma.watchedWallet.count({
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
 
             return NextResponse.json({ 
                 error: 'LIMIT_REACHED',
-                message: 'Has alcanzado el límite de 3 carteras para usuarios gratuitos. Activa el acceso SOVEREIGN por 1.50 para tener carteras ilimitadas.',
+                message: 'Has alcanzado el límite de 3 carteras para usuarios gratuitos. Activa el acceso Private por 1.50 para tener carteras ilimitadas.',
                 requirePremium: true
             }, { status: 403 });
         }

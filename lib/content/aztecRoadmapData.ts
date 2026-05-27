@@ -295,7 +295,7 @@ export const AZTEC_ROADMAP: AztecRoadmapItem[] = [
     solution: "Quantum Support Vector Machine (QSVM) algorithms and simulated hybrid integrations to discover accumulation patterns without explicitly processing the public L2 state tree.",
     contribution: "Macro analytics for security and flow without breaking individual privacy.",
     deliverable: "Operational QML anomaly detection models feeding back into the Alert Oracle.",
-    integrity: "Complete market analysis while maintaining local private sovereignty intact."
+    integrity: "Complete market analysis while maintaining local private Privatety intact."
   },
   {
     id: 32, phase: 4, phaseTitle: "Analytics and Humanity Ledger Tools",

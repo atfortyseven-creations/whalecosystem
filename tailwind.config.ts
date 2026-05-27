@@ -29,18 +29,18 @@ const config: Config = {
                 "glass-highlight": "rgba(255, 255, 255, 0.06)",
 
                 // Semantic Accents
-                midgard: { // Indigo/Identidad
-                    DEFAULT: "#6366f1", // Indigo 500
-                    glow: "rgba(99, 102, 241, 0.5)",
+                midgard: { // Monochrome Identity
+                    DEFAULT: "#ffffff", // Pure White
+                    glow: "rgba(255, 255, 255, 0.5)",
                 },
-                asgard: { // Amber/Oro/Royalties
-                    DEFAULT: "#f59e0b", // Amber 500
-                    glow: "rgba(245, 158, 11, 0.5)",
+                asgard: { // Monochrome Accent
+                    DEFAULT: "#cccccc", // Light Gray
+                    glow: "rgba(204, 204, 204, 0.5)",
                 }
             },
             backgroundImage: {
-                "void-gradient": "radial-gradient(circle at 50% 0%, #1a1b26 0%, #000000 80%)",
-                "glass-gradient": "linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(255,255,255,0) 100%)",
+                "void-gradient": "none",
+                "glass-gradient": "none",
             },
             animation: {
                 "fade-in": "fadeIn 0.5s ease-out forwards",

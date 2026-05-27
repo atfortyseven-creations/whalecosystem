@@ -1,5 +1,5 @@
 // ============================================================
-// PROTOCOL ABI REGISTRY — ABYSMAL COMPLEXITY QUANTUM ENGINE
+// PROTOCOL ABI REGISTRY — Advanced Architecture QUANTUM ENGINE
 // Full production ABIs for on-chain multicall interrogation
 // ============================================================
 

@@ -235,7 +235,7 @@ export function TokenSelector({
 
                             {/* Section: My Assets */}
                             {!searchQuery && (
-                                <div className="px-3 py-1 text-[10px] font-black text-black/40 uppercase tracking-[0.2em] sticky top-0 bg-white z-10 border-t border-black/5 pt-2">Live Balances</div>
+                                <div className="px-3 py-1 text-[10px] font-black text-black/40 uppercase tracking-[0.2em] sticky top-0 bg-white z-10 border-t border-black/5 pt-2">Active Balances</div>
                             )}
                             
                             {!searchQuery && isLoadingTokens && (

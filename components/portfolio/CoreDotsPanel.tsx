@@ -4,7 +4,7 @@
  * CoreDotsPanel  Full system QDs interface
  * 
  * Features:
- *    Live on-chain QD balance (ERC-20 read, 15s refresh)
+ *    Active on-chain QD balance (ERC-20 read, 15s refresh)
  *    Core Transfer terminal (ERC-2612 Permit + transferWithReceiptPermit)
  *    On-chain receipt history (reads last N receipts from CoreLedger)
  *    Animated 256-bit core entropy visualizer
@@ -176,7 +176,7 @@ function EntropyVisualizer({ entropy }: { entropy: bigint }) {
     );
 }
 
-//  Live Entropy Tab 
+//  Active Entropy Tab 
 function EntropyTab() {
     const [entropy, setEntropy] = useState<bigint>(() => generateCoreEntropy());
     const [autoRefresh, setAutoRefresh] = useState(true);
@@ -207,7 +207,7 @@ function EntropyTab() {
                             autoRefresh ? 'bg-black text-white border-black' : 'bg-transparent text-black/50 border-black/20 hover:border-black/40'
                         }`}
                     >
-                        {autoRefresh ? 'Live' : 'Paused'}
+                        {autoRefresh ? 'Active' : 'Paused'}
                     </button>
                     <button
                         onClick={() => setEntropy(generateCoreEntropy())}

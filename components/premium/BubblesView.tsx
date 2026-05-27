@@ -453,7 +453,7 @@ export default function BubblesView({ limit }: { limit?: number }) {
                                     <BubbleIcon src={node.coin.image} alt={node.coin.symbol} />
                                     <div className="font-black text-[10px] leading-none mb-1 text-white uppercase">{node.coin.symbol}</div>
                                     <div className="font-black text-[9px] tabular-nums text-white">
-                                        <LiveBubblePercentTicker 
+                                        <ActiveBubblePercentTicker 
                                             value={node.coin[`price_change_${timeframe}` as keyof BubbleData] as number || 0} 
                                         />
                                     </div>
@@ -504,7 +504,7 @@ function BubbleIcon({ src, alt }: { src: string, alt: string }) {
     );
 }
 
-function LiveBubblePercentTicker({ value }: { value: number }) {
+function ActiveBubblePercentTicker({ value }: { value: number }) {
     const [displayValue, setDisplayValue] = useState(value);
     
     useEffect(() => {
@@ -524,10 +524,10 @@ function LiveBubblePercentTicker({ value }: { value: number }) {
 function BubbleDetailModal({ coin, onClose }: { coin: BubbleData, onClose: () => void }) {
     const router = useRouter();
     const { t } = useLanguage();
-    const [livePrice, setLivePrice] = useState(coin.current_price);
+    const [livePrice, setActivePrice] = useState(coin.current_price);
 
     useEffect(() => {
-        setLivePrice(coin.current_price);
+        setActivePrice(coin.current_price);
     }, [coin.current_price]);
 
     return (
@@ -566,7 +566,7 @@ function BubbleDetailModal({ coin, onClose }: { coin: BubbleData, onClose: () =>
                            <MetricBlock label={t('market.year')} value={coin.price_change_1y} />
                            <div className="col-span-2 bg-white/5 p-4 rounded-2xl flex flex-col justify-center">
                                 <span className="text-[10px] font-black text-white/30 tracking-widest uppercase">{t('market.volume_24h')}</span>
-                                <LiveModalVolumeTicker value={coin.total_volume} />
+                                <ActiveModalVolumeTicker value={coin.total_volume} />
                            </div>
                         </div>
 
@@ -600,7 +600,7 @@ function MetricBlock({ label, value }: { label: string, value: number }) {
     );
 }
 
-function LiveModalVolumeTicker({ value }: { value: number }) {
+function ActiveModalVolumeTicker({ value }: { value: number }) {
     const displayValue = value;
 
     return (

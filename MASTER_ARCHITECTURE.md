@@ -29,6 +29,13 @@ graph TD
         Hnd[QR Handshake Protocol]
     end
 
+    subgraph Private Aztec Layer
+        Pxe[Private Execution Environment - PXE]
+        Noir[Noir Circuits - Aztec.nr]
+        Azt[Aztec Account Contracts - ECDSA]
+        L2[Aztec L2 Shielded Pool]
+    end
+
     subgraph User Devices
         Nxt[Next.js 15 Web/Desktop]
         Pwa[iOS/Android PWA Offline]
@@ -48,6 +55,12 @@ graph TD
     Cir -->|Zero Knowledge Verified| Nxt
     Daemon -->|E2EE Tunnel| Hnd
     Hnd --> Pwa
+    
+    Nxt -->|aztec.js client-side proofs| Pxe
+    Pwa -->|aztec.js client-side proofs| Pxe
+    Pxe -->|ACIR Compilation| Noir
+    Noir -->|UltraHonk Backend| L2
+    L2 -->|Settlement| Azt
 ```
 
 ###  State & Persistence Layer
@@ -63,6 +76,7 @@ graph TD
 - **ResilientProvider**: Custom fail-over logic with circuit breakers across 4+ RPC endpoints for 100% uptime.
 - **Identity IDKit**: ZK-SNARK based identity proofs for sybil-resistant human verification.
 - **Moralis Deep Indexing**: High-speed retrieval of historical cross-chain transaction data.
+- **Private Aztec Network**: The primary shielded execution layer (Aztec-native), utilizing private notes for anti-double-spend and zero-knowledge privacy out-of-the-box (private-by-default logic for chat, alerts, and portfolio balance).
 
 ###  Background Engine / Scanners (The Whale Engine)
 - **EVM Whale Scanner**: Dedicated long-running process scanning mempools and new blocks for high-value movement.

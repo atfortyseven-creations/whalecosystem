@@ -34,9 +34,9 @@ export async function verifyPremiumAccess(userId: string): Promise<{
     // grant absolute access without consulting the centralized database.
     try {
         const publicClient = createPublicClient({ chain: optimism, transport: http() });
-        const SOVEREIGN_NFT_CONTRACT = '0x0000000000000000000000000000000000000000'; // Replace with real contract
+        const Private_NFT_CONTRACT = '0x0000000000000000000000000000000000000000'; // Replace with real contract
         const balance = await publicClient.readContract({
-            address: SOVEREIGN_NFT_CONTRACT as `0x${string}`,
+            address: Private_NFT_CONTRACT as `0x${string}`,
             abi: parseAbi(['function balanceOf(address) view returns (uint256)']),
             functionName: 'balanceOf',
             args: [normalizedUserId as `0x${string}`],

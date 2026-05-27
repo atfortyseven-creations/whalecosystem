@@ -949,11 +949,11 @@ export class PortfolioService {
   }
 
   /**
-   * [LEGENDARY] Live Price Stream
+   * [LEGENDARY] Active Price Stream
    * Optimized for 1-second interval polling.
    * Returns only price/change/value map to minimize payload.
    */
-  public async getLivePrices(tokens: { symbol: string, balance: number, price?: number, address?: string, chainId?: number }[]) {
+  public async getActivePrices(tokens: { symbol: string, balance: number, price?: number, address?: string, chainId?: number }[]) {
     if (!tokens || tokens.length === 0) return [];
 
     try {
@@ -1023,7 +1023,7 @@ export class PortfolioService {
         };
       });
     } catch (e) {
-      console.error('[Portfolio] Live price fetch failed:', e);
+      console.error('[Portfolio] Active price fetch failed:', e);
       return [];
     }
   }

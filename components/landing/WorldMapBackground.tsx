@@ -144,7 +144,7 @@ export function BtcTransferLegend() {
         <div>
           <div className="flex items-center gap-2 mb-2">
             <span className="text-[10px] font-black uppercase tracking-widest text-black/40">
-              Live BTC Institutional Flows
+              Active BTC Institutional Flows
             </span>
             {!error && !flows[0]?.loading && (
               <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
@@ -158,7 +158,7 @@ export function BtcTransferLegend() {
           </p>
         </div>
 
-        {/* Live stats */}
+        {/* Active stats */}
         <div className="flex gap-4 shrink-0 bg-black/[0.03] p-3 rounded-xl border border-black/[0.05]">
           <div className="flex flex-col">
             <span className="text-[8px] font-bold text-black/40 uppercase tracking-wider mb-1">Source</span>

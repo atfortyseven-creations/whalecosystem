@@ -231,7 +231,7 @@ export const DownheadCursor = ({
         style={{ imageRendering: "pixelated" }}
       />
 
-      {/* Live trail layer  cleared and redrawn every frame */}
+      {/* Active trail layer  cleared and redrawn every frame */}
       <canvas
         ref={liveCanvasRef}
         className="pointer-events-none absolute inset-0 z-[49]"

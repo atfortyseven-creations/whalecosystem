@@ -311,7 +311,7 @@ export default function TradingViewChart({ symbol = "ETHUSDT", height = 400, tra
       {stats && (
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <StatCard
-            label="Live Price (Binance)"
+            label="Active Price (Binance)"
             value={`$${safeToLocaleString(stats.current, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
             icon={<div className={`w-2 h-2 rounded-full ${isConnected ? 'bg-red-500 animate-pulse' : 'bg-[#ef4444]/40'}`} />}
           />

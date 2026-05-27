@@ -95,7 +95,7 @@ export function MultiversePortfolio({ theme = 'default' }: { theme?: 'default' |
                         <div className="flex gap-4 mt-6 md:mt-0">
                             <div className="px-5 py-3 rounded-full bg-white border border-slate-200 shadow-sm flex items-center gap-3">
                                 <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-700">Live API Resolving</span>
+                                <span className="text-[9px] font-black uppercase tracking-widest text-slate-700">Active API Resolving</span>
                             </div>
                         </div>
                     </div>

@@ -4,7 +4,7 @@ import { verifyMessage } from 'viem';
 
 export const dynamic = 'force-dynamic';
 
-const ADMIN_WALLET = process.env.NEXT_PUBLIC_SOVEREIGN_ADMIN_WALLET || '0x0000000000000000000000000000000000000000'; 
+const ADMIN_WALLET = process.env.NEXT_PUBLIC_Private_ADMIN_WALLET || '0x0000000000000000000000000000000000000000'; 
 
 export async function POST(req: NextRequest) {
     try {
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
         
         const isValid = await verifyMessage({
             address: ADMIN_WALLET as `0x${string}`,
-            message: `SOVEREIGN_HEARTBEAT_${timestamp}`,
+            message: `Private_HEARTBEAT_${timestamp}`,
             signature: signature as `0x${string}`,
         });
         

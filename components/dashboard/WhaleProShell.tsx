@@ -151,7 +151,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
     const { latency, isConnected: streamConnected, mode } = useMarketStream();
     const { connector, isConnected: isWalletConnected, isSystemHandshake } = useSystemAccount();
 
-    //  UX-18: Live ETH metrics (shared hook, DRY with landing) 
+    //  UX-18: Active ETH metrics (shared hook, DRY with landing) 
     const { blockNumber, baseFeeGwei, utcTime, syncing: ethSyncing } = useEthMetrics();
 
     const currentExplanation = MODULE_EXPLANATIONS[activeTab] || {
@@ -403,7 +403,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         </span>
                     </button>
 
-                    {/* UX-18: Live ETH metrics replacing the empty LiveMarketBand slot */}
+                    {/* UX-18: Active ETH metrics replacing the empty ActiveMarketBand slot */}
                     <div className="hidden lg:flex items-center gap-0 divide-x divide-black/10 flex-1 mx-6 overflow-hidden">
                         {[
                             { label: 'ETH Block', value: ethSyncing ? '...' : (blockNumber ?? '---') },

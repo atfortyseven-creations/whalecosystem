@@ -214,7 +214,7 @@ export function InstitutionalQuantChart() {
     };
   }, []);
 
-  //  Live data injection loop 
+  //  Active data injection loop 
   const injectData = useCallback(() => {
     if (!candleRef.current || !volumeRef.current) return;
     const { candles, volumes } = buildBarsFromStore(resolution);
@@ -269,7 +269,7 @@ export function InstitutionalQuantChart() {
               {r}
             </button>
           ))}
-          {/* Live pulse */}
+          {/* Active pulse */}
           <div className="flex items-center gap-1.5 ml-2">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#D4AF37] opacity-75" />

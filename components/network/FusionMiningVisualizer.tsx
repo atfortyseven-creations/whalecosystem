@@ -178,7 +178,7 @@ export function FusionMiningVisualizer({ theme = 'default' }: { theme?: 'default
            <div className="min-w-0">
               <div className="flex items-center gap-3 mb-1">
                  <div className={`w-2 h-2 rounded-full animate-pulse shrink-0 ${isArctic ? 'bg-indigo-600' : 'bg-[#00ff9d]'}`} />
-                 <span className={`text-[10px] font-black uppercase tracking-[0.3em] truncate ${isArctic ? 'text-indigo-600' : 'text-[#00ff9d]'}`}>Mempool Live Stream</span>
+                 <span className={`text-[10px] font-black uppercase tracking-[0.3em] truncate ${isArctic ? 'text-indigo-600' : 'text-[#00ff9d]'}`}>Mempool Active Stream</span>
               </div>
               <h2 className={`text-2xl md:text-3xl font-black uppercase tracking-tighter ${isArctic ? 'text-slate-900' : 'text-white'}`}>
                 Fusion <span className={isArctic ? 'text-slate-300' : 'text-white/20'}>Visualizer</span>

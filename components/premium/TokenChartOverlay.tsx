@@ -80,7 +80,7 @@ export const TokenChartOverlay = ({ symbol, onClose }: OverlayProps) => {
                                 <span className="w-px h-3 bg-white/10" />
                                 <div className="flex items-center gap-1.5">
                                     <div className="w-1.5 h-1.5 rounded-full bg-[var(--aztec-orchid)] animate-pulse" />
-                                    <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-[var(--aztec-orchid)]/80">Live</span>
+                                    <span className="font-aztec-h2 text-[9px] uppercase tracking-[0.35em] text-[var(--aztec-orchid)]/80">Active</span>
                                 </div>
                             </div>
                         </div>

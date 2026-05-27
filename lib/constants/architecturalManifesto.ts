@@ -420,8 +420,8 @@ At the JavaScript layer, all animations use only transform and opacity  the two 
 18.2 Next.js Bundle Optimisation
 The production Next.js bundle is optimised through dynamic imports with lazy loading, tree shaking of unused code paths, and the optimizePackageImports option configured for all major icon libraries and utility packages.
 
-18.3 Server-Sent Events for Live Data
-Live data updates use Server-Sent Events rather than WebSocket connections. SSE is a unidirectional protocol that uses the browser's built-in reconnection logic, is compatible with HTTP/2 multiplexing, and traverses corporate firewalls without modification.
+18.3 Server-Sent Events for Active Data
+Active data updates use Server-Sent Events rather than WebSocket connections. SSE is a unidirectional protocol that uses the browser's built-in reconnection logic, is compatible with HTTP/2 multiplexing, and traverses corporate firewalls without modification.
 
 19. The Visual Design System
 The visual design system of the Whale Alert Network is governed by a three-colour institutional palette:

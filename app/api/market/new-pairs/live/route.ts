@@ -154,7 +154,7 @@ export async function GET() {
         });
 
     } catch (err: any) {
-        console.error('[New Pairs Live EP3]', err?.message);
+        console.error('[New Pairs Active EP3]', err?.message);
         return NextResponse.json({ pairs: [], source: 'error' }, { status: 200 });
     }
 }

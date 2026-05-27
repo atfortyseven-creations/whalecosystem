@@ -70,13 +70,13 @@ interface ApiKeyRecord { tier: Tier; secret?: string; ownerId: string }
 
 async function resolveApiKey(key: string): Promise<ApiKeyRecord | null> {
     // Tier 1: Check static env keys (for bootstrap / internal use)
-    if (key === process.env.SOVEREIGN_API_KEY_INSTITUTIONAL) {
-        return { tier: 'INSTITUTIONAL', secret: process.env.SOVEREIGN_HMAC_SECRET, ownerId: 'internal' };
+    if (key === process.env.Private_API_KEY_INSTITUTIONAL) {
+        return { tier: 'INSTITUTIONAL', secret: process.env.Private_HMAC_SECRET, ownerId: 'internal' };
     }
-    if (key === process.env.SOVEREIGN_API_KEY_PRO) {
+    if (key === process.env.Private_API_KEY_PRO) {
         return { tier: 'PRO', ownerId: 'internal-pro' };
     }
-    if (key === process.env.SOVEREIGN_API_KEY_FREE) {
+    if (key === process.env.Private_API_KEY_FREE) {
         return { tier: 'FREE', ownerId: 'internal-free' };
     }
 

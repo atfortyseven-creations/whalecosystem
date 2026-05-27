@@ -313,7 +313,7 @@ export function EntityGraphVis() {
                             : 'bg-[#00C076]/5 border-[#00C076]/20 text-[#00C076]'
                     }`}>
                         {isOffline ? <WifiOff size={9} /> : <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse inline-block" />}
-                        {isOffline ? 'Degraded' : 'Live'}
+                        {isOffline ? 'Degraded' : 'Active'}
                     </div>
                 </div>
             </div>

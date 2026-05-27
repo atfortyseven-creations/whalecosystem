@@ -56,7 +56,7 @@ const COMMUNITY_CHANNELS = [
 
 const DOCS_LINKS = [
     { icon: <BookOpen size={16} />, label: 'Technical Whitepaper',  href: '/whitepaper',  desc: 'Full cryptographic architecture of Humanity Ledger on Aztec L2.' },
-    { icon: <Shield size={16} />,   label: 'Privacy Manifesto',     href: '/manifesto',   desc: 'Our commitment to zero-knowledge privacy and human sovereignty.' },
+    { icon: <Shield size={16} />,   label: 'Privacy Manifesto',     href: '/manifesto',   desc: 'Our commitment to zero-knowledge privacy and human Privatety.' },
     { icon: <Zap size={16} />,      label: 'QDs Tokenomics',        href: '/tokenomics',  desc: 'Supply schedule, distribution model, and governance mechanics.' },
     { icon: <Globe size={16} />,    label: 'Roadmap',               href: '/roadmap',     desc: 'Quarterly milestones and Aztec Network integration timeline.' },
     { icon: <Code2 size={16} />,    label: 'Developer Hub',         href: '/developer',   desc: 'API documentation, SDK references, and Noir circuit guides.' },
@@ -131,10 +131,10 @@ export function WhaleSupport() {
                                 Aztec Network · Ecosystem Hub · Documentation · Support
                             </span>
                         </div>
-                        {/* Live badge */}
+                        {/* Active badge */}
                         <div className="flex items-center gap-2 px-3 py-1.5 bg-black/[0.03] border border-black/8 rounded-full">
                             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40">Forum Live</span>
+                            <span className="font-mono text-[9px] font-black uppercase tracking-widest text-black/40">Forum Active</span>
                         </div>
                     </div>
 

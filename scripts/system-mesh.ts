@@ -79,7 +79,7 @@ if (typeof redisSub.on === 'function') {
  * Cryptographic validation of the sending node's signature
  */
 function verifyNodeSignature(payload: any): boolean {
-    if (payload.clearance !== 'SOVEREIGN') return false;
+    if (payload.clearance !== 'Private') return false;
     if (!payload.pubKey || !payload.signature) return false;
 
     try {
@@ -122,7 +122,7 @@ export function broadcastToMesh(eventType: string, data: any) {
     const payload = {
         eventId,
         type: eventType,
-        clearance: 'SOVEREIGN',
+        clearance: 'Private',
         pubKey: NODE_PUBLIC_KEY,
         signature: signature,
         timestamp: timestamp,

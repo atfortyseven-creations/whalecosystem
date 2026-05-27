@@ -24,7 +24,7 @@ const CATEGORIES = [
   "PARTNERSHIPS, INTEGRATIONS AND STRATEGIC ALLIANCES",
   "MONETIZATION, TOKENOMICS AND ECONOMIC SUSTAINABILITY",
   "UI/UX, PRODUCT EXPERIENCE AND ENTERPRISE DESIGN",
-  "SECURITY, COMPLIANCE AND EXTREME SOVEREIGNTY",
+  "SECURITY, COMPLIANCE AND EXTREME PrivateTY",
   "SCALABILITY, INFRA AND GLOBAL PERFORMANCE",
   "ROADMAP EXECUTION, METRICS AND 2026-2027 CONQUEST PLAN",
 ];
@@ -52,7 +52,7 @@ const TITLES: Record<number, string[]> = {
     "Consensus Layer Light Client", "Rollup State Fraud Prover",
   ],
   2: [
-    "World ID Sybil-Resistant Verification", "AI Whale Behavior Predictor", "Live Dark Pool Detector",
+    "World ID Sybil-Resistant Verification", "AI Whale Behavior Predictor", "Active Dark Pool Detector",
     "Cross-Chain MEV Sandwich Scanner", "Real-Time Liquidation Alerter", "NFT Whale Tracking Grid",
     "Institutional-Grade Copy Trading", "Smart Money Wallet Classifier", "Protocol Revenue Dashboard",
     "On-Chain Sentiment Aggregator", "Perpetuals Funding Rate Monitor", "Stablecoin Flow Analytics",

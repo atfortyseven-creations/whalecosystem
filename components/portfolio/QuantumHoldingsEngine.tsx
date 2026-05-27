@@ -33,7 +33,7 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase }: {
         balance = formatUnits(raw, token.decimals);
       }
       
-      // Simulate historical volatility and 24h change for abysmal complexity
+      // Simulate historical volatility and 24h change for Advanced Architecture
       const hashSeed = token.address.charCodeAt(token.address.length - 1);
       const volatility = ((hashSeed % 100) / 100) * 15;
       const change24h = (hashSeed % 20) - 10;

@@ -9,7 +9,7 @@
  *   WATCHER    MIN_REFERRALS = 0   (applicant)
  *   SENTINEL   MIN_REFERRALS = 5   (early community member)
  *   GUARDIAN   MIN_REFERRALS = 20  (active promoter, 10% commission)
- *   SOVEREIGN  MIN_REFERRALS = 50  (elite ambassador, 20% commission + exclusive alpha)
+ *   Private  MIN_REFERRALS = 50  (elite ambassador, 20% commission + exclusive alpha)
  *
  * On approval, ambassador receives:
  *   - Unique referral code  (ref=ABC123)
@@ -49,7 +49,7 @@ const PROGRAM_INFO = {
             perks:        ['10% commission', 'API key PRO tier free', 'Quarterly strategy call with core team', 'Guardian NFT badge'],
         },
         {
-            name:         'SOVEREIGN',
+            name:         'Private',
             minReferrals: 50,
             commission:   20,
             perks:        ['20% lifetime commission', 'INSTITUTIONAL API access free', 'Private alpha channel', 'System NFT badge', '"State of Whale Analytics" co-authorship'],
@@ -91,7 +91,7 @@ export async function GET(req: NextRequest) {
                 applicantStatus = {
                     walletAddress,
                     referralCount:    refCount,
-                    currentTier:      refCount >= 50 ? 'SOVEREIGN' : refCount >= 20 ? 'GUARDIAN' : refCount >= 5 ? 'SENTINEL' : 'WATCHER',
+                    currentTier:      refCount >= 50 ? 'Private' : refCount >= 20 ? 'GUARDIAN' : refCount >= 5 ? 'SENTINEL' : 'WATCHER',
                     hasApplied:       false,
                     nextTierAt:       refCount >= 50 ? null : refCount >= 20 ? 50 : refCount >= 5 ? 20 : 5,
                 };

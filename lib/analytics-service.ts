@@ -11,7 +11,7 @@ export interface HeikinAshiCandle {
 
 export class WacAnalyticsService {
   /**
-   * 🪐 ASTRONOMICAL RISK SCORING (0-100)
+   *  ASTRONOMICAL RISK SCORING (0-100)
    * Base logic: 
    * - Inactivity/New Wallet: +High Risk
    * - Mixing (Tornado): +Critical Risk

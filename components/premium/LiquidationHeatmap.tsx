@@ -112,7 +112,7 @@ export default function LiquidationHeatmap() {
       <div className="flex flex-wrap items-center justify-between gap-4 glass-premium p-4 rounded-3xl relative z-10">
         <div className="flex items-center gap-3">
           <div className="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-xl border border-white/10 text-white font-bold text-sm">
-            BTC/USDT <span className="text-[10px] text-[#e0ff00] uppercase tracking-widest ml-2">Live WS</span>
+            BTC/USDT <span className="text-[10px] text-[#e0ff00] uppercase tracking-widest ml-2">Active WS</span>
           </div>
           <div className="flex bg-white/5 rounded-xl p-1 border border-white/10 gap-1">
             {Object.keys(TIMEFRAME_MAP).map(tf => (
@@ -183,7 +183,7 @@ export default function LiquidationHeatmap() {
               </motion.div>
             )}
             <div className="absolute bottom-6 right-8 flex items-center gap-2 opacity-30 select-none pointer-events-none z-10">
-              <span className="text-xs font-black tracking-widest text-purple-400 uppercase italic">Binance Klines · Live WS</span>
+              <span className="text-xs font-black tracking-widest text-purple-400 uppercase italic">Binance Klines · Active WS</span>
             </div>
           </div>
         </div>
@@ -194,9 +194,9 @@ export default function LiquidationHeatmap() {
         <div className="glass-premium p-6 rounded-[2rem] border border-white/5 flex items-start gap-4">
           <div className="p-3 bg-purple-500/10 rounded-2xl text-purple-400"><Info size={24} /></div>
           <div>
-            <h4 className="font-bold mb-1">Live Binance Orderbook</h4>
+            <h4 className="font-bold mb-1">Active Binance Orderbook</h4>
             <p className="text-sm text-white/40 leading-relaxed">
-              Historical data from Binance Klines REST API. Live price appended from WebSocket stream. 0 mock data.
+              Historical data from Binance Klines REST API. Active price appended from WebSocket stream. 0 mock data.
             </p>
           </div>
         </div>

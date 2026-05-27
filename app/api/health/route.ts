@@ -17,7 +17,7 @@ export async function GET() {
         await prisma.$queryRaw`SELECT 1`;
         const dbLatency = Date.now() - start;
 
-        // [2] Live data counts  proves real ingestion, not mock
+        // [2] Active data counts  proves real ingestion, not mock
         const [totalWhaleEvents, last24hEvents, totalTickets] = await Promise.all([
             prisma.whaleActivity.count(),
             prisma.whaleActivity.count({
@@ -78,7 +78,7 @@ export async function GET() {
                 },
             },
 
-            //  Live data proof  verifiable evidence of real ingestion 
+            //  Active data proof  verifiable evidence of real ingestion 
             liveData: {
                 totalWhaleEventsIndexed: totalWhaleEvents,
                 whaleEventsLast24h: last24hEvents,

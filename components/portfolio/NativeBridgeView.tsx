@@ -20,11 +20,11 @@ const BRIDGE_ROUTER_ABI = [
 const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98"; 
 
 const CHAINS = [
-    { id: 'ethereum', name: 'Ethereum L1', icon: '🌐', lzId: 101, color: '#627EEA' },
-    { id: 'polygon', name: 'Polygon PoS', icon: '🟣', lzId: 109, color: '#8247E5' },
-    { id: 'arbitrum', name: 'Arbitrum One', icon: '🔵', lzId: 110, color: '#28A0F0' },
-    { id: 'optimism', name: 'Optimism', icon: '🔴', lzId: 111, color: '#FF0420' },
-    { id: 'base', name: 'Base', icon: '🔵', lzId: 184, color: '#0052FF' },
+    { id: 'ethereum', name: 'Ethereum L1', icon: '', lzId: 101, color: '#627EEA' },
+    { id: 'polygon', name: 'Polygon PoS', icon: '', lzId: 109, color: '#8247E5' },
+    { id: 'arbitrum', name: 'Arbitrum One', icon: '', lzId: 110, color: '#28A0F0' },
+    { id: 'optimism', name: 'Optimism', icon: '', lzId: 111, color: '#FF0420' },
+    { id: 'base', name: 'Base', icon: '', lzId: 184, color: '#0052FF' },
 ];
 
 export function NativeBridgeView({ address, onBack }: any) {

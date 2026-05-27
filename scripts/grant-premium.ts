@@ -1,7 +1,7 @@
 /**
- * [SOVEREIGN ADMIN SCRIPT] grant-premium.ts
+ * [Private ADMIN SCRIPT] grant-premium.ts
  * 
- * Grants SOVEREIGN tier access to a user by wallet address.
+ * Grants Private tier access to a user by wallet address.
  * Zero-Clerk: uses native Prisma DB lookups only.
  *
  * Usage:
@@ -16,7 +16,7 @@ const prisma = new PrismaClient();
 
 //  CONFIG 
 const TARGET_WALLET = process.env.TARGET_WALLET || '0xYOUR_WALLET_ADDRESS_HERE';
-const TARGET_TIER   = 'SOVEREIGN';
+const TARGET_TIER   = 'Private';
 // 
 
 async function grantPremium() {
@@ -25,7 +25,7 @@ async function grantPremium() {
   console.log('-------------------------------------------');
 
   try {
-    // 1. Upsert User in DB with SOVEREIGN tier
+    // 1. Upsert User in DB with Private tier
     console.log(' Upserting User in database...');
     const user = await prisma.user.upsert({
       where: { walletAddress: TARGET_WALLET.toLowerCase() },
@@ -51,13 +51,13 @@ async function grantPremium() {
       where: { id: existing?.id || 'no-match' },
       update: {
         status: 'ACTIVE',
-        tier: 'SOVEREIGN',
+        tier: 'Private',
         expiresAt: new Date('2099-12-31'),
       },
       create: {
         userId: user.walletAddress,
         status: 'ACTIVE',
-        tier: 'SOVEREIGN',
+        tier: 'Private',
         expiresAt: new Date('2099-12-31'),
       },
     });

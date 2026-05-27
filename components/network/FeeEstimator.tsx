@@ -79,7 +79,7 @@ export function FeeEstimator({ hideHeader = false, theme = 'default' }: { hideHe
                 <span className="text-slate-400">Minimum Relay: <span className="text-slate-600">{fees.minimumFee} vB</span></span>
                 <div className="flex items-center gap-2 px-3 py-1 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
                     <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    <span>Live Update</span>
+                    <span>Active Update</span>
                 </div>
             </div>
         </Card>

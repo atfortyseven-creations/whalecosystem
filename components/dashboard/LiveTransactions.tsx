@@ -18,11 +18,11 @@ interface Transaction {
     timestamp: string;
 }
 
-export default function LiveTransactions() {
+export default function ActiveTransactions() {
     // =========================================================================
     // INJECTED DATA HOOK  Zero-Mock Mandate
     // MOCK STREAM ERADICATED: No more Math.random() / setInterval fake data.
-    // Mempool endpoint injected via REGISTRY.SOVEREIGN_INTEL.massTransfers
+    // Mempool endpoint injected via REGISTRY.Private_INTEL.massTransfers
     // =========================================================================
     const { data: rawData, isLoading, error } = useSystemIntel('massTransfers');
     const txs: Transaction[] = (rawData?.transfers || []).slice(0, 20).map((t: any, i: number) => ({

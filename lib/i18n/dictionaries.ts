@@ -35,7 +35,7 @@ const en = {
         stats: {
             identities: 'Entities',
             secured: 'Monitored',
-            decentralized: 'Live'
+            decentralized: 'Active'
         },
         accessGranted: 'Dashboard Ready',
         welcome: 'Welcome,',
@@ -79,7 +79,7 @@ const en = {
             category: "Network",
             description: "A high-fidelity view of the Bitcoin mempool and recent blocks.",
             detailedInfo: "Analyze unconfirmed transactions, fee distributions, and block health. Our explorer provides a transparent window into the network's liquidity and pending settlement layers.",
-            benefits: ["Low-latency data feed", "Transaction values in satoshis", "Mining pool identification", "Live sync progress monitoring"]
+            benefits: ["Low-latency data feed", "Transaction values in satoshis", "Mining pool identification", "Active sync progress monitoring"]
           },
           {
             title: "AI Whale Signals",
@@ -149,7 +149,7 @@ const en = {
   },
   whale: {
     tabs: {
-      liveFeed: 'Live Feed',
+      liveFeed: 'Active Feed',
       liveFeedDesc: 'Real-time early warning system. Monitor large BTC transactions as they enter the mempool before they are even confirmed. This allows you to see massive market shifts seconds before the rest of the world.',
       alerts: 'Alerts',
       alertsDesc: 'Personalized surveillance suite. Configure the specific threshold of BTC that triggers your "Whale Sonar" and never miss a critical elite move again with instant visual and audio feedback.',
@@ -303,7 +303,7 @@ const en = {
     syncing: 'Syncing Portfolio Ledger',
     encryption: 'Maximum Security Encryption',
     notConnectedDesc: 'Active cryptographic connection required to inspect asset ledger.',
-    liveFeed: 'Live Feed',
+    liveFeed: 'Active Feed',
     updated: 'Updated',
     injectPlaceholder: 'Inject Wallet Address / ENS...',
     terminal: 'Portfolio',
@@ -346,7 +346,7 @@ const en = {
       heroSubtitle: 'Advanced analytical tools to track whale wallets, predict on-chain liquidations, and measure token unlock pressure. Raw data presented without distractions.',
       stats: {
           activeWhales: 'Active Mega Whales',
-          tps: 'Current TPS (Live)',
+          tps: 'Current TPS (Active)',
           systemicRisk: 'Systemic Risk',
           baseFee: 'Base Fee (Gwei)'
       },
@@ -356,7 +356,7 @@ const en = {
           status: 'Cross-Chain Persistence Active'
       },
       grid: {
-          title: 'Live Settlement Grid',
+          title: 'Active Settlement Grid',
           streamingBlock: 'Streaming Block',
           table: {
               timestamp: 'Timestamp',
@@ -393,7 +393,7 @@ const en = {
           fastest: 'Fastest',
           recommended: 'RECOMMENDED',
           minRelay: 'Minimum Relay',
-          liveUpdates: 'Live Updates',
+          liveUpdates: 'Active Updates',
       },
           difficulty: 'Difficulty Adjustment',
           status: 'Network Status',

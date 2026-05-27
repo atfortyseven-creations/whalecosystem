@@ -25,7 +25,7 @@ contract CoreDots is ERC20, ERC20Burnable, ERC20Pausable, AccessControl, ERC20Pe
     uint256 public constant MAX_SUPPLY = 210_000_000 * 10 ** 18;
 
     /// @dev System Vault wallet  receives the 5,000,000 QD genesis allocation.
-    address public constant SOVEREIGN_VAULT = 0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a;
+    address public constant Private_VAULT = 0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a;
 
     /// @dev Genesis allocation to the System Vault at deploy time.
     uint256 public constant GENESIS_SUPPLY = 5_000_000 * 10 ** 18;
@@ -43,7 +43,7 @@ contract CoreDots is ERC20, ERC20Burnable, ERC20Pausable, AccessControl, ERC20Pe
         // Genesis mint: 5,000,000 QDs directly to the System Vault.
         // This is the initial circulating supply. Remaining ~205M can be minted
         // by MINTER_ROLE holders up to the 210M hard cap.
-        _mint(SOVEREIGN_VAULT, GENESIS_SUPPLY);
+        _mint(Private_VAULT, GENESIS_SUPPLY);
     }
 
     function pause() public onlyRole(PAUSER_ROLE) {

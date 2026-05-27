@@ -491,7 +491,7 @@ export default function AkashicLedger() {
             style={{ background: "#00C076" }}
           />
           <span className="text-[9px] font-black uppercase tracking-widest" style={{ color: "rgba(0,0,0,0.25)" }}>
-            Live Registry
+            Active Registry
           </span>
         </div>
       </div>

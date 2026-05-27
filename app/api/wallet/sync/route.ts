@@ -79,7 +79,7 @@ export async function POST(req: NextRequest) {
         const sessionToken = await mintJWT({
             sub: userId,
             address: userId,
-            clearance: 'SOVEREIGN',
+            clearance: 'Private',
             tier: existingUser?.tier || 'FREE',
             kycStatus: kycStatus,
             humanityScore: existingUser?.humanityScore || 0,

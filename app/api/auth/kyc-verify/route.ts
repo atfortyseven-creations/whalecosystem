@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
         const jwt = await mintJWT({
             sub: normalizedAddress,
             address: normalizedAddress,
-            clearance: 'SOVEREIGN',
+            clearance: 'Private',
             tier: user.tier || 'FREE',
             kycStatus: 'VERIFIED',
             isZkVerified: true,

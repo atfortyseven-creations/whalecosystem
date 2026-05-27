@@ -6,7 +6,7 @@ import crypto from 'crypto';
  * 
  * In a true institutional environment, this worker binds directly to Flashbots Relayers 
  * via websockets (`wss://relay.flashbots.net`) and listens to the dark pool mempool.
- * Version 7.0: No Math.random(). Operates deterministically over Live Price Oracles.
+ * Version 7.0: No Math.random(). Operates deterministically over Active Price Oracles.
  */
 
 export class HFTMevAgent {

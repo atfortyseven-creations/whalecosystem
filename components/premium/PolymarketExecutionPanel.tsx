@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useSendTransaction, useAccount, useSwitchChain, useChainId } from "wagmi";
 import { polymarketRouterService } from "@/lib/blockchain/PolymarketRouterService";
-import { useLivePortfolio } from "@/hooks/useLivePortfolio";
+import { useActivePortfolio } from "@/hooks/useActivePortfolio";
 import { X, CheckCircle, AlertTriangle } from "lucide-react";
 import { toast } from "sonner";
 
@@ -26,7 +26,7 @@ export function PolymarketExecutionPanel({ symbol, probability, direction, marke
     const chainId = useChainId();
     const { switchChain, switchChainAsync } = useSwitchChain();
     const { sendTransaction, isPending, isSuccess } = useSendTransaction();
-    const { usdcBalance } = useLivePortfolio();
+    const { usdcBalance } = useActivePortfolio();
 
     const isPolygon = chainId === 137;
 

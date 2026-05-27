@@ -120,7 +120,7 @@ export async function POST(req: NextRequest) {
     const jwt = await mintJWT({
       sub: walletAddress,
       address: walletAddress,
-      clearance: 'SOVEREIGN',
+      clearance: 'Private',
       tier: existingUser?.tier || 'FREE',
       kycStatus: 'UNVERIFIED',
       humanityScore: existingUser?.humanityScore || 0,

@@ -122,7 +122,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
   const [uuid, setUuid] = useState<string | null>(null);
   const [ekey, setEkey] = useState<string | null>(null);
   const [expiresAt, setExpiresAt] = useState<number>(0);
-  const [livenessScore, setLivenessScore] = useState<number>(0);
+  const [livenessScore, setActivenessScore] = useState<number>(0);
   const [errorMsg, setErrorMsg] = useState("");
   const pollRef = useRef<NodeJS.Timeout | null>(null);
   const remaining = useCountdown(expiresAt);
@@ -168,7 +168,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
 
         if (data.status === "SUCCESS") {
           clearInterval(pollRef.current!);
-          setLivenessScore(data.livenessScore || 99);
+          setActivenessScore(data.livenessScore || 99);
           setStage("MOBILE_SCANNING");
 
           // Brief dramatic pause for the scanner animation to show
@@ -404,7 +404,7 @@ export function PCKYCGate({ walletAddress, onVerified }: PCKYCGateProps) {
                 Verifying Humanity Proof
               </p>
               <p className="text-[10px] text-white/30 mt-2 uppercase tracking-widest">
-                Liveness Score: {livenessScore}/100
+                Activeness Score: {livenessScore}/100
               </p>
             </div>
             <div className="w-full max-w-xs h-0.5 bg-white/5 rounded-full overflow-hidden">

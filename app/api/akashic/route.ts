@@ -39,12 +39,12 @@ function computeAkashicHash(fields: {
     fields.id, fields.chain, String(fields.amountUsd),
     fields.from.toLowerCase(), fields.to.toLowerCase(),
     fields.timestamp, String(fields.blockNumber),
-  ].join('|SOVEREIGN|');
+  ].join('|Private|');
   return createHash('sha256').update(canonical, 'utf8').digest('hex');
 }
 
 //  Format a live WhaleActivity row as an Akashic entry 
-function formatLiveEntry(row: any, index: number) {
+function formatActiveEntry(row: any, index: number) {
   const amountUsd = parseFloat(row.usdValue) || 0;
   const id = String(index + 1).padStart(5, '0');
   const timestamp = (row.timestamp ?? new Date()).toISOString();
@@ -89,22 +89,22 @@ export async function GET(req: NextRequest) {
     };
 
     // Fetch ALL qualifying rows to compute total, then paginate in memory
-    const allLive = await prisma.whaleActivity.findMany({
+    const allActive = await prisma.whaleActivity.findMany({
       where,
       orderBy: { timestamp: 'desc' },
       take: 500, // Fetch up to 500 for pagination
     });
 
     // Filter to Akashic threshold ($50M+)
-    const qualifying = allLive.filter(r => parseFloat(r.usdValue) >= AKASHIC_THRESHOLD_USD);
-    const totalLive  = qualifying.length;
+    const qualifying = allActive.filter(r => parseFloat(r.usdValue) >= AKASHIC_THRESHOLD_USD);
+    const totalActive  = qualifying.length;
     const paginated  = qualifying.slice(offset, offset + limit);
-    const liveEntries = paginated.map((row, i) => formatLiveEntry(row, offset + i));
+    const liveEntries = paginated.map((row, i) => formatActiveEntry(row, offset + i));
 
     //  2. Determine data source strategy 
-    const useLive = liveEntries.length > 0;
+    const useActive = liveEntries.length > 0;
 
-    const records = useLive
+    const records = useActive
       ? liveEntries
       : CURATED_REGISTRY
           .filter(r => !chain || r.chain === chain)
@@ -118,8 +118,8 @@ export async function GET(req: NextRequest) {
             }),
           }));
 
-    const total = useLive
-      ? totalLive
+    const total = useActive
+      ? totalActive
       : CURATED_REGISTRY.filter(r => !chain || r.chain === chain).length;
 
     //  3. Integrity verification mode 
@@ -145,7 +145,7 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      source: useLive ? 'LIVE_DB' : 'CURATED_REGISTRY',
+      source: useActive ? 'LIVE_DB' : 'CURATED_REGISTRY',
       total,
       limit,
       offset,
@@ -158,7 +158,7 @@ export async function GET(req: NextRequest) {
     }, {
       headers: {
         'Cache-Control': 'no-store', // Always serve fresh integrity data
-        'X-Akashic-Source': useLive ? 'LIVE' : 'CURATED',
+        'X-Akashic-Source': useActive ? 'LIVE' : 'CURATED',
         'X-Akashic-Total': String(total),
       }
     });

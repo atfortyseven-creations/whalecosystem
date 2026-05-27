@@ -46,7 +46,7 @@ export function SearchAnalyticsView({ result, onClose }: SearchAnalyticsViewProp
                             <div className="min-w-0">
                                 <div className="flex items-center gap-3">
                                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/40">Real-Time Forensic Scan</span>
-                                    <div className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest">Live</div>
+                                    <div className="px-2 py-0.5 rounded bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-[9px] font-black uppercase tracking-widest">Active</div>
                                 </div>
                                 <h1 className="text-xl lg:text-3xl font-black uppercase tracking-tighter text-white mt-1 break-all truncate">{query}</h1>
                                 <div className="flex items-center gap-2 mt-2">

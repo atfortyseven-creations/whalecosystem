@@ -76,8 +76,8 @@ function extractAddressFromAppKit(value: string): string | null {
   return match ? match[0].toLowerCase() : null;
 }
 
-//  Live clock hook 
-function useLiveClock(intervalMs = 1000): Date {
+//  Active clock hook 
+function useActiveClock(intervalMs = 1000): Date {
   const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), intervalMs);
@@ -275,7 +275,7 @@ function ConnectedScreen({
   initialScanData?: string | null;
   setShowKyc: (v: boolean) => void;
 }) {
-  const now = useLiveClock();
+  const now = useActiveClock();
   const [showInfoModal, setShowInfoModal] = useState(false);
   const [userAgentInfo, setUserAgentInfo] = useState('');
   const [sessionHistory, setSessionHistory] = useState<any[]>([]);

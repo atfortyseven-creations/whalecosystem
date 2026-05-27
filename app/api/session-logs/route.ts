@@ -36,7 +36,7 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { exportFormat, action, userId } = body;
 
-    //  Live insertion 
+    //  Active insertion 
     if (!exportFormat && action) {
       const ip = req.headers.get('x-forwarded-for') || req.headers.get('x-real-ip') || '127.0.0.1';
       const ua = req.headers.get('user-agent') || 'System';

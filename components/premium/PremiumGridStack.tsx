@@ -14,7 +14,7 @@ const PERFECTION_TOKENS = [
     "BTC", "ETH", "SOL", "BNB", "XRP", "ADA", "AVAX", "DOGE", "DOT", "LINK"
 ];
 
-interface LiveMarketState {
+interface ActiveMarketState {
     momentumScore: number;
     direction: 'BEARISH' | 'BULLISH' | 'NEUTRAL';
     targetPrice: number;
@@ -239,12 +239,12 @@ export function PremiumGridStack() {
                             </div>
                         )}
 
-                        {/*  Card: Live Portfolio  */}
+                        {/*  Card: Active Portfolio  */}
                         {card.id === 'live-portfolio' && (
                             <div className="bg-white border border-[#E5E5E5] p-6 shadow-[0_8px_30px_rgb(0,0,0,0.06)] hover:shadow-[0_8px_30px_rgb(0,0,0,0.1)] transition-all rounded-xl relative overflow-hidden group h-full">
                                 <div className="absolute inset-0 bg-gradient-to-tr from-[#FFFFFF] to-transparent pointer-events-none opacity-50" />
                                 <div className="flex justify-between items-start mb-4 relative z-10">
-                                    <p className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Live Portfolio</p>
+                                    <p className="text-[9px] font-black text-[#555] uppercase tracking-[0.2em]">Active Portfolio</p>
                                     {isConnected ? (
                                         <div className="w-2 h-2 rounded-full bg-[#00C076]" title="Connected to Native Wallet"/>
                                     ) : (

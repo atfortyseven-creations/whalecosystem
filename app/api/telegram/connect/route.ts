@@ -88,7 +88,7 @@ export async function POST(req: NextRequest) {
                 chat_id: chatId,
                 parse_mode: 'HTML',
                 text: [
-                    ' <b>SOVEREIGN INTELLIGENCE TERMINAL</b>',
+                    ' <b>Private INTELLIGENCE TERMINAL</b>',
                     '',
                     ' Alertas activadas correctamente.',
                     '',

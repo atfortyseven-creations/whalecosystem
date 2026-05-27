@@ -270,9 +270,9 @@ function ContactsTab({ contacts, addContact, removeContact }: any) {
 
 function ConnectedSitesTab() {
     const [sites, setSites] = useState([
-        { domain: 'app.uniswap.org', icon: '🦄', connectedAt: '2 days ago' },
-        { domain: 'polymarket.com', icon: '🔮', connectedAt: '5 hours ago' },
-        { domain: 'opensea.io', icon: '🌊', connectedAt: '1 week ago' }
+        { domain: 'app.uniswap.org', icon: '', connectedAt: '2 days ago' },
+        { domain: 'polymarket.com', icon: '', connectedAt: '5 hours ago' },
+        { domain: 'opensea.io', icon: '', connectedAt: '1 week ago' }
     ]);
 
     const removeSite = (domain: string) => {
@@ -327,7 +327,7 @@ function SnapsTab() {
         <div className="space-y-6">
             <div className="border border-black/10 p-6 space-y-4 bg-black/5 text-center">
                 <div className="w-12 h-12 rounded-full border border-black/20 bg-white mx-auto flex items-center justify-center text-lg mb-4">
-                    🧩
+                    
                 </div>
                 <h3 className="text-xs font-bold uppercase tracking-widest text-black">Snaps & Plugins</h3>
                 <p className="text-[10px] text-black/50 leading-relaxed max-w-[280px] mx-auto">

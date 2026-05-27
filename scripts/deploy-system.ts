@@ -177,7 +177,7 @@ async function main() {
 
     //  6. Summary 
     separator("");
-    log("", "SOVEREIGN DEPLOYMENT COMPLETE");
+    log("", "Private DEPLOYMENT COMPLETE");
     separator("");
     log("", `WhaleDeadmanSwitch: ${deadmanAddress}`);
     log("", `HumanTimeLock:      ${timelockAddress}`);

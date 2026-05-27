@@ -83,9 +83,9 @@ The 2026 behavioral taxonomy refines our 2025 classification framework based on 
 | ARBITRAGEUR        | Cross-chain same-block round trips            | 22.1%          |
 | OTC_DARK_POOL      | Large transfers to non-DEX addresses          | 11.3%          |
 | MARKET_MAKER       | Symmetric LP operations on both sides         | 7.9%           |
-| UNKNOWN_SOVEREIGN  | Single transaction, never before seen wallet  | 5.8%           |
+| UNKNOWN_Private  | Single transaction, never before seen wallet  | 5.8%           |
 
-The most dangerous classification remains **UNKNOWN_SOVEREIGN**: a single massive transaction from a wallet with zero prior history. These accounted for only 5.8% of detections but 23.4% of total USD volume  averaging $21.7M per event.
+The most dangerous classification remains **UNKNOWN_Private**: a single massive transaction from a wallet with zero prior history. These accounted for only 5.8% of detections but 23.4% of total USD volume  averaging $21.7M per event.
 
 ---
 
@@ -127,7 +127,7 @@ The Whale Alert Hall of Fame  launched in Q2 2026  enabled community Sentinels t
 
 ## Methodology & Data Sources
 
-- **Data Collection**: Live RPC subscription to BASE (Alchemy), ETHEREUM (Alchemy), BSC (GetBlock), SOLANA (GetBlock), BITCOIN (GetBlock) nodes
+- **Data Collection**: Active RPC subscription to BASE (Alchemy), ETHEREUM (Alchemy), BSC (GetBlock), SOLANA (GetBlock), BITCOIN (GetBlock) nodes
 - **Storage**: PostgreSQL via Prisma, Neo4j graph correlation, Redis event queue
 - **Detection Algorithm**: EVM Thermodynamics v2.3 (gas pattern + Z-score + wallet graph)
 - **Verification**: All data is cross-referenced against block explorers via asynchronous verification workers

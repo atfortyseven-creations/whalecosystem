@@ -85,7 +85,7 @@ export async function GET(req: NextRequest) {
           const jwt = await mintJWT({
             sub: normalizedAddress,
             address: normalizedAddress,
-            clearance: 'SOVEREIGN',
+            clearance: 'Private',
             tier: 'INITIATE',
             kycStatus: 'VERIFIED',
             isZkVerified: true,

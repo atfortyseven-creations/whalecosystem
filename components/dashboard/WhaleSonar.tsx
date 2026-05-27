@@ -6,7 +6,7 @@ import { useSystemIntel } from '@/lib/api-client';
 export function WhaleSonar() {
     // =========================================================================
     // INJECTED DATA HOOK  Zero-Mock Mandate
-    // Whale stream endpoint injected via REGISTRY.SOVEREIGN_INTEL.massTransfers
+    // Whale stream endpoint injected via REGISTRY.Private_INTEL.massTransfers
     // =========================================================================
     const { data: rawData, isLoading } = useSystemIntel('massTransfers');
     const alerts: any[] = rawData?.alerts || rawData?.transfers || [];

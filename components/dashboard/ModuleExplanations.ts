@@ -4,7 +4,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         subtitle: 'Network overview',
         overview: 'A real-time summary of network activity, wallet state, and protocol health. All data is read directly from verified node connections.',
         features: [
-            { title: 'Live Data', desc: 'Direct node feeds with no third-party intermediary.' },
+            { title: 'Active Data', desc: 'Direct node feeds with no third-party intermediary.' },
             { title: 'Network Health', desc: 'Connection status, latency, and block confirmation monitoring.' },
             { title: 'Unified View', desc: 'Key metrics across all connected accounts and chains.' },
         ]
@@ -42,7 +42,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
     'markets': {
         title: 'Markets',
         subtitle: 'Real-time prices',
-        overview: 'Live market data sourced directly from major exchanges. Track prices, depth, and capital flows across asset classes.',
+        overview: 'Active market data sourced directly from major exchanges. Track prices, depth, and capital flows across asset classes.',
         features: [
             { title: 'Depth View', desc: 'Order book depth for major trading pairs.' },
             { title: 'Capital Flow', desc: 'Net flow tracking between exchanges and wallets.' },
@@ -80,7 +80,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         ]
     },
     'firehose': {
-        title: 'Live Feed',
+        title: 'Active Feed',
         subtitle: 'Mempool stream',
         overview: 'A direct stream from the network mempool. See large transactions as they are broadcast, before confirmation.',
         features: [
@@ -235,7 +235,7 @@ export const MODULE_EXPLANATIONS: Record<string, { title: string, subtitle: stri
         overview: 'An interactive view of the Humanity Ledger development roadmap. Explore delivered, in-progress, and planned protocol components.',
         features: [
             { title: 'Interactive Canvas', desc: 'Drag to pan, scroll to zoom, click nodes for details.' },
-            { title: 'Status Tracking', desc: 'Live, building, and planned states for each component.' },
+            { title: 'Status Tracking', desc: 'Active, building, and planned states for each component.' },
             { title: 'Architecture Summary', desc: 'Layer-by-layer breakdown below the roadmap canvas.' },
         ]
     },

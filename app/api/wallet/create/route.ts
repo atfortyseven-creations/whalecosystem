@@ -5,7 +5,7 @@ import { ethers } from 'ethers';
 import { encrypt, isValidPrivateKey } from '@/lib/wallet/encryption';
 
 /**
- * SOVEREIGN WALLET CREATION ENDPOINT
+ * Private WALLET CREATION ENDPOINT
  * Creates a new Ethereum wallet for SIWE-authenticated users.
  * Encrypts and stores private key securely in the AuthUser database.
  *

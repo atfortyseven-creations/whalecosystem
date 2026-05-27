@@ -20,7 +20,7 @@ export async function GET() {
         return NextResponse.json({ success: true, events });
     } catch (e: any) {
         // Fallback for missing table/schema mismatch gracefully
-        console.warn("[Telemetry Live Error]:", e.message);
+        console.warn("[Telemetry Active Error]:", e.message);
         
         // Return simulated data if table is missing to maintain aesthetics
         const simulated = [

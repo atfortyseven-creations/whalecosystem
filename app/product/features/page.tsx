@@ -104,7 +104,7 @@ export default function FeaturesPage() {
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-green-400"></span>
-                                    <span><strong>Order Book:</strong> Live depth visualization</span>
+                                    <span><strong>Order Book:</strong> Active depth visualization</span>
                                 </li>
                                 <li className="flex items-start gap-2">
                                     <span className="text-green-400"></span>
@@ -208,7 +208,7 @@ export default function FeaturesPage() {
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
                                 <h4 className="font-bold mb-2">️ Recent Trades</h4>
-                                <p className="text-sm text-white/70">Live trade feed showing market activity and price action.</p>
+                                <p className="text-sm text-white/70">Active trade feed showing market activity and price action.</p>
                             </div>
 
                             <div className="bg-white/5 p-4 rounded-lg border border-white/10">
@@ -348,7 +348,7 @@ export default function FeaturesPage() {
                                     <td className="border border-white/10 p-3">Priority Support</td>
                                     <td className="border border-white/10 p-3 text-center"></td>
                                     <td className="border border-white/10 p-3 text-center">Email</td>
-                                    <td className="border border-white/10 p-3 text-center">24/7 Live Chat</td>
+                                    <td className="border border-white/10 p-3 text-center">24/7 Active Chat</td>
                                 </tr>
                             </tbody>
                         </table>

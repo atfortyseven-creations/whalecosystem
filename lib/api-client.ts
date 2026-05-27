@@ -12,7 +12,7 @@ export const REGISTRY = {
     newPairs:       "/api/market/new-pairs",
     polymarket:     "/api/polymarket/orders",
   },
-  SOVEREIGN_INTEL: {
+  Private_INTEL: {
     massTransfers:  "/api/analytics/mass-transfers", // mapped interceptor
     entityMap:      "/api/network/evm/recent", 
     smartSignals:   "/api/whale-stream",
@@ -85,10 +85,10 @@ export function useMarketData(endpointKey: keyof typeof REGISTRY.MARKET_DATA) {
 }
 
 // Highly secured analytics fetches
-export function useSystemIntel(endpointKey: keyof typeof REGISTRY.SOVEREIGN_INTEL) {
+export function useSystemIntel(endpointKey: keyof typeof REGISTRY.Private_INTEL) {
   return useQuery({
     queryKey: ['intel', endpointKey],
-    queryFn: () => fetchSystem(REGISTRY.SOVEREIGN_INTEL[endpointKey], true),
+    queryFn: () => fetchSystem(REGISTRY.Private_INTEL[endpointKey], true),
     refetchInterval: endpointKey === 'massTransfers' ? 30_000 : 60_000,
     staleTime: endpointKey === 'massTransfers' ? 25_000 : 55_000,
   });

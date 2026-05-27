@@ -5,7 +5,7 @@
  */
 import { useEffect, useRef, useState, useCallback } from 'react';
 
-export interface LiveTicker {
+export interface ActiveTicker {
     symbol: string;
     price: number;
     change24h: number;
@@ -26,7 +26,7 @@ const SYMBOL_MAP: Record<string, string> = {
 };
 
 export function useRealTimeFeed() {
-    const [tickers, setTickers] = useState<Record<string, LiveTicker>>({});
+    const [tickers, setTickers] = useState<Record<string, ActiveTicker>>({});
     const [connected, setConnected] = useState(false);
     const [error, setError] = useState('');
     const wsRef = useRef<WebSocket | null>(null);

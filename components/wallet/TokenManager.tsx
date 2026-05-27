@@ -90,7 +90,7 @@ export default function TokenManager({ walletAddress, chainId, onSelectToken }: 
             <h2 className="text-2xl font-black text-[#1F1F1F]">Tokens</h2>
             <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
               <RefreshCw size={12} className="text-emerald-500 animate-spin" style={{ animationDuration: '3s' }} />
-              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wider">Live</span>
+              <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wider">Active</span>
             </div>
           </div>
           <p className="text-sm text-[#1F1F1F]/70">Total Value: ${safeToFixed(totalValue || 0, 2)}</p>

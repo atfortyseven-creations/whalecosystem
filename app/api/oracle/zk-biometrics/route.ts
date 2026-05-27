@@ -3,7 +3,7 @@ import { verifyMessage } from 'viem';
 import { prisma } from '@/lib/prisma';
 
 /**
- * SOVEREIGN ZK-BIOMETRICS ORACLE (V3)
+ * Private ZK-BIOMETRICS ORACLE (V3)
  * 
  * Performs molecular verification of 3D liveness data bound to wallet signatures.
  * Zero mocks. Absolute cryptographic integrity.
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
         // 2. Verify Payload Integrity
         const payloadHash = payload.slice(-32); // Use the tail of the base64 as a quick 'hash' for binding
-        const message = `[SOVEREIGN ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
+        const message = `[Private ZK-GATE]\nBinding biometric liveness attestation for ${address}\nPayload: ${payloadHash}\nNonce: ${nonce}\nTimestamp: ${timestamp}`;
 
         // 3. Session Integrity Verification (Zero-Signature Check)
         try {
@@ -58,10 +58,10 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid or missing secure session. Reconnect wallet.' }, { status: 401 });
         }
 
-        // 4. Neural Mesh Liveness Audit (Molecular Verification)
+        // 4. Neural Mesh Activeness Audit (Molecular Verification)
         // In a real production environment, this would involve a server-side ML model
         // processing the 'payload' buffer. Here, we perform a molecular state verification.
-        console.log(`[ZK-ORACLE]  Analyzing 3D Liveness Mesh (Bound to Signature)`);
+        console.log(`[ZK-ORACLE]  Analyzing 3D Activeness Mesh (Bound to Signature)`);
         
         // 4. Persistence & System Attestation Issuance
         // Zero-Knowledge Proof minted immediately upon molecular verification.

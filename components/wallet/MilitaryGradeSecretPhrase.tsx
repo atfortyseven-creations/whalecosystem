@@ -119,7 +119,7 @@ Wallet: Whale Alert Network Terminal v4.0
                 </div>
             </div>
 
-            {/* Security Stats with Live Monitoring */}
+            {/* Security Stats with Active Monitoring */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
                 <StatCard
                     icon={<Lock className="text-[#050505]" />}

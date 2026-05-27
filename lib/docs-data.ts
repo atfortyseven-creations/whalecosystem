@@ -106,7 +106,7 @@ export const docsData: Record<string, DocSection> = {
     content: [
       "Certain computational processes require the rapid storage and retrieval of temporary data without the overhead of persisting it to disk. We implement a high-performance transient storage layer utilizing distributed, in-memory data structures like Redis.",
       "This storage layer is used extensively for caching frequently accessed data, managing rate limits, and maintaining the state of active WebSocket connections. By keeping this data entirely in Random Access Memory (RAM), we achieve read and write latencies in the microsecond range. This is essential for applications that require real-time responsiveness, such as trading interfaces and live analytics dashboards.",
-      "Data in the transient storage layer is highly volatile and is typically configured with strict Time-To-Live (TTL) parameters. Once the TTL expires, the data is automatically evicted, ensuring that memory usage remains optimized and that the system does not retain unnecessary state. This architectural choice maximizes throughput while minimizing infrastructure costs."
+      "Data in the transient storage layer is highly volatile and is typically configured with strict Time-To-Active (TTL) parameters. Once the TTL expires, the data is automatically evicted, ensuring that memory usage remains optimized and that the system does not retain unnecessary state. This architectural choice maximizes throughput while minimizing infrastructure costs."
     ]
   },
   "blocks": {
@@ -144,7 +144,7 @@ export const docsData: Record<string, DocSection> = {
     content: [
       "To minimize latency and reduce the load on our primary databases, we implement a comprehensive distributed caching strategy. Frequently requested data, such as market summaries, API configurations, and static assets, are stored in a distributed in-memory cache that spans multiple availability zones.",
       "When a client requests data, the system first checks the cache. If the data is present (a cache hit), it is returned immediately, typically within milliseconds. If the data is not present (a cache miss), the system queries the primary database, returns the result to the client, and simultaneously populates the cache for future requests. This read-through caching mechanism significantly improves overall system responsiveness.",
-      "Cache invalidation is handled programmatically to ensure data consistency. When the underlying data changes, the corresponding cache entries are automatically purged or updated. We utilize a combination of Time-To-Live (TTL) expiration and event-driven invalidation to balance performance with accuracy, providing developers with fast, reliable access to platform data."
+      "Cache invalidation is handled programmatically to ensure data consistency. When the underlying data changes, the corresponding cache entries are automatically purged or updated. We utilize a combination of Time-To-Active (TTL) expiration and event-driven invalidation to balance performance with accuracy, providing developers with fast, reliable access to platform data."
     ]
   },
   "fallbacks": {

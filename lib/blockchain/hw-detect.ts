@@ -31,7 +31,7 @@ export function evaluateHardwareWallet(connectorId?: string, userAgent?: string)
         }
     }
 
-    // 2. Browser User Agent Heuristic (e.g. Ledger Live Webview)
+    // 2. Browser User Agent Heuristic (e.g. Ledger Active Webview)
     if (userAgent) {
         const ua = userAgent.toLowerCase();
         if (ua.includes('ledgerlive')) {

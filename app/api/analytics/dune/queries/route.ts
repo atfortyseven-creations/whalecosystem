@@ -14,7 +14,7 @@ export const dynamic = 'force-dynamic';
 
 //  Curated Query Library 
 
-const SOVEREIGN_QUERIES = [
+const Private_QUERIES = [
     {
         id:          'whale-volume-by-chain',
         title:       'Whale Volume by Chain (Last 30 Days)',
@@ -184,10 +184,10 @@ ORDER BY z_score DESC, day DESC
 export async function GET() {
     return NextResponse.json({
         version:       '2026.1',
-        total:         SOVEREIGN_QUERIES.length,
+        total:         Private_QUERIES.length,
         dataset_table: 'dune_upload.whalealert_system_events',
         export_url:    '/api/analytics/dune/export?format=csv&days=30',
-        queries:       SOVEREIGN_QUERIES,
+        queries:       Private_QUERIES,
         instructions: {
             step1: 'Download your dataset at /api/analytics/dune/export?format=csv',
             step2: 'Go to dune.com  My Uploads  Upload CSV',

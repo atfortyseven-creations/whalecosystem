@@ -48,7 +48,7 @@ export async function GET() {
             };
         });
 
-        //  [SOVEREIGN PERSISTENCE] Save mega-whale BTC movements to DB 
+        //  [Private PERSISTENCE] Save mega-whale BTC movements to DB 
         // Threshold: 50 BTC+ (5,000,000,000 satoshis)  only true giants are indexed.
         // FIRE AND FORGET: DB write never blocks the response.
         const giantWhales = mappedTxs.filter((tx: any) => tx.value >= 5_000_000_000);

@@ -38,7 +38,7 @@ export default function SecurityArchitecturePage() {
               At Whale Alert Network, security is not an afterthought or a compliance checkbox — it is the fundamental pillar upon which our entire architecture is built. We understand that in the realm of decentralised finance, the integrity of data and the protection of user assets are absolutely paramount.
             </p>
             <p>
-              We employ a defence-in-depth strategy, combining cutting-edge cryptographic protocols, a strict zero-trust operational model, and continuous third-party auditing to ensure that our platform remains resilient against emerging threats. This document outlines the exhaustive measures we take to secure our infrastructure and protect your digital sovereignty.
+              We employ a defence-in-depth strategy, combining cutting-edge cryptographic protocols, a strict zero-trust operational model, and continuous third-party auditing to ensure that our platform remains resilient against emerging threats. This document outlines the exhaustive measures we take to secure our infrastructure and protect your digital Privatety.
             </p>
           </div>
         </section>

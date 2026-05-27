@@ -3,13 +3,13 @@
 import { useRealWalletData } from './useRealWalletData';
 
 /**
- * useLivePortfolio
+ * useActivePortfolio
  * 
  * Strict live connection wrapper for on-chain portfolio execution.
  * Data refresh intervals are managed by TanStack Query inside useRealWalletData
  * (10s for balance, 15s for positions, 30s for assets/history).
  */
-export function useLivePortfolio() {
+export function useActivePortfolio() {
     const { 
         address,
         isConnected,

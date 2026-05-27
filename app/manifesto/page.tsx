@@ -6,7 +6,7 @@ export default function ManifestoPage() {
     <AztecDocPage
       eyebrow="Protocol · Privacy Manifesto"
       title="Privacy Manifesto"
-      subtitle="The foundational principles governing data sovereignty, financial confidentiality, and cryptographic self-determination within the Humanity Ledger protocol."
+      subtitle="The foundational principles governing data Privatety, financial confidentiality, and cryptographic self-determination within the Humanity Ledger protocol."
       sections={MANIFESTO_SECTIONS}
     />
   );

@@ -144,7 +144,7 @@ export default function UserProfilePage() {
             <div className="flex flex-col">
               <h2 className="text-[18px] font-bold text-slate-900 mb-4">No activity yet</h2>
               <p className="text-[14px] text-slate-700 leading-relaxed max-w-[900px] mb-8">
-                Welcome to our community! You are brand new here and have not yet contributed to discussions. As a first step, visit <Link href="/forum?filter=top" className="text-[#0088cc] hover:underline">Top</Link> or <Link href="/forum" className="text-[#0088cc] hover:underline">Categories</Link> and just start reading! Select <span className="text-pink-500">♥</span> on posts that you like or want to learn more about. As you participate, your activity will be listed here.
+                Welcome to our community! You are brand new here and have not yet contributed to discussions. As a first step, visit <Link href="/forum?filter=top" className="text-[#0088cc] hover:underline">Top</Link> or <Link href="/forum" className="text-[#0088cc] hover:underline">Categories</Link> and just start reading! Select <span className="text-pink-500"></span> on posts that you like or want to learn more about. As you participate, your activity will be listed here.
               </p>
               <p className="text-[14px] text-slate-600">
                 There are no posts

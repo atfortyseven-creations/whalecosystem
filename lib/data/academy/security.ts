@@ -312,7 +312,7 @@
         },
         {
             id: "permissionless-exit-validium-l3-phd",
-            title: "18. Salida sin Permiso: Garantía de Liveness en Capas Modulares",
+            title: "18. Salida sin Permiso: Garantía de Activeness en Capas Modulares",
             description: "Mecanismos de escape: Cómo recuperar fondos si el operador del Rollup desaparece.",
             readTime: 360,
             content: `<div class="academy-article">

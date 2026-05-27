@@ -22,7 +22,7 @@ const ARCHITECTURE_NODES = [
   { icon: Activity, label: "Real-Time Stream (SSE)", desc: "Event delivery via Server-Sent Events with sub-500ms latency after detection." },
   { icon: Terminal, label: "Enterprise API Gateway", desc: "Dedicated REST and WebSocket infrastructure for mass access with IP Whitelisting." },
   { icon: Webhook, label: "Webhook Dispatcher", desc: "Asynchronous alert dispatch to external endpoints with retries and HMAC-SHA256 signatures." },
-  { icon: Code2, label: "Portfolio Fusion Engine", desc: "Live balance and USD value calculation integrating real-time prices via GetBlock RPC nodes." },
+  { icon: Code2, label: "Portfolio Fusion Engine", desc: "Active balance and USD value calculation integrating real-time prices via GetBlock RPC nodes." },
   { icon: Lock, label: "FIX Protocol Gateway", desc: "HFT (Financial Information eXchange) interface with Checksum validation for Hedge Funds." },
 ];
 

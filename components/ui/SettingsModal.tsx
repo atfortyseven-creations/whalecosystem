@@ -286,7 +286,7 @@ export function SettingsModal({ isOpen, onClose }: { isOpen: boolean; onClose: (
                         <h3 className="text-2xl font-bold text-white mb-2">The Void Support Desk</h3>
                         <p className="text-zinc-400 mb-8 max-w-sm mx-auto">Experiencing issues with your KYC or dark pool routing? Contact the engineers directly.</p>
                         <div className="flex flex-col gap-4 max-w-xs mx-auto">
-                            <button className="px-6 py-3 bg-pink-500/10 text-pink-400 border border-pink-500/30 rounded-xl font-bold hover:bg-pink-500/20 transition-colors">Start Live Chat</button>
+                            <button className="px-6 py-3 bg-pink-500/10 text-pink-400 border border-pink-500/30 rounded-xl font-bold hover:bg-pink-500/20 transition-colors">Start Active Chat</button>
                             <button className="px-6 py-3 bg-white/5 text-zinc-300 border border-white/10 rounded-xl font-bold hover:bg-white/10 transition-colors">Submit Ticket</button>
                         </div>
                     </div>

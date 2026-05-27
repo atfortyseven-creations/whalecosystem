@@ -43,7 +43,7 @@ const EDGES: RoadmapEdge[] = [
 ];
 
 const STATUS_CONFIG = {
-  live:     { label: 'Live',     dot: 'bg-black',       text: 'text-black',       border: 'border-black' },
+  live:     { label: 'Active',     dot: 'bg-black',       text: 'text-black',       border: 'border-black' },
   building: { label: 'Building', dot: 'bg-black/40',    text: 'text-black/60',    border: 'border-black/40' },
   planned:  { label: 'Planned',  dot: 'bg-black/15',    text: 'text-black/35',    border: 'border-black/15' },
 };

@@ -11,7 +11,7 @@ import { prisma } from '../lib/prisma';
 
 async function main() {
     console.log("=================================================");
-    console.log("️  SOVEREIGN DB HARDENING  INITIALIZING");
+    console.log("️  Private DB HARDENING  INITIALIZING");
     console.log("=================================================");
 
     try {

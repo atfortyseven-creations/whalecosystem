@@ -93,8 +93,8 @@ function HexParticles() {
     );
 }
 
-//  Live Price Ticker 
-function LivePriceTicker() {
+//  Active Price Ticker 
+function ActivePriceTicker() {
     const { ethPrice, btcPrice, gasGwei, blockNumber } = useVIPStore();
     const items = [
         { label: 'BTC', value: btcPrice ? `$${btcPrice.toLocaleString()}` : '$104,000', color: '#0f172a', icon: <Hash size={12} /> },
@@ -204,7 +204,7 @@ export function AnalyticsDashboard() {
                                     </span>
                                     <SignalBars level={healthScore >= 80 ? 5 : healthScore >= 60 ? 3 : 2} color={statusColor} />
                                 </div>
-                                <LivePriceTicker />
+                                <ActivePriceTicker />
                             </div>
                         </div>
                     </div>

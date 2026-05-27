@@ -136,7 +136,7 @@ export default function FiatCardIssuance({ walletAddress, balance }: { walletAdd
                                 </div>
                                 <div className="flex justify-between items-end">
                                     <div>
-                                        <div className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Live Balance</div>
+                                        <div className="text-[10px] uppercase tracking-widest opacity-50 mb-1">Active Balance</div>
                                         <div className="font-bold text-lg tracking-wide">${balance} USD</div>
                                     </div>
                                     <div className="text-right">

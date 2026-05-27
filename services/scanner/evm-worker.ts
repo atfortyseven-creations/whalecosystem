@@ -192,7 +192,7 @@ async function processWhaleTx(hash: string, from: string, to: string, asset: str
     const isCexOutflow = metadata.isExchangeOutflow || from.toLowerCase().includes('binance') || from.toLowerCase().includes('coinbase');
     const type = isCexOutflow ? 'CEX_OUTFLOW' : (metadata.method || "TRANSFER");
 
-    console.log(` [${chain}] SOVEREIGN_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
+    console.log(` [${chain}] Private_EVENT: $${(usdValue / 1e6).toFixed(2)}M | BTC: ${valueBTC.toFixed(3)} | Type: ${type}`);
 
     // [LOGICA INHUMANA] Ejecución paralela O(1) de persistencia BD y propagación Redis 
     // Reduce la latencia del trabajador a la mitad eliminando el bloqueo en serie.

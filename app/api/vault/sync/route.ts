@@ -9,8 +9,8 @@ export async function POST(request: Request) {
         const body = await request.json();
         const { payload_type } = body;
 
-        const vaultUrl = process.env.SOVEREIGN_VAULT_URL;
-        const vaultSecret = process.env.SOVEREIGN_VAULT_SECRET || 'SOVEREIGN_QUANTUM_KEY_777';
+        const vaultUrl = process.env.Private_VAULT_URL;
+        const vaultSecret = process.env.Private_VAULT_SECRET || 'Private_QUANTUM_KEY_777';
 
         const authHeader = request.headers.get('authorization');
         if (authHeader !== `Bearer ${vaultSecret}`) {
@@ -18,7 +18,7 @@ export async function POST(request: Request) {
         }
 
         if (!vaultUrl) {
-            return NextResponse.json({ error: 'SOVEREIGN_VAULT_URL not configured.' }, { status: 500 });
+            return NextResponse.json({ error: 'Private_VAULT_URL not configured.' }, { status: 500 });
         }
 
         let dataToArchive: any[] = [];

@@ -329,7 +329,7 @@ export const FEATURE_CARDS: FeatureCard[] = [
     id: 21,
     title: "Real-Time Portfolio Tracking",
     category: "Analytics",
-    description: "Live updates of your entire multi-chain portfolio.",
+    description: "Active updates of your entire multi-chain portfolio.",
     detailedInfo: "Monitor your holdings across 15+ blockchains with millisecond refresh rates. Beautiful charts display your allocation, performance, and historical P&L with Elite precision.",
     benefits: [
       "WebSocket live price feeds",

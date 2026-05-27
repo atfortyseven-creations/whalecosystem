@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 /**
- * SOVEREIGN ARCADE - HIGH-SPEED TRANSACTION BROADCASTER
+ * Private ARCADE - HIGH-SPEED TRANSACTION BROADCASTER
  * ----------------------------------------------------
  * Relays signed BSV transactions to high-performance miners/nodes.
  */

@@ -172,7 +172,7 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
 
             {/*  PRICE HERO  */}
             <div className="px-7 py-6 border-b border-black/6 bg-black/[0.015]">
-              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/35 mb-2">Live Oracle Price</p>
+              <p className="text-[9px] font-bold uppercase tracking-[0.2em] text-black/35 mb-2">Active Oracle Price</p>
               <div className="flex items-end justify-between gap-4">
                 <p className="text-[42px] font-black font-mono leading-none tracking-tighter text-black">
                   {fmtP(token.price, currency, eurRate)}

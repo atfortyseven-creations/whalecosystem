@@ -102,7 +102,7 @@ export function formatPriceAlertTelegram(data: {
   return `
 ${emoji} <b>PRICE ALERT</b>
 
-🪙 <b>Token:</b> ${data.token}
+ <b>Token:</b> ${data.token}
  <b>Current Price:</b> $${safeToLocaleString(data.currentPrice)}
  <b>Target:</b> $${safeToLocaleString(data.targetPrice)}
  <b>Condition:</b> ${conditionText}

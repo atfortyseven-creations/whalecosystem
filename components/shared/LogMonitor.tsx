@@ -14,7 +14,7 @@ interface LogEntry {
 
 export function LogMonitor() {
   const [logs, setLogs] = useState<LogEntry[]>([]);
-  const [isLive, setIsLive] = useState(true);
+  const [isActive, setIsActive] = useState(true);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const fetchLogs = async () => {
@@ -34,10 +34,10 @@ export function LogMonitor() {
   useEffect(() => {
     fetchLogs();
     const interval = setInterval(() => {
-      if (isLive) fetchLogs();
+      if (isActive) fetchLogs();
     }, 3000);
     return () => clearInterval(interval);
-  }, [isLive]);
+  }, [isActive]);
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -64,14 +64,14 @@ export function LogMonitor() {
         </div>
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className={`w-1.5 h-1.5 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-white/20'}`} />
-            <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">{isLive ? 'Live' : 'Paused'}</span>
+            <div className={`w-1.5 h-1.5 rounded-full ${isActive ? 'bg-emerald-500 animate-pulse' : 'bg-white/20'}`} />
+            <span className="text-[9px] font-bold uppercase tracking-widest opacity-40">{isActive ? 'Active' : 'Paused'}</span>
           </div>
           <button 
-            onClick={() => setIsLive(!isLive)}
+            onClick={() => setIsActive(!isActive)}
             className="px-2.5 py-1 bg-white/5 hover:bg-white/10 rounded-md border border-white/10 transition-colors"
           >
-            {isLive ? 'PAUSE' : 'RESUME'}
+            {isActive ? 'PAUSE' : 'RESUME'}
           </button>
         </div>
       </div>

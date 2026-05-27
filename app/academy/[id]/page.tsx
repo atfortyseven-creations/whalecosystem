@@ -139,7 +139,7 @@ export default async function AcademyModulePage({ params }: { params: Promise<{ 
                                     </li>
                                     <li className="flex items-center gap-2">
                                         <Activity size={14} className="text-[#00C076]" />
-                                        Live Network Metrics
+                                        Active Network Metrics
                                     </li>
                                 </ul>
                             </div>

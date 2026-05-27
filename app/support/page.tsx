@@ -22,7 +22,7 @@ const CARD   = "rgba(255,255,255,0.04)";
 const FAQ_ITEMS = [
   {
     q: "How do I connect my wallet to the platform?",
-    a: "Navigate to the Connect page via the top-right button or any 'Connect Wallet' call-to-action. The system supports MetaMask (browser extension and mobile), WalletConnect v2 (compatible with all major mobile wallets including Rainbow, Trust Wallet, and Ledger Live), and Coinbase Wallet with Smart Wallet MPC mode. Authentication is performed via ECDSA cryptographic message signing (EIP-4361 / Sign-In with Ethereum). No email address, password, or personal data is collected or stored at any stage of the process. On mobile devices, scan the QR code displayed on the Connect page using your wallet application to establish a cross-device session."
+    a: "Navigate to the Connect page via the top-right button or any 'Connect Wallet' call-to-action. The system supports MetaMask (browser extension and mobile), WalletConnect v2 (compatible with all major mobile wallets including Rainbow, Trust Wallet, and Ledger Active), and Coinbase Wallet with Smart Wallet MPC mode. Authentication is performed via ECDSA cryptographic message signing (EIP-4361 / Sign-In with Ethereum). No email address, password, or personal data is collected or stored at any stage of the process. On mobile devices, scan the QR code displayed on the Connect page using your wallet application to establish a cross-device session."
   },
   {
     q: "Is my financial data and identity private?",
@@ -169,7 +169,7 @@ function SystemStatus() {
         <div className="flex items-center gap-2.5">
           <Activity size={12} style={{ color: MUTED }} />
           <span className="font-mono text-[9px] uppercase tracking-[0.3em] font-black" style={{ color: MUTED }}>
-            Live System Status
+            Active System Status
           </span>
         </div>
         <div className="flex items-center gap-2">

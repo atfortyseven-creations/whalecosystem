@@ -73,7 +73,7 @@ export function MinimalDarkPool() {
                 <div>
                     <h2 className="text-white text-2xl font-black tracking-widest uppercase flex items-center gap-3">
                         <Waves className="text-blue-500" size={28} />
-                        Live Dark Pool
+                        Active Dark Pool
                     </h2>
                     <p className="text-blue-500/50 text-xs mt-1 tracking-[0.2em] uppercase">On-Chain Entity Analytics</p>
                 </div>

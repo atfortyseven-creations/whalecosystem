@@ -197,7 +197,7 @@ function ChainItem({
       {/* Stats (if enabled) */}
       {showStats && isSelected && (
         <div className="text-xs text-[#1F1F1F]/70">
-          Live
+          Active
         </div>
       )}
     </button>

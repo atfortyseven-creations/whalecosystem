@@ -90,7 +90,7 @@ export function NativeSwapView({ address, onBack }: any) {
                 
                 setAmountOut((conversion * 0.997).toFixed(6));
                 
-                // Live gas estimation mock based on network traffic
+                // Active gas estimation mock based on network traffic
                 const baseGas = activeNetwork === 'ethereum' ? 0.002 : 0.0001;
                 setGasEstimate((baseGas * (1 + Math.random() * 0.5)).toFixed(5));
 

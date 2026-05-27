@@ -89,7 +89,7 @@ export default function SystemNodeCore() {
                             transition={{ delay: 0.1 }}
                             className="text-white/40 text-lg font-medium tracking-tight"
                         >
-                            Live chain health, block latency, and validator status across supported networks.
+                            Active chain health, block latency, and validator status across supported networks.
                         </motion.p>
                     </div>
 
@@ -176,7 +176,7 @@ export default function SystemNodeCore() {
                     >
                         <div className="space-y-6 flex-1">
                             <div className="flex items-center justify-between">
-                                <h3 className="text-lg font-black uppercase tracking-widest leading-none">Live Logs</h3>
+                                <h3 className="text-lg font-black uppercase tracking-widest leading-none">Active Logs</h3>
                                 <Terminal size={14} className="text-white/20" />
                             </div>
                             

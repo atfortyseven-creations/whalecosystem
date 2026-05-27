@@ -27,7 +27,7 @@ async function getMessages() {
 }
 
 /**
- * SOVEREIGN GOSSIP - DECENTRALIZED MESSAGE RELAY
+ * Private GOSSIP - DECENTRALIZED MESSAGE RELAY
  * --------------------------------------------
  * Handles system peer-to-peer communication simulation.
  * Messages are ephemeral and cryptographically signed.

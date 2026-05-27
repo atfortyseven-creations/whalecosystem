@@ -27,7 +27,7 @@ interface PortfolioViewProps {
 
 export default function PaperPortfolioView({ totalValue, balances, prices, change24hValue, change24hPercent, onForceSync, address }: PortfolioViewProps) {
   const [filter, setFilter] = useState<'ALL' | 'ETH' | 'ERC20' | 'NFT'>('ALL');
-  const [liveTxs, setLiveTxs] = useState<any[]>([]);
+  const [liveTxs, setActiveTxs] = useState<any[]>([]);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [copied, setCopied] = useState(false);
   const { formatValue, currency } = useCurrency();
@@ -46,7 +46,7 @@ export default function PaperPortfolioView({ totalValue, balances, prices, chang
     socket.on('connect', () => console.log(' [Network Hub] Synchronized'));
     socket.on('vitals.tx.new', (tx) => {
         if (tx.to?.toLowerCase() === address.toLowerCase() || tx.from?.toLowerCase() === address.toLowerCase()) {
-            setLiveTxs(prev => [tx, ...prev].slice(0, 10));
+            setActiveTxs(prev => [tx, ...prev].slice(0, 10));
         }
     });
     return () => { if (socket) socket.disconnect(); };

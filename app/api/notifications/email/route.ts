@@ -177,7 +177,7 @@ function formatPriceAlertEmail(data: {
       <p>Your price target has been reached!</p>
       
       <div class="stat">
-        <div class="stat-label">🪙 Token</div>
+        <div class="stat-label"> Token</div>
         <div class="stat-value">${data.token}</div>
       </div>
       

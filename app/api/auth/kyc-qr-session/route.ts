@@ -42,9 +42,9 @@ export async function POST(req: NextRequest) {
 
     // Validate liveness score
     if (typeof livenessScore !== 'number' || livenessScore < 72) {
-      console.warn(`[KYC:Session] Liveness score too low: ${livenessScore} for UUID: ${uuid.slice(0, 8)}`);
+      console.warn(`[KYC:Session] Activeness score too low: ${livenessScore} for UUID: ${uuid.slice(0, 8)}`);
       return NextResponse.json(
-        { error: 'Liveness verification did not meet threshold.' },
+        { error: 'Activeness verification did not meet threshold.' },
         { status: 422 }
       );
     }

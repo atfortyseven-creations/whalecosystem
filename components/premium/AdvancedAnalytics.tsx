@@ -226,7 +226,7 @@ export default function AdvancedAnalytics({ walletAddress, isPremium, hasTrialed
         </div>
         <h3 className="text-sm font-black text-gray-400 mb-6 flex items-center gap-2 uppercase tracking-[0.2em]">
             <TrendingUp size={16} className="text-orange-500" />
-            Binance Live Tracker: BTC / USDT
+            Binance Active Tracker: BTC / USDT
         </h3>
         <TradingViewChart 
             symbol="BTCUSDT" 
@@ -356,7 +356,7 @@ export default function AdvancedAnalytics({ walletAddress, isPremium, hasTrialed
         <div className="bg-emerald-500/5 border border-emerald-500/20 rounded-3xl p-4 flex items-center justify-between backdrop-blur-md">
             <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Live Signal:</span>
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest whitespace-nowrap">Active Signal:</span>
             </div>
             <span className="text-xs font-mono font-black text-emerald-400 italic truncate ml-2">{portfolioData.lastActive || 'Analyzing...'}</span>
         </div>

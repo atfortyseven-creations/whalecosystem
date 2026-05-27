@@ -100,7 +100,7 @@ export function LightningDashboard() {
                         </div>
                         <div className="flex items-center gap-2 px-4 py-2 bg-emerald-50 text-emerald-600 rounded-full border border-emerald-100">
                             <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] font-black uppercase tracking-widest">Live Flow</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest">Active Flow</span>
                         </div>
                     </div>
                     <div className="bg-white border border-slate-100 rounded-[3rem] overflow-hidden shadow-sm">

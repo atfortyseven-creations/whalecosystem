@@ -80,7 +80,7 @@ export const PerformanceChart: React.FC = () => {
             <div ref={chartContainerRef} className="w-full h-full" />
             {mode !== 'loading' && mode !== 'error' && (
                 <div className="absolute top-2 right-2 px-2 py-1 bg-black/60 rounded-lg border border-white/10 text-[9px] font-mono text-white/40 uppercase tracking-widest">
-                    {mode === 'wallet' ? ' Live Wallet' : ' ETH Index'} · CoinGecko
+                    {mode === 'wallet' ? ' Active Wallet' : ' ETH Index'} · CoinGecko
                 </div>
             )}
         </div>

@@ -198,7 +198,7 @@ export function PreCognitiveGrid({ symbol }: PreCognitiveGridProps) {
                 onMouseEnter={() => setIsHovered(true)}
                 onMouseLeave={() => setIsHovered(false)}
             >
-                {/* Live Indicator Badge */}
+                {/* Active Indicator Badge */}
                 {!error && (
                     <div className="absolute top-5 right-5 flex items-center gap-1.5 z-20">
                         <div className="w-1.5 h-1.5 rounded-full bg-[#00FFAA] animate-[pulse_600ms_ease-in-out_infinite]" />

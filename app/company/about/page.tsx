@@ -214,7 +214,7 @@ export default function AboutPage() {
           </h2>
           <div className="space-y-4 text-[15px] leading-[1.75] text-black/70">
             <p>
-              Whale Alert Network is entirely <strong>Open Source</strong>. We believe that true financial sovereignty and privacy can only be achieved when the underlying code is fully transparent, auditable, and verifiable by the community. We do not commercialise the system; our goal is to provide a robust, production-ready public good for the decentralised ecosystem.
+              Whale Alert Network is entirely <strong>Open Source</strong>. We believe that true financial Privatety and privacy can only be achieved when the underlying code is fully transparent, auditable, and verifiable by the community. We do not commercialise the system; our goal is to provide a robust, production-ready public good for the decentralised ecosystem.
             </p>
             <p>
               We are deeply integrated with the <strong>Aztec Network</strong>, a programmable zero-knowledge (ZK) rollup. By leveraging Aztec’s Noir circuits and confidential execution environments, we obscure sensitive user interactions:

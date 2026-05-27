@@ -7,7 +7,7 @@ import React, { useEffect, useRef } from 'react';
  * Utiliza Canvas API y manipulación directa del DOM para evadir por completo 
  * el ciclo de renderizado de React (garantizando 60 FPS fijos).
  */
-export function LiveTerminalWidgets({ 
+export function ActiveTerminalWidgets({ 
   type, 
   workerRef 
 }: { 

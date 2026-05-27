@@ -115,7 +115,7 @@ WhaleStreamContext (React)
 |----------|--------|-------------|
 | `/api/health` | GET | K8s/Railway readiness probe |
 | `/api/whale-stream` | GET (SSE) | Real-time whale event stream |
-| `/api/contracts/status` | GET | Live on-chain DeadmanSwitch + TimeLock state |
+| `/api/contracts/status` | GET | Active on-chain DeadmanSwitch + TimeLock state |
 | `/api/market/signals` | GET | System API Marketplace (3-tier HMAC) |
 | `/api/analytics/dune/export` | GET | CSV/JSON Dune-ready export |
 | `/api/analytics/dune/queries` | GET | 6 system Dune SQL queries |

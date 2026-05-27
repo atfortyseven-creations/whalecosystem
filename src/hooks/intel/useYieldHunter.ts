@@ -20,7 +20,7 @@ export function useYieldHunter() {
     useEffect(() => {
         const fetchOpps = async () => {
             try {
-                const liveOpps = await analyticsService.getLiveYieldOpportunities();
+                const liveOpps = await analyticsService.getActiveYieldOpportunities();
                 setPools(liveOpps);
             } catch (e) {
                 console.error('[useYieldHunter] Failed to sync with on-chain oracles');

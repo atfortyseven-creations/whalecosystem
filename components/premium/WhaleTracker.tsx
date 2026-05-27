@@ -419,7 +419,7 @@ export default function WhaleTracker({
                     </div>
                     <span className="text-sm font-bold text-green-400 bg-green-900/20 border border-green-500/20 px-3 py-1 rounded-full animate-pulse flex items-center gap-2">
                         <span className="w-2 h-2 rounded-full bg-green-500"></span>
-                        Live Update
+                        Active Update
                     </span>
                 </div>
 

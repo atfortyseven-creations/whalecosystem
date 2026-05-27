@@ -143,7 +143,7 @@ export function WhaleDetectionVisual() {
                     {/* Passive UI Elements */}
                     <div className="absolute top-8 left-8 flex items-center gap-3">
                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_8px_rgba(16,185,129,0.8)]" />
-                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Live Feed / Nodes_Satoshi</span>
+                        <span className="text-[9px] font-black text-white/40 uppercase tracking-[0.3em]">Active Feed / Nodes_Satoshi</span>
                     </div>
 
                     <div className="absolute top-8 right-8">

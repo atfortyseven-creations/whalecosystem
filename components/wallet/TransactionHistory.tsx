@@ -141,7 +141,7 @@ export default function TransactionHistory({ authUserId, transactions: propTrans
           <h2 className="text-2xl font-black text-[#1F1F1F] tracking-tighter">Activity Analytics</h2>
           <div className="flex items-center gap-1.5 px-2 py-1 bg-emerald-500/10 rounded-lg border border-emerald-500/20">
             <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
-            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wider">Live</span>
+            <span className="text-[9px] font-black text-emerald-600 uppercase tracking-wider">Active</span>
           </div>
         </div>
         

@@ -317,11 +317,11 @@ export class AnalyticsService {
     }
 
     /**
-     *  [Enterprise DISCOVERY] getLiveYieldOpportunities
+     *  [Enterprise DISCOVERY] getActiveYieldOpportunities
      * Scans real on-chain liquidity pools via Premium RPCs. 
      * Eradicates the need for static mock lists.
      */
-    public async getLiveYieldOpportunities(): Promise<any[]> {
+    public async getActiveYieldOpportunities(): Promise<any[]> {
         const cacheKey = 'live_yield_opps';
         const cached = await redis.get(cacheKey);
         if (cached) return safeJsonParse(cached, [], 'YIELD_OPPS');
@@ -346,7 +346,7 @@ export class AnalyticsService {
                 { id: 'pendle-eth', name: 'Pendle ETH', protocol: 'Pendle', baseApy: 32.5, tvl: 12000000, risk: 'HIGH' }
             ];
 
-            // Cache for 15 minutes to preserve CUs while maintaining "Live" feel
+            // Cache for 15 minutes to preserve CUs while maintaining "Active" feel
             await redis.set(cacheKey, JSON.stringify(results), 'EX', 900);
             return results;
         } catch (e) {
@@ -356,10 +356,10 @@ export class AnalyticsService {
     }
 
     /**
-     *  [Enterprise DISCOVERY] getLiveGovProposals
+     *  [Enterprise DISCOVERY] getActiveGovProposals
      * Fetches real-time DAO proposals (Optimism, Uniswap, Aave) via Snapshot/Tally logic blueprints.
      */
-    public async getLiveGovProposals(): Promise<any[]> {
+    public async getActiveGovProposals(): Promise<any[]> {
         const cacheKey = 'live_gov_proposals';
         const cached = await redis.get(cacheKey);
         if (cached) return safeJsonParse(cached, [], 'GOV_PROPOSALS');

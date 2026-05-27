@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
     // Limit to top 50 to prevent abuse
     const subset = tokens.slice(0, 50);
 
-    const updates = await portfolioService.getLivePrices(subset.map((t: any) => ({
+    const updates = await portfolioService.getActivePrices(subset.map((t: any) => ({
       symbol: t.symbol,
       balance: t.balanceNumeric || t.balance || 0,
       price: t.price || 0,
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(updates);
   } catch (error: any) {
     return NextResponse.json(
-      { error: 'Live update failed' },
+      { error: 'Active update failed' },
       { status: 500 }
     );
   }

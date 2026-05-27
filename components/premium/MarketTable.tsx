@@ -97,7 +97,7 @@ export default function MarketTable() {
         return safeToLocaleString(val) + ' $';
     };
 
-    const LivePriceTicker = ({ value, flash }: { value: number, flash: 'up' | 'down' | null }) => {
+    const ActivePriceTicker = ({ value, flash }: { value: number, flash: 'up' | 'down' | null }) => {
         const displayValue = value;
 
         return (
@@ -135,7 +135,7 @@ export default function MarketTable() {
         );
     };
 
-    const LiveVolumeTicker = ({ value }: { value: number }) => {
+    const ActiveVolumeTicker = ({ value }: { value: number }) => {
         return (
             <span className="text-sm font-black text-white tabular-nums transition-all duration-1000">
                 {formatCompact(value)}
@@ -276,7 +276,7 @@ export default function MarketTable() {
                                 </td>
                                 <td className="px-6 py-4 text-right">
                                     <div className="flex justify-end">
-                                        <LivePriceTicker 
+                                        <ActivePriceTicker 
                                             value={coin.current_price} 
                                             flash={flashStates[coin.id] || null} 
                                         />
@@ -286,7 +286,7 @@ export default function MarketTable() {
                                     {formatCompact(coin.market_cap)}
                                 </td>
                                 <td className="px-6 py-4 text-right">
-                                    <LiveVolumeTicker value={coin.total_volume} />
+                                    <ActiveVolumeTicker value={coin.total_volume} />
                                 </td>
                                 <td className="px-4 py-4 text-center">
                                     <PercentBadge val={coin.price_change_1h} coinId={coin.id} timeframe="1h" />

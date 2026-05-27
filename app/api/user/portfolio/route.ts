@@ -1,6 +1,6 @@
 /**
  * GET /api/user/portfolio?address=0x...
- * Powers LivePortfolio panel via GetBlock EP1 (JSON-RPC)
+ * Powers ActivePortfolio panel via GetBlock EP1 (JSON-RPC)
  * Real on-chain ETH + ERC-20 balances  no synthetic data.
  */
 

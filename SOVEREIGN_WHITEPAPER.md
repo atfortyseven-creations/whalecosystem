@@ -1,4 +1,4 @@
-# SOVEREIGN WHITEPAPER: HUMANITY LEDGER & WHALE ALERT NETWORK
+# Private WHITEPAPER: HUMANITY LEDGER & WHALE ALERT NETWORK
 **Version:** 4.0.0 — The Definitive Technical Reference  
 **Date:** May 2026  
 **Repository:** [github.com/atfortyseven-creations/whalecosystem](https://github.com/atfortyseven-creations/whalecosystem) — **Public & Open Source**  
@@ -76,14 +76,14 @@ The foundational ERC-20 token of the Humanity Ledger ecosystem.
 | Name | CoreDots |
 | Symbol | QDs |
 | Hard Cap (`MAX_SUPPLY`) | **210,000,000 QDs** |
-| Genesis Allocation | 5,000,000 QDs → SOVEREIGN_VAULT |
+| Genesis Allocation | 5,000,000 QDs → Private_VAULT |
 | Remaining Mintable | 205,000,000 QDs (via MINTER_ROLE) |
 | Decimal Precision | 18 |
-| Pausing | ✅ PAUSER_ROLE |
-| Governance Votes | ✅ ERC-5805 (on-chain voting weight) |
-| Gasless Approvals | ✅ ERC-2612 Permit |
+| Pausing |  PAUSER_ROLE |
+| Governance Votes |  ERC-5805 (on-chain voting weight) |
+| Gasless Approvals |  ERC-2612 Permit |
 
-The `MAX_SUPPLY` is enforced as a hard ceiling on every single `mint()` call — it is mathematically impossible to exceed 210,000,000 QDs. The `SOVEREIGN_VAULT` (`0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a`) receives the genesis allocation directly at deploy time.
+The `MAX_SUPPLY` is enforced as a hard ceiling on every single `mint()` call — it is mathematically impossible to exceed 210,000,000 QDs. The `Private_VAULT` (`0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a`) receives the genesis allocation directly at deploy time.
 
 **ERC-5805 (Votes):** CoreDots implements the OpenZeppelin Votes extension. Every QDs holder has an on-chain voting weight equal to their balance (when self-delegated). This enables governance proposals to be tallied on-chain without a separate governance token.
 
@@ -377,7 +377,7 @@ Critical vulnerabilities (fund loss or user deanonymization) are eligible for up
 
 ## 15. Roadmap
 
-### Phase 1 — Core Protocol (✅ Delivered)
+### Phase 1 — Core Protocol ( Delivered)
 - Aztec PXE integration and Barretenberg browser proving.
 - CoreDots ERC-20 with ERC-2612 Permit and ERC-5805 Votes.
 - CoreLedger on-chain receipt registry with MEV-protected permit transfer.
@@ -391,7 +391,7 @@ Critical vulnerabilities (fund loss or user deanonymization) are eligible for up
 - Whale Chat — XMTP v5 end-to-end encrypted messaging.
 - Full public open-source repository release.
 
-### Phase 2 — Institutional Tooling (🔄 In Progress — Q3 2026)
+### Phase 2 — Institutional Tooling ( In Progress — Q3 2026)
 - Selective disclosure SDK: viewing keys and ZK range proofs for regulatory compliance.
 - W3C Verifiable Credential issuance and verification.
 - Threshold multi-signature: M-of-N authorization proven in Noir circuit.
@@ -399,7 +399,7 @@ Critical vulnerabilities (fund loss or user deanonymization) are eligible for up
 - Compliance API: endpoints for regulated financial activity attestation.
 - Post-quantum circuit migration planning (BN128 → Pasta curves).
 
-### Phase 3 — Scale Applications (📅 Planned — 2027)
+### Phase 3 — Scale Applications ( Planned — 2027)
 - Real-world asset (RWA) tokenization with ZK attestation of underlying validity.
 - Dark pool liquidity: blind order matching with ZK proofs — MEV structurally impossible.
 - Full decentralized governance: community control of all protocol parameters.

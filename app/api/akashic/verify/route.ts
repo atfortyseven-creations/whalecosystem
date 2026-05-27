@@ -28,7 +28,7 @@ function computeAkashicHash(fields: {
         fields.id, fields.chain, String(fields.amountUsd),
         fields.from.toLowerCase(), fields.to.toLowerCase(),
         fields.timestamp, String(fields.blockNumber),
-    ].join('|SOVEREIGN|');
+    ].join('|Private|');
     return createHash('sha256').update(canonical, 'utf8').digest('hex');
 }
 
@@ -66,11 +66,11 @@ export async function POST(req: NextRequest) {
         }
 
         // Fetch candidates from DB (entries >= $50M)
-        const allLive = await prisma.whaleActivity.findMany({
+        const allActive = await prisma.whaleActivity.findMany({
             orderBy: { timestamp: 'desc' },
             take:    500,
         });
-        const qualifying = allLive.filter(r => parseFloat(r.usdValue.toString()) >= AKASHIC_THRESHOLD_USD);
+        const qualifying = allActive.filter(r => parseFloat(r.usdValue.toString()) >= AKASHIC_THRESHOLD_USD);
 
         // Build a map of id  {hash, fields}
         const entryMap = new Map<string, { hash: string; fields: any }>();
@@ -126,7 +126,7 @@ export async function POST(req: NextRequest) {
             integrityStatus:    anyTampered ? 'COMPROMISED' : allVerified ? 'INTACT' : 'PARTIAL',
             results,
             verifiedAt:         new Date().toISOString(),
-            algorithm:          'SHA-256 (SOVEREIGN-CANONICAL)',
+            algorithm:          'SHA-256 (Private-CANONICAL)',
             comparisonMethod:   'timingSafeEqual (constant-time, side-channel resistant)',
         }, {
             headers: {
@@ -153,11 +153,11 @@ export async function GET(req: NextRequest) {
     if (!id) {
         // Public Audit Feed: Return the 5 latest verified entries
         try {
-            const allLive = await prisma.whaleActivity.findMany({
+            const allActive = await prisma.whaleActivity.findMany({
                 orderBy: { timestamp: 'desc' },
                 take: 100, // Fetch a chunk to find qualifying entries
             });
-            const qualifying = allLive.filter(r => parseFloat(r.usdValue.toString()) >= 50_000_000).slice(0, 5);
+            const qualifying = allActive.filter(r => parseFloat(r.usdValue.toString()) >= 50_000_000).slice(0, 5);
             
             const results = qualifying.map((row, index) => {
                 const entryId       = String(index + 1).padStart(5, '0');
@@ -172,7 +172,7 @@ export async function GET(req: NextRequest) {
                     entryId, row.chain, String(amountUsd),
                     fromAddr.toLowerCase(), toAddr.toLowerCase(),
                     timestamp, String(blockNumber),
-                ].join('|SOVEREIGN|');
+                ].join('|Private|');
                 const hash = require('crypto').createHash('sha256').update(canonical, 'utf8').digest('hex');
 
                 return {

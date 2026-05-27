@@ -1751,7 +1751,7 @@ USD
 103.94M
 USD
 999.90M
-Livepeer
+Activepeer
 LPT
 2.07
 USD

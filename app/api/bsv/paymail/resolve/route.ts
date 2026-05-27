@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 /**
- * SOVEREIGN IDENTITY - PAYMAIL RESOLUTION ENGINE
+ * Private IDENTITY - PAYMAIL RESOLUTION ENGINE
  * -----------------------------------------------
  * Translates human-readable handles into Bitcoin SV addresses and PKI metadata.
  * 

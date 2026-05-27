@@ -6,7 +6,7 @@ import { RefreshCw, Search, Banknote, ShieldCheck, Loader2, AlertTriangle } from
 import { useSendTransaction, useSwitchChain, useChainId } from 'wagmi';
 import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { polymarketRouterService } from '@/lib/blockchain/PolymarketRouterService';
-import { useLivePortfolio } from '@/hooks/useLivePortfolio';
+import { useActivePortfolio } from '@/hooks/useActivePortfolio';
 import { toast } from 'sonner';
 import Image from 'next/image';
 import { useMarketData } from '@/lib/api-client';
@@ -113,7 +113,7 @@ export default function PolymarketPanel() {
     const chainId = useChainId();
     const { switchChain, switchChainAsync } = useSwitchChain();
     const { sendTransactionAsync } = useSendTransaction();
-    const { usdcBalance } = useLivePortfolio();
+    const { usdcBalance } = useActivePortfolio();
 
     const isPolygon = chainId === 137;
 

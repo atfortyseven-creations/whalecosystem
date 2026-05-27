@@ -5,7 +5,7 @@
  *
  * Zero-Mock Mandate: All synthetic event generators have been permanently
  * eradicated. The store is hydrated exclusively via:
- *   1. Live Oracle prices from Binance (fetchOraclePrices)
+ *   1. Active Oracle prices from Binance (fetchOraclePrices)
  *   2. Real alpha events from the database (/api/alpha-events)
  *
  * No Math.random() mock streams. No synthetic whale events.

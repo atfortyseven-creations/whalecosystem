@@ -34,7 +34,7 @@ const HIGHLIGHTS = [
   { key: "Underlying Infrastructure", value: "Aztec L2 zkRollup" },
   { key: "State Management", value: "Encrypted UTXOs (Private State)" },
   { key: "Encryption Standard", value: "AES-GCM-256" },
-  { key: "Identity Verification", value: "Biometric Liveness Proofs" },
+  { key: "Identity Verification", value: "Biometric Activeness Proofs" },
   { key: "Session Control", value: "Zero-Knowledge Mathematics" },
   { key: "Cross-Layer Execution", value: "Seamless L1  L2 Messaging" }
 ];

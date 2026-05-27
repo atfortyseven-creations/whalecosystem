@@ -112,7 +112,7 @@ function formatWhaleAlertDiscord(data: {
         inline: true,
       },
       {
-        name: '🪙 Token',
+        name: ' Token',
         value: data.token,
         inline: true,
       },
@@ -146,7 +146,7 @@ function formatPriceAlertDiscord(data: {
     color,
     fields: [
       {
-        name: '🪙 Token',
+        name: ' Token',
         value: data.token,
         inline: true,
       },

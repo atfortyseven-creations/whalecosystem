@@ -4,7 +4,7 @@ import { verifyWorldIDProof } from '@/lib/worldid';
 
 /**
  * POST /api/zk/verify-identity
- * Absolute Reality: Verifies a WorldID ZK-SNARK proof to elevate user to SOVEREIGN tier.
+ * Absolute Reality: Verifies a WorldID ZK-SNARK proof to elevate user to Private tier.
  * Zero simulation policy integration.
  */
 export async function POST(request: NextRequest) {
@@ -23,11 +23,11 @@ export async function POST(request: NextRequest) {
         );
         
         if (result.success) {
-            // Update the user to SOVEREIGN tier in the institutional database
+            // Update the user to Private tier in the institutional database
             await (prisma as any).user.update({
                 where: { walletAddress: address.toLowerCase() },
                 data: { 
-                    tier: 'SOVEREIGN', 
+                    tier: 'Private', 
                     worldIdNullifierHash: nullifier_hash,
                     reputation: { increment: 100 }
                 }
@@ -35,8 +35,8 @@ export async function POST(request: NextRequest) {
             
             return NextResponse.json({ 
                 success: true, 
-                message: 'Identity verified via WorldID ZK-SNARK. Account upgraded to SOVEREIGN.',
-                tier: 'SOVEREIGN'
+                message: 'Identity verified via WorldID ZK-SNARK. Account upgraded to Private.',
+                tier: 'Private'
             });
         }
         

@@ -50,7 +50,7 @@ export function WhalecosystemTweetFeed({
               <span className={`text-[11px] font-black uppercase tracking-widest ${isDark ? 'text-white/80' : 'text-black/80'}`}>
                 @humanityledger
               </span>
-              {/* "Live Feed" text has been explicitly removed as requested */}
+              {/* "Active Feed" text has been explicitly removed as requested */}
             </div>
           </div>
           <div className="flex items-center gap-2">

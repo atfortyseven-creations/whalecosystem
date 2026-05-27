@@ -219,7 +219,7 @@ export function OmniGridCanvas() {
         ctx!.fillRect(0, 0, cw, ch);
       }
 
-      //  Live stats HUD & Genesis Status 
+      //  Active stats HUD & Genesis Status 
       ctx!.font = '9px "Roboto Mono", monospace';
       ctx!.fillStyle = isConnected ? 'rgba(212,175,55,0.45)' : 'rgba(0,195,255,0.45)';
       const statusText = isConnected ? `Connected ${address?.slice(0,6)}` : 'Not connected';

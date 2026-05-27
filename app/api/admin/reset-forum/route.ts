@@ -57,7 +57,7 @@ Here you will find a premium, secure environment for institutional discussion an
 
 ### Key Features
 1. **Institutional Grid**: Deep-dive analysis and structured data.
-2. **Live Feed**: Real-time discussions and updates.
+2. **Active Feed**: Real-time discussions and updates.
 3. **Recent Profiles**: Track new system identities joining the network.
 4. **Highest Yield**: The most valuable and upvoted analytics.
 

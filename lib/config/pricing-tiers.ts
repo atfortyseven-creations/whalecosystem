@@ -45,7 +45,7 @@ export const SECTION_FEATURES: SectionFeatureGroup[] = [
     label: 'Dashboard',
     icon: '',
     freeFeatures: [
-      'Live whale movement feed (top 50 per day)',
+      'Active whale movement feed (top 50 per day)',
       'Basic on-chain activity overview',
       'Market cap & volume snapshot',
       '24h price movement tracker',
@@ -135,7 +135,7 @@ export const PRICING_TIERS: PricingTier[] = [
     accentColor:  '#050505',
     lottie:       'isometric-cube.json',
     features: [
-      { text: 'Live whale movement feed (top 50 per day)', section: 'dashboard' },
+      { text: 'Active whale movement feed (top 50 per day)', section: 'dashboard' },
       { text: 'Basic on-chain activity overview & market snapshot', section: 'dashboard' },
       { text: 'Access to public community chat (7-day history)', section: 'chat' },
       { text: 'Single wallet portfolio tracker', section: 'portfolio' },

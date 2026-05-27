@@ -1,5 +1,5 @@
 /**
- * SOVEREIGN SYSTEM HEALTH ENDPOINT
+ * Private SYSTEM HEALTH ENDPOINT
  *
  * Exposes real-time metrics for:
  *   - Circuit breaker states (RPC providers + Neo4j)

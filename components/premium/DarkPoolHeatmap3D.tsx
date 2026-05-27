@@ -186,7 +186,7 @@ export function DarkPoolHeatmap3D() {
         </h3>
         <p className="text-white/40 font-mono text-[10px] uppercase tracking-widest flex items-center gap-2">
           <span className="w-2 h-2 rounded-full bg-rose-500 animate-pulse shadow-[0_0_10px_rgba(244,63,94,0.8)]" />
-          Live 3D Topography
+          Active 3D Topography
         </p>
       </div>
 

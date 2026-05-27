@@ -51,7 +51,7 @@ export function usePolymarketSession() {
             const message = `Enable Polymarket Trading\nTimestamp: ${Date.now()}`;
             await signMessageAsync({ message });
 
-            // STEP 2: Deploy Proxy Wallet (Live logic needed here)
+            // STEP 2: Deploy Proxy Wallet (Active logic needed here)
             toast.info("Deploying Proxy Wallet...", { duration: 2000 });
             // The real logic would involve transaction confirmation for the proxy factory
             // e.g., await proxyFactory.deploy();

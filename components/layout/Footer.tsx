@@ -52,7 +52,7 @@ export const Footer = () => {
 
                         {/* Connect */}
                         <div className="flex flex-col gap-8">
-                            <h4 className="text-[10px] font-aztec-mono font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-3">
+                            <h4 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-3">
                                 <span className="w-4 h-[1px] bg-white/30" /> Connect
                             </h4>
                             <div className="flex flex-col gap-5">
@@ -61,6 +61,20 @@ export const Footer = () => {
                                 <FooterLink href="/docs" icon={<Code size={15} />}>Docs</FooterLink>
                                 <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy</FooterLink>
                                 <FooterLink href="/terms" icon={<Lock size={15} />}>Terms</FooterLink>
+                            </div>
+                        </div>
+
+                        {/* Executed Phases */}
+                        <div className="flex flex-col gap-8 md:col-span-2 mt-8 md:mt-0">
+                            <h4 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-3">
+                                <span className="w-4 h-[1px] bg-white/30" /> System Phases
+                            </h4>
+                            <div className="grid grid-cols-2 gap-x-8 gap-y-3">
+                                {[...Array(15)].map((_, i) => (
+                                    <FooterLink key={i} href={`/phase-${i+1}`} icon={<Database size={12} />}>
+                                        Phase {i+1}
+                                    </FooterLink>
+                                ))}
                             </div>
                         </div>
                     </div>

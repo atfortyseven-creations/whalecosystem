@@ -14,7 +14,7 @@ interface ChainPulseCardProps {
     metrics?: {
         tps: number;
         health: number;
-        isLive: boolean;
+        isActive: boolean;
     };
     delay?: number;
 }
@@ -33,7 +33,7 @@ export function ChainPulseCard({ chain, metrics, delay = 0, theme = 'default' }:
         >
             {/* Background Pulse (Authentic) */}
             <motion.div
-                animate={isDataAvailable && metrics.isLive ? { 
+                animate={isDataAvailable && metrics.isActive ? { 
                     scale: [1, 1.05, 1],
                     opacity: [0.03, 0.08, 0.03]
                 } : { opacity: 0 }}
@@ -91,7 +91,7 @@ export function ChainPulseCard({ chain, metrics, delay = 0, theme = 'default' }:
 
                 <div className="flex items-center justify-between mt-1">
                     <div className="flex gap-1">
-                        <Zap size={10} className={metrics?.isLive ? "text-amber-500 shadow-sm rounded-full" : "text-slate-300"} />
+                        <Zap size={10} className={metrics?.isActive ? "text-amber-500 shadow-sm rounded-full" : "text-slate-300"} />
                         <Shield size={10} className={isDataAvailable ? "text-indigo-500" : "text-slate-300"} />
                         <Activity size={10} className={isDataAvailable ? "text-rose-500" : "text-slate-300"} />
                     </div>

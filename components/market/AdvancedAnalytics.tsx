@@ -10,7 +10,7 @@ export function AdvancedAnalytics() {
     const chartContainerRef = useRef<HTMLDivElement>(null);
     const [prices, setPrices] = useState({ btc: 0, eth: 0, sol: 0 });
 
-    // Live Ticker is now driven by real-time API polling in the next useEffect
+    // Active Ticker is now driven by real-time API polling in the next useEffect
     useEffect(() => {
         // We rely on the fetchData polling in the next effect for real updates
         return () => {};
@@ -48,7 +48,7 @@ export function AdvancedAnalytics() {
         };
 
         fetchData();
-        const interval = setInterval(fetchData, 10000); // Live Updates from Backend
+        const interval = setInterval(fetchData, 10000); // Active Updates from Backend
 
         const handleResize = () => {
             chart.applyOptions({ width: chartContainerRef.current?.clientWidth || 800 });

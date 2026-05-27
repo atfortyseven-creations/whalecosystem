@@ -29,7 +29,7 @@ const FEATURED_INTEGRATIONS = [
         url:         'https://whalealert.network',
         description: 'The system terminal. EVM Thermodynamics engine, ZK identity layer, institutional analytics.',
         category:    'analytics',
-        tier:        'SOVEREIGN',
+        tier:        'Private',
         since:       '2026-01-01',
         logo:        '/logo.png',
         badge:       ' Core Platform',

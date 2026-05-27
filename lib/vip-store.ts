@@ -163,7 +163,7 @@ export interface VIPStoreState {
     lastLiqUpdate: number;
     lastSatoshiUpdate: number;
     lastVolumeUpdate: number;
-    lastLiveNetworkUpdate: number;
+    lastActiveNetworkUpdate: number;
     lastNexusUpdate: number;
     lastLeaderboardUpdate: number; // [NEW]
 
@@ -179,7 +179,7 @@ export interface VIPStoreState {
     setVolumeData: (v: VolumeData) => void;
     setEthPrice: (p: number) => void;
     setBtcPrice: (p: number) => void;
-    setLiveNetworkMetrics: (gas: number, block: number, ethPrice: number, btcPrice: number) => void;
+    setActiveNetworkMetrics: (gas: number, block: number, ethPrice: number, btcPrice: number) => void;
     setLeaderboard500: (whales: any[]) => void;
     setNexus: (nexus: { entities: { address: string; label: string; balance: string }[] }) => void;
 }
@@ -229,7 +229,7 @@ export const useVIPStore = create<VIPStoreState>()(
         lastLiqUpdate: 0,
         lastSatoshiUpdate: 0,
         lastVolumeUpdate: 0,
-        lastLiveNetworkUpdate: 0,
+        lastActiveNetworkUpdate: 0,
         lastNexusUpdate: 0,
         lastLeaderboardUpdate: 0,
 
@@ -346,8 +346,8 @@ export const useVIPStore = create<VIPStoreState>()(
         setVolumeData: (volumeData) => set({ volumeData, lastVolumeUpdate: Date.now() }),
         setEthPrice: (ethPrice) => set({ ethPrice }),
         setBtcPrice: (btcPrice) => set({ btcPrice }),
-        setLiveNetworkMetrics: (gasGwei, blockNumber, ethPrice, btcPrice) => 
-            set({ gasGwei, blockNumber, ethPrice, btcPrice, lastLiveNetworkUpdate: Date.now() }),
+        setActiveNetworkMetrics: (gasGwei, blockNumber, ethPrice, btcPrice) => 
+            set({ gasGwei, blockNumber, ethPrice, btcPrice, lastActiveNetworkUpdate: Date.now() }),
         setLeaderboard500: (leaderboard500) => set({ leaderboard500, lastLeaderboardUpdate: Date.now() }),
         setNexus: (nexus) => set({ nexus, lastNexusUpdate: Date.now() }),
     }))

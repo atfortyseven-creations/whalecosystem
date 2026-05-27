@@ -111,7 +111,7 @@ PRISMA_GENERATE_DATAPROXY="true"
 **Solution:** Check `chainId` matches exactly. Restart the Railway app to flush the Next.js cache.
 
 ### 5. Issue: "WebSocket 502 Bad Gateway"
-**Symptoms:** Live alerts do not appear. Terminal shows "Reconnecting...".
+**Symptoms:** Active alerts do not appear. Terminal shows "Reconnecting...".
 **Solution:** Railway might be routing to the wrong internal port. Ensure your worker exposes the correct WebSocket port and the Railway firewall allows it.
 
 ---

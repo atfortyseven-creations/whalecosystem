@@ -43,7 +43,7 @@ export async function GET(req: NextRequest) {
         where: { userId: authUserId, status: 'ACTIVE' }
     });
 
-    const isPremium = !!activeSub || dbUser?.tier === 'SOVEREIGN';
+    const isPremium = !!activeSub || dbUser?.tier === 'Private';
 
     return NextResponse.json({
       isPremium,

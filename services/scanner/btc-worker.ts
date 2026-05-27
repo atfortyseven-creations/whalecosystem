@@ -143,7 +143,7 @@ async function processWhaleTx(
         btcPrice = 98000;
     }
 
-    console.log(` [BTC] SOVEREIGN_BREACH: $${(usdValue / 1e6).toFixed(2)}M | tx: ${hash.slice(0, 8)}`);
+    console.log(` [BTC] Private_BREACH: $${(usdValue / 1e6).toFixed(2)}M | tx: ${hash.slice(0, 8)}`);
 
     await prisma.whaleActivity.upsert({
         where: { transactionHash: hash },

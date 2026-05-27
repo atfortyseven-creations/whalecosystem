@@ -44,9 +44,9 @@ export default function NotificationsPreferencesPage() {
           </div>
         </section>
 
-        {/* Live Notifications */}
+        {/* Active Notifications */}
         <section>
-          <h3 className="text-sm font-bold text-black dark:text-white mb-4">Live Notifications</h3>
+          <h3 className="text-sm font-bold text-black dark:text-white mb-4">Active Notifications</h3>
           <p className="text-xs text-black/50 dark:text-white/50 mb-3">Browser push notifications when you are active on the site.</p>
           <button className="px-4 py-2 border border-blue-500 text-blue-600 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg text-sm font-bold transition-colors">
             Enable Push Notifications

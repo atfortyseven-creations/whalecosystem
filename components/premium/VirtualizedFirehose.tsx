@@ -157,7 +157,7 @@ export function VirtualizedFirehose() {
 
             <div className="flex-1 w-full bg-white border border-[#E5E5E5] rounded-xl shadow-[0_8px_30px_rgb(0,0,0,0.06)] flex flex-col min-h-0 relative group overflow-hidden">
 
-            {/* HEADER REMOVED - User requested to eliminate 'Global liquidity firehose Live' */}
+            {/* HEADER REMOVED - User requested to eliminate 'Global liquidity firehose Active' */}
 
             {/* VIRTUALIZED LIST CONTAINER */}
             <div
@@ -209,7 +209,7 @@ export function VirtualizedFirehose() {
                             onClick={handleJumpTop}
                             className="absolute top-4 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2 px-4 py-2 bg-[#050505] text-[#FFFFFF] text-[9px] font-black uppercase tracking-widest rounded-full shadow-lg hover:scale-105 transition-transform active:scale-95 border border-[#E5E5E5]/20"
                         >
-                            <ChevronUp size={12} /> Jump to Live Stream
+                            <ChevronUp size={12} /> Jump to Active Stream
                         </motion.button>
                     )}
                 </AnimatePresence>

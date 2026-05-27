@@ -91,7 +91,7 @@ export function CatchTheWhale() {
                 </div>
             </div>
 
-            {/* Live UTC Clock */}
+            {/* Active UTC Clock */}
             <div className="flex flex-col items-center gap-4">
                 <span className="text-[10px] font-black uppercase tracking-[0.5em] text-[var(--aztec-ink)]/30">Schedule</span>
                 <div className="bg-[var(--aztec-parchment)]/40 backdrop-blur-3xl px-8 py-3 rounded-2xl border border-[var(--aztec-ink)]/5 shadow-lg shadow-[var(--aztec-ink)]/5">

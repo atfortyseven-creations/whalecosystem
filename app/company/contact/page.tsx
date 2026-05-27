@@ -186,7 +186,7 @@ export default function ContactPage() {
                         <div className="bg-white/5 p-6 rounded-xl border border-white/10">
                             <h3 className="font-bold mb-4">LEGEND Tier Support</h3>
                             <p className="text-sm text-white/70 mb-2">
-                                <strong>24/7 Live Chat</strong> for premium subscribers
+                                <strong>24/7 Active Chat</strong> for premium subscribers
                             </p>
                             <p className="text-sm text-white/70 mb-2">
                                 Response time: {'<'} 1 hour average

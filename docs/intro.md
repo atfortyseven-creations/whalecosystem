@@ -34,13 +34,13 @@ Whale Alert Network operates in compliance with CFTC and OFAC guidelines. Jurisd
 
 | Network | Chain ID | RPC Provider | Status |
 |---|---|---|---|
-| Ethereum Mainnet | 1 | GetBlock Dedicated |  Live |
-| BNB Smart Chain | 56 | GetBlock Dedicated |  Live |
-| Polygon PoS | 137 | Alchemy |  Live |
-| Base | 8453 | GetBlock / Public |  Live |
-| Arbitrum One | 42161 | Public |  Live |
-| Optimism | 10 | Alchemy / Public |  Live |
-| World Chain | 480 | Alchemy |  Live |
+| Ethereum Mainnet | 1 | GetBlock Dedicated |  Active |
+| BNB Smart Chain | 56 | GetBlock Dedicated |  Active |
+| Polygon PoS | 137 | Alchemy |  Active |
+| Base | 8453 | GetBlock / Public |  Active |
+| Arbitrum One | 42161 | Public |  Active |
+| Optimism | 10 | Alchemy / Public |  Active |
+| World Chain | 480 | Alchemy |  Active |
 
 ---
 

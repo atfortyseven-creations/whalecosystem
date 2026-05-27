@@ -11,7 +11,7 @@
  *     companyName:    string,   // Required
  *     contactName:    string,   // Required
  *     email:          string,   // Required
- *     tier:           'PRO' | 'ENTERPRISE' | 'SOVEREIGN',
+ *     tier:           'PRO' | 'ENTERPRISE' | 'Private',
  *     useCase:        string,   // Min 50 chars
  *     teamSize:       number,
  *     currentStack:   string,   // Optional: "Nansen + Arkham + custom"
@@ -24,7 +24,7 @@ import { NextRequest, NextResponse } from 'next/server';
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
 
-const VALID_TIERS = ['PRO', 'ENTERPRISE', 'SOVEREIGN'] as const;
+const VALID_TIERS = ['PRO', 'ENTERPRISE', 'Private'] as const;
 
 export async function POST(req: NextRequest) {
     try {
@@ -123,7 +123,7 @@ export async function POST(req: NextRequest) {
             nextSteps: [
                 `Reference ID <${inquiryId}> in all communications`,
                 'Check your email for confirmation',
-                tier === 'SOVEREIGN'
+                tier === 'Private'
                     ? 'A strategic partnership call will be scheduled within 48h'
                     : `Schedule a call: https://cal.com/whalealert/enterprise`,
             ],

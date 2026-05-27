@@ -33,12 +33,12 @@ export async function GET(req: Request) {
             const token = authHeader.split(' ')[1];
             const payload = await privyRelayer.verifyToken(token);
             if (!payload) {
-                console.warn(`[Whale-Live] Invalid Privy JWT.`);
+                console.warn(`[Whale-Active] Invalid Privy JWT.`);
                 // Return 401 if strict auth is desired:
                 // return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
             }
         } else {
-            console.debug(`[Whale-Live] Missing Privy Authorization header.`);
+            console.debug(`[Whale-Active] Missing Privy Authorization header.`);
         }
 
         const { searchParams } = new URL(req.url);
@@ -56,7 +56,7 @@ export async function GET(req: Request) {
         });
 
     } catch (err: any) {
-        console.error('[Whale Live EP2]', err?.message);
+        console.error('[Whale Active EP2]', err?.message);
         return NextResponse.json({ events: [], total: 0, source: 'error' }, { status: 200 });
     }
 }

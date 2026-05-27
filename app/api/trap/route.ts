@@ -11,7 +11,7 @@ export const runtime = 'edge'; // Edge runtime for zero-latency trap response
 // ANY hit on these routes:
 //   1. Returns a plausible-but-empty 200 response (low noise)
 //   2. Logs the IP, User-Agent, and path to console (Railway logs + alerting)
-//   3. Sets a "SOVEREIGN_TRAP_HIT" header for downstream WAF correlation
+//   3. Sets a "Private_TRAP_HIT" header for downstream WAF correlation
 //
 // Legitimate traffic never hits these paths.
 // 

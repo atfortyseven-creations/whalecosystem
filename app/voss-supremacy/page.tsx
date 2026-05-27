@@ -84,7 +84,7 @@ export default function VossSupremacyPage() {
           <div className="grid md:grid-cols-3 gap-8">
             <div className="bg-[#1A1A1A] text-white p-8">
                <h3 className="font-mono text-sm tracking-widest text-[#8C8C8C] mb-4">PHASE 1 // DAYS 1-30</h3>
-               <p className="text-lg font-medium mb-2">Architectural Sovereignty</p>
+               <p className="text-lg font-medium mb-2">Architectural Privatety</p>
                <p className="text-sm text-gray-400">Implementation 1-125. Transition to Rust Bindings and ZK-Rollup Integration. Initial liquidity provisioning protocols established.</p>
             </div>
             <div className="bg-[#1A1A1A] text-white p-8">

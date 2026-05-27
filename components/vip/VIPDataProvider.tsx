@@ -124,12 +124,12 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
     };
 
     //  6. NETWORK ORACLE METRICS (ETH Block, Gas, Chainlink) 
-    const pollLiveNetwork = async () => {
+    const pollActiveNetwork = async () => {
         try {
             const res = await fetch('/api/network/live');
             const data = await res.json();
             if (data.success) {
-                store.setLiveNetworkMetrics(
+                store.setActiveNetworkMetrics(
                     data.gasGwei,
                     data.blockNumber,
                     data.ethPrice,
@@ -201,7 +201,7 @@ export function VIPDataProvider({ children }: { children: React.ReactNode }) {
         runPoll(pollMempool, INTERVALS.mempool);
         runPoll(pollFunding, INTERVALS.funding);
         runPoll(pollLiquidations, INTERVALS.liquidations);
-        runPoll(pollLiveNetwork, INTERVALS.liveNetwork);
+        runPoll(pollActiveNetwork, INTERVALS.liveNetwork);
         runPoll(pollTopWhales, INTERVALS.topWhales);
         runPoll(pollLeaderboard, INTERVALS.leaderboard);
         runPoll(pollSatoshi, INTERVALS.satoshi);

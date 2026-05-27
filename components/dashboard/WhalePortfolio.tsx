@@ -58,7 +58,7 @@ export function WhalePortfolio() {
     const [view, setView] = React.useState<'leaderboard' | 'portfolio'>('leaderboard');
     const [search, setSearch] = React.useState('');
     const [lastUpdated, setLastUpdated] = React.useState(new Date());
-    const [liveWhaleCount, setLiveWhaleCount] = React.useState(0);
+    const [liveWhaleCount, setActiveWhaleCount] = React.useState(0);
     const [mounted, setMounted] = React.useState(false);
 
     const { address, isConnected } = useAccount();
@@ -105,7 +105,7 @@ export function WhalePortfolio() {
                 if (res.ok) {
                     const parsed = await res.json();
                     if (parsed && parsed.type === 'WHALE_TX') {
-                        setLiveWhaleCount(c => c + 1);
+                        setActiveWhaleCount(c => c + 1);
                         setLastUpdated(new Date());
                     }
                 }

@@ -70,7 +70,7 @@ function fmtTime(ts: string): string {
 export function TopWhaleEvents24h() {
     // =========================================================================
     // INJECTED DATA HOOK  Zero-Mock Mandate
-    // Whale events endpoint injected via REGISTRY.SOVEREIGN_INTEL.eventLedger
+    // Whale events endpoint injected via REGISTRY.Private_INTEL.eventLedger
     // =========================================================================
     const { data: rawData, isLoading, error } = useSystemIntel('eventLedger');
     const events: WhaleEvent[] = rawData?.data ?? [];

@@ -39,7 +39,7 @@ export class VIPGridEngine {
     // Calcula la propensión a un Short/Long squeeze combinando Binance + Hyperliquid
     static async calculatePrecognitiveState(asset: string): Promise<PrecognitiveOutput> {
         try {
-            const state = await this.fetchLiveAggregatedState(asset);
+            const state = await this.fetchActiveAggregatedState(asset);
             
             // 1. Squeeze Gravity Calculation
             const oiDelta = state.aggregatedShortOI - state.aggregatedLongOI;
@@ -102,7 +102,7 @@ export class VIPGridEngine {
         }
     }
 
-    private static async fetchLiveAggregatedState(asset: string): Promise<GlobalMarketState> {
+    private static async fetchActiveAggregatedState(asset: string): Promise<GlobalMarketState> {
         // Fetch Phase 1 data from Binance API
         const symbol = `${asset.toUpperCase()}USDT`;
         

@@ -32,7 +32,7 @@ const STATS = [
   { label: "State Model", value: "Private Notes (UTXO)" },
   { label: "Circuit Language", value: "Noir" },
   { label: "Settlement", value: "Ethereum L1" },
-  { label: "Identity", value: "ZK Biometric Liveness" },
+  { label: "Identity", value: "ZK Biometric Activeness" },
   { label: "Compliance", value: "W3C Verifiable Credentials" },
 ];
 

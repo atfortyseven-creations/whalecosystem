@@ -200,7 +200,7 @@ export default function AztecPrivacyHub() {
             </div>
             <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
               <Activity size={14} className="text-purple-400" />
-              <span className="text-[10px] font-mono text-white/60">Live</span>
+              <span className="text-[10px] font-mono text-white/60">Active</span>
             </div>
           </div>
 

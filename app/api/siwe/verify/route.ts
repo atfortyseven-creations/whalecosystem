@@ -56,7 +56,7 @@ export async function POST(req: NextRequest) {
       chainId: fields.chainId,
       domain: fields.domain,
       issuedAt: fields.issuedAt,
-      clearance: 'SOVEREIGN',
+      clearance: 'Private',
       tier: user?.tier || 'FREE',
       kycStatus: 'UNVERIFIED',
       humanityScore: user?.humanityScore || 0,
@@ -75,7 +75,7 @@ export async function POST(req: NextRequest) {
       ok: true,
       address: fields.address,
       chainId: fields.chainId,
-      clearance: 'SOVEREIGN',
+      clearance: 'Private',
     });
 
     const cookieOptions = {

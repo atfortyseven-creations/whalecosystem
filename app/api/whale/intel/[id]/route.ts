@@ -2,7 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 
 /**
- * SOVEREIGN INTEL - PREMIUM DATA PAYWALL
+ * Private INTEL - PREMIUM DATA PAYWALL
  * ------------------------------------
  * High-value whale data is locked behind a BSV micropayment.
  * Verifies transaction proof of payment and releases full analytics.

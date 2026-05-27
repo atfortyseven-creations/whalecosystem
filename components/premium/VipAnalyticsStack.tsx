@@ -55,7 +55,7 @@ function L2FeesPanel() {
                 </div>
                 <div className="flex items-center gap-2 bg-white/5 border border-white/10 px-4 py-2 rounded-xl backdrop-blur-sm">
                     <Cpu size={12} className="text-cyan-400" />
-                    <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">Live Updates</span>
+                    <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">Active Updates</span>
                 </div>
             </div>
 
@@ -80,7 +80,7 @@ function L2FeesPanel() {
                                     <span className="text-sm font-black text-white/90 uppercase tracking-wide">{chainMeta?.name}</span>
                                 </div>
                                 <div className="px-2 py-1 bg-cyan-400/10 border border-cyan-400/20 rounded-lg">
-                                    <span className="text-[8px] font-black text-cyan-400 uppercase">Live</span>
+                                    <span className="text-[8px] font-black text-cyan-400 uppercase">Active</span>
                                 </div>
                             </div>
                             

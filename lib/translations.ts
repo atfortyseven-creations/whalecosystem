@@ -215,7 +215,7 @@ export const translations = {
 
         // VIP Section
         'vip.badge': 'LEGIONARY STATUS',
-        'vip.title_track': 'WHALE SOVEREIGNTY',
+        'vip.title_track': 'WHALE PrivateTY',
         'vip.title_copy': 'CAPITAL STRATEGY',
         'vip.desc': 'Professional-grade whale tracking with AI-powered insights, real-time alerts, and automated copy trading. Join 10,000+ traders making smarter decisions.',
         'vip.tab_tracker': 'Whale Tracker',

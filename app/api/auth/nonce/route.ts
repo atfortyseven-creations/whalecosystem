@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
 /**
- * SOVEREIGN CRYPTOGRAPHIC NONCE GENERATOR
+ * Private CRYPTOGRAPHIC NONCE GENERATOR
  * Generates a military-grade, single-use challenge token to prevent replay attacks.
  */
 export async function GET() {

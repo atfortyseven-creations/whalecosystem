@@ -66,7 +66,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
         }, 1500);
       }, 4000);
     } else if (stage === "PERMISSION" && hasPermission === false) {
-      setErrorMsg("Camera access denied. We require WebRTC telemetry for Liveness.");
+      setErrorMsg("Camera access denied. We require WebRTC telemetry for Activeness.");
       setStage("ERROR");
     }
   }, [stage, hasPermission]);
@@ -94,7 +94,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
     try {
       // Hardware entropy
       const hwEntropy = window.crypto.getRandomValues(new Uint32Array(1))[0].toString(16);
-      const message = `System KYC Attestation\n\nIdentity: ${address}\nTimestamp: ${Date.now()}\nLiveness: High-Fidelity WebRTC Frame Verified\nEntropy: ${hwEntropy}`;
+      const message = `System KYC Attestation\n\nIdentity: ${address}\nTimestamp: ${Date.now()}\nActiveness: High-Fidelity WebRTC Frame Verified\nEntropy: ${hwEntropy}`;
       
       const signature = await signMessageAsync({ message });
       
@@ -200,7 +200,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
                  <div className="relative w-48 h-64 rounded-full bg-black overflow-hidden mb-6 shadow-[0_0_40px_rgba(0,0,0,0.1)] border-4 border-white">
                    <video ref={videoRef} autoPlay playsInline muted className="absolute inset-0 w-full h-full object-cover scale-x-[-1]" />
                    
-                   {/* Face Liveness HUD */}
+                   {/* Face Activeness HUD */}
                    <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
                      <motion.ellipse cx="50" cy="50" rx="46" ry="46" fill="none" stroke="#10B981" strokeWidth="2" strokeDasharray="10 20"
                        animate={{ rotate: 360 }} transition={{ duration: 15, repeat: Infinity, ease: "linear" }} style={{ originX: "50%", originY: "50%" }} />
@@ -209,7 +209,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
                  
                  <div className="w-full flex flex-col items-center mb-4">
                    <p className="text-[11px] font-black uppercase tracking-[0.2em] text-[#0a0a0a] mb-1">Look Directly At Camera</p>
-                   <p className="text-[8px] text-black/40 uppercase tracking-widest">Analyzing 3D Liveness & Micro-expressions</p>
+                   <p className="text-[8px] text-black/40 uppercase tracking-widest">Analyzing 3D Activeness & Micro-expressions</p>
                  </div>
                  
                  <div className="w-full h-1.5 bg-black/5 rounded-full overflow-hidden w-48">
@@ -263,7 +263,7 @@ export function ZKBiometricGate({ onSuccess, uuid }: ZKBiometricGateProps) {
           </div>
           <div className="flex justify-between w-full">
              <span className="text-[8px] text-black/30 uppercase tracking-widest flex items-center gap-1"><ScanLine size={10}/> Telemetry</span>
-             <span className="text-[8px] text-black/50 uppercase tracking-widest font-bold">Liveness Edge</span>
+             <span className="text-[8px] text-black/50 uppercase tracking-widest font-bold">Activeness Edge</span>
           </div>
         </div>
 

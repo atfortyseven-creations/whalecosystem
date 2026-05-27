@@ -50,7 +50,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const [currentAddress, setCurrentAddress] = useState<string>('');
     const [accountBalances, setAccountBalances] = useState<Record<string, string>>({});
 
-    const [liveNews, setLiveNews] = useState<NewsItem[]>([]);
+    const [liveNews, setActiveNews] = useState<NewsItem[]>([]);
 
     useEffect(() => {
         const fetchNews = async () => {
@@ -65,7 +65,7 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
                     source: a.source_info?.name || 'Intel Desk',
                     publishedAt: new Date(a.published_on * 1000).toISOString(),
                 }));
-                setLiveNews(realNews);
+                setActiveNews(realNews);
             } catch (err) {
                 console.error(err);
             }

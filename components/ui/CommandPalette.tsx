@@ -112,8 +112,8 @@ export function CommandPalette({ onNavigate, onBridgeOpen }: CommandPaletteProps
   const COMMANDS: CommandItem[] = useMemo(() => [
     // Navigation
     { id: "explorer",       label: "Block Explorer",      description: "Search blocks, addresses, transactions",   icon: <Search size={15}/>,         category: "Navigation", action: () => navigate("explorer", "Block Explorer"),       keywords: ["block", "search", "explorer"] },
-    { id: "alerts",         label: "Live Alerts",         description: "Real-time whale movement feed",            icon: <Activity size={15}/>,       category: "Navigation", action: () => navigate("alerts", "Live Alerts"),            keywords: ["alerts", "live", "feed"] },
-    { id: "live-txs",       label: "Live Transactions",   description: "Unconfirmed transaction stream",           icon: <RefreshCw size={15}/>,      category: "Navigation", action: () => navigate("live-txs", "Live Transactions"),   keywords: ["transactions", "mempool", "live"] },
+    { id: "alerts",         label: "Active Alerts",         description: "Real-time whale movement feed",            icon: <Activity size={15}/>,       category: "Navigation", action: () => navigate("alerts", "Active Alerts"),            keywords: ["alerts", "live", "feed"] },
+    { id: "live-txs",       label: "Active Transactions",   description: "Unconfirmed transaction stream",           icon: <RefreshCw size={15}/>,      category: "Navigation", action: () => navigate("live-txs", "Active Transactions"),   keywords: ["transactions", "mempool", "live"] },
     // Analytics
     { id: "tracker",        label: "Whale Tracker",       description: "Track major wallet movements",             icon: <Globe size={15}/>,          category: "Analytics", action: () => navigate("tracker", "Whale Tracker"),       keywords: ["whale", "tracker", "wallet"] },
     { id: "new-pairs",      label: "New Pairs",           description: "Newly launched token pairs on DEXs",       icon: <Plus size={15}/>,           category: "Analytics", action: () => navigate("new-pairs", "New Pairs"),         keywords: ["pairs", "dex", "new", "tokens"] },

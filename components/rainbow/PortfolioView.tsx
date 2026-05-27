@@ -568,7 +568,7 @@ export default function PortfolioView({
           size={18}
           className={`text-white/50 ${isRefreshing ? "animate-spin text-purple-400" : ""}`}
         />
-        {/* Live dot */}
+        {/* Active dot */}
         <div
           className={`absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ring-2 ring-[#0B0E11] ${
             wsConnected ? "bg-green-500" : "bg-gray-600"

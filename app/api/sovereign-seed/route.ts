@@ -103,7 +103,7 @@ export async function GET() {
         // 1. Create 5 Institutional Categories
         const categoriesData = [
             { slug: 'institutional-grid', name: 'Institutional Grid', description: 'Core strategic discussions and macroeconomic allocation.', color: '#4F46E5', orderIndex: 1 },
-            { slug: 'live-feed', name: 'Live Feed', description: 'Real-time analytics and network anomalies.', color: '#10B981', orderIndex: 2 },
+            { slug: 'live-feed', name: 'Active Feed', description: 'Real-time analytics and network anomalies.', color: '#10B981', orderIndex: 2 },
             { slug: 'recent-profiles', name: 'Recent Profiles', description: 'New verified entities and institutional nodes.', color: '#F59E0B', orderIndex: 3 },
             { slug: 'pending-review', name: 'Pending Review', description: 'Proposals, audits, and smart contract verification queues.', color: '#EF4444', orderIndex: 4 },
             { slug: 'highest-yield', name: 'Highest Yield', description: 'Algorithmic stablecoins, DeFi yields, and delta-neutral strategies.', color: '#8B5CF6', orderIndex: 5 }
@@ -132,7 +132,7 @@ export async function GET() {
                     displayName: displayName,
                     bio: `Managing tier-1 liquidity on EVM. Institutional grade execution. [Verified via ${domain}]`,
                     isPro: Math.random() > 0.5,
-                    tier: Math.random() > 0.8 ? 'SOVEREIGN' : 'PRO',
+                    tier: Math.random() > 0.8 ? 'Private' : 'PRO',
                 }
             });
             generatedUsers.push(user);

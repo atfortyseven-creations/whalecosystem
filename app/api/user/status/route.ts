@@ -23,7 +23,7 @@ export async function GET(req: NextRequest) {
         });
 
         // Verification Logic
-        const isVerified = user?.tier === 'HUMAN' || user?.tier === 'SOVEREIGN' || !!user?.worldIdNullifierHash;
+        const isVerified = user?.tier === 'HUMAN' || user?.tier === 'Private' || !!user?.worldIdNullifierHash;
 
         // 2. Prepare Response
         const response = NextResponse.json({

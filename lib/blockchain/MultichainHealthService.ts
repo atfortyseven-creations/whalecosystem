@@ -5,7 +5,7 @@ export interface ChainHealth {
     id: string;
     tps: number;
     health: number;
-    isLive: boolean;
+    isActive: boolean;
     latency: number;
     gasPriceGwei?: number;
     gasUsd?: number;
@@ -92,7 +92,7 @@ export class MultichainHealthService {
         return this.PUBLIC_ENDPOINTS[chainId] ?? null;
     }
 
-    private async probeEVM(endpoint: string): Promise<{ isLive: boolean; latency: number; gasPriceGwei?: number }> {
+    private async probeEVM(endpoint: string): Promise<{ isActive: boolean; latency: number; gasPriceGwei?: number }> {
         const start = Date.now();
         try {
             const res = await fetch(endpoint, {
@@ -102,7 +102,7 @@ export class MultichainHealthService {
                 signal: AbortSignal.timeout(2000),
             });
             const latency = Date.now() - start;
-            if (!res.ok) return { isLive: false, latency: 0 };
+            if (!res.ok) return { isActive: false, latency: 0 };
 
             let gasPriceGwei: number | undefined;
             try {
@@ -120,23 +120,23 @@ export class MultichainHealthService {
                 }
             } catch { /* no-op */ }
 
-            return { isLive: true, latency, gasPriceGwei };
+            return { isActive: true, latency, gasPriceGwei };
         } catch {
-            return { isLive: false, latency: 0 };
+            return { isActive: false, latency: 0 };
         }
     }
 
-    private async probeBitcoin(endpoint: string): Promise<{ isLive: boolean; latency: number }> {
+    private async probeBitcoin(endpoint: string): Promise<{ isActive: boolean; latency: number }> {
         const start = Date.now();
         try {
             const res = await fetch(endpoint, { signal: AbortSignal.timeout(2000) });
-            return { isLive: res.ok, latency: Date.now() - start };
+            return { isActive: res.ok, latency: Date.now() - start };
         } catch {
-            return { isLive: false, latency: 0 };
+            return { isActive: false, latency: 0 };
         }
     }
 
-    private async probeSolana(endpoint: string): Promise<{ isLive: boolean; latency: number }> {
+    private async probeSolana(endpoint: string): Promise<{ isActive: boolean; latency: number }> {
         const start = Date.now();
         try {
             const res = await fetch(endpoint, {
@@ -145,9 +145,9 @@ export class MultichainHealthService {
                 body: JSON.stringify({ jsonrpc: '2.0', id: 1, method: 'getHealth' }),
                 signal: AbortSignal.timeout(2000),
             });
-            return { isLive: res.ok, latency: Date.now() - start };
+            return { isActive: res.ok, latency: Date.now() - start };
         } catch {
-            return { isLive: false, latency: 0 };
+            return { isActive: false, latency: 0 };
         }
     }
 
@@ -157,11 +157,11 @@ export class MultichainHealthService {
             const baseTps = this.BASELINE_TPS[chain.id] ?? 0;
 
             if (!endpoint) {
-                return { id: chain.id, tps: 0, health: 0, isLive: false, latency: 0 };
+                return { id: chain.id, tps: 0, health: 0, isActive: false, latency: 0 };
             }
 
             try {
-                let probe: { isLive: boolean; latency: number; gasPriceGwei?: number };
+                let probe: { isActive: boolean; latency: number; gasPriceGwei?: number };
 
                 if (chain.id === 'bitcoin') {
                     probe = await this.probeBitcoin(endpoint);
@@ -173,15 +173,15 @@ export class MultichainHealthService {
 
                 return {
                     id: chain.id,
-                    tps: probe.isLive ? baseTps : 0,
-                    health: probe.isLive ? 100 : 0,
-                    isLive: probe.isLive,
-                    latency: probe.isLive ? probe.latency : 0,
+                    tps: probe.isActive ? baseTps : 0,
+                    health: probe.isActive ? 100 : 0,
+                    isActive: probe.isActive,
+                    latency: probe.isActive ? probe.latency : 0,
                     gasPriceGwei: probe.gasPriceGwei,
                     gasUsd: probe.gasPriceGwei ? probe.gasPriceGwei * 0.0000035 : undefined,
                 };
             } catch {
-                return { id: chain.id, tps: 0, health: 0, isLive: false, latency: 0 };
+                return { id: chain.id, tps: 0, health: 0, isActive: false, latency: 0 };
             }
         });
 

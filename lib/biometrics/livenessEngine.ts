@@ -1,5 +1,5 @@
 /**
- * System Biometric Liveness Engine v3.0
+ * System Biometric Activeness Engine v3.0
  * ==========================================
  * Production-grade anti-spoofing without external APIs.
  * Runs entirely client-side via Canvas pixel analysis.
@@ -11,7 +11,7 @@
  *  4. Parallax depth challenge    3D face vs 2D photo
  */
 
-export type LivenessStage =
+export type ActivenessStage =
   | "IDLE"
   | "ALIGNING"
   | "SCANNING"
@@ -22,7 +22,7 @@ export type LivenessStage =
   | "REJECTED_SPOOF"
   | "REJECTED_TIMEOUT";
 
-export interface LivenessMetrics {
+export interface ActivenessMetrics {
   earHistory: number[];       // Eye Aspect Ratio over time
   jitterScore: number;        // micro-movement deviation (px)
   textureScore: number;       // 0-1, higher = more natural skin
@@ -164,10 +164,10 @@ export function analyzeParallaxDepth(
   return Math.min(1, ratio / 1.8); // normalized, >0.7 = real 3D face
 }
 
-//  Combined Liveness Score 
-export function computeLivenessScore(metrics: LivenessMetrics): {
+//  Combined Activeness Score 
+export function computeActivenessScore(metrics: ActivenessMetrics): {
   score: number;
-  isLive: boolean;
+  isActive: boolean;
   spoofType: string | null;
 } {
   const {
@@ -181,7 +181,7 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
 
   // Minimum frames for reliable analysis
   if (frameCount < 30) {
-    return { score: 0, isLive: false, spoofType: null };
+    return { score: 0, isActive: false, spoofType: null };
   }
 
   //  Component Scores 
@@ -242,9 +242,9 @@ export function computeLivenessScore(metrics: LivenessMetrics): {
     spoofType = "SCREEN_REPLAY"; // Screen/printer periodic texture
   }
 
-  const isLive = score >= 72 && spoofType === null;
+  const isActive = score >= 72 && spoofType === null;
 
-  return { score, isLive, spoofType };
+  return { score, isActive, spoofType };
 }
 
 //  Canvas-based Face Region Extractor 

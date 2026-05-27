@@ -23,6 +23,22 @@ services:
     networks:
       - system-net
 
+
+  # Aztec Sandbox (Sequencer + Prover + Node + PXE)
+  aztec-sandbox:
+    image: aztecprotocol/aztec-sandbox:latest
+    ports:
+      - "8080:8080" # PXE
+      - "8081:8081" # Node
+    environment:
+      - PORT=8080
+      - HOST=0.0.0.0
+      - LOG_LEVEL=debug
+      - AZTEC_CHAIN_ID=aztec-testnet-2026
+      - BARRETENBERG_BACKEND=ultrahonk
+    networks:
+      - system-net
+
 networks:
   system-net:
 

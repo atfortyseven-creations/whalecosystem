@@ -147,7 +147,7 @@ export async function POST(req: Request) {
                     displayName: displayName,
                     bio: `Managing tier-1 liquidity on EVM. Institutional grade execution. [Verified via ${domain}]`,
                     isPro: Math.random() > 0.5,
-                    tier: Math.random() > 0.8 ? 'SOVEREIGN' : 'PRO',
+                    tier: Math.random() > 0.8 ? 'Private' : 'PRO',
                 }
             });
             generatedUsers.push(user);

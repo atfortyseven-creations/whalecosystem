@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `feat(community)`: `/api/ambassador`  4-tier ambassador program (520% commission), automatic referral code, WorldID gating
 - `feat(ecosystem)`: `/api/powered-by`  dApp integration registry with embed snippet and badge Markdown generation
 - `security(telegram)`: Removed hardcoded BOT_TOKEN from `scripts/telegram-worker.ts`; process.exit(1) if missing
-- `docs(academic)`: `SOVEREIGN_WHITEPAPER.md`  completed academic paper: EVM Thermodynamics formal model G(t)/E(t)/Z(t), EIP-1153 TSTORE signal validation, Neo4j Cypher graph correlation, ZK-proof signal distribution, complete security threat model, 8 academic references
+- `docs(academic)`: `Private_WHITEPAPER.md`  completed academic paper: EVM Thermodynamics formal model G(t)/E(t)/Z(t), EIP-1153 TSTORE signal validation, Neo4j Cypher graph correlation, ZK-proof signal distribution, complete security threat model, 8 academic references
 - `docs(report)`: `STATE_OF_WHALE_INTELLIGENCE_2026.md`  annual report: $4.7T volume, 842K detections, Z-Score calibration table, wallet behavioral taxonomy, 2027 outlook
 
 ### Phase 4: Governance & Smart Contracts

@@ -33,7 +33,7 @@ async function provisionBeta() {
         data: {
           userAddress: `0xUNCLAIMED_${crypto.randomBytes(4).toString('hex').toUpperCase()}`, // Placeholder until claimed
           serialCode: serialCode,
-          tier: 'SOVEREIGN_BETA',
+          tier: 'Private_BETA',
           badgeColor: 'OBSIDIAN',
           networkLaunchEligible: true,
           isActive: false, // Becomes true when claimed via ZK proof

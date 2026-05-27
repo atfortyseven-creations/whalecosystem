@@ -277,7 +277,7 @@ export function WhaleProfiler({ address, onClose }: Props) {
                                                                         <span className="text-white font-black text-xs uppercase tracking-[0.2em]">Alpha Forensic Scan</span>
                                                                     </div>
                                                                     <div className="px-2 py-0.5 rounded bg-indigo-500/30 border border-indigo-500/50 text-[8px] font-black text-indigo-200 uppercase animate-pulse">
-                                                                        Live AI Inference
+                                                                        Active AI Inference
                                                                     </div>
                                                                 </div>
                                                                 

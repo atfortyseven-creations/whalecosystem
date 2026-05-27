@@ -57,10 +57,10 @@ export interface GoldenTicketClaim {
 // DOMAIN CONSTANTS
 // 
 
-export const SOVEREIGN_DOMAIN = 'humanity-ledger.system.v1';
+export const Private_DOMAIN = 'humanity-ledger.system.v1';
 export const DOMAIN_HASH = '0x' + crypto
   .createHash('sha256')
-  .update(SOVEREIGN_DOMAIN)
+  .update(Private_DOMAIN)
   .digest('hex');
 
 // Tier commitment salt  used in Pedersen hash (production: from ceremony)
@@ -155,7 +155,7 @@ export function validateProofStructure(proof: ZKProof): { valid: boolean; error?
 export function validateDomainHash(publicSignals: GoldenTicketPublicSignals): boolean {
   const expectedDomainHash = '0x' + crypto
     .createHash('sha256')
-    .update(SOVEREIGN_DOMAIN)
+    .update(Private_DOMAIN)
     .digest('hex');
   // Timing-safe comparison
   try {

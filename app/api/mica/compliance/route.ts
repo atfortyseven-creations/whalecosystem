@@ -9,7 +9,7 @@ export const dynamic = 'force-dynamic';
  * Enterprise Endpoint: MiCA & GDPR Compliance Toolkit
  * Handles European user data residency and the "Right to Be Forgotten".
  * 
- * Required Clearance: SOVEREIGN or ADMIN
+ * Required Clearance: Private or ADMIN
  */
 export async function POST(req: NextRequest) {
     try {
@@ -27,8 +27,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Invalid or forged token' }, { status: 403 });
         }
 
-        // Only SOVEREIGN clearance users or full Admins can execute EU Data wipes
-        if (payload.clearance !== 'SOVEREIGN' && payload.role !== 'ADMIN') {
+        // Only Private clearance users or full Admins can execute EU Data wipes
+        if (payload.clearance !== 'Private' && payload.role !== 'ADMIN') {
             return NextResponse.json({ error: 'Clearance level too low for compliance tooling' }, { status: 403 });
         }
 

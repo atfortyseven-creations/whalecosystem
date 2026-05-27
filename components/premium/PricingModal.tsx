@@ -192,7 +192,7 @@ export default function PricingModal({ isOpen, onClose, onSubscribe }: PricingMo
           </div>
           <div className="text-center">
             <div className="text-2xl font-black text-[#1F1F1F] mb-1">24/7</div>
-            <div className="text-xs text-[#1F1F1F]/70">Live Monitoring</div>
+            <div className="text-xs text-[#1F1F1F]/70">Active Monitoring</div>
           </div>
         </div>
 

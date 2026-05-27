@@ -77,7 +77,7 @@ export function usePolymarketBet() {
             setStatus("TRADING");
             toast.loading(`Buying ${outcome}...`);
 
-            // 3. Execute Trade (Live)
+            // 3. Execute Trade (Active)
             // Real 0x order filling or CTF exchange interaction needed here
             // await ctfExchange.fillOrder(...);
 

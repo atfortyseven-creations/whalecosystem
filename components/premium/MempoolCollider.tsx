@@ -16,7 +16,7 @@ import { usePerformanceMode, shouldRenderFrame } from "@/hooks/usePerformanceMod
 // 
 type VectorDir = "EXPAND" | "NEUTRAL" | "CONTRACT";
 
-interface LiveSignal {
+interface ActiveSignal {
   key: string;
   label: string;
   value: string;
@@ -203,7 +203,7 @@ export function MempoolCollider() {
   const [history, setHistory] = useState<number[]>([]);
   const [direction, setDirection] = useState<VectorDir>("NEUTRAL");
   const [confidence, setConfidence] = useState(55);
-  const [signals, setSignals] = useState<LiveSignal[]>([]);
+  const [signals, setSignals] = useState<ActiveSignal[]>([]);
   const prevSignalsRef = useRef<Record<string, number>>({});
 
   useEffect(() => {
@@ -225,7 +225,7 @@ export function MempoolCollider() {
     setHistory([...historyRef.current]);
 
     const prev = prevSignalsRef.current;
-    const newSignals: LiveSignal[] = [
+    const newSignals: ActiveSignal[] = [
       {
         key: "rate",
         label: "Block Velocity",
@@ -295,7 +295,7 @@ export function MempoolCollider() {
                     <span className={`relative inline-flex rounded-full h-2 w-2 ${isConnected ? "bg-emerald-500" : "bg-red-500"}`} />
                 </span>
                 <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">
-                    {isConnected ? "Live Flow" : "Interrupted"}
+                    {isConnected ? "Active Flow" : "Interrupted"}
                 </span>
             </div>
         </div>
@@ -353,7 +353,7 @@ export function MempoolCollider() {
         <div className="lg:col-span-4 p-10 bg-white">
             <div className="flex items-center gap-3 mb-10">
                 <Zap size={14} className="text-indigo-600" />
-                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">Live Infrastructure Signals</h3>
+                <h3 className="text-[10px] font-black uppercase tracking-[0.3em] text-slate-900">Active Infrastructure Signals</h3>
             </div>
           <div className="grid grid-cols-2 gap-4">
             {signals.map((sig) => {

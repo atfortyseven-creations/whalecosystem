@@ -1,5 +1,5 @@
 /**
- * [SOVEREIGN ADMIN SCRIPT] find-user.ts
+ * [Private ADMIN SCRIPT] find-user.ts
  * 
  * Finds a user in the database by wallet address, email, or partial match.
  * Zero-Clerk: uses native Prisma DB lookups only.

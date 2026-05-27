@@ -2,13 +2,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { useLivePortfolio } from '@/hooks/useLivePortfolio';
+import { useActivePortfolio } from '@/hooks/useActivePortfolio';
 import { Wallet, TrendingUp, TrendingDown, RefreshCcw, LayoutGrid } from 'lucide-react';
 import { useAccount } from 'wagmi';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
-export function LivePortfolio() {
+export function ActivePortfolio() {
     const { isConnected: isWagmiConnected } = useAccount();
     const { address: eoaAddress } = useSystemAccount();
     const { address: systemAddress } = useWalletStore();
@@ -24,7 +24,7 @@ export function LivePortfolio() {
         polymarketPositions,
         assets,
         isLoading 
-    } = useLivePortfolio();
+    } = useActivePortfolio();
 
     if (!mounted) {
         return (

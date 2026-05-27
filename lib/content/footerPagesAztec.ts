@@ -74,7 +74,7 @@ export const WHITEPAPER_SECTIONS: AztecDocSection[] = [
     title: '6. Identity and Sybil Resistance',
     paragraphs: [
       'The Humanity Ledger identity layer uses zero-knowledge biometric proofs to establish unique human status without exposing personally identifiable information. Users prove uniqueness through integration with established liveness protocols by generating a ZK proof of credential possession rather than submitting the credential itself.',
-      'To interact with the protocol, a user provisions a sovereign on-chain identity. This is achieved by generating an Aztec Account Contract (a specialized smart contract wallet natively deployed on L2) which abstracts the key pairs. A user possesses a standard ECDSA or EdDSA signing key, but the account contract handles the verification, enabling sophisticated multi-sig and threshold designs natively.',
+      'To interact with the protocol, a user provisions a Private on-chain identity. This is achieved by generating an Aztec Account Contract (a specialized smart contract wallet natively deployed on L2) which abstracts the key pairs. A user possesses a standard ECDSA or EdDSA signing key, but the account contract handles the verification, enabling sophisticated multi-sig and threshold designs natively.',
       'For institutional participants requiring formal compliance, the protocol supports selective disclosure through viewing keys and W3C Verifiable Credentials. Institutions can prove specific attributes to regulators — balance thresholds, transaction limits, jurisdictional compliance — without revealing their full transactional history or counterparty graph.',
     ],
   },
