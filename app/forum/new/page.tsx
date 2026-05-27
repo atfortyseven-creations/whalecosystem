@@ -256,11 +256,11 @@ function NewTopicContent() {
                 <select
                 value={categoryId}
                 onChange={e => setCategoryId(e.target.value)}
-                className="w-full px-4 py-3 text-[14px] font-sans rounded-lg outline-none transition-all cursor-pointer appearance-none bg-white border border-slate-200 text-slate-900 focus:border-[#0088cc] focus:ring-1 focus:ring-[#0088cc]/20"
+                className="w-full px-4 py-3 pr-10 text-[14px] font-sans rounded-lg outline-none transition-all cursor-pointer appearance-none bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] focus:bg-white dark:focus:bg-[#1A1A1A]"
                 >
-              <option value="" disabled className="text-slate-400">Select a category</option>
+              <option value="" disabled className="text-black/40 dark:text-[#555555]">Select a category</option>
               {categories.map(cat => (
-                <option key={cat.id} value={cat.id} className="bg-white text-slate-900">{cat.name}</option>
+                <option key={cat.id} value={cat.id} className="bg-white dark:bg-[#111111] text-black dark:text-white">{cat.name}</option>
               ))}
                 </select>
                 <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400" size={16} />
@@ -294,10 +294,10 @@ function NewTopicContent() {
                 Attach files or paste a link. Uploaded files are stored securely and embedded in your post.
             </p>
             {documents.map((doc, idx) => (
-                <div key={idx} className="flex gap-4 items-center bg-black/5 dark:bg-[#000000] p-3 rounded-xl border border-black/5 dark:border-white/5 relative group transition-colors">
-                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="flex-1 px-4 py-2.5 text-[12px] rounded-lg bg-white dark:bg-[#050505] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] outline-none transition-colors" />
+                <div key={idx} className="flex flex-col md:flex-row gap-4 items-stretch md:items-center bg-black/5 dark:bg-[#000000] p-3 rounded-xl border border-black/5 dark:border-white/5 relative group transition-colors">
+                    <input type="text" placeholder="Document Title (e.g. Audit Report 2026)" value={doc.title} onChange={e => updateDocument(idx, 'title', e.target.value)} className="w-full md:flex-1 px-4 py-2.5 text-[12px] rounded-lg bg-white dark:bg-[#050505] border border-black/10 dark:border-white/10 text-black dark:text-white focus:border-[#00C076] outline-none transition-colors" />
                     
-                    <div className="flex-1 relative flex items-center">
+                    <div className="w-full md:flex-1 relative flex items-center">
                         <input type="text" placeholder="Secure URL / IPFS CID" value={doc.url} onChange={e => updateDocument(idx, 'url', e.target.value)} className="w-full px-4 py-2.5 pr-[100px] text-[12px] font-mono rounded-lg bg-white dark:bg-[#050505] border border-black/10 dark:border-white/10 text-[#00C076] focus:border-[#00C076] outline-none transition-colors" />
                         
                         {/* Native File Upload Integration */}
@@ -309,7 +309,7 @@ function NewTopicContent() {
                         </div>
                     </div>
 
-                    <button onClick={() => removeDocument(idx)} className="p-2.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/20">
+                    <button onClick={() => removeDocument(idx)} className="p-2.5 bg-red-500/10 text-red-500 hover:bg-red-500/20 rounded-lg transition-colors border border-red-500/20 self-end md:self-auto shrink-0 flex items-center justify-center">
                         <svg width="14" height="14" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" /></svg>
                     </button>
                 </div>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
@@ -162,7 +162,7 @@ export default function TopicPage() {
       {/* Topic Header */}
       <div className="mb-10 pb-6 border-b border-slate-200">
         <div className="flex items-start justify-between gap-4">
-          <h1 className="text-[26px] md:text-[32px] font-bold leading-[1.2] tracking-tight mb-4 flex-1 text-slate-900">
+          <h1 className="text-[26px] md:text-[32px] font-bold leading-[1.2] tracking-tight mb-4 flex-1 text-slate-900 break-words">
             {topic.title}
           </h1>
           {isTopicAuthor && (
@@ -250,13 +250,13 @@ export default function TopicPage() {
                  <div className="flex flex-col gap-1">
                     <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Created</span>
                     <span className="text-[13px] font-medium text-slate-900">
-                       {topic.createdAt ? format(new Date(topic.createdAt), 'MMM d, yyyy') : ''}
+                       {topic.createdAt && !isNaN(new Date(topic.createdAt).getTime()) ? format(new Date(topic.createdAt), 'MMM d, yyyy') : 'Unknown'}
                     </span>
                  </div>
                  <div className="flex flex-col gap-1">
                     <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black/60 dark:text-[#555] transition-colors">Latest Proposal</span>
                     <span className="text-[13px] font-bold text-black dark:text-white transition-colors">
-                       {topic.updatedAt ? formatDistanceToNowStrict(new Date(topic.updatedAt)) + ' ago' : ''}
+                       {topic.updatedAt && !isNaN(new Date(topic.updatedAt).getTime()) ? formatDistanceToNowStrict(new Date(topic.updatedAt)) + ' ago' : 'Recently'}
                     </span>
                  </div>
                  <div className="flex flex-col gap-1">
@@ -322,7 +322,7 @@ function RenderContent({ content }: { content: string }) {
 
   return (
     <>
-      <div className="whitespace-pre-wrap font-serif text-[15px] leading-relaxed text-black/80 dark:text-[#D0D0D0] transition-colors">{text}</div>
+      <div className="whitespace-pre-wrap break-words font-serif text-[15px] leading-relaxed text-black/80 dark:text-[#D0D0D0] transition-colors">{text}</div>
       
       {docs.length > 0 && (
           <div className="mt-8 flex flex-col gap-3">
@@ -378,8 +378,9 @@ function PostRow({
   const [confirmingDelete, setConfirmingDelete] = useState(false);
   const [imgError, setImgError] = useState(false);
   const addr  = entity.author?.walletAddress || '';
-  const label = entity.author?.displayName || (addr ? `${addr.slice(0, 6)}${addr.slice(-4)}` : 'ANONYMOUS');
-  const time  = entity.createdAt ? format(new Date(entity.createdAt), 'MMM d, yyyy') : '';
+  const label = entity.author?.displayName || (addr ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : 'ANONYMOUS');
+  const isValidDate = entity.createdAt && !isNaN(new Date(entity.createdAt).getTime());
+  const time  = isValidDate ? format(new Date(entity.createdAt), 'MMM d, yyyy') : 'Unknown';
 
   const isAuthor = sessionAddress && addr.toLowerCase() === sessionAddress;
 
@@ -497,12 +498,12 @@ function PostRow({
             </div>
           </div>
 
-        <div className="mb-6">
+        <div className="mb-6 overflow-hidden">
           <RenderContent content={entity.content} />
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-5 mt-auto border-t border-slate-100 pt-3 transition-colors">
+        <div className="flex flex-wrap items-center gap-3 sm:gap-5 mt-auto border-t border-slate-100 pt-3 transition-colors">
           <button
             onClick={handleLike}
             className={`flex items-center gap-2 text-[13px] transition-colors ${liked ? 'text-red-500' : 'text-slate-400 hover:text-slate-700'}`}
