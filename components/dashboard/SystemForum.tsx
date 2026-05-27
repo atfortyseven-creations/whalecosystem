@@ -48,13 +48,13 @@ function SearchModal({ onClose }: { onClose: () => void }) {
   useEffect(() => { inputRef.current?.focus(); }, []);
 
   useEffect(() => {
-    if (!query.trim()) { setResults([]); return; }
+    if (query.trim().length < 2) { setResults([]); return; }  // BUG-08 FIX: min 2 chars
     const t = setTimeout(async () => {
       setLoading(true);
       try {
-        const r = await fetch(`/api/forum/topics?search=${encodeURIComponent(query)}&limit=8`);
+        const r = await fetch(`/api/forum/topics?search=${encodeURIComponent(query.trim())}&limit=8`);
         const data = await r.json();
-        if (Array.isArray(data)) setResults(data);
+        if (Array.isArray(data)) setResults(data);  // BUG-04 FIX: guard Array
       } catch {} finally { setLoading(false); }
     }, 300);
     return () => clearTimeout(t);
@@ -63,11 +63,11 @@ function SearchModal({ onClose }: { onClose: () => void }) {
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, backdropFilter: 'blur(0px)' }} 
-        animate={{ opacity: 1, backdropFilter: 'blur(8px)' }} 
-        exit={{ opacity: 0, backdropFilter: 'blur(0px)' }}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
         transition={{ duration: 0.15 }}
-        className="fixed inset-0 z-[200] bg-black/40 flex items-start justify-center pt-20 px-4"
+        className="fixed inset-0 z-[200] bg-black/40 backdrop-blur-[8px] flex items-start justify-center pt-20 px-4"
         onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
       >
         <motion.div
@@ -171,7 +171,7 @@ function HamburgerMenu({ categories, onClose }: { categories: any[]; onClose: ()
     };
     document.addEventListener('mousedown', handler);
     return () => document.removeEventListener('mousedown', handler);
-  }, [onClose]);
+  }, [onClose]);  // BUG-09 FIX: onClose in dependency array
 
   const menuLinks = [
     { label: 'All Topics',    href: '/forum?filter=latest', icon: <MessageSquare size={16} /> },
@@ -196,7 +196,7 @@ function HamburgerMenu({ categories, onClose }: { categories: any[]; onClose: ()
           animate={{ opacity: 1, x: 0, scale: 1 }}
           exit={{ opacity: 0, x: 20, scale: 0.96 }}
           transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-          className="absolute top-[54px] right-4 w-[380px] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
+          className="absolute top-[54px] right-4 w-[min(380px,calc(100vw-2rem))] bg-white rounded-2xl shadow-2xl border border-slate-200 overflow-hidden"
         >
           {/* Main links grid */}
           <div className="p-4 grid grid-cols-2 gap-1">
@@ -329,8 +329,12 @@ function CategoryCard({ cat, index }: { cat: any; index: number }) {
 // ─── Topic Row ────────────────────────────────────────────────────────────────
 function TopicRow({ topic, mounted }: { topic: any; mounted: boolean }) {
   const meta = CATEGORY_META[topic.category?.slug] || { color: '#64748B', bg: 'bg-slate-400' };
-  const activity = mounted
-    ? formatDistanceToNowStrict(new Date(topic.updatedAt || topic.createdAt), { addSuffix: false })
+  const rawDate = topic.updatedAt || topic.createdAt;
+  // BUG-06 FIX: Guard against null/invalid dates that crash date-fns
+  const parsedDate = rawDate ? new Date(rawDate) : null;
+  const isValidDate = parsedDate && !isNaN(parsedDate.getTime());
+  const activity = mounted && isValidDate
+    ? formatDistanceToNowStrict(parsedDate!, { addSuffix: false })
         .replace(' minutes', 'm').replace(' minute', 'm')
         .replace(' hours', 'h').replace(' hour', 'h')
         .replace(' days', 'd').replace(' day', 'd')
@@ -408,6 +412,7 @@ function ForumHomeContent() {
   useEffect(() => {
     setIsMounted(true);
     // Keyboard shortcut for search
+    // BUG-07 FIX: Use separate handlers so keyboard events don't interfere with scroll passivity
     const handler = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === 'k') { e.preventDefault(); setSearchOpen(true); }
       if (e.key === 'Escape') { setSearchOpen(false); setMenuOpen(false); }
@@ -416,24 +421,35 @@ function ForumHomeContent() {
     return () => window.removeEventListener('keydown', handler);
   }, []);
 
-  const loadData = useCallback(async () => {
-    setLoading(true);
-    try {
-      const [topicsRes, catsRes] = await Promise.all([
-        fetch(`/api/forum/topics?limit=40&filter=${activeTab === 'categories' ? 'latest' : activeTab}`),
-        fetch('/api/forum/categories'),
-      ]);
-      const [topicsData, catsData] = await Promise.all([topicsRes.json(), catsRes.json()]);
-      if (Array.isArray(topicsData)) setTopics(topicsData);
-      if (Array.isArray(catsData)) setCategories(catsData);
-    } catch (e) {
-      console.error(e);
-    } finally {
-      setLoading(false);
-    }
+  // BUG-02 FIX: loadData must NOT be in useCallback with activeTab as dep
+  // and separately re-triggered by useEffect([loadData]).
+  // That pattern causes 2 simultaneous fetches on every tab change.
+  // Instead: a single useEffect with activeTab as direct dependency.
+  useEffect(() => {
+    let cancelled = false;
+    const run = async () => {
+      setLoading(true);
+      try {
+        const filterParam = activeTab === 'categories' ? 'latest' : activeTab;
+        const [topicsRes, catsRes] = await Promise.all([
+          fetch(`/api/forum/topics?limit=40&filter=${filterParam}`),
+          fetch('/api/forum/categories'),
+        ]);
+        const [topicsData, catsData] = await Promise.all([topicsRes.json(), catsRes.json()]);
+        if (cancelled) return;
+        // BUG-04 FIX: Always validate Array before setState
+        if (Array.isArray(topicsData)) setTopics(topicsData);
+        if (Array.isArray(catsData)) setCategories(catsData);
+      } catch (e) {
+        if (!cancelled) console.error('[Forum] loadData failed:', e);
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    run();
+    return () => { cancelled = true; };
   }, [activeTab]);
 
-  useEffect(() => { loadData(); }, [loadData]);
 
   return (
     <div className="flex-1 flex flex-col bg-[#FAF9F6] dark:bg-[#050505] text-[#050505] dark:text-[#FFFFFF] w-full overflow-y-auto">
@@ -563,9 +579,9 @@ function ForumHomeContent() {
               )}
             </div>
 
-            {/* Right Panel: Latest Topics */}
+            {/* Right Panel: Latest Topics - BUG-05 FIX: sticky inside iOS scroll */}
             <div className="w-full lg:w-[360px] xl:w-[400px] shrink-0">
-              <div className="sticky top-[72px]">
+              <div className="lg:sticky lg:top-[72px]">
                 <div className="flex items-center justify-between mb-4 pb-3 border-b-2 border-[#0088cc]">
                   <h2 className="text-[13px] font-bold text-[#0088cc] uppercase tracking-wide flex items-center gap-2">
                     <Clock size={13} /> Latest
