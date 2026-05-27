@@ -151,14 +151,14 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
             {isDisconnecting && (
                 <div className="fixed inset-0 z-[9999] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black mb-4"></div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Purging Session...</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Terminating Session...</p>
                 </div>
             )}
             <header className="flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-6 gap-6 md:gap-0 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#050505] relative z-10 shadow-none transition-colors">
                 <div className="flex flex-col gap-1 w-full md:w-1/3">
                     <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 dark:text-white/40 flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-500 animate-pulse block"></span> 
-                        EXECUTION SUBNET
+                        NETWORK CONNECTION
                     </span>
                     <button onClick={onNetworkClick} className="flex items-center gap-2 hover:opacity-70 transition-opacity mt-1">
                         <span className="text-[14px] uppercase tracking-widest font-black text-black dark:text-white">{address ? networkInfo.name : 'OFFLINE'}</span>
@@ -170,7 +170,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     </button>
                     <div className="flex items-center gap-4 mt-2">
                         <div className="text-[8px] font-mono text-black/40 dark:text-white/40 tracking-widest uppercase">
-                            ENTROPY INDEX: {(Math.random() * 100).toFixed(4)} qE
+                             MEMPOOL LATENCY: {(Math.random() * 80 + 20).toFixed(1)} ms
                         </div>
                         <div className="text-[8px] font-mono text-black/40 dark:text-white/40 tracking-widest uppercase">
                             BLOCK HEIGHT: {Math.floor(Date.now()/15000)}
@@ -198,7 +198,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                             <span className="text-[10px] font-black uppercase tracking-widest text-black group-hover:text-white dark:text-white dark:group-hover:text-black transition-colors">VAULT MANAGER</span>
                         </button>
                         <button onClick={handleDisconnect} className="text-red-500 hover:text-white hover:bg-red-500 uppercase text-[9px] font-black tracking-widest ml-2 border border-red-500 px-4 py-1.5 transition-colors">
-                            PURGE
+                            DISCONNECT
                         </button>
                     </div>
                 )}
@@ -245,10 +245,10 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 ) : (
                     <div className="flex flex-col items-center gap-6 mt-4 p-12 bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 max-w-md shadow-2xl relative overflow-hidden">
                         <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
-                        <h4 className="text-base font-black uppercase tracking-[0.2em] text-black dark:text-white">SYSTEM UNINITIALIZED</h4>
-                        <p className="text-xs text-black/50 dark:text-white/50 leading-relaxed font-mono">Cryptographic keys are required to interface with the EVM layer. Initialize your quantum vault.</p>
+                        <h4 className="text-base font-black uppercase tracking-[0.2em] text-black dark:text-white">WALLET NOT CONNECTED</h4>
+                        <p className="text-xs text-black/50 dark:text-white/50 leading-relaxed font-mono">A cryptographic key pair is required to interact with the EVM layer. Create or import an account to proceed.</p>
                         <button onClick={onCreate} className="w-full bg-black text-white dark:bg-white dark:text-black px-8 py-5 text-[12px] uppercase tracking-[0.3em] font-black hover:bg-black/90 dark:hover:bg-white/90 transition-all mt-4 shadow-xl">
-                            INITIALIZE VAULT
+                            CONNECT WALLET
                         </button>
                     </div>
                 )}
@@ -340,7 +340,7 @@ function SendView({ prefilledAddress, onBack }: any) {
 
     const handleSend = async () => {
         if (!amount || parseFloat(amount) <= 0) {
-            toast.error("INVALID VECTOR EXECUTION", { description: "Mathematical amount must be strictly greater than 0 to calculate transfer state transition." });
+            toast.error("INVALID AMOUNT", { description: "Transfer amount must be greater than zero." });
             return;
         }
         if (!toAddress) {
@@ -375,10 +375,10 @@ function SendView({ prefilledAddress, onBack }: any) {
     return (
         <ModalView title="Transmit Value" onBack={onBack}>
             <div className="space-y-6">
-                <FormField label={`Destination Target (0x... or .eth)`}>
+                <FormField label={`Recipient Address (0x... or .eth)`}>
                     <input type="text" value={toAddress} onChange={e => setToAddress(e.target.value)} placeholder="0x... or vitalik.eth" className="w-full bg-transparent border border-black/10 p-4 text-sm outline-none placeholder:text-black/20 focus:border-black transition-colors" />
                 </FormField>
-                <FormField label="Cryptographic Amount">
+                <FormField label="Transfer Amount">
                     <div className="relative border border-black/10 focus-within:border-black transition-colors">
                         <input type="number" value={amount} onChange={e => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-transparent border-none p-6 text-2xl font-light outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none" />
                         <span className="absolute right-6 top-1/2 -translate-y-1/2 text-sm font-bold text-black/40 uppercase">{networkInfo.currency}</span>
@@ -403,7 +403,7 @@ function SendView({ prefilledAddress, onBack }: any) {
                     </div>
                 </FormField>
                 <button onClick={handleSend} disabled={isSigning || !toAddress || !amount} className="w-full py-5 bg-black text-white font-bold text-[10px] uppercase tracking-[0.2em] transition-opacity hover:opacity-90 disabled:opacity-30 flex items-center justify-center gap-3 mt-4">
-                    {isSigning ? 'EXECUTING PROOF...' : 'INITIALIZE TRANSFER'}
+                    {isSigning ? 'SIGNING TRANSACTION...' : 'CONFIRM TRANSFER'}
                 </button>
             </div>
         </ModalView>
@@ -413,7 +413,7 @@ function SendView({ prefilledAddress, onBack }: any) {
 function ReceiveView({ address, onBack }: any) {
     const [copied, setCopied] = useState(false);
     return (
-        <ModalView title="Inbound Interface" onBack={onBack}>
+        <ModalView title="Receive Address" onBack={onBack}>
             <div className="flex flex-col items-center gap-8 border border-black/10 p-10 bg-black/5">
                 <div className="p-4 bg-white border border-black/20 shadow-sm">
                     <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${address || ''}&color=000000&bgcolor=FFFFFF`} alt="QR" className="w-[180px] h-[180px] object-contain mix-blend-multiply" />
@@ -465,12 +465,12 @@ function CreateWalletView({ onBack, onCreated }: any) {
                         +
                     </div>
                     <div className="px-6">
-                        <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Generate New Seed</h3>
+                        <h3 className="text-sm font-bold uppercase tracking-widest mb-4">Generate New Wallet</h3>
                         <p className="text-black/50 text-xs leading-relaxed max-w-sm mx-auto">This initiates a deterministic private key generation on your local hardware. Keys are not transmitted externally.</p>
                     </div>
                     <div className="px-6">
                         <button onClick={() => { createWallet(); onCreated(); }} className="w-full py-4 bg-black text-white font-bold text-[10px] uppercase tracking-[0.2em] hover:bg-black/90 transition-colors">
-                            Execute Generation
+                            Generate Key Pair
                         </button>
                     </div>
                 </div>

@@ -27,6 +27,7 @@ const NAV_COLUMNS = [
       { label: "News Analytics",       href: "/news" },
       { label: "Status",               href: "/status" },
       { label: "Architecture Guide",   href: "/architecture" },
+      { label: "API Docs",             href: "/developers/api-docs" },
     ]
   },
   {
@@ -34,7 +35,7 @@ const NAV_COLUMNS = [
     links: [
       { label: "About Us",             href: "/company/about" },
       { label: "Careers",              href: "/careers" },
-      { label: "Whale Chat",           href: "/forum" },
+      { label: "Whale Chat",           href: "/chat" },
     ]
   },
   {

@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 
 import React, { useState, Suspense, lazy } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +48,7 @@ const SystemIntelTab: React.FC = () => {
                         </h1>
                     </div>
                     <p className="text-[10px] text-[#888888] uppercase tracking-[0.2em] font-bold">
-                        Real-time extraction of latent graph topologies
+                        On-chain data and metadata analysis
                     </p>
                 </div>
                 
@@ -68,16 +68,16 @@ const SystemIntelTab: React.FC = () => {
                     <div className="flex-1 flex flex-col items-center justify-center text-[#888888]">
                         <Loader2 className="animate-spin mb-4" size={32} />
                         <p className="text-[11px] font-black uppercase tracking-[0.2em]">WAITING FOR ON-CHAIN ENDPOINT</p>
-                        <p className="text-[9px] mt-2">Zero-Mock Mandate Active</p>
+                        <p className="text-[9px] mt-2">Connecting to RPC Nodes...</p>
                     </div>
                 ) : (
                     <>
-                        {/* Thermodynamic KPI Grid */}
+                        {/* Network KPI Grid */}
                         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 shrink-0">
                             <MetricCard 
                                 title="Z-Score Atlas" 
                                 value={mainframeData.zScore.toFixed(2)} 
-                                subtitle="Statistical Anomaly Index"
+                                subtitle="Statistical Anomaly Indicator"
                                 icon={<Activity size={16} />}
                                 accent="green"
                             />
@@ -91,7 +91,7 @@ const SystemIntelTab: React.FC = () => {
                             <MetricCard 
                                 title="Network Entropy" 
                                 value={mainframeData.entropy.toString()} 
-                                subtitle="Bits of Chaos Detected"
+                                subtitle="Network Congestion Index"
                                 icon={<Cpu size={16} />}
                                 accent="black"
                             />
@@ -111,14 +111,14 @@ const SystemIntelTab: React.FC = () => {
                                 <CardHeader className="flex flex-row items-center justify-between border-b border-[#F0F0F0] dark:border-white/10 pb-4">
                                     <div className="space-y-0.5">
                                         <CardTitle className="text-[#050505] dark:text-white tracking-widest text-[11px] uppercase font-black">
-                                            Eternal Node Configuration
+                                            Local Node Configuration
                                         </CardTitle>
                                         <p className="text-[9px] text-[#888888] uppercase tracking-widest font-bold">
-                                            Browser-Based Gossip Propagation Hub
+                                            Browser-Based Protocol Participant
                                         </p>
                                     </div>
                                     <Badge variant={isNodeActive ? "default" : "outline"} className={`px-3 py-1 uppercase tracking-widest text-[9px] font-black ${isNodeActive ? 'bg-[#00C076] hover:bg-[#00C076]/90 text-white border-transparent' : 'text-[#888888] border-[#E5E5E5] dark:border-white/10'}`}>
-                                        {isNodeActive ? 'Active  Gossiping' : 'Dormant'}
+                                        {isNodeActive ? 'Active' : 'Dormant'}
                                     </Badge>
                                 </CardHeader>
                                 <CardContent className="pt-6">
@@ -135,11 +135,11 @@ const SystemIntelTab: React.FC = () => {
                                                     className="data-[state=checked]:bg-[#050505] dark:data-[state=checked]:bg-white"
                                                 />
                                                 <label htmlFor="node-toggle" className="text-sm font-black text-[#050505] dark:text-white cursor-pointer">
-                                                    {isNodeActive ? 'Autonomous Status: ACTIVE' : 'Activate Eternal Node'}
+                                                    {isNodeActive ? 'Node Status: ACTIVE' : 'Activate Local Node'}
                                                 </label>
                                             </div>
                                             <p className="text-[11px] text-[#888888] max-w-md leading-relaxed font-medium">
-                                                Activating the node allows your terminal to participate in the decentralized gossip of block metadata and thermodynamic signals. Your IP is masked via WebRTC multi-hop.
+                                                Activating the node allows your client to participate in the decentralized relay of block metadata and transactional signals. Network traffic is routed via secure WebRTC.
                                             </p>
                                         </div>
                                         
@@ -164,7 +164,7 @@ const SystemIntelTab: React.FC = () => {
                             </div>
                         </div>
 
-                        {/* MATRIX DIRECTIVES */}
+                        {/* NETWORK DIRECTIVES */}
                         <div className="flex-1 min-h-0 w-full flex flex-col border border-[#E5E5E5] dark:border-white/10 rounded-2xl bg-[#FFFFFF] dark:bg-[#111111] overflow-hidden shadow-sm">
                             <div className="px-5 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#1A1A1A] flex items-center justify-between shrink-0">
                                 <div className="flex items-center gap-2">

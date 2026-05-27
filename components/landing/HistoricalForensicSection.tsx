@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion } from "framer-motion";
@@ -43,7 +43,7 @@ export function HistoricalForensicSection() {
                 Forensic <span className="text-slate-200">Case Studies</span>
             </h2>
             <p className="text-slate-500 max-w-2xl mx-auto text-lg leading-relaxed">
-                Our neural engine doesn't just track; it analyzes. Review the historical data points that defined market pivots, captured 12 seconds before the general market realization.
+                The platform's analytical infrastructure does not merely track — it performs structured forensic analysis. Review the historical data points that defined market pivots, detected and documented ahead of broader market awareness.
             </p>
         </div>
 

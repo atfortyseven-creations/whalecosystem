@@ -1,9 +1,9 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { WhaleLogo } from "@/components/shared/WhaleLogo";
-import { ChevronRight, ShieldCheck, Activity, BrainCircuit, X } from "lucide-react";
+import { ChevronRight, ShieldCheck, Activity, BarChart3, X } from "lucide-react";
 import { useWalletStore } from "@/lib/store/wallet-store";
 
 const SEEN_ONBOARDING_KEY = "system_onboarding_completed";
@@ -28,22 +28,22 @@ export function WelcomeModal() {
 
   const steps = [
     {
-      title: "THE APEX OF ON-CHAIN INTELLIGENCE",
-      desc: "Welcome to the System Terminal. Here, you gain unparalleled access to the darkest movements of the market. Observe the megalodons, trace the invisible flows, and protect your identity.",
+      title: "INSTITUTIONAL ON-CHAIN INTELLIGENCE",
+      desc: "Welcome to the Humanity Ledger infrastructure. You now have direct access to real-time on-chain capital flow surveillance, large-position tracking, and cross-chain portfolio analytics at an institutional resolution.",
       icon: <WhaleLogo className="w-12 h-12" />,
-      action: "INITIALIZE SYSTEM"
+      action: "BEGIN ORIENTATION"
     },
     {
-      title: "CRYPTOGRAPHIC SILENCE",
-      desc: "Your identity is obscured through MEV-protected routing tunnels. Every dashboard sync, every transaction preview, is cryptographically shielded from public mempools.",
+      title: "PRIVACY-PRESERVING ARCHITECTURE",
+      desc: "Your session is secured through MEV-protected routing and zero-knowledge proof primitives. Every dashboard interaction and transaction preview is cryptographically isolated from public mempool visibility.",
       icon: <ShieldCheck size={48} className="text-[#00F2EA]" strokeWidth={1} />,
-      action: "ACKNOWLEDGE PROTOCOL"
+      action: "CONFIRM & CONTINUE"
     },
     {
-      title: "THE AKASHIC LEDGER",
-      desc: "Our neural data lake parses millions of events per second. You are now plugged into a live feed of the world's most significant capital rotations. Stay vigilant.",
+      title: "LIVE MARKET INTELLIGENCE FEED",
+      desc: "The platform's data infrastructure processes millions of on-chain events per second across all major networks. You are now connected to a live feed of the most significant capital movements in global decentralised markets.",
       icon: <Activity size={48} className="text-[#00C076]" strokeWidth={1} />,
-      action: "ENTER TERMINAL"
+      action: "ACCESS DASHBOARD"
     }
   ];
 

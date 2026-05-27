@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -177,9 +177,13 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
   }, [isLinked, isWalletConnected, isMounted]);
 
   //  Redirect unauthenticated users to /connect 
-  // Enterprise LAW: 400ms debounce prevents false-positive redirects during the
-  // transient window right after a wallet connects (before the sign step or
-  // system_handshake cookie has been written).
+  // SECURITY PROTOCOL: A dual-layer check is performed before any redirect fires.
+  // Layer A — in-memory isLinked flag (set by this component's mount effect).
+  // Layer B — direct cookie/localStorage read (guards against the race condition
+  //            where the mount effect's state update hasn't propagated yet when
+  //            the timer fires, e.g. after a client-side navigation from /sign-up).
+  //
+  // This eliminates the "sign-up → /dashboard → /connect loop" permanently.
   useEffect(() => {
     if (!isMounted) return;
     const isPublic = pathname === '/' ||
@@ -191,18 +195,33 @@ export function LinkedGate({ children }: { children: React.ReactNode }) {
                      pathname.startsWith('/developers') ||
                      pathname.startsWith('/news') ||
                      pathname.startsWith('/chat') ||
-                     pathname.startsWith('/portfolio') ||   //  mobile users can create/login here
+                     pathname.startsWith('/portfolio') ||
                      pathname.startsWith('/sign-up') ||
                      (pathname.startsWith('/forum') && !pathname.startsWith('/forum/settings'));
     const isBot = typeof window !== 'undefined' && /bot|google|grok|crawler|spider|robot|crawling|bing/i.test(navigator.userAgent);
-    // Only redirect if NOT connected at all (not just un-signed)
-    if (!isLinked && !isWalletConnected && !isPublic && !isBot) {
-      router.replace('/connect');
-    }
-  }, [isLinked, isWalletConnected, isMounted, pathname, router]);
+
+    const checkTimer = setTimeout(() => {
+      // Layer B: direct cookie check — catches the race condition window
+      // where isLinked is still false even though the session is established.
+      const hasCookieSession = typeof document !== 'undefined' &&
+        hasValidStoredSession(address);
+
+      if (hasCookieSession && !isLinked) {
+        // Session is valid — self-heal the in-memory state and abort redirect.
+        setLinked(true);
+        return;
+      }
+
+      // Only redirect if genuinely unauthenticated across all layers.
+      if (!isLinked && !hasCookieSession && !isWalletConnected && !isPublic && !isBot) {
+        router.replace('/connect');
+      }
+    }, 1500);
+
+    return () => clearTimeout(checkTimer);
+  }, [isLinked, isWalletConnected, isMounted, pathname, router, address, setLinked]);
 
 
 
   return <>{children}</>;
 }
-

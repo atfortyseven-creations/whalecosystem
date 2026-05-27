@@ -42,14 +42,14 @@ export const AIAnalysisModal = ({ textToAnalyze }: AIAnalysisProps) => {
                     onClick={runSimulation}
                     className="flex items-center gap-2 text-xs font-mono text-[#00f2ea] hover:underline"
                 >
-                    <BrainCircuit size={14} /> ANALYZE WITH VOID AI
+                    <BrainCircuit size={14} /> RUN SENTIMENT ANALYSIS
                 </button>
             )}
 
             {analyzing && (
                 <div className="flex items-center gap-2 text-xs font-mono text-[#888899] animate-pulse">
                     <BrainCircuit size={14} className="animate-spin" />
-                    NEURAL NET PROCESSING...
+                    PROCESSING MARKET DATA...
                 </div>
             )}
 

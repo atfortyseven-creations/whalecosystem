@@ -1,4 +1,4 @@
-﻿import type { AztecDocSection } from '@/components/landing/AztecDocPage';
+import type { AztecDocSection } from '@/components/landing/AztecDocPage';
 
 // ─── WHITEPAPER ───────────────────────────────────────────────────────────────
 
@@ -33,14 +33,15 @@ export const WHITEPAPER_SECTIONS: AztecDocSection[] = [
     title: '3. Cryptographic Foundations',
     paragraphs: [
       'Humanity Ledger is built on zk-SNARKs — Zero-Knowledge Succinct Non-Interactive Arguments of Knowledge. A zk-SNARK allows one party (the prover) to demonstrate to another party (the verifier) that a statement is true, without revealing any information beyond the truth of the statement itself.',
-      'In the context of Humanity Ledger, the prover is the user device running the local proving environment. The verifier is the Aztec Network. The user proves that a state transition — for example, a transfer of funds — was executed correctly according to the protocol rules, without revealing who sent what to whom, or for how much.',
+      'In the context of Humanity Ledger, the prover is the user device running the local Private Execution Environment (PXE). The verifier is the Aztec Network. The user proves that a state transition — for example, a transfer of funds — was executed correctly according to the protocol rules, without revealing who sent what to whom, or for how much.',
       'State is managed using a private UTXO model structured as an encrypted Merkle tree. Each asset is represented as a private note committing to its owner, value, and a random blinding factor. To spend a note, the user generates a deterministic nullifier derived from the note secret and submits it alongside the proof. The nullifier is recorded publicly to prevent double-spending, while the note itself remains opaque.',
+      'The cryptographic backbone relies on the Grumpkin curve for note encryption and nullifier generation, and the BN254 curve for the Barretenberg proving backend. This dual-curve architecture is critical because Barretenberg operates natively on BN254, but requires a cycle of curves or efficient non-native field arithmetic to express cryptographic primitives efficiently.',
     ],
     bullets: [
-      'Client-side proving: All witness generation and proof construction occur on the user device. The network receives only the proof and the public inputs — never the private data.',
+      'Client-side proving: All witness generation and proof construction occur on the user device using WebAssembly-compiled Barretenberg. The network receives only the proof and the public inputs.',
       'Nullifier trees: Prevent double-spending without revealing which note was spent or establishing any linkability between transactions.',
       'Authorization witnesses (AuthWit): Allow smart contracts to execute actions on a user\'s behalf through in-circuit proofs, eliminating the need for linkable on-chain signatures.',
-      'Barretenberg backend: The proving system is implemented using the Barretenberg library, supporting the UltraPlonk constraint system with efficient proof generation in browser and native environments.',
+      'Pedersen Hashes: Used extensively for state tree commitments due to their efficiency inside algebraic circuits compared to traditional hashes like SHA-256.',
     ],
   },
   {
@@ -48,9 +49,9 @@ export const WHITEPAPER_SECTIONS: AztecDocSection[] = [
     title: '4. System Architecture',
     paragraphs: [
       'The Humanity Ledger architecture is divided into three distinct operational layers, each with well-defined responsibilities and trust boundaries.',
-      'The Client Layer runs entirely on the user device. It holds cryptographic keys, manages the local Private Execution Environment (PXE), constructs private state transitions, and generates zk-SNARKs using the Barretenberg proving backend. No private inputs are transmitted outside this layer under any circumstances.',
+      'The Client Layer runs entirely on the user device. It holds cryptographic keys, manages the local PXE, constructs private state transitions, and generates zk-SNARKs using the Barretenberg proving backend. No private inputs are transmitted outside this layer under any circumstances. IndexedDB is used to cache encrypted state to accelerate sync times.',
       'The Aztec L2 Layer operates as a zkRollup on Ethereum. It receives proofs from users, verifies their validity in batches, and updates the global state roots. The sequencer processes encrypted data and publishes verified state commitments without accessing the underlying private content. The L2 layer is responsible for transaction ordering, proof verification, and state root publication.',
-      'The Ethereum L1 Layer provides ultimate settlement and data availability. State roots published by the Aztec sequencer are anchored to Ethereum, providing economic finality, censorship resistance, and a permanent audit trail of verified state transitions. Ethereum serves as the source of truth for the Aztec L2 state.',
+      'The Ethereum L1 Layer provides ultimate settlement and data availability. State roots published by the Aztec sequencer are anchored to Ethereum, providing economic finality, censorship resistance, and a permanent audit trail of verified state transitions. L1 and L2 communicate via messaging portals that utilize Inbox and Outbox smart contracts to enable trustless asset bridging.',
     ],
   },
   {
@@ -59,7 +60,7 @@ export const WHITEPAPER_SECTIONS: AztecDocSection[] = [
     paragraphs: [
       'The Whale Alert Network monitors capital flows across more than 20 major blockchain networks in real time. It identifies large asset transfers, exchange inflows and outflows, wallet activations, and macroeconomic flow patterns, and surfaces these events as structured, queryable data.',
       'This intelligence is accessible within the Humanity Ledger shielded environment through private indexing logic. Users interact with the data — querying events, setting alert conditions, analyzing accumulation patterns — entirely inside the Aztec shielded pool. Their queries, alert configurations, and subsequent actions are cryptographically hidden from the public network.',
-      'The architecture creates a dual-state design: market intelligence is derived from publicly available on-chain data, while user engagement with that intelligence remains entirely private. A user who acts on a large transfer alert cannot be observed by competitors or adversarial actors.',
+      'The architecture creates a dual-state design: market intelligence is derived from publicly available on-chain data (via rigorous graph DB parsing and RPC ingestion), while user engagement with that intelligence remains entirely private. A user who acts on a large transfer alert cannot be observed by competitors or adversarial actors.',
     ],
     bullets: [
       'Alert Engine: Configurable alert conditions triggered by specific flow events across monitored networks.',
@@ -72,8 +73,8 @@ export const WHITEPAPER_SECTIONS: AztecDocSection[] = [
     id: 'identity-layer',
     title: '6. Identity and Sybil Resistance',
     paragraphs: [
-      'The Humanity Ledger identity layer uses zero-knowledge biometric proofs to establish unique human status without exposing personally identifiable information. Users prove uniqueness through integration with established liveness protocols — including World ID — by generating a ZK proof of credential possession rather than submitting the credential itself.',
-      'The network can verify that a participant is a unique, verified human without learning their identity, device details, or the specific credential used. This enables Sybil-resistant governance and reward distribution without traditional KYC — a requirement that would fundamentally compromise the privacy guarantees of the protocol.',
+      'The Humanity Ledger identity layer uses zero-knowledge biometric proofs to establish unique human status without exposing personally identifiable information. Users prove uniqueness through integration with established liveness protocols by generating a ZK proof of credential possession rather than submitting the credential itself.',
+      'To interact with the protocol, a user provisions a sovereign on-chain identity. This is achieved by generating an Aztec Account Contract (a specialized smart contract wallet natively deployed on L2) which abstracts the key pairs. A user possesses a standard ECDSA or EdDSA signing key, but the account contract handles the verification, enabling sophisticated multi-sig and threshold designs natively.',
       'For institutional participants requiring formal compliance, the protocol supports selective disclosure through viewing keys and W3C Verifiable Credentials. Institutions can prove specific attributes to regulators — balance thresholds, transaction limits, jurisdictional compliance — without revealing their full transactional history or counterparty graph.',
     ],
   },
@@ -406,62 +407,52 @@ export const ROADMAP_SECTIONS: AztecDocSection[] = [
 
 export const API_REFERENCE_SECTIONS: AztecDocSection[] = [
   {
-    title: 'API Overview',
+    title: 'API Overview & Network Architecture',
     paragraphs: [
-      'The Humanity Ledger API provides programmatic access to network analytics, Aztec L2 state data, real-time Whale Network event streams, and proof submission endpoints. The API is designed around RESTful principles for request-response interactions and WebSocket connections for real-time event delivery.',
-      'The base URL for all API endpoints is https://api.humanidfi.com/v1. All requests must be made over HTTPS. Plaintext HTTP connections are rejected.',
+      'The Humanity Ledger Institutional API provides deterministic, cryptographically secure programmatic access to network analytics, Aztec L2 state commitments, and real-time Whale Network event streams. The API architecture separates read-only intelligence endpoints from write-heavy state-transition relay layers.',
+      'All interactions operate over TLS 1.3 with strict cypher suite enforcement. The base URL for the production environment is `https://api.humanidfi.com/v1`. Testnet environments operate on `https://testnet-api.humanidfi.com/v1`.',
+      'The API Gateway implements a sophisticated bucket-algorithm rate limiter based on the caller\'s institutional tier, verifying HMAC-SHA256 signatures derived from assigned API keys in sub-millisecond latencies using edge-deployed WebAssembly verifiers.'
     ],
   },
   {
-    title: 'Authentication',
+    title: 'Authentication & Cryptographic Signatures',
     paragraphs: [
-      'All API requests require authentication via HMAC-SHA256 request signing. To authenticate a request, you must include three headers: X-API-Key (your API key identifier), X-Timestamp (Unix timestamp of the request, must be within 300 seconds of server time), and X-Signature (the HMAC-SHA256 signature of the canonical request string).',
-      'The canonical request string is constructed as: METHOD + "\\n" + PATH + "\\n" + TIMESTAMP + "\\n" + SHA256(BODY). The HMAC is computed using your API secret as the key. The resulting hex-encoded signature is included in the X-Signature header.',
+      'Authentication relies on stateless HMAC-SHA256 signatures to eliminate the attack vectors inherent in session tokens. Every request must be independently signed using a secret key strictly guarded by the calling institution\'s HSM (Hardware Security Module) or secrets manager.',
+      'Three mandatory headers must accompany every request:',
+      '`X-API-Key`: Your institutional public identifier.',
+      '`X-Timestamp`: The Unix timestamp in seconds. The gateway rejects requests older than 300 seconds to prevent replay attacks.',
+      '`X-Signature`: The computed Hex-encoded HMAC-SHA256 signature.'
     ],
     bullets: [
-      'GET /v1/events — List recent large transfer events across monitored chains',
-      'GET /v1/events/:id — Retrieve a specific event by identifier',
-      'GET /v1/state/roots — Current Aztec L2 state roots',
-      'POST /v1/proofs — Submit a client-generated zk-SNARK for sequencer relay',
-      'GET /v1/account/:address — Public state for an Aztec account address',
+      'Signature Construction: The string to sign is formulated as: `METHOD + "\\n" + PATH + "\\n" + TIMESTAMP + "\\n" + SHA256(BODY)`.',
+      'For GET requests, the `BODY` is empty, so `SHA256(BODY)` equals `e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855`.',
+      'If the signature fails verification, the API immediately terminates the connection with a 401 Unauthorized status, providing no internal state leakage.'
     ],
   },
   {
-    title: 'Event Objects',
+    title: 'REST Endpoint Specifications',
     paragraphs: [
-      'All event objects returned by the API share a consistent schema regardless of the originating chain or event type. This allows client applications to handle events uniformly without conditional logic for each chain.',
+      'The REST API is structured around immutable event streams, private state proofs, and network telemetry. Responses strictly adhere to `application/json` formatting with deterministic schemas.',
     ],
     bullets: [
-      'id (string): Unique event identifier. Stable across API versions.',
-      'chain (string): Originating blockchain identifier (e.g., "ethereum", "solana", "bnb").',
-      'type (string): Event classification ("large_transfer", "exchange_inflow", "exchange_outflow", "wallet_activation").',
-      'asset (string): Asset ticker symbol.',
-      'amount_usd (number): Normalized USD value at the time of detection.',
-      'tx_hash (string): Transaction identifier on the originating chain.',
-      'detected_at (string): ISO 8601 timestamp of event detection.',
-      'confidence (number): Confidence score between 0 and 1 indicating classification reliability.',
+      'GET /v1/events/mempool : Stream raw, pre-processed mempool anomalies matching standard institutional Z-Score deviations (requires Enterprise tier).',
+      'POST /v1/pxe/proof_relay : Submits a Barretenberg-compiled zk-SNARK proof. The payload requires the base64-encoded proof, public inputs array, and target contract address. The gateway validates the structure but cannot read the private inputs.',
+      'GET /v1/state/roots : Returns the latest finalized L2 state roots (Note Tree, Nullifier Tree, Public Data Tree, and Global Variables) necessary for constructing localized proofs.'
     ],
   },
   {
-    title: 'WebSocket Streams',
+    title: 'WebSocket Multiplexing & High-Frequency Streams',
     paragraphs: [
-      'Connect to the WebSocket endpoint at wss://stream.humanidfi.com/v1. Authentication is performed during the initial handshake by including the same headers required for REST requests as connection parameters.',
-      'After connecting, send a subscription message to begin receiving events on specific channels. Subscriptions can be updated at any time without reconnecting.',
-      'The connection remains active until explicitly closed by the client or until a 60-second ping timeout occurs. Clients should send a ping frame at least every 30 seconds to maintain the connection. The server will respond with a pong frame within 10 seconds.',
+      'For high-frequency algorithmic execution, the platform provides an authenticated WebSocket endpoint at `wss://stream.humanidfi.com/v1`. Unlike standard HTTP polling, the WebSocket layer supports multiplexing—allowing a single TCP connection to subscribe to multiple, concurrent telemetry channels (e.g., DEX swaps, cross-chain bridge movements, centralized exchange inflows).',
+      'Authentication is handled during the `UPGRADE` request via the same HMAC headers. Once established, the client must send a `{"op": "subscribe", "channels": ["whale_eth", "darkpool_arb"]}` frame to begin receiving binary-encoded JSON payloads.',
+      'To maintain connection integrity across load balancers, the client must transmit a `{"op": "ping"}` frame every 15,000 milliseconds. Failure to ping within the TTL window results in an unceremonious TCP closure.'
     ],
   },
   {
-    title: 'Error Codes',
+    title: 'JSON Schemas and Type Definitions',
     paragraphs: [
-      'The API uses standard HTTP status codes for REST responses. Error responses include a JSON body with a machine-readable error code and a human-readable message.',
-    ],
-    bullets: [
-      '400 Bad Request: The request is malformed, missing required parameters, or contains invalid values.',
-      '401 Unauthorized: Authentication failed. The API key is invalid, the signature is incorrect, or the timestamp is outside the acceptable window.',
-      '403 Forbidden: The request is authenticated but the API key does not have permission to access the requested resource.',
-      '404 Not Found: The requested resource does not exist.',
-      '429 Too Many Requests: The rate limit for the API key has been exceeded. The Retry-After header indicates when requests can resume.',
-      '500 Internal Server Error: An unexpected error occurred on the server. These are logged and investigated automatically.',
+      'All event objects conform to strict TypeScript interfaces. For example, a Whale Alert event will consistently contain `transaction_hash`, `source_chain`, `destination_chain`, `asset_contract`, `normalized_usd_volume`, and `z_score`.',
+      'Amounts are serialized as stringified BigInts (e.g., `"1500000000000000000"`) to prevent IEEE-754 floating-point precision loss in JSON parsers. Timestamps are invariably ISO-8601 strings in UTC.'
     ],
   },
 ];
@@ -470,122 +461,40 @@ export const API_REFERENCE_SECTIONS: AztecDocSection[] = [
 
 export const NOIR_CIRCUITS_SECTIONS: AztecDocSection[] = [
   {
-    title: 'Overview',
+    title: 'Noir and Barretenberg Proving Backend',
     paragraphs: [
-      'The Humanity Ledger protocol logic is expressed in Noir circuits. These circuits define the mathematical constraints that a state transition must satisfy to be accepted by the network. A state transition is valid if and only if a valid proof can be generated demonstrating that the transition satisfies its circuit constraints.',
-      'Circuits are compiled using the Noir compiler (nargo) to generate an abstract circuit representation and a corresponding proving key. The proving key is used by the client prover to generate proofs for specific inputs. The verification key is published on-chain and used by the Aztec sequencer to verify submitted proofs.',
+      'The core cryptographic guarantees of Humanity Ledger are articulated in Noir—a Rust-inspired Domain Specific Language (DSL) for Zero-Knowledge proofs. Noir abstracts the intense complexity of arithmetic circuits, compiling high-level logic into ACIR (Abstract Circuit Intermediate Representation).',
+      'Once compiled to ACIR, the Humanity Ledger Private Execution Environment (PXE) invokes Barretenberg. Barretenberg is an ultra-fast, WebAssembly-optimized SNARK proving backend that utilizes the UltraPlonk constraint system. UltraPlonk supports custom gates and lookup tables (Plookup), drastically reducing the constraint count for complex operations like SHA-256 hashing or ECDSA signature verification.',
+      'Because Barretenberg is executed entirely client-side (in-browser or via mobile HSMs), the private inputs—such as the user\'s true wallet balance, the recipient\'s address, and the precise transaction amount—never leave the device. The sequencer only receives the finalized proof.'
     ],
   },
   {
-    title: 'Private Transfer Circuit',
+    title: 'State Architecture: Note Trees and Nullifiers',
     paragraphs: [
-      'The private transfer circuit governs the shielded movement of assets between accounts. Given a set of input notes and a set of output notes, the circuit proves that: the input notes are valid commitments to unspent assets in the state tree, the total value of outputs equals the total value of inputs, the input nullifiers are correctly derived from the input note secrets, and the output notes are correctly committed to the state tree.',
-      'The circuit reveals only the nullifiers of spent input notes and the commitments of new output notes. The amounts, sender, and recipient are not revealed.',
+      'Aztec Network relies on a private UTXO (Unspent Transaction Output) model. Assets are stored as "Notes" within an append-only Merkle tree. A Note is essentially a cryptographic commitment (a Pedersen hash) of its underlying values: `owner`, `amount`, `asset_id`, and a `random_blinding_factor`.',
+      'When a transaction occurs, the user\'s local PXE generates a proof that they possess a valid Note and know the private key corresponding to the `owner`. To prevent double-spending without revealing which Note is being spent, the circuit deterministically derives a "Nullifier" from the Note and the user\'s private key.',
+      'The Nullifier is published to the public Nullifier Tree. The Aztec sequencer checks if the Nullifier already exists; if not, the transaction is valid, the Nullifier is added, and the new output Notes are appended to the Note Tree. The linkage between the spent Note and the new Notes is entirely obliterated.'
+    ],
+    callout: {
+      title: 'Cryptographic Detail',
+      body: 'The deterministic generation of Nullifiers uses the Grumpkin curve, a curve that forms a cycle with the BN254 curve used by Barretenberg, allowing highly efficient in-circuit elliptic curve operations without the massive overhead of non-native field arithmetic.',
+      href: 'https://docs.aztec.network',
+      hrefLabel: 'Aztec Official Docs'
+    }
+  },
+  {
+    title: 'Cross-Chain Message Boxes (L1 <-> L2)',
+    paragraphs: [
+      'To interact with Ethereum (L1) DeFi protocols—such as Uniswap or Aave—from the shielded L2, Humanity Ledger utilizes Aztec\'s L1 to L2 messaging portals. This architecture guarantees trustless capital movement without centralized multisig bridges.',
+      'When withdrawing assets from the private L2 pool to L1, the Noir circuit constructs an `L2ToL1Message`. This message contains the target L1 contract address, the function selector, and the payload. The L2 sequencer collects these messages and, upon generating the Rollup Proof, anchors them into the `Outbox` smart contract on Ethereum.',
+      'Once the L1 Outbox is updated, any relayer (or the user themselves) can execute the transaction on L1 by providing the Merkle proof of the message\'s inclusion. This guarantees that capital flows directly from the L2 shielded pool to L1 liquidity pools with cryptographic finality.'
     ],
   },
   {
-    title: 'Identity Circuit',
+    title: 'Authorization Witnesses (AuthWits)',
     paragraphs: [
-      'The identity circuit enables users to prove possession of a valid identity credential without revealing the credential itself. It takes a signed credential from an approved identity oracle as a private input and produces a public output confirming that the credential is valid and meets specific criteria — for example, that it represents a unique, verified human.',
-      'The circuit does not reveal which oracle signed the credential, which specific credential was used, or any identifying information about the holder. It produces only a Boolean confirmation that the proof is valid.',
+      'Traditional Ethereum requires users to sign an `approve()` transaction before a contract can move their tokens, exposing the intent on-chain. Humanity Ledger uses Noir Authorization Witnesses (AuthWits) to abstract this.',
+      'An AuthWit is a private, in-circuit proof that the owner of an Aztec Account Contract has authorized a specific action (e.g., "swap 100 USDC for WETH"). The AuthWit is passed to the execution function. The smart contract validates the proof and executes the logic in a single atomic transaction. The authorization is consumed immediately and securely without requiring a distinct, visible approval transaction.'
     ],
-  },
-  {
-    title: 'Membership Circuit',
-    paragraphs: [
-      'The membership circuit proves that a user holds sufficient QDs to access a specific protocol feature without revealing their exact balance. It takes the user\'s private note set as input and produces a proof that the total committed value meets or exceeds the required threshold.',
-      'This circuit enables tier-based feature access — for example, confirming eligibility for dark pool participation — without requiring users to disclose their actual holdings to any counterparty or observer.',
-    ],
-  },
-  {
-    title: 'Governance Circuit',
-    paragraphs: [
-      'The governance circuit proves that a valid, non-duplicate vote has been cast in an active governance proposal. It takes the voter\'s identity proof and their QDs note set as private inputs, and produces a proof confirming: the voter is a verified participant, the voter has not previously voted on this proposal (proven via nullifier), and the vote weight is correctly derived from the voter\'s eligible balance.',
-      'The circuit reveals only the nullifier (to prevent double voting) and the vote weight. The voter\'s identity, address, and specific holdings are not disclosed.',
-    ],
-  },
-];
-
-// ─── ARCHITECTURE VISION ──────────────────────────────────────────────────────
-
-export const ARCHITECTURE_VISION_SECTIONS: AztecDocSection[] = [
-  {
-    title: 'Cryptographic Architecture',
-    paragraphs: [
-      'The cryptographic foundation of Humanity Ledger is designed for long-term security. The current architecture uses CRYSTALS-Dilithium for digital signatures and the Barretenberg UltraPlonk proving system for zk-SNARKs. These represent current best practice for post-quantum-resistant signatures and efficient zero-knowledge proving.',
-      'The protocol is designed to be upgrade-compatible with future cryptographic improvements. Circuit components are modular, allowing signature schemes and hash functions to be updated through governance as standards evolve without requiring a complete protocol migration.',
-    ],
-    bullets: [
-      'Proving system: Barretenberg UltraPlonk — efficient proof generation suitable for browser and native environments.',
-      'Signature scheme: CRYSTALS-Dilithium — NIST-standardized, lattice-based digital signature algorithm.',
-      'Hash function: Poseidon — ZK-friendly hash function optimized for circuit efficiency.',
-      'Key exchange: X25519 for session encryption with planned hybrid integration of CRYSTALS-Kyber for post-quantum resistance.',
-    ],
-  },
-  {
-    title: 'State Management',
-    paragraphs: [
-      'Private state is managed as a set of note commitments stored in an append-only Merkle tree. Notes represent ownership of assets and are encrypted using the recipient\'s public key. Only the recipient, who possesses the corresponding private key, can decrypt and spend a note.',
-      'When a note is spent, a nullifier derived from the note secret is published to the network. The nullifier set is maintained publicly to prevent double-spending. Because nullifiers are derived using a one-way function from note secrets, they reveal nothing about the note itself — only that it has been spent.',
-      'The global state consists of two primary data structures: the note hash tree, containing commitments to all created notes, and the nullifier tree, containing all published nullifiers. The roots of these trees are published by the sequencer and anchored to Ethereum L1.',
-    ],
-  },
-  {
-    title: 'Sequencer Architecture',
-    paragraphs: [
-      'The Aztec sequencer is responsible for ordering private transactions, verifying their associated zk-SNARKs, and publishing verified state roots to Ethereum. The sequencer processes encrypted transaction data — it receives proofs and public inputs but never has access to private witness data.',
-      'Transaction ordering is currently centralized in the Aztec sequencer, with full decentralization planned as the Aztec Network protocol matures. The security of user funds does not depend on the sequencer\'s honest behavior — invalid proofs are rejected by the on-chain verification contract regardless of sequencer actions.',
-      'The sequencer\'s primary censorship resistance mechanism is the L1 forced transaction queue. If the sequencer withholds a transaction, users can force inclusion directly through the Ethereum L1 bridge contract after a defined waiting period.',
-    ],
-  },
-  {
-    title: 'Data Availability',
-    paragraphs: [
-      'Encrypted transaction data is published to Ethereum calldata, ensuring that the full history required to reconstruct private state is permanently available and censorship-resistant. Users can re-derive their private note set from the published data if the local PXE database is lost.',
-      'Note encryption uses the recipient\'s public key, derived from their private key through the Aztec key derivation scheme. The recipient scans published transaction data, attempting decryption with their private key. Successfully decrypted notes are added to the local PXE database for future spending.',
-    ],
-  },
-  {
-    title: 'L1–L2 Bridge',
-    paragraphs: [
-      'Assets move between Ethereum L1 and the Aztec L2 shielded pool through the portal contract system. Deposits from L1 to L2 create a private note in the shielded pool — no public record of the L2 recipient is created. Withdrawals from L2 to L1 require a valid proof of ownership of the corresponding L2 note.',
-      'Cross-chain asset movements through the bridge are therefore private in one direction: the L1 deposit is publicly visible (as it must be, being an Ethereum transaction), but the L2 recipient is not. Similarly, the L2 withdrawal proof is publicly verifiable, but the source note and its history within the shielded pool are not.',
-    ],
-  },
-];
-
-// ─── COMMUNITY FORUM INTRO ───────────────────────────────────────────────────
-
-export const COMMUNITY_FORUM_INTRO: AztecDocSection[] = [
-  {
-    title: 'Welcome to the Community Governance Architecture',
-    paragraphs: [
-      'This forum serves as the primary operational and governance hub for the Humanity Ledger community. It is a strictly moderated, professional environment dedicated to technical architecture discussions, Noir circuit peer review, protocol economics, and the formalization of governance proposals. We maintain an institutional standard of discourse to ensure that all protocol developments are vetted rigorously.',
-      'We expect all interactions to be substantive, strictly factual, and conducted with maximum professional courtesy. This is not a venue for price speculation, trading analysis, or promotional content of any kind. Any content that deviates from technical or operational protocol advancement will be immediately archived by our moderation team.',
-      'All formal protocol governance proposals must undergo a mandatory public review period within this forum before they can be submitted for cryptographic voting on-chain. This structural requirement ensures that all proposals are subjected to comprehensive community scrutiny, edge-case analysis, and technical vetting before execution.'
-    ],
-  },
-  {
-    title: 'Code of Professional Conduct',
-    paragraphs: [
-      'Participation in the Humanity Ledger governance forum requires adherence to our strict Code of Professional Conduct. We operate under a zero-tolerance policy for harassment, discrimination, or unprofessional behavior. This community is built on meritocracy, intellectual rigor, and the shared goal of advancing privacy-preserving financial infrastructure.',
-      'Contributors are expected to provide verifiable data to support their arguments. When debating architectural changes or economic parameters, assumptions must be clearly stated, and models should be provided for peer review. Disagreements are inevitable and encouraged, but they must remain focused on the technical merits of the proposal, never on the individual contributor.',
-      'Moderators are empowered to issue warnings, suspend posting privileges, or permanently revoke forum access for repeated violations of these standards. We prioritize signal over noise, and maintaining a high-quality discussion environment is essential for the long-term success of the protocol.'
-    ],
-  },
-  {
-    title: 'Proposal Lifecycle and Technical Standards',
-    paragraphs: [
-      'The journey from an initial concept to an executed protocol upgrade follows a rigid, standardized lifecycle. Ideas are first introduced as "Draft Proposals," where the community can assess their initial viability. If a draft receives sufficient support, it must be upgraded to a "Formal Request for Comment" (RFC), complete with technical specifications, economic impact assessments, and proposed Noir circuit modifications.',
-      'During the RFC phase, core contributors and community developers will conduct technical audits of the proposed changes. All accompanying code must meet our stringent quality standards, including comprehensive unit testing, documentation, and formal verification where applicable. Proposals lacking this rigor will not proceed.',
-      'Once the RFC phase is successfully concluded, the proposal is finalized and moved to the on-chain voting queue. The forum serves as the permanent archival record of this entire process, ensuring complete transparency into the rationale behind every protocol decision.'
-    ]
-  },
-  {
-    title: 'Security and Responsible Disclosure',
-    paragraphs: [
-      'This forum is public, and as such, it must never be used to report active security vulnerabilities, circuit exploits, or critical infrastructure weaknesses. The publication of zero-day vulnerabilities in a public venue is considered a severe violation of protocol security standards.',
-      'If you discover a potential security flaw, you must utilize our Responsible Disclosure program. All findings should be securely transmitted directly to our security engineering team using the encrypted channels detailed in our Security Architecture documentation. We offer substantial bounties for responsible disclosure, provided the vulnerability has not been publicly exposed.'
-    ]
   }
 ];

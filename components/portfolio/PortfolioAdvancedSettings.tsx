@@ -475,7 +475,7 @@ export function PortfolioAdvancedSettings({ isOpen, onClose, userAddress }: Port
                                 <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div>
                                         <h3 className="text-2xl font-black uppercase tracking-tighter mb-2 bg-gradient-to-r from-purple-600 to-blue-500 bg-clip-text text-transparent">Experimental</h3>
-                                        <p className="text-xs font-mono" style={{ color: MUTED }}>Bleeding-edge quantum features. Use with caution.</p>
+                                        <p className="text-xs font-mono" style={{ color: MUTED }}>Advanced protocol features under active development. Enable with caution in production environments.</p>
                                     </div>
 
                                     <div className="space-y-8">
@@ -483,7 +483,7 @@ export function PortfolioAdvancedSettings({ isOpen, onClose, userAddress }: Port
                                             <div className="flex items-center justify-between">
                                                 <div className="flex items-center gap-2">
                                                     <Zap size={16} className="text-purple-600" />
-                                                    <label className="text-[11px] font-black uppercase tracking-widest text-purple-700">Quantum Routing</label>
+                                                    <label className="text-[11px] font-black uppercase tracking-widest text-purple-700">Adaptive Cross-Chain Routing</label>
                                                 </div>
                                                 <Toggle isOn={quantumRouting} onToggle={() => { setQuantumRouting(!quantumRouting); save('sys_set_quantum', !quantumRouting); }} color="bg-purple-600" />
                                             </div>
@@ -506,7 +506,7 @@ export function PortfolioAdvancedSettings({ isOpen, onClose, userAddress }: Port
                                 <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div>
                                         <h3 className="text-2xl font-black uppercase tracking-tighter mb-2" style={{ color: INK }}>About</h3>
-                                        <p className="text-xs font-mono" style={{ color: MUTED }}>Version 14.12.0 (Quantum Edition)</p>
+                                        <p className="text-xs font-mono" style={{ color: MUTED }}>Version 14.12.0 — Institutional Release</p>
                                     </div>
 
                                     <div className="space-y-4">

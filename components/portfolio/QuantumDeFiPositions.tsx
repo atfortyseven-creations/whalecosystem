@@ -9,7 +9,7 @@ import { formatUnits } from 'viem';
 import { motion } from 'framer-motion';
 
 // ================================================================
-// QUANTUM DEFI POSITIONS ENGINE
+// INSTITUTIONAL DEFI POSITIONS ENGINE
 // Interrogates AAVE V3, Compound V3 via parallelized on-chain reads
 // ================================================================
 export function QuantumDeFiPositions({ address, activeNetwork }: { address: string, activeNetwork: string }) {
@@ -103,7 +103,7 @@ export function QuantumDeFiPositions({ address, activeNetwork }: { address: stri
             <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-black/5 border border-black/10">
                 <Layers size={24} className="text-black/20 mb-4" />
                 <p className="text-[11px] text-black/60 uppercase tracking-widest font-black mb-2">Network Segment Mismatch</p>
-                <p className="text-[10px] text-black/40 max-w-[250px]">Quantum DeFi tracking requires L1 Mainnet context. Change network to activate the engine.</p>
+                <p className="text-[10px] text-black/40 max-w-[250px]">Institutional DeFi tracking requires L1 Mainnet context. Change network to activate the engine.</p>
             </div>
         );
     }
@@ -112,7 +112,7 @@ export function QuantumDeFiPositions({ address, activeNetwork }: { address: stri
         return (
             <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] text-center p-8 border border-black/10 bg-white">
               <RefreshCw size={24} className="animate-spin text-black/20 mb-4" />
-              <p className="text-[11px] font-black uppercase tracking-widest text-black/60">Interrogating Liquidity Matrices...</p>
+              <p className="text-[11px] font-black uppercase tracking-widest text-black/60">Synchronizing Liquidity Protocols...</p>
               <div className="w-48 h-1 bg-black/5 mt-4 overflow-hidden rounded-full relative">
                   <motion.div 
                     initial={{ x: '-100%' }} animate={{ x: '100%' }} transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
@@ -135,7 +135,7 @@ export function QuantumDeFiPositions({ address, activeNetwork }: { address: stri
                 <table className="w-full text-left text-[11px] font-mono">
                     <thead className="bg-black/5 border-b border-black/10 text-[9px] uppercase tracking-widest text-black/50">
                         <tr>
-                            <th className="py-3 px-4 font-black">Matrix Protocol</th>
+                            <th className="py-3 px-4 font-black">DeFi Protocol</th>
                             <th className="py-3 px-4 font-black text-right">Net Liquidity</th>
                             <th className="py-3 px-4 font-black text-right">Active Liabilities</th>
                             <th className="py-3 px-4 font-black text-right">System Health</th>
@@ -176,7 +176,7 @@ export function QuantumDeFiPositions({ address, activeNetwork }: { address: stri
                                     <div className="flex flex-col items-center justify-center text-center">
                                         <Landmark size={24} className="text-black/20 mb-3" />
                                         <p className="text-[10px] text-black/40 uppercase tracking-widest font-black mb-1">Zero Mathematical Exposure</p>
-                                        <p className="text-[9px] text-black/30 max-w-[300px]">The quantum IL engine found no active liquidity concentrated positions, options, or over-collateralized debt structures.</p>
+                                        <p className="text-[9px] text-black/30 max-w-[300px]">The institutional analytics engine found no active liquidity concentrated positions, options, or over-collateralized debt structures.</p>
                                     </div>
                                 </td>
                             </tr>
@@ -188,7 +188,7 @@ export function QuantumDeFiPositions({ address, activeNetwork }: { address: stri
             <div className="border-t border-black/10 p-3 bg-black/5 flex items-center justify-between">
                 <div className="flex items-center gap-2 text-black/40">
                     <Activity size={12} className="text-black/60" />
-                    <span className="text-[9px] font-black uppercase tracking-widest">Black-Scholes & IL Engine Online</span>
+                    <span className="text-[9px] font-black uppercase tracking-widest">Institutional Analytics Engine Online</span>
                 </div>
             </div>
         </div>

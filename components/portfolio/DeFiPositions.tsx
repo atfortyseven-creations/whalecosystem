@@ -139,7 +139,7 @@ export function DeFiPositions({ address, activeNetwork }: { address: string, act
                                     <div className="flex flex-col items-center justify-center text-center">
                                         <Landmark size={24} className="text-black/20 mb-3" />
                                         <p className="text-[10px] text-black/40 uppercase tracking-widest font-black mb-1">Zero DeFi Exposure</p>
-                                        <p className="text-[9px] text-black/30 max-w-[200px]">The quantum engine found no active liquidity positions or debt structures associated with this key pair.</p>
+                                        <p className="text-[9px] text-black/30 max-w-[200px]">No active liquidity positions or collateralised debt structures were detected for this address across monitored protocols.</p>
                                     </div>
                                 </td>
                             </tr>

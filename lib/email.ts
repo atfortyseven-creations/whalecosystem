@@ -175,7 +175,7 @@ export async function sendWelcomeEmail(email: string, name?: string): Promise<vo
                       <!-- Action CTA -->
                       <div style="text-align: left;">
                         <a href="https://whalealertid.fi" style="display: inline-block; background-color: #1D1A10; color: #F2ECD8; padding: 20px 40px; font-family: 'Roboto Mono', monospace; font-weight: 900; text-decoration: none; font-size: 11px; text-transform: uppercase; letter-spacing: 0.3em;">
-                          ENTER THE MATRIX >
+                          ACCESS NETWORK >
                         </a>
                       </div>
                     </td>

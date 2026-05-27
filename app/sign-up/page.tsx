@@ -2,156 +2,136 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Shield, Fingerprint, Lock, ArrowRight, Loader2, CheckCircle, BrainCircuit, ScanLine, Link as LinkIcon } from 'lucide-react';
+import { Shield, Fingerprint, Lock, ArrowRight, CheckCircle, Wallet, Activity, Key, Database, Cpu } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { useAccount, useSignTypedData, useConnect, useDisconnect } from 'wagmi';
-
-// EIP-712 Domain and Types for highly complex cryptographic identity binding
-const domain = {
-    name: 'Humanity Ledger',
-    version: '1.0.0',
-    chainId: 1, // Mainnet standard anchoring
-    verifyingContract: '0x0000000000000000000000000000000000000000' as const,
-};
-
-const types = {
-    IdentityProvision: [
-        { name: 'alias', type: 'string' },
-        { name: 'email', type: 'string' },
-        { name: 'wallet', type: 'address' },
-        { name: 'nonce', type: 'uint256' },
-        { name: 'timestamp', type: 'uint256' }
-    ],
-};
+import { useUIStore } from '@/lib/store/ui-store';
+import { Wallet as EthersWallet } from 'ethers';
 
 export default function SignUpPage() {
     const router = useRouter();
-    const { address, isConnected, connector } = useAccount();
-    const { connect, connectors } = useConnect();
-    const { signTypedDataAsync } = useSignTypedData();
-    const { disconnect } = useDisconnect();
+    const { setLinked } = useUIStore();
 
     const [step, setStep] = useState(0);
-    const [status, setStatus] = useState<"idle" | "connecting" | "signing" | "verifying" | "complete">("idle");
-    const [email, setEmail] = useState('');
+    const [status, setStatus] = useState<"idle" | "generating" | "encrypting" | "complete">("idle");
     const [alias, setAlias] = useState('');
+    const [password, setPassword] = useState('');
+    const [confirmPassword, setConfirmPassword] = useState('');
+    
+    // Cryptographic state
+    const [progress, setProgress] = useState(0);
+    const [generatedAddress, setGeneratedAddress] = useState<string>('');
+    const [logs, setLogs] = useState<string[]>([]);
 
-    const [cryptographicProof, setCryptographicProof] = useState<string>('');
+    const addLog = (msg: string) => {
+        setLogs(prev => [...prev, `[${new Date().toISOString().split('T')[1].slice(0, -1)}] ${msg}`]);
+    };
 
-    const handleCreate = async () => {
-        if (!email || !alias) {
-            toast.error('Identity vectors incomplete', { description: 'Please provide required biometric/identity data.' });
+    const handleCreateVault = async () => {
+        if (!alias) {
+            toast.error('Required field', { description: 'Please enter a display name.' });
             return;
         }
-
-        if (!isConnected) {
-            toast.error('No Node Connected', { description: 'Web3 Wallet connection is strictly required for cryptographic anchoring.' });
-            setStep(0);
+        if (password.length < 8) {
+            toast.error('Weak password', { description: 'Password must be at least 8 characters long.' });
+            return;
+        }
+        if (password !== confirmPassword) {
+            toast.error('Mismatch', { description: 'Passwords do not match.' });
             return;
         }
 
         try {
             setStep(1);
-            setStatus("signing");
+            setStatus("generating");
+            setLogs([]);
             
-            // Generate non-simulated cryptographic entropy for EIP-712 payload
-            const timestamp = Math.floor(Date.now() / 1000);
-            const nonce = Math.floor(Math.random() * 1e9);
+            addLog("Initializing Native Vault Generation...");
+            addLog("Allocating entropy buffer (BIP39)...");
+            
+            // Allow UI to render the logs before blocking the thread
+            await new Promise(r => setTimeout(r, 500));
 
-            const message = {
-                alias,
-                email,
-                wallet: address as `0x${string}`,
-                nonce: BigInt(nonce),
-                timestamp: BigInt(timestamp)
-            };
+            addLog("Computing secp256k1 keypair...");
+            
+            // Generate a true, random HD wallet
+            const wallet = EthersWallet.createRandom();
+            setGeneratedAddress(wallet.address);
+            
+            addLog(`Address Derived: ${wallet.address}`);
+            addLog("Binding Identity Alias...");
+            
+            await new Promise(r => setTimeout(r, 800));
 
-            // STRICT ON-CHAIN REQUIREMENT: Prompt real wallet signature
-            toast.loading("Awaiting Cryptographic Signature...", { id: "sign" });
-            const signature = await signTypedDataAsync({
-                domain,
-                types,
-                primaryType: 'IdentityProvision',
-                message,
+            setStatus("encrypting");
+            addLog("Initiating Scrypt Key Derivation Function...");
+            addLog("Encrypting private key to Keystore JSON...");
+
+            // Encrypt the wallet with the user's password.
+            // This is a computationally heavy operation that takes several seconds.
+            const keystoreJson = await wallet.encrypt(password, (p: number) => {
+                const percent = Math.round(p * 100);
+                setProgress(percent);
+                if (percent % 10 === 0) {
+                    addLog(`Encryption Progress: ${percent}% (Scrypt N=131072, r=8, p=1)`);
+                }
             });
-            toast.success("Signature Validated On-Chain", { id: "sign" });
 
-            setCryptographicProof(signature);
-            setStatus("verifying");
+            addLog("Encryption Complete. Ciphertext locked.");
             
-            // Simulating network broadcast delay, but the cryptographic proof is REAL
-            await new Promise(r => setTimeout(r, 1500));
-
             setStatus("complete");
-            setStep(2);
             
-            // Write session cookie with the Ethereum address (NOT the signature).
-            // The middleware validates system_handshake against /^0x[a-fA-F0-9]{40}$/
-            // — storing the 132-char EIP-712 signature here caused an infinite redirect loop.
-            document.cookie = `system_handshake=${address}; path=/; max-age=604800; SameSite=Lax`;
+            // 1. Save the encrypted keystore locally
             if (typeof localStorage !== 'undefined') {
+                localStorage.setItem('system_vault_v1', keystoreJson);
+                // Also simulate the standard system session so UI works seamlessly
+                const norm = wallet.address.toLowerCase();
                 localStorage.setItem('system_session_v2', JSON.stringify({ 
                     exp: Date.now() + 86400000 * 30,
-                    wallet: address,
-                    proof: signature
+                    address: norm,
+                    wallet: wallet.address,
+                    alias: alias
                 }));
             }
 
-            toast.success("Identity Matrix Synchronized", { description: "Quantum key pair established successfully." });
-            
-            // Redirection as requested
-            setTimeout(() => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const returnUrl = urlParams.get('returnUrl') || urlParams.get('redirect_url');
-                if (returnUrl) {
-                    if (returnUrl.startsWith('http')) {
-                        window.location.href = returnUrl;
-                    } else {
-                        router.replace(returnUrl);
-                    }
-                } else {
-                    router.replace('/dashboard');
-                }
-            }, 2000);
-        } catch (error: any) {
-            console.error("Cryptographic Anchor Failed:", error);
-            toast.error("Signature Rejected", { id: "sign", description: error.message || "Failed to secure identity." });
-            setStep(0);
-            setStatus("idle");
-        }
-    };
+            // 2. Set the handshake cookie so all middleware APIs recognize the user
+            const norm = wallet.address.toLowerCase();
+            document.cookie = \`system_handshake=\${norm}; path=/; max-age=31536000; SameSite=Lax\`;
 
-    const handleConnect = () => {
-        if (isConnected) {
-            disconnect();
-            return;
-        }
-        setStatus("connecting");
-        const injected = connectors.find(c => c.id === 'injected' || c.id === 'metaMask');
-        if (injected) {
-            connect({ connector: injected });
-        } else if (connectors.length > 0) {
-            connect({ connector: connectors[0] });
-        } else {
-            toast.error("No Web3 Provider Found", { description: "Please install MetaMask or a Web3 wallet." });
-            setStatus("idle");
+            // 3. Update Zustand global state
+            setLinked(true);
+
+            addLog("Identity Provisioned. Access Granted.");
+            setStep(2);
+            
+            toast.success("Vault Created", { description: "Your local wallet is ready." });
+            
+            // 4. Redirect seamlessly to the dashboard/portfolio
+            setTimeout(() => {
+                window.location.replace('/dashboard');
+            }, 2000);
+
+        } catch (error: any) {
+            console.error("Vault Creation Failed:", error);
+            addLog(`CRITICAL ERROR: ${error.message}`);
+            toast.error("Generation Failed", { description: error.message || "Failed to secure local vault." });
+            setTimeout(() => { setStep(0); setStatus("idle"); setProgress(0); }, 3000);
         }
     };
 
     return (
         <div className="min-h-[100dvh] w-full bg-[#050505] text-white flex flex-col font-mono relative overflow-hidden selection:bg-white/20">
-            {/* Background Quantum Effects */}
+            {/* Background Effects */}
             <div className="absolute inset-0 z-0 opacity-10 pointer-events-none">
                 <div className="absolute top-1/4 left-1/4 w-[50vw] h-[50vw] bg-white/5 rounded-full blur-[100px]" />
                 <div className="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-white/5 rounded-full blur-[80px]" />
             </div>
 
-            <div className="absolute top-0 left-0 p-6 z-20 flex items-center gap-4">
-                <BrainCircuit size={24} className="text-white/60" />
+            <div className="absolute top-0 left-0 p-6 z-20 flex items-center gap-3">
+                <Wallet size={20} className="text-white/60" />
                 <div className="flex flex-col">
                     <span className="text-[10px] font-black uppercase tracking-[0.3em] text-white/50">Humanity Ledger</span>
-                    <span className="text-[8px] font-medium tracking-[0.4em] text-white/30">STRICT ON-CHAIN INITIALIZATION</span>
+                    <span className="text-[8px] font-medium tracking-[0.4em] text-white/30">NATIVE VAULT GENERATION</span>
                 </div>
             </div>
 
@@ -168,15 +148,15 @@ export default function SignUpPage() {
                                 className="flex flex-col gap-8"
                             >
                                 <div className="text-center mb-4">
-                                    <h1 className="text-3xl font-light tracking-tighter mb-2">Create Identity</h1>
+                                    <h1 className="text-3xl font-light tracking-tighter mb-2">Initialize Native Vault</h1>
                                     <p className="text-[11px] text-white/40 uppercase tracking-[0.2em] leading-relaxed max-w-xs mx-auto">
-                                        Establish your sovereign node on the Humanity Ledger protocol via cryptographic signing.
+                                        Generate an isolated, non-custodial cryptographic identity directly on your device.
                                     </p>
                                 </div>
 
                                 <div className="space-y-6">
                                     <div className="space-y-2 relative">
-                                        <label className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold ml-1">Cryptographic Alias</label>
+                                        <label className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold ml-1">Identity Alias</label>
                                         <div className="relative">
                                             <input 
                                                 type="text" 
@@ -190,43 +170,46 @@ export default function SignUpPage() {
                                     </div>
 
                                     <div className="space-y-2 relative">
-                                        <label className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold ml-1">Communication Vector (Email)</label>
+                                        <label className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold ml-1">Encryption Password</label>
                                         <div className="relative">
                                             <input 
-                                                type="email" 
-                                                value={email}
-                                                onChange={e => setEmail(e.target.value)}
-                                                placeholder="identity@network.local"
+                                                type="password" 
+                                                value={password}
+                                                onChange={e => setPassword(e.target.value)}
+                                                placeholder="Minimum 8 characters"
                                                 className="w-full bg-white/5 border border-white/10 rounded-none p-4 text-sm outline-none focus:border-white/40 focus:bg-white/10 transition-all text-white placeholder:text-white/20"
                                             />
-                                            <ScanLine size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20" />
+                                            <Key size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20" />
                                         </div>
                                     </div>
-                                    
-                                    <div className="space-y-2 relative pt-2">
-                                        <label className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold ml-1">Web3 Hardware Enclave</label>
-                                        <button 
-                                            onClick={handleConnect}
-                                            className={`w-full border rounded-none p-4 text-sm flex items-center justify-between transition-all ${isConnected ? 'bg-[#00C076]/10 border-[#00C076]/30 text-[#00C076]' : 'bg-white/5 border-white/10 text-white/60 hover:bg-white/10 hover:text-white'}`}
-                                        >
-                                            <span className="font-mono tracking-widest">{isConnected ? `${address?.slice(0,6)}...${address?.slice(-4)}` : 'Connect Wallet'}</span>
-                                            {isConnected ? <CheckCircle size={16} /> : <LinkIcon size={16} />}
-                                        </button>
+
+                                    <div className="space-y-2 relative">
+                                        <label className="text-[9px] uppercase tracking-[0.2em] text-white/50 font-bold ml-1">Confirm Password</label>
+                                        <div className="relative">
+                                            <input 
+                                                type="password" 
+                                                value={confirmPassword}
+                                                onChange={e => setConfirmPassword(e.target.value)}
+                                                placeholder="Confirm encryption key"
+                                                className="w-full bg-white/5 border border-white/10 rounded-none p-4 text-sm outline-none focus:border-white/40 focus:bg-white/10 transition-all text-white placeholder:text-white/20"
+                                            />
+                                            <Lock size={16} className="absolute right-4 top-1/2 -translate-y-1/2 text-white/20" />
+                                        </div>
                                     </div>
                                 </div>
 
                                 <div className="p-4 bg-white/5 border border-white/10 flex items-start gap-4 mt-2">
                                     <Shield size={16} className="text-white/40 mt-1 shrink-0" />
                                     <p className="text-[10px] text-white/40 leading-loose">
-                                        Your identity is secured by EIP-712 structured data signing. Keys are verified via your Web3 Provider and anchored cryptographically.
+                                        Your private keys are generated via BIP39 locally and encrypted using the Scrypt Key Derivation Function. They never leave your device.
                                     </p>
                                 </div>
 
                                 <button 
-                                    onClick={isConnected ? handleCreate : handleConnect}
-                                    className={`w-full py-5 font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 transition-all mt-4 ${isConnected ? 'bg-white text-black hover:bg-white/90 active:scale-[0.98]' : 'bg-[#00C076] text-black hover:bg-[#00e08a] active:scale-[0.98]'}`}
+                                    onClick={handleCreateVault}
+                                    className="w-full py-5 font-black text-[11px] uppercase tracking-[0.3em] flex items-center justify-center gap-3 transition-all mt-4 bg-white text-black hover:bg-white/90 active:scale-[0.98]"
                                 >
-                                    {isConnected ? 'Sign EIP-712 Matrix' : 'Connect to Proceed'} <ArrowRight size={14} />
+                                    Generate Keystore <ArrowRight size={14} />
                                 </button>
                             </motion.div>
                         )}
@@ -237,34 +220,37 @@ export default function SignUpPage() {
                                 initial={{ opacity: 0, scale: 0.95 }}
                                 animate={{ opacity: 1, scale: 1 }}
                                 exit={{ opacity: 0, scale: 1.05 }}
-                                className="flex flex-col items-center justify-center text-center py-12"
+                                className="flex flex-col items-center justify-center py-8 w-full max-w-lg mx-auto"
                             >
-                                <div className="w-24 h-24 mb-8 relative flex items-center justify-center">
-                                    <div className="absolute inset-0 border-2 border-white/10 border-t-white rounded-full animate-spin" />
-                                    <div className="absolute inset-2 border-2 border-white/10 border-b-white/50 rounded-full animate-spin-slow" />
-                                    <Lock size={28} className="text-white/80" />
+                                <div className="w-20 h-20 mb-8 relative flex items-center justify-center">
+                                    <div className="absolute inset-0 border border-white/10 border-t-white rounded-full animate-spin" />
+                                    <div className="absolute inset-2 border border-[#00C076]/20 border-b-[#00C076] rounded-full animate-spin-slow" />
+                                    <Cpu size={24} className={status === 'encrypting' ? 'text-[#00C076] animate-pulse' : 'text-white/80'} />
                                 </div>
 
-                                <h2 className="text-xl font-light tracking-widest uppercase mb-4">
-                                    {status === 'signing' && 'EIP-712 Cryptographic Signing'}
-                                    {status === 'verifying' && 'Anchoring Signature'}
+                                <h2 className="text-sm font-black tracking-widest uppercase mb-6 text-center text-white/90">
+                                    {status === 'generating' ? 'Deriving Cryptographic Identity' : 'Encrypting Local Vault'}
                                 </h2>
                                 
-                                <p className="text-[10px] text-white/40 uppercase tracking-[0.3em] h-8">
-                                    {status === 'signing' && 'Awaiting approval in Web3 Provider...'}
-                                    {status === 'verifying' && 'Broadcasting cryptographic proof...'}
-                                </p>
+                                <div className="w-full bg-black/50 border border-white/10 p-4 rounded-none font-mono text-[9px] md:text-[10px] text-white/60 leading-loose h-64 overflow-y-auto flex flex-col gap-1 text-left">
+                                    {logs.map((log, i) => (
+                                        <div key={i} className="animate-in fade-in slide-in-from-bottom-1">{log}</div>
+                                    ))}
+                                    {status === "encrypting" && (
+                                        <div className="text-[#00C076] animate-pulse mt-2">► PERFORMING HEAVY COMPUTATION... PLEASE WAIT</div>
+                                    )}
+                                </div>
 
-                                <div className="w-full max-w-[200px] bg-white/5 h-1 mt-8 overflow-hidden">
+                                <div className="w-full bg-white/5 h-[2px] mt-8 overflow-hidden relative">
                                     <motion.div 
-                                        className="h-full bg-white"
+                                        className="absolute top-0 left-0 h-full bg-[#00C076]"
                                         initial={{ width: "0%" }}
-                                        animate={{ width: status === 'signing' ? "50%" : "100%" }}
-                                        transition={{ duration: 0.5 }}
+                                        animate={{ width: \`\${progress}%\` }}
+                                        transition={{ duration: 0.2 }}
                                     />
                                 </div>
-                                <div className="mt-8 font-mono text-[8px] text-white/20 break-all w-full text-center tracking-widest px-4">
-                                    {cryptographicProof ? cryptographicProof : 'Awaiting signature...'}
+                                <div className="text-[10px] text-white/40 mt-2 tracking-widest">
+                                    {progress}%
                                 </div>
                             </motion.div>
                         )}
@@ -276,12 +262,15 @@ export default function SignUpPage() {
                                 animate={{ opacity: 1, scale: 1 }}
                                 className="flex flex-col items-center justify-center text-center py-12"
                             >
-                                <div className="w-24 h-24 mb-8 rounded-full bg-[#00C076]/20 flex items-center justify-center text-[#00C076] border border-[#00C076]/40">
-                                    <CheckCircle size={40} />
+                                <div className="w-24 h-24 mb-8 rounded-full bg-[#00C076]/10 flex items-center justify-center text-[#00C076] border border-[#00C076]/30">
+                                    <Database size={40} />
                                 </div>
-                                <h2 className="text-2xl font-light tracking-widest uppercase mb-4 text-[#00C076]">Proof Accepted</h2>
-                                <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] leading-relaxed">
-                                    Node initialized with verified EIP-712 payload. Redirecting...
+                                <h2 className="text-2xl font-light tracking-widest uppercase mb-2 text-[#00C076]">Vault Secured</h2>
+                                <p className="text-[10px] text-white/50 font-mono mb-8 tracking-widest">
+                                    {generatedAddress}
+                                </p>
+                                <p className="text-[10px] text-white/50 uppercase tracking-[0.2em] leading-relaxed max-w-sm">
+                                    Your native connection is established. Redirecting to your institutional portfolio...
                                 </p>
                             </motion.div>
                         )}

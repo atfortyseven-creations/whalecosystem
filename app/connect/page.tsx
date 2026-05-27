@@ -47,16 +47,14 @@ function RealDeviceRouter() {
   }, [isConnected]);
 
   useEffect(() => {
-    // If already authenticated, redirect to root immediately  no connect needed.
-    // However, if there is a 'uuid' parameter, they are trying to link a desktop
-    // session, so we MUST stay on this page to let MobileLanding handle the sync.
+    // If already authenticated, redirect to the target destination immediately.
+    // Exception: if a 'uuid' parameter is present, the user is linking a desktop
+    // session from mobile — MUST stay on this page so MobileLanding handles the sync.
     const urlParams = new URLSearchParams(window.location.search);
     const hasUuid = urlParams.has('uuid');
 
-    //  Session detection: check both cookie AND localStorage 
-    // The cookie (system_handshake) expires in 7 days.
-    // The localStorage session (system_session_v2) lasts 30 days.
-    // If either is valid  user is already authenticated  go to landing page.
+    // Session detection: check both cookie AND localStorage.
+    // Cookie (system_handshake) expires in 7 days; localStorage session 30 days.
     const hasCookie = document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x'));
 
     let hasLocalSession = false;
@@ -70,27 +68,17 @@ function RealDeviceRouter() {
 
     const isAlreadyLinked = hasCookie || hasLocalSession;
     if (isAlreadyLinked && !hasUuid) {
-      // Redirect to the 'next' param if present, otherwise the connect/scanner page.
-      // NOTE: Goes to '/connect' so the user lands on the ConnectedScreen (scanner + info),
-      // NOT the landing page and NOT the dashboard directly.
-      const next = urlParams.get('next') || '/connect';
-      if (next !== window.location.pathname) {
-        window.location.replace(next);
-      } else {
-        // If we are already on the target page, we just determine the view.
-        const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
-        const isTouchDevice = (
-          'ontouchstart' in window ||
-          navigator.maxTouchPoints > 0 ||
-          // @ts-ignore
-          navigator.msMaxTouchPoints > 0
-        );
-        const isNarrowScreen = window.screen.width < 768;
-        setView(isUaMobile || (isTouchDevice && isNarrowScreen) ? 'mobile' : 'desktop');
-      }
+      // Authenticated: go to the 'next' param destination, or the dashboard.
+      // NEVER default back to /connect — that creates an infinite redirect loop.
+      const next = urlParams.get('next');
+      const destination = next && !next.startsWith('/connect') && !next.startsWith('/sign-up')
+        ? next
+        : '/dashboard';
+      window.location.replace(destination);
       return;
     }
 
+    // Not authenticated — determine device type and show appropriate connect UI.
     const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
     const isTouchDevice = (
       'ontouchstart' in window ||

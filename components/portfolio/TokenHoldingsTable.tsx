@@ -129,7 +129,7 @@ export function TokenHoldingsTable({ address, activeNetwork, scannerBase }: { ad
                             <div className="flex flex-col items-center justify-center text-center">
                                 <Database size={24} className="text-black/20 mb-3" />
                                 <p className="text-[10px] text-black/40 uppercase tracking-widest font-black mb-1">Zero Assets Detected</p>
-                                <p className="text-[9px] text-black/30 max-w-[200px]">The quantum scanner found no balance for the tracked major tokens.</p>
+                                <p className="text-[9px] text-black/30 max-w-[200px]">No balances detected for the monitored token list associated with this address.</p>
                             </div>
                         </td>
                     </tr>

@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
 import { RefreshCw, Search, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
@@ -437,7 +437,7 @@ export function GainersLosersPanel() {
                     {isLoading ? (
                         <div className="flex-1 flex flex-col items-center justify-center text-slate-400 h-full p-12">
                             <Loader2 className="animate-spin mb-4" size={36} />
-                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-[0.2em]">INITIALIZING LEDGER MATRIX</p>
+                            <p className="text-[12px] font-black text-slate-900 uppercase tracking-[0.2em]">INITIALIZING LEDGER INFRASTRUCTURE</p>
                             <p className="text-[10px] mt-2 tracking-widest opacity-60">Zero-Mock Protocol Enforced</p>
                         </div>
                     ) : error ? (

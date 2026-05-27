@@ -146,9 +146,9 @@ export default function QDsPage() {
         {/* Static Image  replaces buggy 3D Atom */}
         {mounted && (
           <div
-            className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center opacity-70 mix-blend-multiply"
+            className="absolute inset-0 z-0 pointer-events-none flex items-center justify-center"
           >
-            <img src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" alt="Core Atom" className="w-full h-full object-contain" />
+            {/* Logo removed per user request for pure white background */}
           </div>
         )}
 
@@ -279,11 +279,7 @@ export default function QDsPage() {
         style={{ height: 'clamp(340px, 45vh, 520px)' }}
       >
         <div className="absolute inset-0 flex items-center justify-center">
-          <img 
-            src="/system-shots/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg" 
-            alt="Core Atom" 
-            className="w-full h-full object-contain opacity-80 mix-blend-multiply"
-          />
+            {/* Logo removed per user request for pure white background */}
         </div>
         {/* Edge fades */}
         <div className="absolute inset-x-0 top-0 h-20 bg-gradient-to-b from-white to-transparent pointer-events-none z-10" />
