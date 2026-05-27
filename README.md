@@ -1,4 +1,7 @@
 # Whale Ecosystem powered by Humanity Ledger
+
+![Whale Ecosystem Aztec](public/system-shots/Devine-Lu-Linvega-monochrome-pixel-art-illustration-arch-2268374-wallhere.com.jpg)
+
 **Privacy-First Analytics & Encrypted Communications built natively on Aztec Network**
 
 The Whale Ecosystem is a comprehensive suite of on-chain analytics, real-time capital detection, and encrypted social coordination tools. By leveraging the Aztec Network's zero-knowledge rollup and Noir circuits, we have engineered a system where institutional-grade data ingestion meets absolute programmable privacy. 
