@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
@@ -145,6 +145,15 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
   const initInFlight = useRef(false);
   // Persistent known-peers set  survives across sync cycles (fixes mobile-to-mobile)
   const knownPeersRef = useRef<Set<string>>(new Set());
+  /**
+   * DEDUPLICATION ENGINE
+   * confirmedMsgIds: the single source of truth for all real XMTP message IDs.
+   * Once a real ID is registered here, no path (stream, poll, fetch) can insert it twice.
+   * optimisticContentMap: maps content string -> optimistic message ID so the stream
+   * can perform an atomic swap even if the XMTP echo ID differs from our local id.
+   */
+  const confirmedMsgIds = useRef<Set<string>>(new Set());
+  const optimisticContentMap = useRef<Map<string, string>>(new Map()); // content -> optimisticId
 
   // Detect physical device type (touch + narrow screen = mobile)
   useEffect(() => {
@@ -631,7 +640,16 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     syncGlobal();
     const globalPoll = setInterval(syncGlobal, 6000);
 
-    // Global Stream
+    // ─── GLOBAL XMTP STREAM ────────────────────────────────────────────────────
+    // DEDUPLICATION CONTRACT:
+    // 1. Every real XMTP message ID is registered in confirmedMsgIds on first sight.
+    // 2. If the ID is already registered → skip (absolute deduplication).
+    // 3. If the message is from SELF → look up the optimistic placeholder via
+    //    optimisticContentMap (content-keyed) and swap it atomically.
+    //    This prevents the "sender sees message twice" bug caused by XMTP echoing
+    //    the sender's own message back through the stream.
+    // 4. If no optimistic placeholder exists (e.g. opened in a second tab) →
+    //    insert normally, but only after confirming the ID is not already present.
     (async () => {
       try {
         const gen = streamMessages(client);
@@ -643,75 +661,100 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           const sentAtNs = nsToDate(msg.sentAtNs ?? msg.sentAt).getTime();
           const currentActivePeer = activePeerRef.current?.toLowerCase();
           const msgConvPeer = msg.conversation?.peerAddress?.toLowerCase() ?? '';
-          
-          const mappedMsg = {
-             id: msg.id ?? String(sentAtNs),
-             senderInboxId: msg.senderInboxId ?? '',
-             content: content || msg.fallback || 'Encrypted Data',
-             sentAtNs,
-             conversationId: msgConvPeer ? `dm-${msgConvPeer}` : `dm-${currentActivePeer}`
-          };
+          const realId = msg.id ?? `real-${sentAtNs}-${Math.random()}`;
 
-          // Filter out system messages (e.g. metadata field changes, inbox additions)
-          if (typeof mappedMsg.content === 'string' && mappedMsg.content.includes('initiatedByInboxId')) {
-             continue;
-          }
+          // Filter system metadata messages (XMTP internal group protocol frames)
+          if (typeof content === 'string' && content.includes('initiatedByInboxId')) continue;
+
+          // ── ABSOLUTE DEDUPLICATION GATE ──────────────────────────────────────
+          // If we have already processed this exact XMTP ID, skip unconditionally.
+          if (confirmedMsgIds.current.has(realId)) continue;
+          confirmedMsgIds.current.add(realId);
+          // ─────────────────────────────────────────────────────────────────────
+
+          const mappedMsg = {
+            id: realId,
+            senderInboxId: msg.senderInboxId ?? '',
+            content: content || msg.fallback || 'Encrypted Data',
+            sentAtNs,
+            conversationId: msgConvPeer ? `dm-${msgConvPeer}` : `dm-${currentActivePeer}`
+          };
 
           const belongsToActive = (msgConvPeer === currentActivePeer) || (!msgConvPeer && currentActivePeer);
 
           if (belongsToActive) {
-            // @ts-ignore
-            if (!isMobile && fromPeer && typeof playAudioPing === 'function' && soundEffects) playAudioPing('receive');
+            if (!isMobile && fromPeer) playAudioPing('receive');
+
             setMessages(prev => {
-              if (prev.some(m => m.id === mappedMsg.id)) return prev;
-              
+              // Guard: if real ID already in list (can happen on reconnect), skip
+              if (prev.some(m => m.id === realId)) return prev;
+
               if (!fromPeer) {
-                // Deduplicate own optimistic messages
-                const optIndex = prev.findIndex(m => m.id.startsWith('optimistic-') && m.content === mappedMsg.content);
-                if (optIndex !== -1) {
+                // ── OWN MESSAGE ECHO: atomic optimistic swap ──────────────────
+                // Strategy 1: look up by content key in optimisticContentMap
+                const knownOptId = optimisticContentMap.current.get(content);
+                if (knownOptId) {
+                  optimisticContentMap.current.delete(content); // consume the entry
+                  const idx = prev.findIndex(m => m.id === knownOptId);
+                  if (idx !== -1) {
+                    const next = [...prev];
+                    next[idx] = mappedMsg; // replace placeholder with confirmed msg
+                    return next.sort((a, b) => a.sentAtNs - b.sentAtNs);
+                  }
+                }
+                // Strategy 2: fallback — find any optimistic with identical content
+                // within a 10-second window (handles encoding edge cases)
+                const optIdx = prev.findIndex(
+                  m => m.id.startsWith('optimistic-') &&
+                       m.content === content &&
+                       Math.abs(m.sentAtNs - sentAtNs) < 10_000
+                );
+                if (optIdx !== -1) {
                   const next = [...prev];
-                  next[optIndex] = mappedMsg;
+                  next[optIdx] = mappedMsg;
                   return next.sort((a, b) => a.sentAtNs - b.sentAtNs);
                 }
+                // Strategy 3: no optimistic found (e.g. second tab) — insert if not duplicate
+                return [...prev, mappedMsg].sort((a, b) => a.sentAtNs - b.sentAtNs);
               }
-              
+
+              // ── PEER MESSAGE: straightforward insert ──────────────────────────
               return [...prev, mappedMsg].sort((a, b) => a.sentAtNs - b.sentAtNs);
             });
-            
-            // Update last message in conv list
+
+            // Update conversation preview
             setConversations(prev => {
-                const updated = prev.map(c => 
-                  c.peerAddress.toLowerCase() === currentActivePeer 
-                    ? { ...c, lastMessage: content.slice(0, 30), lastAt: new Date() } 
-                    : c
-                );
-                persistToLocal(updated);
-                return updated;
+              const updated = prev.map(c =>
+                c.peerAddress.toLowerCase() === currentActivePeer
+                  ? { ...c, lastMessage: content.slice(0, 30), lastAt: new Date() }
+                  : c
+              );
+              persistToLocal(updated);
+              return updated;
             });
           } else if (fromPeer) {
-            // Belongs to another conversation
+            // Belongs to a different (background) conversation
             setConversations(prev => {
-               if (!msgConvPeer) return prev;
-               const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
-               let updated;
-               if (exists) {
-                 updated = prev.map(c => 
-                   c.peerAddress.toLowerCase() === msgConvPeer 
-                     ? { ...c, lastMessage: content.slice(0, 30), lastAt: new Date() } 
-                     : c
-                 );
-               } else {
-                 updated = [{
-                    peerAddress: msg.conversation.peerAddress,
-                    lastMessage: content.slice(0, 30),
-                    lastAt: new Date()
-                 }, ...prev];
-               }
-               persistToLocal(updated);
-               return updated;
+              if (!msgConvPeer) return prev;
+              const exists = prev.some(c => c.peerAddress.toLowerCase() === msgConvPeer);
+              let updated;
+              if (exists) {
+                updated = prev.map(c =>
+                  c.peerAddress.toLowerCase() === msgConvPeer
+                    ? { ...c, lastMessage: content.slice(0, 30), lastAt: new Date() }
+                    : c
+                );
+              } else {
+                updated = [{
+                  peerAddress: msg.conversation.peerAddress,
+                  lastMessage: content.slice(0, 30),
+                  lastAt: new Date()
+                }, ...prev];
+              }
+              persistToLocal(updated);
+              return updated;
             });
-            // @ts-ignore
-            if (!isMobile && typeof playAudioPing === 'function') playAudioPing('receive');
+            playAudioPing('receive');
           }
         }
       } catch (e) {
@@ -778,14 +821,30 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
           }))
           .filter((m: any) => !(typeof m.content === 'string' && m.content.includes('initiatedByInboxId')));
         
+        // ── POLL MERGE WITH FULL DEDUPLICATION ───────────────────────────────
+        // Register all newly fetched real IDs in confirmedMsgIds so the stream
+        // cannot double-insert them when the echo arrives after the poll.
+        mappedMsgs.forEach((m: any) => confirmedMsgIds.current.add(m.id));
+        pendingServer.forEach((p: any) => confirmedMsgIds.current.add(p.id));
+
         setMessages(prev => {
           const activeId = `dm-${activePeer.toLowerCase()}`;
           const others = prev.filter(p => p.conversationId !== activeId);
           
-          // Merge with optimistic local messages safely
           const mappedIds = new Set(mappedMsgs.map((m: any) => m.id));
-          const pendingIds = new Set(pendingServer.map(p => p.id));
-          const optimistic = prev.filter(m => m.conversationId === activeId && m.id.startsWith('optimistic-') && !mappedIds.has(m.id) && !pendingIds.has(m.id));
+          const pendingIds = new Set(pendingServer.map((p: any) => p.id));
+
+          // Preserve ONLY optimistic messages whose content does NOT match any
+          // already-confirmed real message. This is the critical guard that
+          // prevents stale optimistics from appearing alongside their confirmed twins.
+          const optimistic = prev.filter(m => {
+            if (m.conversationId !== activeId) return false;
+            if (!m.id.startsWith('optimistic-')) return false;
+            // If a confirmed message exists with identical content, drop optimistic
+            const alreadyConfirmed = mappedMsgs.some((r: any) => r.content === m.content) ||
+                                     pendingServer.some((p: any) => p.content === m.content);
+            return !alreadyConfirmed;
+          });
           
           return [...others, ...mappedMsgs, ...pendingServer, ...optimistic].sort((a, b) => a.sentAtNs - b.sentAtNs);
         });
@@ -874,52 +933,59 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         localStorage.removeItem(`whale_draft_${address.toLowerCase()}_${activePeer.toLowerCase()}`);
     }
 
+    const optimisticId = `optimistic-${Date.now()}`;
+
     try {
-      //  1. REAL ON-CHAIN DECENTRALIZED TRANSMISSION 
-        // Optimistic local message so the sender sees it immediately
-        const optimisticId = `optimistic-${Date.now()}`;
-        const optimisticMsg = {
-          id: optimisticId,
-          senderInboxId: client?.inboxId || '',
-          content: content,
-          sentAtNs: Date.now(),
-          conversationId: `dm-${activePeer.toLowerCase()}`
-        };
-        setMessages(prev => [...prev, optimisticMsg].sort((a, b) => a.sentAtNs - b.sentAtNs));
+      // ─── OPTIMISTIC INSERT ────────────────────────────────────────────────────
+      // Register the content in the map BEFORE inserting, so the stream echo
+      // can find and replace this optimistic message atomically when it arrives.
+      optimisticContentMap.current.set(content, optimisticId);
 
-        //  FIX: Clear typing indicator immediately
-        stopTypingSignal();
+      const optimisticMsg = {
+        id: optimisticId,
+        senderInboxId: client?.inboxId || '',
+        content: content,
+        sentAtNs: Date.now(),
+        conversationId: `dm-${activePeer.toLowerCase()}`
+      };
+      setMessages(prev => [...prev, optimisticMsg].sort((a, b) => a.sentAtNs - b.sentAtNs));
 
-        // @ts-ignore
-        if (!isMobile && typeof playAudioPing === 'function' && soundEffects) playAudioPing('send');
-        
-        let canMsg = canReceiveCache.current.get(activePeer.toLowerCase());
-        if (canMsg !== true) {
-          canMsg = await canReceiveMessages(client, activePeer);
-          if (canMsg) canReceiveCache.current.set(activePeer.toLowerCase(), true);
-        }
+      // Clear typing indicator immediately
+      stopTypingSignal();
 
-        if (canMsg) {
-           await sendMessage(client, activePeer, content);
-        } else {
-           // QUEUE TO SERVER FOR UNREGISTERED WALLET
-           await fetch('/api/chat/pending', {
-             method: 'POST',
-             headers: { 'Content-Type': 'application/json' },
-             body: JSON.stringify({ sender: address, recipient: activePeer, content })
-           });
-        }
+      // @ts-ignore
+      if (!isMobile && typeof playAudioPing === 'function' && soundEffects) playAudioPing('send');
+      
+      let canMsg = canReceiveCache.current.get(activePeer.toLowerCase());
+      if (canMsg !== true) {
+        canMsg = await canReceiveMessages(client, activePeer);
+        if (canMsg) canReceiveCache.current.set(activePeer.toLowerCase(), true);
+      }
 
-        //  2. UPDATE LOCAL ADDRESS BOOK 
-        setConversations(prev => {
-          const updated = prev.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
-            ? prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
-            : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...prev];
-          persistToLocal(updated);
-          return updated;
+      if (canMsg) {
+        await sendMessage(client, activePeer, content);
+      } else {
+        // QUEUE TO SERVER FOR UNREGISTERED WALLET
+        await fetch('/api/chat/pending', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ sender: address, recipient: activePeer, content })
         });
+      }
+
+      // UPDATE LOCAL ADDRESS BOOK
+      setConversations(prev => {
+        const updated = prev.find(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase())
+          ? prev.map(c => c.peerAddress.toLowerCase() === activePeer.toLowerCase() ? { ...c, lastMessage: content, lastAt: new Date() } : c)
+          : [{ peerAddress: activePeer, lastMessage: content, lastAt: new Date() }, ...prev];
+        persistToLocal(updated);
+        return updated;
+      });
 
     } catch (err) {
+      // On failure, remove the optimistic message and clean up the map
+      optimisticContentMap.current.delete(content);
+      setMessages(prev => prev.filter(m => m.id !== optimisticId));
       console.error('[Chat] executeSend failed:', err);
     } finally {
       setSending(false);
