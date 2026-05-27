@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
@@ -81,11 +81,17 @@ export default function CategoryPage() {
             </div>
           ) : category.topics.map((topic: any, i: number) => {
             const lastActivity = topic.updatedAt || topic.createdAt;
-            const activityText = formatDistanceToNowStrict(new Date(lastActivity), { addSuffix: false })
-              .replace(' minutes', 'm').replace(' minute', 'm')
-              .replace(' hours', 'h').replace(' hour', 'h')
-              .replace(' days', 'd').replace(' day', 'd')
-              .replace(' months', 'mo').replace(' month', 'mo');
+            const parsedDate = lastActivity ? new Date(lastActivity) : null;
+            const isValidDate = parsedDate && !isNaN(parsedDate.getTime());
+            
+            const activityText = isValidDate
+              ? formatDistanceToNowStrict(parsedDate!, { addSuffix: false })
+                  .replace(' minutes', 'm').replace(' minute', 'm')
+                  .replace(' hours', 'h').replace(' hour', 'h')
+                  .replace(' days', 'd').replace(' day', 'd')
+                  .replace(' months', 'mo').replace(' month', 'mo')
+              : '';
+              
             const initials = (topic.author?.walletAddress?.slice(2, 4) || '??').toUpperCase();
 
             return (

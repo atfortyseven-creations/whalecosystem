@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from 'react';
 import { useParams, useRouter, useSearchParams } from 'next/navigation';
@@ -101,12 +101,12 @@ export default function UserProfilePage() {
         </div>
 
         {/* Main Tabs */}
-        <div className="flex items-center w-full border-b border-slate-200 mb-0">
+        <div className="flex items-center w-full border-b border-slate-200 mb-0 overflow-x-auto no-scrollbar">
           {TABS.map(t => (
             <button
               key={t.id}
               onClick={() => setTab(t.id)}
-              className={`flex items-center gap-2 px-6 py-4 text-[14px] font-medium transition-colors border-b-[3px] relative top-[1px] ${
+              className={`flex items-center gap-2 px-6 py-4 text-[14px] font-medium transition-colors border-b-[3px] relative top-[1px] whitespace-nowrap ${
                 rawTab === t.id 
                   ? 'border-[#0088cc] text-[#0088cc]' 
                   : 'border-transparent text-slate-600 hover:text-slate-900'
