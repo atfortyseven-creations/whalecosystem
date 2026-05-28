@@ -25,7 +25,6 @@ const PRODUCT_LINKS = [
 
 const COMPANY_LINKS = [
   { label: "About", href: "/company" },
-  { label: "Careers", href: "/careers" },
   { label: "Security", href: "/security" },
   { label: "Blog", href: "/blog" },
 ];
@@ -624,7 +623,7 @@ function GlobalRegistrySection() {
 
         {/* Real map */}
         <div style={{ aspectRatio: "21/9" }}>
-          <RealWorldMap totalFlows={totalFlows} />
+          <RealWorldMap />
         </div>
 
       </div>

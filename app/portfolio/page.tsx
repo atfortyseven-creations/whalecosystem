@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { CoreAuthGate } from '@/components/auth/CoreAuthGate';
-import { GalacticDashboard } from '@/components/dashboard/GalacticDashboard';
+import { InstitutionalPortfolioView } from '@/components/bsv/InstitutionalPortfolioView';
 import { UnlockVaultScreen } from '@/components/security/UnlockVaultScreen';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import Link from 'next/link';
@@ -46,6 +46,6 @@ export default function PortfolioPage() {
     );
   }
 
-  // Render the highly complex Galactic Dashboard
-  return <GalacticDashboard />;
+  // The new minimalist black and white Quantum design requested by the user
+  return <InstitutionalPortfolioView />;
 }

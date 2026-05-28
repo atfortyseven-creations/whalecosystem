@@ -7,10 +7,19 @@ import {
   RefreshCcw, Settings, Key, LogOut, Copy, ExternalLink, 
   ArrowDownToLine, ArrowRightLeft, Route, Send, Download, ScanLine,
   Shield, CheckCircle2, Zap, Blocks, Network, ActivitySquare,
-  Wallet, PieChart, Clock
+  Wallet, PieChart, Clock, X
 } from 'lucide-react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { toast } from 'sonner';
+
+// Import all real functional modals
+import ReceiveHub from '@/components/wallet/ReceiveHub';
+import QRScannerModal from '@/components/wallet/QRScannerModal';
+import UniversalSendModal from '@/components/wallet/UniversalSendModal';
+import SwapModal from '@/components/wallet/SwapModal';
+import FiatOnRamp from '@/components/wallet/FiatOnRamp';
+import SecurityVault from '@/components/wallet/SecurityVault';
+import SettingsPanel from '@/components/wallet/SettingsPanel';
 
 // Custom Polygon RPC for direct on-chain reads
 const POLYGON_RPC = "https://polygon-rpc.com";
@@ -34,6 +43,20 @@ interface ActivityEvent {
   status: 'confirmed' | 'pending' | 'failed';
 }
 
+const GenericModal = ({ title, onClose, children }: { title: string, onClose: () => void, children: React.ReactNode }) => (
+  <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in" onClick={onClose}>
+    <div className="w-full max-w-4xl bg-[#050505] rounded-[40px] shadow-[0_0_80px_-20px_rgba(168,85,247,0.3)] border border-white/10 max-h-[90vh] flex flex-col" onClick={e => e.stopPropagation()}>
+      <div className="p-4 flex justify-between items-center border-b border-white/5 shrink-0 bg-[#0A0A0A] rounded-t-[40px]">
+        <h2 className="text-xl font-bold ml-4 text-white tracking-widest uppercase">{title}</h2>
+        <button onClick={onClose} className="p-2 rounded-full hover:bg-white/10 transition-colors"><X size={20} className="text-white/60" /></button>
+      </div>
+      <div className="overflow-y-auto p-6 custom-scrollbar bg-[#050505] rounded-b-[40px] text-white">
+        {children}
+      </div>
+    </div>
+  </div>
+);
+
 export function GalacticDashboard() {
   const { address, disconnect } = useSystemAccount();
   const [activeTab, setActiveTab] = useState<'TOKENS' | 'DEFI' | 'ACTIVITY'>('TOKENS');
@@ -42,6 +65,15 @@ export function GalacticDashboard() {
   const [maticPrice, setMaticPrice] = useState<number>(0);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [blockNumber, setBlockNumber] = useState<number>(0);
+
+  // Functional Modal States
+  const [showSend, setShowSend] = useState(false);
+  const [showSwap, setShowSwap] = useState(false);
+  const [showReceive, setShowReceive] = useState(false);
+  const [showDeposit, setShowDeposit] = useState(false);
+  const [showScanner, setShowScanner] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
+  const [showVault, setShowVault] = useState(false);
 
   // Simulated token list for UI demonstration of complexity
   const mockTokens: TokenInfo[] = [
@@ -111,6 +143,22 @@ export function GalacticDashboard() {
     return `${addr.slice(0, 10)}...${addr.slice(-8)}`;
   };
 
+  // Centralized Action Handler
+  const handleAction = (label: string) => {
+    if (label === 'Send') setShowSend(true);
+    else if (label === 'Swap') setShowSwap(true);
+    else if (label === 'Receive') setShowReceive(true);
+    else if (label === 'Deposit') setShowDeposit(true);
+    else if (label === 'Scan') setShowScanner(true);
+    else if (label === 'Settings') setShowSettings(true);
+    else if (label === 'Vault Manager') setShowVault(true);
+    else if (label === 'Bridge') {
+      toast.success('Bridge functionality integrates seamlessly via Smart Swap routes.');
+      setShowSwap(true);
+    }
+    else toast.info(`${label} functionality coming soon`);
+  };
+
   return (
     <div className="w-full h-screen bg-[#050505] text-white flex overflow-hidden font-sans selection:bg-white/20">
       
@@ -147,11 +195,11 @@ export function GalacticDashboard() {
             <RefreshCcw size={16} className={`text-white/70 ${isRefreshing ? 'animate-spin' : ''}`} />
             <span className="text-[9px] font-black uppercase tracking-widest text-white/70">Refresh</span>
           </button>
-          <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+          <button onClick={() => handleAction('Settings')} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
             <Settings size={16} className="text-white/70" />
             <span className="text-[9px] font-black uppercase tracking-widest text-white/70">Settings</span>
           </button>
-          <button className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
+          <button onClick={() => handleAction('Vault Manager')} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-colors border border-white/5">
             <Key size={16} className="text-white/70" />
             <span className="text-[9px] font-black uppercase tracking-widest text-white/70">Vault Manager</span>
           </button>
@@ -272,11 +320,11 @@ export function GalacticDashboard() {
               { icon: Download, label: 'Receive' },
               { icon: ScanLine, label: 'Scan' },
             ].map((action, i) => (
-              <button key={i} className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.06] hover:scale-[1.02] transition-all group">
-                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-white/10 transition-colors">
-                  <action.icon size={18} className="text-white/70 group-hover:text-white" />
+              <button key={i} onClick={() => handleAction(action.label)} className="flex flex-col items-center justify-center gap-3 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:bg-white/[0.06] hover:border-purple-500/30 hover:scale-[1.02] transition-all group">
+                <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                  <action.icon size={18} className="text-white/70 group-hover:text-purple-400" />
                 </div>
-                <span className="text-[10px] font-bold uppercase tracking-widest text-white/70 group-hover:text-white">{action.label}</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-white/70 group-hover:text-purple-400">{action.label}</span>
               </button>
             ))}
           </div>
@@ -382,6 +430,64 @@ export function GalacticDashboard() {
 
         </div>
       </div>
+
+      {/* RENDER ON-CHAIN FUNCTIONALITY MODALS */}
+      <UniversalSendModal isOpen={showSend} onClose={() => setShowSend(false)} />
+      
+      {/* 
+        Swap Modal is natively dark now, but if the old SwapModal was causing issues,
+        the newly rewritten SwapModal handles dark mode gracefully. 
+      */}
+      <SwapModal isOpen={showSwap} onClose={() => setShowSwap(false)} />
+
+      {/* Embedded components inside elegant generic wrappers */}
+      <AnimatePresence>
+        {showDeposit && (
+          <GenericModal title="Deposit Assets" onClose={() => setShowDeposit(false)}>
+            <FiatOnRamp />
+          </GenericModal>
+        )}
+        {showVault && (
+          <GenericModal title="Security Vault" onClose={() => setShowVault(false)}>
+            <SecurityVault />
+          </GenericModal>
+        )}
+        {showSettings && (
+          <GenericModal title="System Settings" onClose={() => setShowSettings(false)}>
+            <SettingsPanel />
+          </GenericModal>
+        )}
+      </AnimatePresence>
+
+      {/* Standalone Modals */}
+      {showReceive && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-md p-4 animate-in fade-in" onClick={() => setShowReceive(false)}>
+          <div className="w-full max-w-4xl bg-[#050505] rounded-[40px] border border-white/10 shadow-[0_0_80px_-20px_rgba(168,85,247,0.3)] overflow-hidden" onClick={e => e.stopPropagation()}>
+            <div className="p-4 flex justify-between items-center border-b border-white/5 bg-[#0A0A0A]">
+              <h2 className="text-xl font-bold ml-4 text-white tracking-widest uppercase">Receive Assets</h2>
+              <button onClick={() => setShowReceive(false)} className="p-2 rounded-full hover:bg-white/10 transition-colors"><X size={20} className="text-white/60" /></button>
+            </div>
+            {/* 
+              ReceiveHub naturally adapts or works well in a dark wrapper, 
+              assuming its internal classes are agnostic or overridden by the parent. 
+            */}
+            <ReceiveHub addresses={[
+                { network: 'Polygon', address: address || '', token: 'MATIC', chainId: 137 }
+            ]} />
+          </div>
+        </div>
+      )}
+
+      <QRScannerModal 
+        isOpen={showScanner} 
+        onClose={() => setShowScanner(false)}
+        onScan={(data) => {
+            console.log("Scanned:", data);
+            toast.success(`Scanned: ${data}`);
+            setShowScanner(false);
+        }}
+      />
+
     </div>
   );
 }

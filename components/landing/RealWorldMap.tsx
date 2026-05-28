@@ -181,8 +181,8 @@ export const RealWorldMap = memo(function RealWorldMap({
         >
           <ZoomableGroup zoom={1}>
             <Geographies geography={GEO_URL}>
-              {({ geographies }) =>
-                geographies.map((geo) => {
+              {({ geographies }: { geographies: any[] }) =>
+                geographies.map((geo: any) => {
                   const name: string = geo.properties?.name ?? "";
                   const count = countryData[name] ?? 0;
                   const tier = getLevel(count);
@@ -192,8 +192,8 @@ export const RealWorldMap = memo(function RealWorldMap({
                     <Geography
                       key={geo.rsmKey}
                       geography={geo}
-                      onMouseMove={(evt) => handleMouseMove(geo, evt as any)}
-                      onTouchStart={(evt) => handleMouseMove(geo, evt as any)}
+                      onMouseMove={(evt: any) => handleMouseMove(geo, evt)}
+                      onTouchStart={(evt: any) => handleMouseMove(geo, evt)}
                       onMouseLeave={handleMouseLeave}
                       onTouchEnd={handleMouseLeave}
                       style={{

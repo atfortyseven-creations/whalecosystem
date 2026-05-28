@@ -558,17 +558,6 @@ function ConnectedScreen({
             <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Learn</span>
           </Link>
 
-          {/* Careers */}
-          <Link
-            href="/careers"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <Briefcase size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <span className="text-[14px] font-medium text-black">Careers</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Join</span>
-          </Link>
 
           {/* Status */}
           <Link

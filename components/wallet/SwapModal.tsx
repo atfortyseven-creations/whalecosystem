@@ -1,238 +1,412 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowDown, Settings, Loader2, RefreshCw, Zap, Sparkles, Route } from "lucide-react";
-import { useAccount, useBalance, useWriteContract, useChainId } from "wagmi";
-import { parseUnits, formatUnits } from "viem";
-import { useEliteSwap } from "@/hooks/useEliteSwap";
+import {
+  X, ArrowDown, Loader2, Zap, CheckCircle2, AlertCircle,
+  ExternalLink, RefreshCw, ChevronDown, Copy
+} from "lucide-react";
+import { useAccount, useWalletClient, usePublicClient, useChainId } from "wagmi";
+import { formatUnits, parseUnits } from "viem";
+import { ethers } from "ethers";
 import { toast } from "sonner";
-
-// Constants for Intent Solver
-const TOKENS = [
-    { symbol: "ETH", name: "Ethereum", icon: "https://cryptologos.cc/logos/ethereum-eth-logo.png", chain: "Ethereum", color: "bg-blue-600" },
-    { symbol: "USDC", name: "USD Coin", icon: "https://cryptologos.cc/logos/usd-coin-usdc-logo.png", chain: "Polygon", color: "bg-blue-500" },
-    { symbol: "MATIC", name: "Polygon", icon: "https://cryptologos.cc/logos/polygon-matic-logo.png", chain: "Polygon", color: "bg-purple-600" },
-    { symbol: "BTC", name: "Bitcoin", icon: "https://cryptologos.cc/logos/bitcoin-btc-logo.png", chain: "Bitcoin", color: "bg-orange-500" },
-];
+import { useWalletStore } from "@/lib/store/wallet-store";
 
 interface SwapModalProps {
-    isOpen: boolean;
-    onClose: () => void;
+  isOpen: boolean;
+  onClose: () => void;
 }
+
+const SUPPORTED_TOKENS = [
+  { symbol: "ETH", name: "Ethereum", icon: "⟠", chain: 1, address: "0x0000000000000000000000000000000000000000", decimals: 18 },
+  { symbol: "MATIC", name: "Polygon", icon: "⬡", chain: 137, address: "0x0000000000000000000000000000000000000000", decimals: 18 },
+  { symbol: "USDC", name: "USD Coin", icon: "$", chain: 137, address: "0x3c499c542cef5e3811e1192ce70d8cc03d5c3359", decimals: 6 },
+  { symbol: "USDT", name: "Tether", icon: "₮", chain: 137, address: "0xc2132d05d31c914a87c6611c10748aeb04b58e8f", decimals: 6 },
+  { symbol: "WETH", name: "Wrapped ETH", icon: "🔷", chain: 1, address: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", decimals: 18 },
+];
+
+type SwapStatus = "IDLE" | "QUOTING" | "SIGNING" | "BROADCASTING" | "SUCCESS" | "ERROR";
 
 export default function SwapModal({ isOpen, onClose }: SwapModalProps) {
-    const { address, isConnected } = useAccount();
-    const chainId = useChainId();
-    const { executeSwap, loading: swapLoading, error: swapError, status: swapStatus } = useEliteSwap();
-    const [payAmount, setPayAmount] = useState("");
-    const [receiveAmount, setReceiveAmount] = useState("");
-    
-    // Intent State
-    const [payToken, setPayToken] = useState(TOKENS[0]); // Default ETH
-    const [receiveToken, setReceiveToken] = useState(TOKENS[1]); // Default USDC
-    const [route, setRoute] = useState<string | null>(null);
+  const wagmi = useAccount();
+  const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
+  const chainId = useChainId();
+  const store = useWalletStore();
 
-    // Real Quote Logic
-    useEffect(() => {
-        if (!payAmount || parseFloat(payAmount) <= 0) {
-            setReceiveAmount("");
-            setRoute(null);
-            return;
-        }
+  const isWagmiConnected = wagmi.isConnected;
+  const isSystemWallet = !!store.privateKey && !!store.address;
+  const activeAddress = isWagmiConnected ? wagmi.address : store.address;
+  const hasWallet = isWagmiConnected || isSystemWallet;
 
-        if (payToken.symbol === receiveToken.symbol) {
-            setReceiveAmount(payAmount);
-            setRoute("Identical token selected");
-            return;
-        }
+  const [fromToken, setFromToken] = useState(SUPPORTED_TOKENS[0]);
+  const [toToken, setToToken] = useState(SUPPORTED_TOKENS[2]);
+  const [fromAmount, setFromAmount] = useState("");
+  const [toAmount, setToAmount] = useState("");
+  const [status, setStatus] = useState<SwapStatus>("IDLE");
+  const [txHash, setTxHash] = useState("");
+  const [errorMsg, setErrorMsg] = useState("");
+  const [quoteData, setQuoteData] = useState<any>(null);
+  const [showFromDropdown, setShowFromDropdown] = useState(false);
+  const [showToDropdown, setShowToDropdown] = useState(false);
+  const [slippage, setSlippage] = useState(0.5);
 
-        const fetchQuote = async () => {
-            try {
-                // LiFi expects amount in base units (e.g., wei)
-                // For simplicity, we'll assume 18 decimals for the input for now, 
-                // but real implementation would fetch decimals.
-                const amountBase = parseUnits(payAmount, 18).toString();
-                
-                const res = await fetch(`https://li.quest/v1/quote?fromChain=${chainId}&toChain=${chainId}&fromToken=${payToken.symbol}&toToken=${receiveToken.symbol}&fromAmount=${amountBase}&fromAddress=${address || '0x0000000000000000000000000000000000000000'}`);
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    setReceiveAmount(formatUnits(BigInt(data.estimate.toAmount), data.action.toToken.decimals));
-                    setRoute(`Best Route: ${data.transactionRequest.to.slice(0, 10)}... via ${data.tool}`);
-                }
-            } catch (e) {
-                console.error("Quote fetch failed", e);
-            }
-        };
+  // Reset on close
+  useEffect(() => {
+    if (!isOpen) {
+      setStatus("IDLE");
+      setFromAmount("");
+      setToAmount("");
+      setTxHash("");
+      setErrorMsg("");
+      setQuoteData(null);
+    }
+  }, [isOpen]);
 
-        const timer = setTimeout(fetchQuote, 500);
-        return () => clearTimeout(timer);
-    }, [payAmount, payToken, receiveToken, chainId, address]);
+  const fetchQuote = useCallback(async () => {
+    if (!fromAmount || parseFloat(fromAmount) <= 0 || !activeAddress) return;
+    if (fromToken.symbol === toToken.symbol) {
+      setToAmount(fromAmount);
+      return;
+    }
+    setStatus("QUOTING");
+    try {
+      const amountInWei = parseUnits(fromAmount, fromToken.decimals).toString();
+      const res = await fetch(
+        `https://li.quest/v1/quote?fromChain=${chainId}&toChain=${chainId}&fromToken=${fromToken.address}&toToken=${toToken.address}&fromAmount=${amountInWei}&fromAddress=${activeAddress}`
+      );
+      if (!res.ok) throw new Error("Could not fetch quote");
+      const data = await res.json();
+      const estimatedOut = formatUnits(BigInt(data.estimate.toAmount), data.action.toToken.decimals);
+      setToAmount(parseFloat(estimatedOut).toFixed(6));
+      setQuoteData(data);
+      setStatus("IDLE");
+    } catch (e) {
+      setToAmount("");
+      setQuoteData(null);
+      setStatus("IDLE");
+    }
+  }, [fromAmount, fromToken, toToken, chainId, activeAddress]);
 
+  useEffect(() => {
+    const t = setTimeout(fetchQuote, 600);
+    return () => clearTimeout(t);
+  }, [fetchQuote]);
 
-    const handleSwap = async () => {
-        if (!address) {
-            toast.error("Please connect your wallet first");
-            return;
-        }
+  const flipTokens = () => {
+    setFromToken(toToken);
+    setToToken(fromToken);
+    setFromAmount(toAmount);
+    setToAmount("");
+    setQuoteData(null);
+  };
 
-        toast.promise(
-            executeSwap({
-                fromChain: chainId,
-                toChain: chainId,
-                fromToken: payToken.symbol,
-                toToken: receiveToken.symbol,
-                fromAmount: parseUnits(payAmount, 18).toString()
-            }),
-            {
-                loading: 'Signing and executing swap...',
-                success: (hash) => {
-                    setTimeout(onClose, 2000);
-                    return `Swap successful! Hash: ${hash.slice(0, 10)}...`;
-                },
-                error: (err) => `Swap failed: ${err.message || 'Unknown error'}`,
-            }
-        );
+  const getExplorerUrl = () => {
+    const ex: Record<number, string> = {
+      1: "https://etherscan.io/tx/",
+      137: "https://polygonscan.com/tx/",
+      8453: "https://basescan.org/tx/",
     };
+    return (ex[chainId] || "https://polygonscan.com/tx/") + txHash;
+  };
 
-    return (
-        <AnimatePresence>
-            {isOpen && (
-                <>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="fixed inset-0 z-[60] bg-black/60 backdrop-blur-md"
-                    />
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.95, y: 20 }}
-                        className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4"
+  const executeSwap = async () => {
+    if (!quoteData) { toast.error("No route found. Please try again."); return; }
+    if (!hasWallet) { toast.error("Connect a wallet first"); return; }
+
+    const { transactionRequest } = quoteData;
+    setStatus("SIGNING");
+
+    try {
+      let hash = "";
+
+      if (isWagmiConnected && walletClient) {
+        // MetaMask / WalletConnect flow
+        hash = await walletClient.sendTransaction({
+          to: transactionRequest.to as `0x${string}`,
+          data: transactionRequest.data as `0x${string}`,
+          value: BigInt(transactionRequest.value || "0"),
+          gas: transactionRequest.gasLimit ? BigInt(transactionRequest.gasLimit) : undefined,
+        });
+        setStatus("BROADCASTING");
+        if (publicClient) await publicClient.waitForTransactionReceipt({ hash: hash as `0x${string}` });
+      } else if (isSystemWallet && store.privateKey) {
+        // System wallet flow
+        const rpc = store.activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com";
+        const provider = new ethers.JsonRpcProvider(rpc);
+        const wallet = new ethers.Wallet(store.privateKey, provider);
+        setStatus("BROADCASTING");
+        const tx = await wallet.sendTransaction({
+          to: transactionRequest.to,
+          data: transactionRequest.data,
+          value: BigInt(transactionRequest.value || "0"),
+        });
+        hash = tx.hash;
+        await tx.wait(1);
+        store.updateBalance();
+      }
+
+      setTxHash(hash);
+      setStatus("SUCCESS");
+    } catch (err: any) {
+      setStatus("ERROR");
+      setErrorMsg(err?.message?.split("\n")[0] || "Swap failed");
+    }
+  };
+
+  const isProcessing = status === "SIGNING" || status === "BROADCASTING" || status === "QUOTING";
+
+  if (!isOpen) return null;
+
+  const TokenDropdown = ({
+    tokens, selected, onSelect, show, onToggle
+  }: { tokens: typeof SUPPORTED_TOKENS, selected: typeof SUPPORTED_TOKENS[0], onSelect: (t: any) => void, show: boolean, onToggle: () => void }) => (
+    <div className="relative">
+      <button
+        onClick={onToggle}
+        className="flex items-center gap-2 bg-white border border-gray-200 hover:border-gray-300 rounded-xl px-3 py-2 transition-all shrink-0"
+      >
+        <span className="text-base">{selected.icon}</span>
+        <span className="font-black text-sm text-gray-900">{selected.symbol}</span>
+        <ChevronDown size={12} className={`text-gray-400 transition-transform ${show ? "rotate-180" : ""}`} />
+      </button>
+      <AnimatePresence>
+        {show && (
+          <motion.div
+            initial={{ opacity: 0, y: -8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            className="absolute top-full right-0 mt-2 w-44 bg-white border border-gray-200 rounded-xl shadow-xl z-50 overflow-hidden"
+          >
+            {tokens.map((t, i) => (
+              <button key={i}
+                onClick={() => { onSelect(t); }}
+                className="w-full flex items-center gap-3 px-3 py-2.5 hover:bg-gray-50 transition-colors text-left"
+              >
+                <span className="text-base">{t.icon}</span>
+                <div>
+                  <div className="font-bold text-sm text-gray-900">{t.symbol}</div>
+                  <div className="text-[10px] text-gray-400">{t.name}</div>
+                </div>
+              </button>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+
+  return (
+    <AnimatePresence>
+      <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+        onClick={onClose} className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm" />
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.96, y: 16 }}
+        transition={{ type: "spring", stiffness: 400, damping: 30 }}
+        className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4"
+      >
+        <div className="w-full max-w-md pointer-events-auto bg-white border border-gray-200 rounded-[28px] shadow-2xl overflow-hidden">
+
+          {/* Header */}
+          <div className="flex items-center justify-between p-5 border-b border-gray-100">
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-indigo-100 flex items-center justify-center">
+                <Zap size={16} className="text-indigo-600" />
+              </div>
+              <div>
+                <h2 className="text-base font-black text-gray-900 uppercase tracking-wide">Smart Swap</h2>
+                <p className="text-[10px] text-gray-400 font-medium uppercase tracking-widest">
+                  Powered by LI.FI — Best Route
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <button onClick={fetchQuote} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors" title="Refresh Quote">
+                <RefreshCw size={13} className={`text-gray-400 ${status === "QUOTING" ? "animate-spin" : ""}`} />
+              </button>
+              <button onClick={onClose} className="p-2 hover:bg-gray-100 rounded-xl transition-colors">
+                <X size={18} className="text-gray-500" />
+              </button>
+            </div>
+          </div>
+
+          {/* No Wallet */}
+          {!hasWallet && (
+            <div className="p-8 text-center">
+              <div className="w-16 h-16 rounded-full bg-orange-50 border border-orange-100 flex items-center justify-center mx-auto mb-4 text-2xl">💼</div>
+              <h3 className="font-black text-gray-900 text-lg mb-2">Wallet Not Connected</h3>
+              <p className="text-sm text-gray-500">Please connect MetaMask or unlock your System Wallet to swap.</p>
+            </div>
+          )}
+
+          {/* SUCCESS */}
+          {status === "SUCCESS" && (
+            <div className="p-8 text-center space-y-4">
+              <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}
+                className="w-16 h-16 rounded-full bg-green-50 border-2 border-green-200 flex items-center justify-center mx-auto">
+                <CheckCircle2 size={32} className="text-green-500" />
+              </motion.div>
+              <div>
+                <h3 className="font-black text-gray-900 text-xl">Swap Complete!</h3>
+                <p className="text-sm text-gray-500 mt-1">Your swap has been confirmed on-chain.</p>
+              </div>
+              <div className="bg-gray-50 border border-gray-100 rounded-xl p-3 flex items-center justify-between">
+                <span className="font-mono text-xs text-gray-500">{txHash.slice(0, 18)}...{txHash.slice(-6)}</span>
+                <div className="flex gap-2">
+                  <button onClick={() => { navigator.clipboard.writeText(txHash); toast.success("Copied!"); }}
+                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors">
+                    <Copy size={12} className="text-gray-500" />
+                  </button>
+                  <a href={getExplorerUrl()} target="_blank" rel="noreferrer"
+                    className="p-1.5 hover:bg-gray-200 rounded-lg transition-colors">
+                    <ExternalLink size={12} className="text-gray-500" />
+                  </a>
+                </div>
+              </div>
+              <button onClick={onClose} className="w-full py-3 bg-gray-900 text-white font-black text-sm rounded-xl hover:bg-gray-800 transition-colors">Done</button>
+            </div>
+          )}
+
+          {/* ERROR */}
+          {status === "ERROR" && (
+            <div className="p-8 text-center space-y-4">
+              <div className="w-16 h-16 rounded-full bg-red-50 border-2 border-red-200 flex items-center justify-center mx-auto">
+                <AlertCircle size={32} className="text-red-500" />
+              </div>
+              <div>
+                <h3 className="font-black text-gray-900 text-xl">Swap Failed</h3>
+                <p className="text-xs text-gray-500 mt-2 bg-red-50 p-3 rounded-xl border border-red-100 font-mono text-left">{errorMsg}</p>
+              </div>
+              <button onClick={() => setStatus("IDLE")}
+                className="w-full py-3 bg-gray-900 text-white font-black text-sm rounded-xl hover:bg-gray-800 transition-colors">
+                Try Again
+              </button>
+            </div>
+          )}
+
+          {/* MAIN SWAP FORM */}
+          {hasWallet && (status === "IDLE" || status === "QUOTING" || status === "SIGNING" || status === "BROADCASTING") && (
+            <div className="p-5 space-y-3">
+
+              {/* FROM */}
+              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
+                <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                  <span>You Pay</span>
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="number"
+                    value={fromAmount}
+                    onChange={e => setFromAmount(e.target.value)}
+                    placeholder="0.00"
+                    className="flex-1 bg-transparent text-3xl font-black text-gray-900 outline-none placeholder:text-gray-200 min-w-0"
+                  />
+                  <TokenDropdown
+                    tokens={SUPPORTED_TOKENS}
+                    selected={fromToken}
+                    onSelect={t => { setFromToken(t); setShowFromDropdown(false); }}
+                    show={showFromDropdown}
+                    onToggle={() => { setShowFromDropdown(!showFromDropdown); setShowToDropdown(false); }}
+                  />
+                </div>
+              </div>
+
+              {/* FLIP BUTTON */}
+              <div className="flex justify-center relative">
+                <button
+                  onClick={flipTokens}
+                  className="absolute -translate-y-1/2 top-1/2 w-9 h-9 bg-white border-2 border-gray-200 rounded-xl flex items-center justify-center hover:border-purple-300 hover:bg-purple-50 transition-all shadow-sm group"
+                >
+                  <ArrowDown size={14} className="text-gray-400 group-hover:text-purple-500 transition-colors" />
+                </button>
+              </div>
+
+              {/* TO */}
+              <div className="bg-gray-50 border border-gray-200 rounded-2xl p-4">
+                <div className="flex justify-between text-[10px] font-black text-gray-400 uppercase tracking-widest mb-3">
+                  <span>You Receive</span>
+                  {status === "QUOTING" && (
+                    <span className="flex items-center gap-1 text-indigo-500">
+                      <Loader2 size={10} className="animate-spin" /> Finding best route...
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-3">
+                  <input
+                    type="text"
+                    value={toAmount}
+                    readOnly
+                    placeholder="0.00"
+                    className={`flex-1 bg-transparent text-3xl font-black outline-none placeholder:text-gray-200 min-w-0 transition-opacity ${status === "QUOTING" ? "opacity-30 text-gray-400" : "text-gray-900"}`}
+                  />
+                  <TokenDropdown
+                    tokens={SUPPORTED_TOKENS}
+                    selected={toToken}
+                    onSelect={t => { setToToken(t); setShowToDropdown(false); }}
+                    show={showToDropdown}
+                    onToggle={() => { setShowToDropdown(!showToDropdown); setShowFromDropdown(false); }}
+                  />
+                </div>
+              </div>
+
+              {/* Route Info */}
+              <AnimatePresence>
+                {quoteData && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    className="bg-indigo-50 border border-indigo-100 rounded-xl px-4 py-3 flex items-center justify-between overflow-hidden"
+                  >
+                    <div className="text-[10px] font-black text-indigo-600 uppercase tracking-widest">
+                      Best Route via {quoteData?.tool || "LI.FI"}
+                    </div>
+                    <div className="flex items-center gap-1.5 text-green-600 text-[10px] font-black">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse" />
+                      Live
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* Slippage */}
+              <div className="flex items-center justify-between px-1">
+                <span className="text-[10px] font-black text-gray-400 uppercase tracking-widest">Slippage</span>
+                <div className="flex gap-1">
+                  {[0.1, 0.5, 1.0].map(s => (
+                    <button key={s}
+                      onClick={() => setSlippage(s)}
+                      className={`px-2.5 py-1 rounded-lg text-[9px] font-black uppercase transition-colors ${slippage === s ? "bg-gray-900 text-white" : "bg-gray-100 text-gray-500 hover:bg-gray-200"}`}
                     >
-                        <div className="w-full max-w-md bg-[#050505] border border-white/10 rounded-[40px] shadow-[0_0_80px_-20px_rgba(var(--aztec-orchid-rgb),0.3)] overflow-hidden pointer-events-auto relative backdrop-blur-2xl">
-                            
-                            {/* Header */}
-                            <div className="flex items-center justify-between p-6 pb-2 border-b border-white/5 bg-white/[0.02]">
-                                <div>
-                                    <h2 className="text-2xl font-black text-white tracking-tight flex items-center gap-2">
-                                        <Zap size={20} className="text-[var(--aztec-orchid)]" />
-                                        Smart Swap
-                                    </h2>
-                                    <p className="text-[10px] font-black text-white/40 uppercase tracking-[0.2em] mt-1">Invisible Bridging Active</p>
-                                </div>
-                                <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full transition-colors">
-                                    <X className="w-5 h-5 text-white/60" />
-                                </button>
-                            </div>
+                      {s}%
+                    </button>
+                  ))}
+                </div>
+              </div>
 
-                            <div className="p-6 space-y-2 bg-[#050505]">
-                                {/* PAY INPUT */}
-                                <div className="bg-white/[0.02] p-5 rounded-[32px] border border-white/5 hover:border-[var(--aztec-orchid)]/50 transition-all group relative overflow-hidden">
-                                    <div className="flex justify-between text-[10px] font-black text-white/40 mb-3 uppercase tracking-[0.15em]">
-                                        <span>You Pay</span>
-                                        <span className="font-mono">Balance: 2.45 ETH</span>
-                                    </div>
-                                    <div className="flex items-center gap-4 relative z-10">
-                                        <input 
-                                            type="number" 
-                                            value={payAmount}
-                                            onChange={(e) => setPayAmount(e.target.value)}
-                                            placeholder="0.00" 
-                                            className="w-full bg-transparent text-4xl font-black font-mono text-white focus:outline-none placeholder:text-white/10"
-                                        />
-                                        <button className="flex items-center gap-2 bg-white/10 text-white px-4 py-2.5 rounded-full hover:bg-white/20 transition-all border border-white/10 shrink-0">
-                                            <span className="font-black text-xs uppercase tracking-wider">{payToken.symbol}</span>
-                                        </button>
-                                    </div>
-                                    <div className="mt-3 text-[9px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1.5">
-                                        <Route size={10} /> Route via {payToken.chain}
-                                    </div>
-                                </div>
-
-                                {/* SWITCHER */}
-                                <div className="relative h-4 z-10 flex justify-center">
-                                    <div className="absolute -top-4 bg-[#050505] p-1.5 rounded-2xl border border-white/5 shadow-[0_0_20px_rgba(0,0,0,0.5)]">
-                                        <div className="bg-white/5 p-2 rounded-xl text-[var(--aztec-orchid)] hover:text-white hover:bg-[var(--aztec-orchid)] transition-all cursor-pointer">
-                                            <ArrowDown size={18} />
-                                        </div>
-                                    </div>
-                                </div>
-
-                                {/* RECEIVE INPUT */}
-                                <div className="bg-white/[0.02] p-5 rounded-[32px] border border-white/5 hover:border-[var(--aztec-orchid)]/50 transition-all group relative overflow-hidden">
-                                    <div className="flex justify-between text-[10px] font-black text-white/40 mb-3 uppercase tracking-[0.15em]">
-                                        <span>You Receive</span>
-                                        {swapStatus === 'quoting' && <span className="flex items-center gap-1.5 text-[var(--aztec-orchid)]"><Loader2 size={10} className="animate-spin"/> Routing...</span>}
-                                    </div>
-                                    <div className="flex items-center gap-4 relative z-10">
-                                        <input 
-                                            type="text" 
-                                            value={receiveAmount}
-                                            readOnly
-                                            placeholder="0.00" 
-                                            className={`w-full bg-transparent text-4xl font-black font-mono text-white focus:outline-none placeholder:text-white/10 transition-opacity ${swapStatus === 'quoting' ? 'opacity-30' : 'opacity-100'}`}
-                                        />
-                                        <button className="flex items-center gap-2 bg-white/10 text-white px-4 py-2.5 rounded-full hover:bg-white/20 transition-all border border-white/10 shrink-0">
-                                            <span className="font-black text-xs uppercase tracking-wider">{receiveToken.symbol}</span>
-                                        </button>
-                                    </div>
-                                    <div className="mt-3 text-[9px] font-black uppercase tracking-widest text-white/30 flex items-center gap-1.5">
-                                        <Route size={10} /> Route via {receiveToken.chain}
-                                    </div>
-                                </div>
-
-                                {/* SOLVER INFO */}
-                                <AnimatePresence>
-                                    {route && (
-                                        <motion.div 
-                                            initial={{ opacity: 0, height: 0, y: -10 }}
-                                            animate={{ opacity: 1, height: 'auto', y: 0 }}
-                                            className="bg-white/[0.03] border border-white/5 p-4 rounded-3xl mt-4 flex items-center justify-between overflow-hidden relative"
-                                        >
-                                            <div className="absolute inset-0 bg-gradient-to-r from-[var(--aztec-orchid)]/5 to-transparent pointer-events-none" />
-                                            <div className="flex items-center gap-3 relative z-10">
-                                                <div className="p-2 bg-[var(--aztec-orchid)]/10 rounded-full text-[var(--aztec-orchid)]">
-                                                    <Sparkles size={14} />
-                                                </div>
-                                                <div>
-                                                    <div className="text-[9px] font-black text-white/40 uppercase tracking-[0.2em]">Flashbots Solver Route</div>
-                                                    <div className="font-mono text-xs font-black text-white/90 mt-0.5">{route}</div>
-                                                </div>
-                                            </div>
-                                            <div className="text-green-400 font-black text-[9px] uppercase tracking-widest bg-green-500/10 border border-green-500/20 px-2 py-1 rounded-lg relative z-10 flex items-center gap-1.5">
-                                                <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse" />
-                                                0-Conf
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-
-                                {/* ACTION BUTTON */}
-                                <button 
-                                    disabled={!payAmount || swapLoading || swapStatus === 'quoting'}
-                                    onClick={handleSwap}
-                                    className="w-full py-5 mt-4 bg-[var(--aztec-orchid)] text-black rounded-[24px] font-black text-sm uppercase tracking-[0.2em] shadow-[0_0_40px_rgba(var(--aztec-orchid-rgb),0.3)] hover:brightness-110 active:scale-95 disabled:opacity-30 disabled:scale-100 disabled:shadow-none transition-all flex items-center justify-center gap-3 relative overflow-hidden group"
-                                >
-                                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000" />
-                                    {swapStatus === 'quoting' ? (
-                                        <>Awaiting Route Grid...</>
-                                    ) : (
-                                        <>
-                                            <Zap fill="currentColor" size={16} />
-                                            {swapStatus === 'signing' ? 'AWAITING WALLET SIGNATURE' : 'EXECUTE TACTICAL SWAP'}
-                                        </>
-                                    )}
-                                </button>
-                            </div>
-                        </div>
-                    </motion.div>
-                </>
-            )}
-        </AnimatePresence>
-    );
+              {/* Execute Button */}
+              <button
+                disabled={!fromAmount || !quoteData || isProcessing}
+                onClick={executeSwap}
+                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-30 disabled:cursor-not-allowed rounded-2xl font-black text-sm uppercase tracking-widest text-white transition-all active:scale-[0.98] flex items-center justify-center gap-3 mt-2"
+              >
+                {status === "QUOTING" ? (
+                  <><Loader2 size={16} className="animate-spin" /> Finding Route...</>
+                ) : status === "SIGNING" ? (
+                  <><Loader2 size={16} className="animate-spin" /> Sign in Wallet...</>
+                ) : status === "BROADCASTING" ? (
+                  <><Loader2 size={16} className="animate-spin" /> Confirming...</>
+                ) : (
+                  <><Zap size={16} fill="currentColor" /> Execute Swap</>
+                )}
+              </button>
+            </div>
+          )}
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
 }
-
