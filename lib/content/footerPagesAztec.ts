@@ -498,3 +498,26 @@ export const NOIR_CIRCUITS_SECTIONS: AztecDocSection[] = [
     ],
   }
 ];
+
+// u2500u2500u2500 COMMUNITY FORUM INTRO u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500u2500
+
+export const COMMUNITY_FORUM_INTRO: AztecDocSection[] = [
+  {
+    title: 'Purpose',
+    paragraphs: [
+      'The System Forum is the primary coordination layer for Humanity Ledger protocol participants. It is the canonical location for technical proposals, circuit reviews, testnet coordination, and governance deliberation.',
+    ],
+  },
+  {
+    title: 'Conduct',
+    paragraphs: [
+      'All participants are expected to maintain technical precision and professional conduct. Discussions must be grounded in verifiable claims. Protocol-level decisions require formal proposals with supporting evidence.',
+    ],
+  },
+  {
+    title: 'Categories',
+    paragraphs: [
+      'Topics are organized into structured categories: Whale Network, General, Applications, Testnets, Noir Circuits, Site Feedback, and QDs Connect. Select the appropriate category before posting to ensure visibility to the relevant participants.',
+    ],
+  },
+];

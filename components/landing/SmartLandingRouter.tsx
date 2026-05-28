@@ -24,24 +24,17 @@ export function SmartLandingRouter({ isMobileUserAgent }: { isMobileUserAgent: b
 
         setIsPhysicallyMobile(isUaMobile || (isTouchPrimary && isSmallScreen));
         setMounted(true);
-        
-        // Force login for all users when entering the landing page
-        try {
-            document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "system_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-            localStorage.clear();
-            sessionStorage.clear();
-        } catch (e) {}
-
+        // [SESSION INTEGRITY FIX] The old code cleared ALL cookies + storage here.
+        // This was destroying valid sessions (QR handshake, Humanity Ledger, MetaMask,
+        // Rainbow) the instant the user landed on '/'. Sessions must NEVER be wiped
+        // at route level — logout is handled exclusively by useSystemSignOut.
     }, []);
 
-    // Fast-path: server already told us it's mobile  render immediately
+    // Fast-path: server already told us it's mobile — render immediately
     // without waiting for JS hydration (eliminates ~3s blank white screen).
     if (!mounted && isMobileUserAgent) return <ClientMobileLanding />;
 
-    // Always show the landing page  never auto-redirect to /dashboard.
+    // Always show the landing page — never auto-redirect to /dashboard.
     // The dashboard redirect is handled exclusively by ConnectPage after
     // a successful wallet signature. This ensures that on page reload
     // the user always lands on the public landing page.

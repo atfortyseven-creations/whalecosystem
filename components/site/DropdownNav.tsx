@@ -20,7 +20,10 @@ import {
     Globe,
     Zap,
     TrendingUp,
-    Shield
+    Shield,
+    LayoutDashboard,
+    MessageCircle,
+    Map
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
@@ -126,9 +129,10 @@ export function DropdownNav() {
 
                     {/* Desktop Navigation */}
                     <div className="hidden lg:flex items-center gap-1">
-                        <NavLink href="/ledger" label="Whale Ledger" icon={Anchor} isActive={pathname === '/ledger'} />
-                        <NavLink href="/portfolio" label="Whale Profile" icon={TrendingUp} isActive={pathname === '/portfolio'} />
-                        <NavLink href="/support" label="Support" icon={LifeBuoy} isActive={pathname === '/support'} />
+                        <NavLink href="/dashboard" label="Dashboard" icon={LayoutDashboard} isActive={pathname === '/dashboard'} />
+                        <NavLink href="/portfolio" label="Portfolio" icon={TrendingUp} isActive={pathname === '/portfolio'} />
+                        <NavLink href="/chat" label="Whale Chat" icon={MessageCircle} isActive={pathname === '/chat'} />
+                        <NavLink href="/registry" label="Global Map" icon={Map} isActive={pathname === '/registry'} badge="LIVE" />
                     </div>
 
                     {/* Action Hub */}
@@ -324,12 +328,12 @@ export function DropdownNav() {
                         >
                             <div className="flex flex-col p-4 gap-2">
                                 <Link 
-                                    href="/ledger" 
+                                    href="/dashboard" 
                                     className="flex items-center gap-3 px-4 py-4 bg-white/5 rounded-xl text-white font-bold"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <Anchor size={20} className="text-indigo-500" />
-                                    Whale Ledger
+                                    <LayoutDashboard size={20} className="text-indigo-500" />
+                                    Dashboard
                                 </Link>
                                 <Link 
                                     href="/portfolio" 
@@ -337,15 +341,24 @@ export function DropdownNav() {
                                     onClick={() => setIsMenuOpen(false)}
                                 >
                                     <TrendingUp size={20} className="text-indigo-500" />
-                                    Whale Profile
+                                    Portfolio
                                 </Link>
                                 <Link 
-                                    href="/support" 
+                                    href="/chat" 
                                     className="flex items-center gap-3 px-4 py-4 bg-white/5 rounded-xl text-white font-bold"
                                     onClick={() => setIsMenuOpen(false)}
                                 >
-                                    <LifeBuoy size={20} className="text-indigo-500" />
-                                    Support
+                                    <MessageCircle size={20} className="text-indigo-500" />
+                                    Whale Chat
+                                </Link>
+                                <Link 
+                                    href="/registry" 
+                                    className="flex items-center gap-3 px-4 py-4 bg-white/5 rounded-xl text-white font-bold border border-indigo-500/20"
+                                    onClick={() => setIsMenuOpen(false)}
+                                >
+                                    <Map size={20} className="text-indigo-500" />
+                                    Global Map
+                                    <span className="ml-auto bg-indigo-500 text-[10px] font-black px-2 py-0.5 rounded text-white animate-pulse">LIVE</span>
                                 </Link>
                             </div>
                         </motion.div>

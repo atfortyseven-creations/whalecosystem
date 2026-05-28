@@ -1306,3 +1306,41 @@ model ProvenanceEvent {
 
   @@index([passportId, createdAt(sort: Desc)])
 }
+
+//
+// HUMANITY LEDGER — GLOBAL LOGIN INTELLIGENCE MAP
+// Records every authenticated session with geo context (GDPR: IP hashed, no PII stored)
+// Powers the /registry map — our live global activity intelligence layer.
+//
+
+model LoginGeoEvent {
+  id           String   @id @default(uuid())
+  // Anonymized identity — never store raw IP or wallet
+  userId       String?  // Hashed user reference (nullable = pre-auth probe)
+  sessionType  String   // "WALLET_CONNECT" | "EMAIL_LOGIN" | "QR_SCAN" | "METAMASK" | "RAINBOW" | "HUMANITY_ID"
+  // Geographic intelligence
+  countryCode  String   // ISO 3166-1 alpha-2: "ES", "US", "JP"
+  countryName  String
+  region       String?  // State/province
+  city         String?
+  latitude     Float?
+  longitude    Float?
+  // Network intelligence
+  ipHash       String?  // SHA-256(ip+salt) — anonymous, non-reversible
+  asn          String?  // Autonomous System Number for network analysis
+  isTor        Boolean  @default(false)
+  isVpn        Boolean  @default(false)
+  isDatacenter Boolean  @default(false)
+  // Session metadata
+  authMethod   String   @default("UNKNOWN") // "SIWE", "EMAIL", "QR", "METAMASK"
+  deviceType   String?  // "MOBILE" | "DESKTOP" | "TABLET"
+  wasSuccessful Boolean @default(true)
+  timestamp    DateTime @default(now())
+
+  @@index([countryCode, timestamp(sort: Desc)])
+  @@index([userId, timestamp(sort: Desc)])
+  @@index([timestamp(sort: Desc)])
+  @@index([sessionType, timestamp(sort: Desc)])
+  @@index([wasSuccessful, timestamp(sort: Desc)])
+  @@map("login_geo_events")
+}

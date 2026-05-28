@@ -43,10 +43,14 @@ export default function LoginPage() {
       if (returnUrl.startsWith("http")) {
         window.location.href = returnUrl;
       } else {
-        router.replace(returnUrl);
+        window.location.replace(returnUrl);
       }
     } else {
-      router.replace("/");
+      // [SESSION FIX] Default to /dashboard, not '/'.
+      // Redirecting to '/' would hit SmartLandingRouter which previously wiped
+      // all session cookies (now fixed), but /dashboard is always the correct
+      // destination after a successful Humanity Ledger login.
+      window.location.replace("/dashboard");
     }
   }, [router]);
 
@@ -132,6 +136,16 @@ export default function LoginPage() {
         try {
           await activateSystemVault(pk, addr);
         } catch (vaultErr) {}
+
+        try {
+          await fetch('/api/auth/system-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: addr })
+          });
+        } catch (e) {
+          console.error('System verify failed:', e);
+        }
 
         toast.success("Login successful");
         handleRedirect();

@@ -344,13 +344,12 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
         <UniversalEliteWallpaper />
 
         <div className={rootClass}>
-          {/* Optional top header for select standalone routes */}
-          <div className="flex-none w-full z-50 fixed top-0 left-0 right-0 hidden lg:block">
-            {showInstitutionalHeader && !isChat && <InstitutionalHeader />}
-          </div>
-          <div className="flex-none w-full z-50 fixed top-0 left-0 right-0 lg:hidden">
-            {showInstitutionalHeader && !isChat && <InstitutionalHeader />}
-          </div>
+          {/* Top header for select standalone routes — single instance, responsive internally */}
+          {showInstitutionalHeader && !isChat && (
+            <div className="flex-none w-full z-50 fixed top-0 left-0 right-0">
+              <InstitutionalHeader />
+            </div>
+          )}
           {/* Spacer to prevent content from hiding under fixed header */}
           {showInstitutionalHeader && !isChat && (
             <div className="w-full flex-none" style={{ minHeight: '64px' }} />

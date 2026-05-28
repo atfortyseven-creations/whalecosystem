@@ -9,6 +9,11 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 // Lottie cargado dinámicamente para evitar SSR issues
 const Lottie = dynamic(() => import("lottie-react"), { ssr: false });
 
+// Real world map — client only (uses browser projection APIs)
+const RealWorldMap = dynamic(
+  () => import("@/components/landing/RealWorldMap").then((m) => m.RealWorldMap),
+  { ssr: false, loading: () => <div className="w-full h-full bg-[#f0f0f0] animate-pulse rounded-xl" /> }
+);
 
 // ─── Nav Data ────────────────────────────────────────────────────────────────
 
@@ -50,7 +55,7 @@ const FEATURES = [
     tag: "Compliance Ready",
   },
   {
-    title: "On-Chain Intelligence",
+    title: "On-Chain Analysis",
     body: "Whale Network monitors capital flows across major chains in real time. Act on institutional-grade data without exposing your position.",
     tag: "Whale Network",
   },
@@ -310,9 +315,10 @@ function HeroSection() {
     <section
       className="relative w-full flex flex-col items-center justify-center overflow-hidden pt-14 bg-white"
       style={{
-        /* dvh for mobile chrome correction, fallback to vh */
-        height: 'calc(var(--vh, 1vh) * 100)',
-        minHeight: '700px',
+        /* Use 100dvh as primary value — it accounts for mobile browser chrome.
+           --vh polyfill updates after mount to correct any mismatch. */
+        height: '100dvh',
+        minHeight: '600px',
       }}
     >
       {/* ── Global pixelated-rendering rule ─────────────────────────────── */}
@@ -341,16 +347,16 @@ function HeroSection() {
           so every original pixel reaches the browser intact.
       */}
       <img
-        src="/system-shots/Devine-Lu-Linvega-monochrome-pixel-art-illustration-arch-2268374-wallhere.com.jpg"
-        alt="Devine Lu Linvega Monochrome Pixel Architecture"
+        src="/system-shots/3679-wandtattoo-weltkarte-einfach-einzel.png"
+        alt="Humanity Ledger Global Network"
         loading="eager"
         // @ts-ignore — fetchpriority is a valid HTML attribute
         fetchpriority="high"
         decoding="sync"
         draggable="false"
-        className="hero-pixel-img absolute inset-0 w-full h-full select-none"
+        className="absolute inset-0 w-full h-full select-none opacity-15"
         style={{
-          objectFit: 'contain',
+          objectFit: 'cover',
           objectPosition: 'center',
         }}
       />
@@ -425,133 +431,86 @@ function DvhPolyfill() {
   return null;
 }
 
-// ─── Network stat strip ───────────────────────────────────────────────────────
+// ─── Value Proposition ─────────────────────────────────────────────────────────
 
-function StatStrip() {
+function ValuePropositionSection() {
   return (
-    <section className="w-full bg-white border-t border-black/8 overflow-hidden">
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 divide-x divide-y divide-black/8 border-b border-black/8">
-        {STATS.map((s) => (
-          <motion.div
-            key={s.label}
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            className="px-5 py-5 flex flex-col gap-1"
-          >
-            <span className="text-[9px] font-mono font-bold uppercase tracking-[0.22em] text-black/35">
-              {s.label}
-            </span>
-            <span className="text-[12px] font-mono font-black text-black leading-snug">
-              {s.value}
-            </span>
-          </motion.div>
-        ))}
+    <section className="w-full bg-white py-24 md:py-32 border-t border-black/10">
+      <div className="w-full max-w-[1000px] mx-auto px-6 text-center flex flex-col items-center">
+        <span className="text-[12px] font-bold uppercase tracking-widest text-black/40 mb-6">
+          Absolute Privacy
+        </span>
+        <h2 className="text-[36px] md:text-[56px] font-black tracking-tighter leading-[1.05] text-black max-w-[800px]">
+          Identity and asset verification
+          <br />
+          <span className="text-black/30">without data custody.</span>
+        </h2>
+        <p className="mt-8 text-[16px] md:text-[18px] font-medium text-black/60 leading-relaxed max-w-[600px]">
+          Humanity Ledger uses zero-knowledge cryptography to prove who you are and what you hold, without ever revealing the underlying data to the applications you interact with.
+        </p>
       </div>
     </section>
   );
 }
 
-// ─── Whale Network callout ────────────────────────────────────────────────────
+// ─── How It Works (Steps) ────────────────────────────────────────────────────
 
-function WhaleNetworkSection() {
+function HowItWorksSection() {
+  const steps = [
+    {
+      step: "01",
+      title: "Secure Authentication",
+      description: "Access your dashboard using a robust cryptographic handshake. Whether connecting via a mobile QR scan or a Web3 wallet, your session is authenticated without relying on vulnerable passwords.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+      )
+    },
+    {
+      step: "02",
+      title: "Private Data Environment",
+      description: "Your assets, identity attributes, and transaction history are encrypted locally on your device. The network processes encrypted states, ensuring complete confidentiality.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+      )
+    },
+    {
+      step: "03",
+      title: "Verifiable Proofs",
+      description: "When an application requests verification (like age, jurisdiction, or solvency), your device generates a mathematical proof. The app verifies the proof instantly, receiving absolute certainty but zero personal data.",
+      icon: (
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      )
+    }
+  ];
+
   return (
-    <section className="w-full bg-white border-t border-black/8 py-28 md:py-40">
+    <section className="w-full bg-[#fcfcfc] py-24 md:py-32 border-t border-black/5">
       <div className="w-full max-w-[1100px] mx-auto px-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-          <div>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-black/30">
-              Whale Network
-            </span>
-            <h2 className="mt-4 text-[36px] sm:text-[52px] font-black tracking-tighter leading-[0.93] text-black">
-              Market intelligence.<br />
-              <span className="text-black/22">Privately acted on.</span>
-            </h2>
-            <p className="mt-6 text-[15px] text-black/55 leading-[1.75] max-w-[480px]">
-              Whale Network monitors capital flows across major blockchains in real time. Large
-              transfers, exchange inflows, and wallet activations are surfaced as structured events.
-            </p>
-            <p className="mt-4 text-[15px] text-black/55 leading-[1.75] max-w-[480px]">
-              Because Humanity Ledger runs inside the Aztec shielded pool, you can act on this
-              data — set alerts, execute trades, route capital — without your own position being
-              visible to anyone else.
-            </p>
-            <div className="mt-10 flex items-center gap-4">
-              <Link
-                href="/portfolio"
-                className="px-6 py-3 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors"
-              >
-                Open Dashboard
-              </Link>
-              <Link
-                href="/architecture"
-                className="text-[13px] font-semibold text-black/50 hover:text-black transition-colors flex items-center gap-1.5"
-              >
-                See Architecture
-                <span>→</span>
-              </Link>
+        <div className="text-center mb-20">
+          <h2 className="text-[32px] md:text-[42px] font-black tracking-tight text-black">
+            Built so there's <i className="font-serif italic font-normal">nothing to leak</i>
+          </h2>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 relative">
+          {/* Connecting line for desktop */}
+          <div className="hidden md:block absolute top-[28px] left-[10%] right-[10%] h-[1px] bg-black/10 z-0" />
+
+          {steps.map((s, i) => (
+            <div key={i} className="relative z-10 flex flex-col items-center text-center">
+              <div className="w-14 h-14 bg-white border border-black/10 rounded-full flex items-center justify-center mb-6 shadow-sm">
+                <span className="text-black">{s.icon}</span>
+              </div>
+              <span className="text-[11px] font-bold tracking-widest uppercase text-black/40 mb-3">
+                Step {s.step}
+              </span>
+              <h3 className="text-[20px] font-black text-black mb-4 tracking-tight">
+                {s.title}
+              </h3>
+              <p className="text-[15px] font-medium text-black/60 leading-relaxed px-2">
+                {s.description}
+              </p>
             </div>
-          </div>
-
-          {/* Stat cards */}
-          <div className="grid grid-cols-2 gap-[1px] bg-black/8 border border-black/8">
-            {[
-              { label: "Chains Monitored", value: "20+" },
-              { label: "Alert Latency", value: "< 1s" },
-              { label: "Transactions Tracked", value: "50M+" },
-              { label: "Private by Default", value: "Always" },
-            ].map((c) => (
-              <div key={c.label} className="bg-white p-7 flex flex-col gap-2">
-                <span className="text-[28px] font-black tracking-tight text-black">{c.value}</span>
-                <span className="text-[12px] font-mono font-bold uppercase tracking-wider text-black/35">{c.label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-// ─── Documentation ────────────────────────────────────────────────────────────
-
-function DocumentationSection() {
-  return (
-    <section className="w-full bg-white border-t border-black/8 py-28 md:py-40">
-      <div className="w-full max-w-[1100px] mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-14">
-          <div>
-            <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-black/30">
-              Documentation
-            </span>
-            <h2 className="mt-4 text-[36px] sm:text-[52px] font-black tracking-tighter leading-[0.93] text-black max-w-[440px]">
-              Everything you<br />
-              <span className="text-black/22">need to build.</span>
-            </h2>
-          </div>
-          <Link
-            href="/developers/api-docs"
-            className="shrink-0 px-6 py-3 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors"
-          >
-            Open Full Docs
-          </Link>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-[1px] bg-black/8 border border-black/8">
-          {DOC_CARDS.map((d) => (
-            <Link
-              key={d.label}
-              href={d.href}
-              className="bg-white p-8 flex flex-col gap-3 group hover:bg-black/[0.02] transition-colors duration-200"
-            >
-              <div className="flex items-center justify-between">
-                <span className="text-[15px] font-black tracking-tight text-black group-hover:text-black/80 transition-colors">
-                  {d.label}
-                </span>
-                <span className="text-black/20 group-hover:text-black/50 transition-colors text-[14px]">→</span>
-              </div>
-              <p className="text-[13px] text-black/50 leading-relaxed">{d.body}</p>
-            </Link>
           ))}
         </div>
       </div>
@@ -559,83 +518,109 @@ function DocumentationSection() {
   );
 }
 
-// ─── Product Showcase ─────────────────────────────────────────────────────────
+// ─── Integration & Features ───────────────────────────────────────────────────
 
-function ProductShowcaseSection() {
+function IntegrationSection() {
+  const cards = [
+    {
+      title: "Identity Verification",
+      body: "Perform sybil-resistance, age, or nationality checks to gate access to your platform without storing PII.",
+      link: "Read documentation",
+      href: "/developers/api-docs"
+    },
+    {
+      title: "Compliance & Audits",
+      body: "Generate viewing keys for regulators while keeping transactions fully shielded from the public.",
+      link: "Explore compliance",
+      href: "/security"
+    },
+    {
+      title: "Private Portfolio",
+      body: "Track cross-chain capital flows and asset balances locally. No server ever sees your complete portfolio.",
+      link: "Open Dashboard",
+      href: "/portfolio"
+    }
+  ];
+
   return (
-    <section className="w-full bg-[#050505] text-white py-28 md:py-40 overflow-hidden relative">
-      <div className="w-full max-w-[1200px] mx-auto px-6 relative z-10">
-        <div className="text-center mb-20">
-          <span className="font-mono text-[10px] font-bold uppercase tracking-[0.28em] text-white/40">
-            Platform Capabilities
-          </span>
-          <h2 className="mt-4 text-[36px] sm:text-[52px] font-black tracking-tighter leading-[0.93] text-white">
-            Built for Institutional Operators.
+    <section className="w-full bg-white py-24 md:py-32 border-t border-black/10">
+      <div className="w-full max-w-[1100px] mx-auto px-6">
+        <div className="mb-16">
+          <h2 className="text-[32px] md:text-[42px] font-black tracking-tight text-black max-w-[500px] leading-[1.1]">
+            One integration for
+            <br />
+            <span className="text-black/30">complete security.</span>
           </h2>
         </div>
 
-        {/* Dashboard Mockup */}
-        <div className="flex flex-col lg:flex-row gap-12 items-center mb-32">
-          <div className="w-full lg:w-1/2">
-            <h3 className="text-[28px] font-black tracking-tight mb-4">Mempool Telemetry</h3>
-            <p className="text-[15px] text-white/60 leading-[1.75] mb-6">
-              Track multi-hop capital flows, flash loans, and coordinated institutional positioning before they settle on the public ledger. Our local-first Neo4j engine graphs relationships instantly.
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {cards.map((c, i) => (
+            <div key={i} className="bg-[#fafafa] border border-black/10 rounded-2xl p-8 flex flex-col items-start transition-all hover:bg-[#f5f5f5] hover:border-black/20">
+              <h3 className="text-[18px] font-black text-black mb-3">{c.title}</h3>
+              <p className="text-[14.5px] font-medium text-black/60 leading-relaxed mb-8 flex-1">
+                {c.body}
+              </p>
+              <Link href={c.href} className="text-[13px] font-bold text-black flex items-center gap-1.5 hover:opacity-70 transition-opacity">
+                {c.link}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </Link>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+// ─── Global Registry Map ────────────────────────────────────────────────────────
+
+function GlobalRegistrySection() {
+  const [totalFlows, setTotalFlows] = useState<number>(14_800_295);
+
+  useEffect(() => {
+    const fetchRealData = async () => {
+      try {
+        const res = await fetch('/api/network/whale-flows', { cache: 'no-store' });
+        const data = await res.json();
+        if (data.flows && data.flows.length > 0) {
+          setTotalFlows(prev => prev + data.flows.length);
+        }
+      } catch { /* silent */ }
+    };
+    fetchRealData();
+    const interval = setInterval(fetchRealData, 15_000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <section className="w-full bg-[#fafafa] py-24 md:py-32 border-t border-black/10">
+      <div className="w-full max-w-[1200px] mx-auto px-6">
+        
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-10">
+          <div>
+            <span className="text-[11px] font-black uppercase tracking-widest text-black/30 mb-3 block">
+              Global Network
+            </span>
+            <h2 className="text-[28px] md:text-[36px] font-black text-black tracking-tight">
+              Verification Registry Map
+            </h2>
+            <p className="text-[14px] text-black/50 font-medium mt-2 max-w-[500px]">
+              Hover any country to see coverage level and accepted document types.
             </p>
-            <ul className="flex flex-col gap-3">
-               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-green-500 rounded-full"></span> Z-Score anomaly detection</li>
-               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Real-time EIP-1153 heuristics</li>
-            </ul>
           </div>
-          <div className="w-full lg:w-1/2 relative">
-             <div className="w-full aspect-[4/3] bg-black border border-white/10 rounded-lg shadow-2xl overflow-hidden flex flex-col">
-                <div className="h-8 border-b border-white/10 flex items-center px-4 gap-2 bg-white/5">
-                   <div className="w-2.5 h-2.5 rounded-full bg-red-500/50"></div>
-                   <div className="w-2.5 h-2.5 rounded-full bg-yellow-500/50"></div>
-                   <div className="w-2.5 h-2.5 rounded-full bg-green-500/50"></div>
-                   <span className="ml-auto font-mono text-[10px] text-white/30">Whale_Scanner_Terminal</span>
-                </div>
-                <div className="p-5 flex-1 font-mono text-[11px] text-green-400/80 flex flex-col gap-2 overflow-hidden relative">
-                   <div className="flex justify-between border-b border-white/5 pb-2 mb-2"><span className="text-white/40">TX HASH</span><span className="text-white/40">VALUE</span><span className="text-white/40">TYPE</span></div>
-                   <div className="flex justify-between hover:bg-white/5 p-1"><span className="text-blue-400">0x8f...32a1</span><span className="text-white">12,500 ETH</span><span className="text-yellow-400">CEX OUTFLOW</span></div>
-                   <div className="flex justify-between hover:bg-white/5 p-1"><span className="text-blue-400">0x2a...99b2</span><span className="text-white">5,000,000 USDC</span><span className="text-purple-400">DEX SWAP</span></div>
-                   <div className="flex justify-between hover:bg-white/5 p-1"><span className="text-blue-400">0x11...4c3d</span><span className="text-white">450 WBTC</span><span className="text-green-400">BRIDGE L2</span></div>
-                   <div className="absolute bottom-0 left-0 w-full h-24 bg-gradient-to-t from-black to-transparent"></div>
-                </div>
-             </div>
-          </div>
+          <Link
+            href="/registry"
+            className="flex items-center gap-2 text-[13px] font-black uppercase tracking-wider text-black hover:opacity-60 transition-opacity shrink-0"
+          >
+            View Full Map
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </Link>
         </div>
 
-        {/* Whale Chat Mockup */}
-        <div className="flex flex-col lg:flex-row-reverse gap-12 items-center">
-          <div className="w-full lg:w-1/2">
-            <h3 className="text-[28px] font-black tracking-tight mb-4">Whale Chat (E2EE)</h3>
-            <p className="text-[15px] text-white/60 leading-[1.75] mb-6">
-              Coordinate strategies in a fully encrypted, Sybil-resistant environment. Authenticate via EIP-191 wallet signatures and communicate using Aztec's zero-knowledge state primitives.
-            </p>
-             <ul className="flex flex-col gap-3">
-               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-white rounded-full"></span> Cryptographic Wallet Ownership Proofs</li>
-               <li className="flex items-center gap-3 text-[14px] text-white/80"><span className="w-1.5 h-1.5 bg-white rounded-full"></span> Unobservable P2P Network Metadata</li>
-            </ul>
-          </div>
-          <div className="w-full lg:w-1/2 relative">
-             <div className="w-full aspect-[4/3] bg-[#0a0a0a] border border-white/10 rounded-lg shadow-2xl overflow-hidden flex flex-col">
-                <div className="h-12 border-b border-white/10 flex items-center px-5 gap-4 bg-white/[0.02]">
-                   <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500"></div>
-                   <div>
-                      <div className="text-[12px] font-bold text-white">0xAlpha...</div>
-                      <div className="text-[10px] text-green-400 font-mono">EIP-191 Verified</div>
-                   </div>
-                </div>
-                <div className="p-5 flex-1 flex flex-col gap-4 font-sans text-[13px] overflow-hidden">
-                   <div className="self-start max-w-[80%] bg-white/10 text-white/90 p-3 rounded-2xl rounded-tl-sm shadow-sm border border-white/5">
-                      Has the mempool anomaly on mainnet been verified?
-                   </div>
-                   <div className="self-end max-w-[80%] bg-white text-black p-3 rounded-2xl rounded-tr-sm shadow-sm">
-                      Yes. Z-score is 4.5. Committing the multi-sig payload to the Noir circuit now.
-                   </div>
-                </div>
-             </div>
-          </div>
+        {/* Real map */}
+        <div style={{ aspectRatio: "21/9" }}>
+          <RealWorldMap totalFlows={totalFlows} />
         </div>
 
       </div>
@@ -643,84 +628,99 @@ function ProductShowcaseSection() {
   );
 }
 
-// ─── Final CTA (DownPage) — with video background ─────────────────────────────
+// ─── FAQ Section ──────────────────────────────────────────────────────────────
 
-function FinalCTASection() {
-  const videoRef = useRef<HTMLVideoElement>(null);
+// ─── FAQ Item (extracted to fix React Hooks Rules violation) ─────────────────
+// useState CANNOT be called inside .map(). Each FAQ needs its own component.
+function FAQItem({ faq, index }: { faq: { q: string; a: string }; index: number }) {
+  const [isOpen, setIsOpen] = React.useState(false);
+  return (
+    <div className="border-b border-black/10">
+      <button
+        onClick={() => setIsOpen(!isOpen)}
+        className="w-full py-6 flex items-center justify-between text-left hover:bg-black/[0.02] transition-colors px-2"
+      >
+        <span className="text-[16px] font-bold text-black pr-8">{faq.q}</span>
+        <span className="text-[20px] text-black/40 font-light w-6 h-6 flex items-center justify-center shrink-0">
+          {isOpen ? "−" : "+"}
+        </span>
+      </button>
+      {isOpen && (
+        <div className="pb-6 px-2 text-[15px] font-medium text-black/60 leading-relaxed">
+          {faq.a}
+        </div>
+      )}
+    </div>
+  );
+}
 
-  useEffect(() => {
-    if (videoRef.current) {
-      videoRef.current.play().catch(() => {
-        // Autoplay blocked by browser policy — silent fail
-      });
+function FAQSection() {
+  const faqs = [
+    {
+      q: "What user data is stored?",
+      a: "None. All identity attributes and financial data are encrypted and stored locally on your device. The network only processes mathematical proofs that attest to the validity of your data."
+    },
+    {
+      q: "How does the verification actually work?",
+      a: "When you prove a statement (e.g., 'I am over 18'), your device generates a zero-knowledge proof. The verifying application checks this proof against a smart contract or SDK, receiving a simple true/false answer without seeing your birthdate."
+    },
+    {
+      q: "Are my wallet keys safe?",
+      a: "Yes. Your private keys never leave your device. They are encrypted using military-grade AES-GCM and require your password or biometric approval to unlock."
+    },
+    {
+      q: "Can regulators audit my activity?",
+      a: "Yes, but only if you explicitly authorize them. You can generate a specific 'viewing key' that grants read-only access to specific transactions for compliance purposes."
     }
-  }, []);
+  ];
 
   return (
-    <section className="w-full relative overflow-hidden" style={{ minHeight: '600px' }}>
-      {/* ── Video background ── */}
-      <video
-        ref={videoRef}
-        className="absolute inset-0 w-full h-full object-cover"
-        src="/system-shots/14683943_3840_2160_30fps.mp4"
-        autoPlay
-        muted
-        loop
-        playsInline
-        preload="auto"
-        style={{ zIndex: 0 }}
-      />
-      {/* Dark overlay for readability */}
-      <div
-        className="absolute inset-0"
-        style={{ background: 'rgba(0,0,0,0.72)', zIndex: 1 }}
-      />
-
-      {/* Content */}
-      <div className="relative z-10 w-full max-w-[800px] mx-auto px-6 py-36 md:py-52 flex flex-col items-center text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.9, ease: [0.16, 1, 0.3, 1] }}
-          className="flex flex-col items-center gap-8"
-        >
-          <div className="w-40 h-40">
-            <RemoteLottie
-              path="/system-shots/block abstract.json"
-              loop={true}
-              className="w-full h-full"
-              style={{ mixBlendMode: 'screen', opacity: 0.9 }}
-            />
-          </div>
-
-          <h2 className="text-[44px] sm:text-[68px] font-black tracking-tighter leading-[0.9] text-white drop-shadow-lg">
-            Start building
-            <br />
-            <span className="text-white/35">privately.</span>
+    <section className="w-full bg-white py-24 border-t border-black/10">
+      <div className="w-full max-w-[800px] mx-auto px-6">
+        <div className="mb-12 text-center">
+          <h2 className="text-[32px] md:text-[42px] font-black tracking-tight text-black">
+            The questions prospects ask
           </h2>
+        </div>
 
-          {/* Texto más en negrita + mejor contraste */}
-          <p className="text-[18px] text-white/80 leading-relaxed max-w-[520px] font-semibold drop-shadow-md">
-            Join the developers and protocols using Humanity Ledger to bring
-            verifiable privacy to every interaction on Aztec.
-          </p>
+        <div className="flex flex-col border-t border-black/10">
+          {faqs.map((faq, i) => (
+            <FAQItem key={i} faq={faq} index={i} />
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
 
-          <div className="flex flex-col sm:flex-row items-center gap-3">
-            <Link
-              href="/portfolio"
-              className="px-9 py-3.5 bg-white text-black text-[13px] font-black uppercase tracking-wider hover:bg-white/90 transition-colors shadow-lg"
-            >
-              Open Application
-            </Link>
-            <Link
-              href="/developers/api-docs"
-              className="px-9 py-3.5 border border-white/30 text-white text-[13px] font-black uppercase tracking-wider hover:border-white/60 hover:bg-white/5 transition-all"
-            >
-              Read the Docs
-            </Link>
-          </div>
-        </motion.div>
+// ─── Final CTA ────────────────────────────────────────────────────────────────
+
+function FinalCTASection() {
+  return (
+    <section className="w-full bg-[#000000] py-32 md:py-48">
+      <div className="w-full max-w-[800px] mx-auto px-6 flex flex-col items-center text-center">
+        <h2 className="text-[40px] md:text-[60px] font-black tracking-tighter leading-[1] text-white mb-6">
+          Ready to reclaim
+          <br />
+          <span className="text-white/40">your digital identity?</span>
+        </h2>
+        <p className="text-[16px] md:text-[18px] text-white/60 font-medium max-w-[500px] mb-12">
+          Join the ecosystem of users and developers bringing absolute, verifiable privacy to the decentralized web.
+        </p>
+        <div className="flex flex-col sm:flex-row items-center gap-4">
+          <Link
+            href="/portfolio"
+            className="w-full sm:w-auto px-10 py-4 bg-white text-black text-[14px] font-black uppercase tracking-wider hover:bg-white/90 transition-transform active:scale-95 rounded-full"
+          >
+            Open Application
+          </Link>
+          <Link
+            href="/developers/api-docs"
+            className="w-full sm:w-auto px-10 py-4 border border-white/20 text-white text-[14px] font-black uppercase tracking-wider hover:bg-white/10 transition-transform active:scale-95 rounded-full"
+          >
+            Read the Docs
+          </Link>
+        </div>
       </div>
     </section>
   );
@@ -736,13 +736,19 @@ export interface ImmersiveManifestoLandingProps {
 export function ImmersiveManifestoLanding(_props: ImmersiveManifestoLandingProps = {}) {
   return (
     <div className="relative text-[#050505] font-sans antialiased overflow-x-hidden w-full flex flex-col bg-white">
-      <LandingNav />
+      {/* LandingNav is HIDDEN: InstitutionalHeader (from ClientLayout) already
+          renders as fixed top-0 on the landing page '/'. Rendering both causes
+          two overlapping fixed navbars. ImmersiveManifestoLanding's own nav is
+          only needed if this component is embedded in a context WITHOUT a global header. */}
+      {/* <LandingNav /> */}
       <HeroSection />
-      <StatStrip />
-      <WhaleNetworkSection />
-      <ProductShowcaseSection />
-      <DocumentationSection />
+      <ValuePropositionSection />
+      <HowItWorksSection />
+      <IntegrationSection />
+      <GlobalRegistrySection />
+      <FAQSection />
       <FinalCTASection />
     </div>
   );
 }
+

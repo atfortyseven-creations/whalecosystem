@@ -65,6 +65,7 @@ export function InstitutionalHeader() {
     const MENU_ITEMS = [
       { label: t('NAV_DASHBOARD') || 'DASHBOARD', href: "/dashboard" },
       { label: 'TOKEN', href: "/qds" },
+      { label: 'MAP', href: "/registry" },
       { label: t('NAV_WHALE_CHAT') || 'WHALE CHAT', href: "/chat" },
       { label: t('NAV_PORTFOLIO') || 'PORTFOLIO', href: "/portfolio" },
       { label: t('NAV_COMMUNITY') || 'COMMUNITY', href: "#", subItems: [{ label: t('NAV_NEWS') || 'NEWS', href: "/news" }, { label: t('NAV_ACADEMY') || 'ACADEMY', href: "/academy" }, { label: t('NAV_FORUM') || 'FORUM', href: "/forum" }, { label: t('NAV_CAREERS') || 'CAREERS', href: "/careers" }] },

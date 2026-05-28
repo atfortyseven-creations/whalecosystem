@@ -443,6 +443,14 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
         console.warn('[CoreAuthGate] Vault activation non-fatal:', vaultErr?.message);
       }
 
+      try {
+        await fetch('/api/auth/system-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: wallet.address })
+        });
+      } catch (e) {}
+
       const elapsed = Date.now() - startTime;
       await new Promise(r => setTimeout(r, Math.max(800 - elapsed, 0)));
       toast.success('Wallet creado y asegurado.');
@@ -590,6 +598,14 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
           console.warn('[CoreAuthGate] Login vault activation non-fatal:', vaultErr?.message);
         }
 
+        try {
+          await fetch('/api/auth/system-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: addr })
+          });
+        } catch (e) {}
+
         const elapsed = Date.now() - startTime;
         setTimeout(() => {
           toast.success('Wallet desbloqueado', { description: `${addr!.slice(0, 6)}...${addr!.slice(-4)}` });
@@ -652,6 +668,14 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
       try {
         await activateSystemVault(restoredWallet.privateKey, restoredWallet.address);
       } catch {}
+
+      try {
+        await fetch('/api/auth/system-verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: restoredWallet.address })
+        });
+      } catch (e) {}
       toast.success('Wallet restaurado', { description: `${restoredWallet.address.slice(0, 6)}...${restoredWallet.address.slice(-4)}` });
       onComplete();
     } catch (e: any) {

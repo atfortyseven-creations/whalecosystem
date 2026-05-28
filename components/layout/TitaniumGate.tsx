@@ -66,16 +66,12 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
         // 1500ms gives wagmi + cookie-write time to complete before we gate.
         // With ssr:true + cookieStorage in appkit.tsx, reconnect is now synchronous
         // on return visits, so this guard only fires on the first-ever connect.
-        const checkTimer = setTimeout(() => {
+        const checkTimer = setTimeout(async () => {
             if (!mounted) return;
 
             // Failsafe: if we are in the middle of connecting/reconnecting, WAIT.
             // This prevents aggressive redirects while the wallet modal is open.
             if (isConnecting || isReconnecting) return;
-
-            // [EXPERT SECURITY FIX] Removed system_pending_wakeup bypass.
-            // Relying on localStorage for gating allowed a permanent UI bypass to protected routes.
-            // If the user is genuinely recovering, isConnecting/isReconnecting will hold the gate.
 
             // Priority 1: Wagmi is connected
             if (isConnected) {
@@ -89,12 +85,31 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
                 return;
             }
 
-            // Priority 3: System Handshake (Cookie  must have real 0x address)
+            // Priority 3: system_handshake cookie (JS-readable, set by all auth paths)
+            // Must have real 0x address prefix — empty/expired values are rejected.
             const hasHandshake = typeof document !== 'undefined'
                 && document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x'));
             if (hasHandshake) {
                 setState('APP');
                 return;
+            }
+
+            // Priority 4: Server-side JWT cookies (whale_session / human_session).
+            // These are HttpOnly so we cannot read them from document.cookie.
+            // Call verify-session which checks all token types server-side.
+            // This is the fallback for QR-hydrated sessions where system_handshake
+            // may briefly lag behind the HttpOnly cookies.
+            try {
+                const res = await fetch('/api/auth/verify-session', { cache: 'no-store' });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.authenticated) {
+                        setState('APP');
+                        return;
+                    }
+                }
+            } catch {
+                // Network error — fail open to avoid locking out users on flaky connections
             }
 
             // Otherwise: Access Denied  redirect to connect

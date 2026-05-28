@@ -229,6 +229,7 @@
     "react-dom": "^19.0.0",
     "react-hotkeys-hook": "^4.6.1",
     "react-is": "^18.3.1",
+    "react-simple-maps": "^3.0.0",
     "react-virtualized-auto-sizer": "^1.0.24",
     "react-window": "^2.2.6",
     "recharts": "^3.7.0",

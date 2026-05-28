@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState, useRef } from 'react';
 import { MobileLanding as MobileSystemLanding } from '@/components/landing/MobileLanding';
@@ -108,10 +108,11 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
 
         // CRITICAL: check for '0x' prefix so an expired cookie ('system_handshake=; max-age=0')
         // does not falsely register as authenticated.
+        // Normalize to lowercase to handle any case variant of the hex address prefix.
         let hasSystemCookie = false;
         try {
             hasSystemCookie = typeof document !== 'undefined'
-                && (document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x')) || document.cookie.includes('wallet-auth='));
+                && (document.cookie.toLowerCase().split('; ').some(r => r.startsWith('system_handshake=0x')) || document.cookie.includes('wallet-auth='));
         } catch(e) {}
 
         if (bypassActive && hasSystemCookie) {
@@ -222,7 +223,6 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
             '/legal',
             '/forum',
             '/careers',
-            '/company',
             '/company',
             '/about',
             '/product',

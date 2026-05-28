@@ -13,23 +13,6 @@ export default function SignUpPage() {
 
   useEffect(() => {
     setMounted(true);
-
-    // If user already has a local wallet, redirect to login — no need to create another one here
-    try {
-      const accs = localStorage.getItem("system_accounts");
-      if (accs && JSON.parse(accs).length > 0) {
-        router.replace("/login");
-        return;
-      }
-      const ks = localStorage.getItem("system_keystore");
-      const vault = localStorage.getItem("system_vault_v1");
-      if (ks || vault) {
-        router.replace("/login");
-        return;
-      }
-    } catch {
-      // localStorage blocked — continue
-    }
   }, [router]);
 
   const handleComplete = useCallback(() => {

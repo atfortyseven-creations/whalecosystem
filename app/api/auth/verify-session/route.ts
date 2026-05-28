@@ -1,21 +1,49 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getSession } from '@/lib/session';
 
 /**
  * GET /api/auth/verify-session
- * Verify if user has a valid session
+ *
+ * [UNIVERSAL SESSION VERIFICATION]
+ * Checks ALL valid session token types used across the system:
+ *   - whale_session   : JWT from system-verify (MetaMask/Rainbow/Wagmi connect)
+ *   - human_session   : JWT from qr-hydrate or system-verify
+ *   - system_handshake: raw 0x address (QR mobile handshake, fast path)
+ *
+ * Previously only checked next-auth.session-token via getSession(), which
+ * returned 401 for every QR, Humanity Ledger, and system-verify session,
+ * causing ConnectPage to skip the "already authenticated" fast path and
+ * trigger a redundant wallet re-sign loop.
  */
 export async function GET(request: NextRequest) {
     try {
-        const session = await getSession();
+        // Priority 1: whale_session or human_session JWT
+        const whaleSession  = request.cookies.get('whale_session')?.value;
+        const humanSession  = request.cookies.get('human_session')?.value;
+        const primaryJwt    = whaleSession || humanSession;
 
-        if (session) {
+        if (primaryJwt) {
+            try {
+                const { verifyJWT } = await import('@/lib/jwt');
+                const payload = await verifyJWT(primaryJwt);
+                const address = (payload.sub || payload.address) as string;
+                if (address) {
+                    return NextResponse.json({
+                        authenticated: true,
+                        user: { address, tier: payload.tier ?? 'FREE' }
+                    });
+                }
+            } catch {
+                // JWT invalid or expired — fall through
+            }
+        }
+
+        // Priority 2: system_handshake cookie (raw Ethereum address)
+        // Set by QR hydration and system-verify. JS-readable (httpOnly: false).
+        const handshake = request.cookies.get('system_handshake')?.value;
+        if (handshake && /^0x[a-fA-F0-9]{40}$/.test(handshake)) {
             return NextResponse.json({
                 authenticated: true,
-                user: {
-                    userId: session.userId,
-                    email: session.email
-                }
+                user: { address: handshake, tier: 'FREE' }
             });
         }
 
@@ -25,11 +53,10 @@ export async function GET(request: NextRequest) {
         );
 
     } catch (error) {
-        console.error('Session verification error:', error);
+        console.error('[verify-session] Error:', error);
         return NextResponse.json(
             { authenticated: false },
             { status: 500 }
         );
     }
 }
-

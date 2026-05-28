@@ -116,9 +116,10 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
      misfire scroll events to the wrong target (document root vs inner container). */
 }
 
-  /* UNIVERSAL A11Y FOCUS */
+  /* UNIVERSAL A11Y FOCUS — WCAG 2.4.7 compliant visible indicator */
   :focus-visible {
-    outline: 2px solid #00f2ea00;
+    outline: 2px solid rgba(0, 0, 0, 0.5);
+    outline-offset: 2px;
   }
   
   /* Rendering Optimization for long pages */
@@ -219,14 +220,8 @@ main[class*="overflow-y-auto"] [class*="min-h-screen"] {
     transition: background-color 0.4s ease, color 0.4s ease;
   }
 
-  /* 
-     35% ZOOM EN ZONA PC (IMMULATE 135% ZOOM)
-      */
-  @media (min-width: 1024px) {
-    html {
-      zoom: 1.35;
-    }
-  }
+  /* NOTE: PC zoom is controlled by the single rule at the bottom of this file.
+   This block intentionally left empty to avoid duplicate/contradictory zoom rules. */
 
   body {
     background-color: transparent; /* wallpaper layer handles the base bg */
@@ -1477,9 +1472,11 @@ html.dark [style*="#FFFFFF"] {
    All navigation headers, tab bars, and pill navs must be perfectly centered.
     */
 
-/* Ensure header inner containers are always max-width centered */
-header > div,
-nav > div {
+/* Ensure header inner containers are always max-width centered.
+   Scoped to max-width containers only to avoid breaking flex children
+   in headers that use justify-between / justify-start layouts. */
+header > div[class*="max-w-"],
+nav > div[class*="max-w-"] {
   margin-left: auto;
   margin-right: auto;
 }

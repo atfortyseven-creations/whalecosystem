@@ -227,6 +227,33 @@ export default function ConnectPage() {
           });
 
           if (hydrateRes.ok) {
+            // [SESSION PERSISTENCE] Decode the wallet address from the JWT payload
+            // and persist it in localStorage so useSystemAccount auto-restores
+            // the session on page reload — making QR sessions identical in durability
+            // to Humanity Ledger and MetaMask sessions.
+            try {
+              const parts = jwt.split('.');
+              if (parts.length === 3) {
+                const payloadRaw = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                const addr = (payloadRaw.sub || payloadRaw.address || '') as string;
+                if (addr && addr.startsWith('0x') && addr.length === 42) {
+                  const normalized = addr.toLowerCase();
+                  // 7-day expiry — same as cookie maxAge
+                  localStorage.setItem('system_session_v2', JSON.stringify({
+                    wallet: normalized,
+                    exp: Date.now() + 604800 * 1000,
+                    source: 'qr-handshake',
+                  }));
+                  try {
+                    sessionStorage.setItem('system_wallet_addr', normalized);
+                    sessionStorage.setItem('portfolio_unlocked', 'true');
+                  } catch {}
+                  // Also set system_handshake client-side as belt-and-suspenders
+                  document.cookie = `system_handshake=${normalized}; path=/; max-age=604800; SameSite=Lax`;
+                }
+              }
+            } catch {}
+
             // Small delay so the SYNCED animation plays before redirect
             await new Promise(r => setTimeout(r, 800));
             window.location.replace("/dashboard");
@@ -235,6 +262,7 @@ export default function ConnectPage() {
             console.error('[QR:Desktop] Hydrate failed:', errData);
             setSyncStatus("ERROR");
           }
+
         }
       } catch (pollErr) {
         console.warn('[QR:Desktop] Poll error (will retry):', pollErr);
