@@ -55,7 +55,7 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase }: {
   if (isLoading) return (
       <div className="flex-1 flex flex-col items-center justify-center min-h-[400px] text-center p-8 bg-white border border-black/10">
         <RefreshCw size={24} className="animate-spin text-black/20 mb-4" />
-        <p className="text-[11px] font-black uppercase tracking-widest text-black/60">Executing Quantum Tokenomics Read...</p>
+        <p className="text-[11px] font-black uppercase tracking-widest text-black/60">Scanning token balances...</p>
       </div>
   );
 

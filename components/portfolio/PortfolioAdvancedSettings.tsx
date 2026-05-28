@@ -506,7 +506,7 @@ export function PortfolioAdvancedSettings({ isOpen, onClose, userAddress }: Port
                                 <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
                                     <div>
                                         <h3 className="text-2xl font-black uppercase tracking-tighter mb-2" style={{ color: INK }}>About</h3>
-                                        <p className="text-xs font-mono" style={{ color: MUTED }}>Version 14.12.0 — Institutional Release</p>
+                                        <p className="text-xs font-mono" style={{ color: MUTED }}>Version 14.12.0 - Institutional Release</p>
                                     </div>
 
                                     <div className="space-y-4">

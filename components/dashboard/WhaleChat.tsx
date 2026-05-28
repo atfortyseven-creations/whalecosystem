@@ -771,19 +771,6 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
 
     let cancelled = false;
     let isFetching = false;
-    
-    // Ignore the institutional support mock for network requests
-    if (activePeer.toLowerCase() === '0xinstitutionalsupport_0000') {
-      const mockMsg = {
-          id: '1',
-          senderAddress: activePeer,
-          content: 'Welcome to the Secure Client Communications channel. All messages are zero-knowledge encrypted end-to-end.',
-          sentAtNs: Date.now(),
-          conversationId: `dm-${activePeer.toLowerCase()}`
-      };
-      setMessages([mockMsg]);
-      return;
-    }
 
     const fetchHistorical = async () => {
       if (isFetching || cancelled) return;

@@ -115,7 +115,7 @@ export function AztecPrivacyTerminal({ onBack }: { onBack: () => void }) {
             </span>
           ) : (
             <span className="text-[8px] font-bold uppercase tracking-widest text-amber-600 border border-amber-200 bg-amber-50 px-2 py-1">
-              {activeNetwork.toUpperCase()} — L1 SHIELD ON MAINNET ONLY
+              {activeNetwork.toUpperCase()} - L1 SHIELD ON MAINNET ONLY
             </span>
           )}
           <button onClick={onBack} className="text-[9px] uppercase tracking-widest font-bold text-black/40 hover:text-black border border-black/10 px-3 py-1.5 hover:border-black transition-all">

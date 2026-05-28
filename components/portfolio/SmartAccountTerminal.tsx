@@ -9,36 +9,42 @@ import { packUserOp, getUserOpHash, ENTRY_POINT_ADDRESS } from '@/lib/erc4337-bu
 import { ethers } from 'ethers';
 
 export function SmartAccountTerminal({ onBack }: { onBack: () => void }) {
-  const { getConnectedWallet, address } = useWalletStore();
+  const { getConnectedWallet, address, isLocked } = useWalletStore();
   const [isPacking, setIsPacking] = useState(false);
   const [userOpData, setUserOpData] = useState<any>(null);
 
   const generateDummyUserOp = async () => {
+    if (isLocked) {
+      toast.error("Vault Locked", { description: "Unlock your vault from the portfolio home screen before signing operations." });
+      return;
+    }
     setIsPacking(true);
     toast.loading("Constructing ERC-4337 UserOperation...", { id: 'uop' });
     try {
       const wallet = await getConnectedWallet();
-      if (!wallet) throw new Error("Wallet Locked");
+      if (!wallet) {
+        toast.error("No signing key available", { id: 'uop', description: "Connect a wallet with a private key to sign UserOperations." });
+        return;
+      }
 
-      // Constructing a simulated institutional batch meta-transaction
       const dummyOp = {
         sender: address || wallet.address,
         nonce: BigInt(Math.floor(Math.random() * 100)),
         initCode: "0x",
-        callData: "0xdeadbeef", // Placeholder for batch execution data
+        callData: "0xdeadbeef",
         callGasLimit: 2000000n,
         verificationGasLimit: 150000n,
         preVerificationGas: 21000n,
         maxFeePerGas: 3000000000n,
         maxPriorityFeePerGas: 1000000000n,
-        paymasterAndData: "0x", // Unsubsidized for this example
+        paymasterAndData: "0x",
         signature: "0x",
       };
 
       const packed = packUserOp(dummyOp);
       const hash = getUserOpHash(dummyOp, ENTRY_POINT_ADDRESS, 1n);
 
-      // Sign the UserOp hash with the master EOA
+      // Sign the UserOp hash with the EOA private key
       const signature = await wallet.signMessage(ethers.getBytes(hash));
       dummyOp.signature = signature;
 
@@ -50,6 +56,7 @@ export function SmartAccountTerminal({ onBack }: { onBack: () => void }) {
       setIsPacking(false);
     }
   };
+
 
   return (
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }} className="flex flex-col max-w-3xl mx-auto w-full pt-8 px-6 pb-20 font-mono min-h-[600px] flex-1">

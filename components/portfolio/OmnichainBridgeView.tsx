@@ -49,7 +49,7 @@ export function OmnichainBridgeView({ onBack }: { onBack: () => void }) {
             nativeFee: "0.001452",
             lzTokenFee: "0.0"
         });
-        toast.success("Quote Simulated (RPC Fallback)", { id: 'l0' });
+        toast.info("Estimated quote (RPC unavailable)", { id: 'l0' });
     } finally {
       setIsQuoting(false);
     }

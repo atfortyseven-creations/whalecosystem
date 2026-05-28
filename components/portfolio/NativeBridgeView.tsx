@@ -99,7 +99,7 @@ export function NativeBridgeView({ address, onBack }: any) {
         }
 
         if (!privateKey) {
-            toast.error("READ-ONLY NODE ACTIVE", { description: "Cryptographic private key not found. Please initialize your Quantum Vault to sign cross-chain transactions." });
+            toast.error("READ-ONLY NODE ACTIVE", { description: "Private key not found. Please import or create a wallet to sign transactions." });
             return;
         }
 
@@ -163,11 +163,8 @@ export function NativeBridgeView({ address, onBack }: any) {
                     throw new Error("sendTransaction returned null");
                 }
             } catch(txErr: any) {
-                addLog(`Execution Reverted. Intercepting via Quantum Mesh Fallback...`);
-                await new Promise(r => setTimeout(r, 1500));
-                addLog(`Quantum Mesh Bridge Sequence Initiated. Packets delivered successfully via shadow network.`);
-                toast.success("Bridge Executed via Q-Mesh", { id: "bridge-tx" });
-                setAmount('');
+                addLog(`ERROR: ${(txErr as any)?.message || 'Transaction failed'}`);
+                toast.error("Bridge Failed", { id: "bridge-tx", description: (txErr as any)?.message });
             }
 
         } catch (e: any) {
@@ -183,7 +180,7 @@ export function NativeBridgeView({ address, onBack }: any) {
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10 dark:border-white/10">
                 <div>
                     <h2 className="text-lg font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-2">
-                        Quantum Bridge
+                        Cross-Chain Bridge
                         <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
                     </h2>
                     <p className="text-[10px] uppercase text-black/50 dark:text-white/50 tracking-widest mt-1">L0 / Stargate Cross-Chain Protocol</p>

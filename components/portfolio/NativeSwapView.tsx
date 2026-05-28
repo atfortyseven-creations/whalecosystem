@@ -86,7 +86,7 @@ export function NativeSwapView({ address, onBack }: any) {
                 const toRate = toToken === 'ETH' ? 3100 : toToken === 'WBTC' ? 65000 : 1;
                 
                 const conversion = (parseFloat(amountIn) * mockRate) / toRate;
-                await new Promise(r => setTimeout(r, 600)); // Quantum computation simulation
+                await new Promise(r => setTimeout(r, 600));
                 
                 setAmountOut((conversion * 0.997).toFixed(6));
                 
@@ -148,10 +148,10 @@ export function NativeSwapView({ address, onBack }: any) {
                 toast.success("ERC20 Approval Confirmed", { id: "approve-tx" });
                 setNeedsApproval(false);
             } catch (err: any) {
-                addLog(`SIMULATED SUCCESS: Tx execution bypassed due to network isolation.`);
-                await new Promise(r => setTimeout(r, 2000));
-                toast.success("Quantum Approval Bypassed (Simulated)", { id: "approve-tx" });
-                setNeedsApproval(false);
+                toast.error("Approval Failed", { id: "approve-tx", description: err?.message });
+                addLog(`ERROR: ${err?.message}`);
+                setIsApproving(false);
+                return;
             }
         } catch (e: any) {
             toast.error("Approval Execution Error", { id: "approve-tx" });
@@ -168,7 +168,7 @@ export function NativeSwapView({ address, onBack }: any) {
         }
 
         if (!privateKey) {
-            toast.error("READ-ONLY NODE ACTIVE", { description: "Cryptographic private key not found. Please initialize your Quantum Vault to sign L1/L2 state transitions." });
+            toast.error("READ-ONLY NODE ACTIVE", { description: "Private key not found. Please import or create a wallet to sign transactions." });
             return;
         }
 
@@ -179,7 +179,7 @@ export function NativeSwapView({ address, onBack }: any) {
 
         setIsSwapping(true);
         setLogs([]);
-        addLog(`Initializing Quantum Swap Sequence...`);
+        addLog(`Initiating swap...`);
         addLog(`Target: ${fromToken} -> ${toToken} on ${activeNetwork.toUpperCase()}`);
         toast.loading("Initiating On-Chain Swap Execution...", { id: "swap-tx" });
 
@@ -229,12 +229,8 @@ export function NativeSwapView({ address, onBack }: any) {
                 setAmountIn('');
                 setAmountOut('');
             } catch(txErr: any) {
-                addLog(`Execution Reverted: Fallback to highly-optimized simulated mesh network.`);
-                await new Promise(r => setTimeout(r, 2000));
-                addLog(`Quantum Mesh Success: Assets settled via proxy channels.`);
-                toast.success("Execution Completed via Q-Mesh", { id: "swap-tx" });
-                setAmountIn('');
-                setAmountOut('');
+                addLog(`ERROR: ${(txErr as any)?.message || 'Transaction failed'}`);
+                toast.error("Swap Failed", { id: "swap-tx", description: (txErr as any)?.message });
             }
 
         } catch (e: any) {
@@ -250,7 +246,7 @@ export function NativeSwapView({ address, onBack }: any) {
             <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/10 dark:border-white/10">
                 <div>
                     <h2 className="text-lg font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-2">
-                        Quantum Execution
+                        Execute Swap
                         <span className="flex h-2 w-2 rounded-full bg-green-500 animate-pulse"></span>
                     </h2>
                     <p className="text-[10px] uppercase text-black/50 dark:text-white/50 tracking-widest mt-1">DEX Routing Engine v4</p>

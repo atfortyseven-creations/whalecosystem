@@ -51,7 +51,7 @@ export function TokenHoldingsTable({ address, activeNetwork, scannerBase }: { ad
           <div className="flex-1 flex flex-col items-center justify-center text-center p-8 bg-black/5 border border-black/10">
               <Layers size={24} className="text-black/20 mb-4" />
               <p className="text-[11px] text-black/60 uppercase tracking-widest font-black mb-2">Network Segment Mismatch</p>
-              <p className="text-[10px] text-black/40">Quantum deep-scan for ERC-20 arrays is currently optimized for Ethereum Mainnet. Switch network to visualize.</p>
+              <p className="text-[10px] text-black/40">Token scanning is currently optimized for Ethereum Mainnet. Switch network to visualize.</p>
           </div>
       );
   }

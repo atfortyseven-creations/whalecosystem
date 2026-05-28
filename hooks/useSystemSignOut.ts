@@ -16,7 +16,7 @@ import { useWalletStore } from '@/lib/store/wallet-store';
  * 6. Hard redirect to /connect
  */
 export function useSystemSignOut() {
-    const { disconnect } = useDisconnect();
+    const { disconnectAsync } = useDisconnect();
 
     const nuclearDisconnect = useCallback(async () => {
         console.log('%c[System] Initiating Nuclear Disconnect...', 'color:#FF3B30;font-weight:bold');
@@ -26,6 +26,15 @@ export function useSystemSignOut() {
             useWalletStore.getState().clearWallet();
         } catch (e) {
             console.warn('[System:Logout] Zustand wallet purge failed:', e);
+        }
+
+        // 4. Disconnect Wagmi BEFORE clearing storage so it can access its keys to disconnect
+        try {
+            if (disconnectAsync) {
+                await disconnectAsync();
+            }
+        } catch (e) {
+            console.warn('[System:Logout] Wagmi disconnect failed:', e);
         }
 
         // 1. Clear Cookies (Nuclear approach)
@@ -89,13 +98,6 @@ export function useSystemSignOut() {
             sessionStorage.clear();
             sessionStorage.setItem('__disconnected__', '1'); // Flag to prevent immediate auto-relink
         } catch (e) {}
-
-        // 4. Disconnect Wagmi
-        try {
-            disconnect();
-        } catch (e) {
-            console.warn('[System:Logout] Wagmi disconnect failed:', e);
-        }
 
         // 5. NextAuth SignOut (if applicable) - Fire and forget to prevent blocking
         try {

@@ -39,7 +39,7 @@ const truncate = (str: string, len: number) => {
 };
 
 export function InstitutionalPortfolioView() {
-    const { address, balance, updateBalance, activeNetwork, restoreFromCloud } = useWalletStore();
+    const { address, balance, updateBalance, activeNetwork, restoreFromCloud, isLocked, unlockVault, passwordHash } = useWalletStore();
     const [view, setView] = useState<View>('HOME');
     const [prefilledAddress, setPrefilledAddress] = useState('');
     const [loading, setLoading] = useState(false);
@@ -84,9 +84,14 @@ export function InstitutionalPortfolioView() {
         );
     }
 
+    // Vault is password-protected and locked: show unlock screen
+    if (isLocked && passwordHash) {
+        return <VaultUnlockScreen unlockVault={unlockVault} />;
+    }
+
     const scannerBase = activeNetwork === 'polygon' ? 'https://polygonscan.com' : 'https://etherscan.io';
-    const priceOracle = ethPrice > 0 ? ethPrice : 3100; 
-    const balanceFiat = `$${(parseFloat(balance || "0") * priceOracle).toFixed(2)}`;
+    const priceOracle = ethPrice > 0 ? ethPrice : 3100;
+    const balanceFiat = `${(parseFloat(balance || "0") * priceOracle).toFixed(2)}`;
 
     return (
         <div className="flex flex-col relative text-black selection:bg-black/10 min-h-[85vh] bg-white font-sans">
@@ -235,11 +240,8 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                         </button>
                         <div className="flex flex-col sm:flex-row gap-3 w-full">
                             <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="flex-1 border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                                INSPECT EXPLORER
+                                INSPECT ON EXPLORER
                             </a>
-                            <button className="flex-1 border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all">
-                                EXPORT PRIVATE KEY
-                            </button>
                         </div>
                     </div>
                 ) : (
@@ -485,7 +487,7 @@ function CreateWalletView({ onBack, onCreated }: any) {
 
     const handleGenerate = async () => {
         setIsGenerating(true);
-        toast.loading("Generating Quantum Entropy...", { id: 'gen' });
+        toast.loading("Generating wallet...", { id: 'gen' });
         // Simulating extreme cryptographic generation time to satisfy user's request for complexity UI
         setTimeout(() => {
             createWallet();
@@ -526,7 +528,7 @@ function CreateWalletView({ onBack, onCreated }: any) {
                     ) : (
                         <div className="px-6 space-y-4">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 border border-red-200 bg-red-50 p-3">
-                                ATTENTION — Secret Recovery Phrase
+                                ATTENTION Secret Recovery Phrase
                             </h3>
                             <p className="text-[9px] font-mono text-black/60 text-left">
                                 This 12-word phrase is the MASTER KEY to all your accounts. Write it down offline. Never share it. If lost, your funds are permanently inaccessible.
@@ -721,5 +723,125 @@ function FormField({ label, children }: any) {
             <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-black/50 block">{label}</label>
             {children}
         </div>
+    );
+}
+
+// ── Vault Unlock Screen ──────────────────────────────────────────────────────
+// Shown when a password-protected vault exists but the session key has been
+// wiped (e.g. page reload). The user must re-enter their password to decrypt
+// the vault and restore the private key into memory.
+function VaultUnlockScreen({ unlockVault }: { unlockVault: (p: string) => boolean }) {
+    const [password, setPassword] = useState('');
+    const [showPw, setShowPw] = useState(false);
+    const [error, setError] = useState('');
+    const [isUnlocking, setIsUnlocking] = useState(false);
+    const inputRef = useRef<HTMLInputElement>(null);
+
+    useEffect(() => {
+        inputRef.current?.focus();
+    }, []);
+
+    const handleUnlock = () => {
+        if (!password) return;
+        setIsUnlocking(true);
+        setError('');
+        // unlockVault is synchronous
+        const ok = unlockVault(password);
+        setIsUnlocking(false);
+        if (!ok) {
+            setError('Incorrect password. Please try again.');
+            setPassword('');
+            inputRef.current?.focus();
+        }
+    };
+
+    return (
+        <motion.div
+            initial={{ opacity: 0, scale: 0.97 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex flex-col items-center justify-center min-h-[85vh] bg-white px-4"
+        >
+            <div className="w-full max-w-sm flex flex-col items-center gap-8">
+                {/* Icon */}
+                <div className="w-14 h-14 border-2 border-black flex items-center justify-center">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
+                        <path d="M7 11V7a5 5 0 0 1 10 0v4" />
+                    </svg>
+                </div>
+
+                {/* Title */}
+                <div className="text-center">
+                    <h1 className="text-[13px] font-black uppercase tracking-[0.3em] text-black mb-2">
+                        Vault Locked
+                    </h1>
+                    <p className="text-[11px] font-mono text-black/40 leading-relaxed max-w-xs">
+                        Your cryptographic vault is encrypted with AES-GCM-256. Enter your password to restore access.
+                    </p>
+                </div>
+
+                {/* Input */}
+                <div className="w-full space-y-3">
+                    <div className="relative border border-black/20 focus-within:border-black transition-colors bg-white">
+                        <input
+                            ref={inputRef}
+                            type={showPw ? 'text' : 'password'}
+                            value={password}
+                            onChange={e => { setPassword(e.target.value); setError(''); }}
+                            onKeyDown={e => e.key === 'Enter' && handleUnlock()}
+                            placeholder="Enter vault password"
+                            className="w-full bg-transparent p-5 pr-14 text-[14px] font-mono text-black outline-none tracking-widest placeholder:text-black/20 placeholder:tracking-normal"
+                        />
+                        <button
+                            type="button"
+                            onClick={() => setShowPw(v => !v)}
+                            className="absolute right-4 top-1/2 -translate-y-1/2 text-black/30 hover:text-black transition-colors"
+                            tabIndex={-1}
+                        >
+                            {showPw ? (
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24" />
+                                    <line x1="1" y1="1" x2="23" y2="23" />
+                                </svg>
+                            ) : (
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                    <circle cx="12" cy="12" r="3" />
+                                </svg>
+                            )}
+                        </button>
+                    </div>
+
+                    {error && (
+                        <p className="text-[10px] font-bold text-red-500 uppercase tracking-widest">
+                            {error}
+                        </p>
+                    )}
+                </div>
+
+                {/* Unlock button */}
+                <button
+                    onClick={handleUnlock}
+                    disabled={!password || isUnlocking}
+                    className="w-full py-5 bg-black text-white font-black text-[10px] uppercase tracking-[0.3em] hover:bg-black/90 disabled:opacity-30 transition-all flex items-center justify-center gap-2"
+                >
+                    {isUnlocking ? (
+                        <>
+                            <svg className="animate-spin" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                                <path d="M21 12a9 9 0 1 1-6.219-8.56" />
+                            </svg>
+                            Decrypting...
+                        </>
+                    ) : (
+                        'Unlock Vault'
+                    )}
+                </button>
+
+                {/* Divider note */}
+                <p className="text-[9px] font-mono text-black/25 text-center max-w-xs leading-relaxed">
+                    If you have forgotten your password, you can reconnect your wallet using MetaMask or WalletConnect from the login page.
+                </p>
+            </div>
+        </motion.div>
     );
 }
