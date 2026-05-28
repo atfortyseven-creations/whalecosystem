@@ -715,7 +715,7 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
               setMessages(prev => {
                 if (prev.some(m => m.id === hydrated.id)) return prev;
                 if (!fromPeer) {
-                  const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content === hydrated.content);
+                  const optIndex = prev.findIndex(m => m.id.startsWith('opt-') && m.content.trim() === hydrated.content.trim());
                   if (optIndex !== -1) {
                     const next = [...prev];
                     next[optIndex] = hydrated;
@@ -788,14 +788,24 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
         const rendered = raw
           .map((m: any) => xmtpToRenderable(m, selfInboxId))
           .filter((m: any) => !(typeof m.content === 'string' && m.content.includes('initiatedByInboxId')))
-          .sort((a, b) => a.sentAt - b.sentAt);
-        
         const hydrated = hydrateMessages(rendered);
         
         setMessages(prev => {
           const optimistic = prev.filter(m => m.id.startsWith('opt-'));
           const renderedIds = new Set(hydrated.map(r => r.id));
-          return [...hydrated, ...optimistic.filter(o => !renderedIds.has(o.id))].sort((a, b) => a.sentAt - b.sentAt);
+          // Strip tags like [REPLY:...] from optimistic to match hydrated if needed, but since optimistic.content is raw, we match exactly.
+          const hydratedContents = new Set(hydrated.map(h => h.content.trim()));
+          
+          // Only keep optimistic messages if they aren't already represented by a real hydrated message from the network.
+          // Also filter out any optimistic message older than 15 seconds to prevent permanent ghost messages.
+          const now = Date.now();
+          const survivingOptimistic = optimistic.filter(o => 
+            !renderedIds.has(o.id) && 
+            !hydratedContents.has(o.content.trim()) &&
+            (now - o.sentAt < 15000)
+          );
+          
+          return [...hydrated, ...survivingOptimistic].sort((a, b) => a.sentAt - b.sentAt);
         });
       } catch (e) {
         console.warn('[Chat] load messages failed:', e);

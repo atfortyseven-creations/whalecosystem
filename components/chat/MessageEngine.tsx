@@ -61,7 +61,7 @@ export default function MessageEngine({
   const closeMenu = () => setMenuState(null);
 
   return (
-    <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1 scroll-smooth" onClick={closeMenu}>
+    <div className="flex-1 overflow-y-auto px-6 py-4 space-y-1" onClick={closeMenu}>
       <AnimatePresence initial={false}>
       {(() => {
         let lastDate = '';
@@ -79,7 +79,6 @@ export default function MessageEngine({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                 transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
-                layout="position"
               >
                 {showDate && (
                   <div className="flex justify-center my-6">
@@ -100,7 +99,7 @@ export default function MessageEngine({
           });
       })()}
       </AnimatePresence>
-      <div ref={bottomRef} />
+      <div ref={bottomRef} className="h-4" />
 
       {/* Floating Context Menu */}
       {menuState && (

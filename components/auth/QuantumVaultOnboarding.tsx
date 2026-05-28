@@ -203,28 +203,24 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
             <div className={`p-4 border transition-colors ${phase === "ENTROPY" ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 1</span>
-                {phase !== "INTRO" && phase !== "ENTROPY" ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Activity size={12} className="text-black/40" />}
               </div>
               <h3 className="text-[12px] font-black uppercase tracking-wider text-black">System Setup</h3>
             </div>
             <div className={`p-4 border transition-colors ${phase === "PROOFS" ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 2</span>
-                {["MNEMONIC_BACKUP", "MNEMONIC_VERIFY", "VAULT_SEAL", "COMPLETE"].includes(phase) ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Cpu size={12} className="text-black/40" />}
               </div>
               <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Wallet Generation</h3>
             </div>
             <div className={`p-4 border transition-colors ${["MNEMONIC_BACKUP", "MNEMONIC_VERIFY"].includes(phase) ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 3</span>
-                {["VAULT_SEAL", "COMPLETE"].includes(phase) ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Key size={12} className="text-black/40" />}
               </div>
               <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Secret Backup</h3>
             </div>
             <div className={`p-4 border transition-colors ${phase === "VAULT_SEAL" ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 4</span>
-                {phase === "COMPLETE" ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Lock size={12} className="text-black/40" />}
               </div>
               <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Secure Password</h3>
             </div>

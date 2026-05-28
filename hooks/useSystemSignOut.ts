@@ -6,26 +6,22 @@ import { signOut } from 'next-auth/react';
 import { useWalletStore } from '@/lib/store/wallet-store';
 
 /**
- * [Enterprise NUCLEAR DISCONNECT]
- * Performs a deep-clean of the user session across all persistence layers.
- * 1. Purges authentication cookies (multi-path/domain)
- * 2. Nukes LocalStorage (System + Wagmi + AppKit keys)
- * 3. Clears SessionStorage
- * 4. Disconnects Wagmi/AppKit connectors
- * 5. Signs out of NextAuth
- * 6. Hard redirect to /connect
+ * [Enterprise SYSTEM LOGOUT]
+ * Secures the local session. Locks the wallet vault but PRESERVES the encrypted 
+ * blob so the user can log in again with their Humanity Ledger password.
  */
 export function useSystemSignOut() {
     const { disconnectAsync } = useDisconnect();
 
     const nuclearDisconnect = useCallback(async () => {
-        console.log('%c[System] Initiating Nuclear Disconnect...', 'color:#FF3B30;font-weight:bold');
+        console.log('%c[System] Initiating System Logout...', 'color:#FF3B30;font-weight:bold');
 
-        // 0. Purge local custom wallet Zustand state
+        // 0. LOCK local custom wallet Zustand state instead of purging
+        // This ensures the user can log back in with their password!
         try {
-            useWalletStore.getState().clearWallet();
+            useWalletStore.getState().lockVault();
         } catch (e) {
-            console.warn('[System:Logout] Zustand wallet purge failed:', e);
+            console.warn('[System:Logout] Zustand wallet lock failed:', e);
         }
 
         // 4. Disconnect Wagmi BEFORE clearing storage so it can access its keys to disconnect
@@ -65,7 +61,7 @@ export function useSystemSignOut() {
                 'system_session_v2',
                 'system_vault_v1',
                 'system_pending_wakeup',
-                'whale-system-wallet-registry-v2'
+                'whale-system-wallet-registry-v2' // Old version, safe to delete
             ];
             targets.forEach(t => localStorage.removeItem(t));
 
@@ -73,6 +69,7 @@ export function useSystemSignOut() {
             Object.keys(localStorage).forEach(key => {
                 const lower = key.toLowerCase();
                 if (lower.startsWith('whale_chat_pin_')) return; // Preserve PIN
+                if (lower.includes('whale-system-wallet-registry-v3')) return; // PRESERVE ENCRYPTED VAULT!
                 
                 if (
                     lower.includes('wagmi') || 
@@ -82,8 +79,6 @@ export function useSystemSignOut() {
                     lower.includes('reown') ||
                     lower.includes('whale_chat') ||
                     lower.includes('whale_draft') ||
-                    lower.includes('whale_') ||
-                    lower.includes('whale-') ||
                     lower.includes('system_')
                 ) {
                     localStorage.removeItem(key);
@@ -105,7 +100,7 @@ export function useSystemSignOut() {
         } catch (e) {}
 
         // 6. Hard Redirect - Instant
-        console.log('%c[System] Session Purged. Redirecting...', 'color:#00A36C');
+        console.log('%c[System] Session Locked. Redirecting...', 'color:#00A36C');
         window.location.replace('/');
 
     }, [disconnectAsync]);

@@ -409,6 +409,33 @@ export default function RegistryPage() {
     const roots: BlockRoot[] = [];
     let totalTxs = 0;
 
+    // ── FETCH REAL CONNECTED ACCOUNTS ─────────────────────────────────────────
+    // This correctly articulates all accounts connected since February, ensuring no simulations.
+    try {
+      const res = await fetch("/api/registry/real-users");
+      if (res.ok) {
+        const { users } = await res.json();
+        for (const u of users) {
+          const key = `real-${u.walletAddress.toLowerCase()}`;
+          walletMap.set(key, {
+            address: u.walletAddress,
+            chain: "Real Person connected",
+            chainId: 1,
+            badge: "REAL",
+            color: "#10b981",
+            txCount: 1,
+            blockNumber: 0,
+            timestamp: u.createdAt,
+            explorer: "https://etherscan.io",
+            network: selectedNetwork,
+            role: "both",
+          });
+        }
+      }
+    } catch (e) {
+      console.warn("[Registry] Failed to fetch real users", e);
+    }
+
     for (let ci = 0; ci < chains.length; ci++) {
       if (abortRef.current) break;
       const cfg = chains[ci];
@@ -1129,7 +1156,7 @@ export default function RegistryPage() {
                                     : "rgba(0,0,0,0.5)",
                                 }}
                               >
-                                #{w.blockNumber.toLocaleString()}
+                                {w.blockNumber > 0 ? `#${w.blockNumber.toLocaleString()}` : "–"}
                               </span>
                             </td>
 

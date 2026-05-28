@@ -724,7 +724,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
                        {accounts.length > 0 && <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full">{accounts.length}/5</span>}
                     </div>
                     <div className="text-[13px] text-white/50 font-medium mt-0.5 tracking-wide">
-                       {accounts.length >= 5 ? 'Maximum vaults reached' : t.create_vault_sub}
+                       {accounts.length >= 5 ? 'Maximum accounts reached' : t.create_vault_sub}
                     </div>
                   </div>
                 </div>
@@ -783,7 +783,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
               {accounts.length > 0 && (
                 <div className="w-full bg-[#FFFFFF] border border-black/10 rounded-[20px] p-2 mb-4">
                   <div className="px-3 pt-2 pb-1 text-[11px] font-black uppercase tracking-widest text-[#0A0A0A]/40">
-                    Select Vault ({accounts.length}/5)
+                    Select Account ({accounts.length}/5)
                   </div>
                   <div className="max-h-[160px] overflow-y-auto space-y-1 mt-2">
                     {accounts.map(acc => (
