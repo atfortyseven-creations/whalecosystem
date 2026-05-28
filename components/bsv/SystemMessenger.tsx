@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Send, Shield, User, Zap, MessageSquare, Activity, Globe, Fingerprint, Hash } from 'lucide-react';
 import { useCWI } from '@/lib/bsv/CWIContext';
 import { useAztec } from '../../context/AztecContext';
+import { AztecProverHUD } from './AztecProverHUD';
 import { toast } from 'sonner';
 import useSWR from 'swr';
 
@@ -20,6 +21,7 @@ export const SystemMessenger = () => {
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
+    const [isProving, setIsProving] = useState(false);
     const scrollRef = useRef<HTMLDivElement>(null);
 
     const { data: syncData, mutate } = useSWR(
@@ -59,6 +61,8 @@ export const SystemMessenger = () => {
             // Aztec Proof simulation
             if (isReady && pxe && walletAddress) {
                 console.log("Generating Aztec Shielded Transaction...", walletAddress);
+                setIsProving(true);
+                return; // Detenemos la ejecución normal web2 para que corra el prover ZK
             }
 
             const res = await fetch('/api/chat/sync', {
@@ -83,8 +87,28 @@ export const SystemMessenger = () => {
         }
     };
 
+    // Hook Callback for when the Prover HUD finishes
+    const onProofComplete = async () => {
+        setIsProving(false);
+        const address = identity?.getAddress() || "Anon";
+        const sender = `System_${address.slice(0, 4)}...${address.slice(-4)}`;
+        
+        // After proof is "verified", we add the message
+        setMessages(prev => [...prev, {
+            id: Date.now().toString(),
+            sender,
+            content: input,
+            timestamp: new Date().toISOString(),
+            status: 'verified_zk'
+        }]);
+        setInput('');
+        toast.success("Zero-Knowledge Proof verified on Aztec Sandbox");
+    };
+
     return (
-        <div className="flex flex-col h-full bg-[#050505] border border-white/5 rounded-[2.5rem] overflow-hidden">
+        <div className="h-full flex flex-col bg-black/40 backdrop-blur-md rounded-2xl border border-white/5 relative">
+            <AztecProverHUD isVisible={isProving} onComplete={onProofComplete} />
+            
             {/* Header */}
             <div className="p-6 border-b border-white/5 bg-white/[0.02] flex justify-between items-center">
                 <div className="flex items-center gap-3">
@@ -112,14 +136,17 @@ export const SystemMessenger = () => {
                             animate={{ opacity: 1, x: 0 }}
                             className={`flex flex-col gap-1 ${msg.type === 'SYS' ? 'items-center opacity-40' : 'items-start'}`}
                         >
-                            <div className="flex items-center gap-2">
-                                <span className="text-[8px] font-black uppercase tracking-widest text-white/30">{msg.sender}</span>
-                                {msg.type !== 'SYS' && (
-                                    <div className="flex items-center gap-1 px-1 bg-green-500/10 border border-green-500/20 rounded-md">
-                                        <Shield size={8} className="text-green-500" />
+                            <div className="flex flex-col gap-1">
+                                <div className="flex items-center gap-2">
+                                    <span className="text-[10px] font-black tracking-widest text-[var(--aztec-orchid)]">{msg.sender}</span>
+                                    {msg.status === 'verified_zk' ? (
+                                        <span className="text-[6px] font-black text-[var(--aztec-chartreuse)] border border-[var(--aztec-chartreuse)]/30 px-1 rounded-sm font-aztec-mono flex items-center gap-1">
+                                            <Shield size={6}/> ZK VERIFIED
+                                        </span>
+                                    ) : (
                                         <span className="text-[6px] font-black text-green-500 font-aztec-mono">SIGNED</span>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                             <div className={`p-4 rounded-2xl text-[11px] font-medium leading-relaxed max-w-[90%]
                                 ${msg.type === 'SYS' ? 'bg-transparent border border-white/5 italic text-center text-[10px]' : 'bg-white/5 border border-white/10 text-white/80'}
