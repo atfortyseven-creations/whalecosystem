@@ -41,19 +41,18 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Whale Network  Institutional Blockchain Analytics & Web3 Ecosystem',
-    template: '%s | Whale Network'
+    default: 'Human IDFi | Privacy-Preserving Identity Verification',
+    template: '%s | Human IDFi'
   },
-  description: 'The ultimate on-chain analytics and institutional ecosystem for Web3. Whale Network provides real-time monitoring, portfolio management, and a thriving community for blockchain professionals. Official domain: whalecosystem.io',
+  description: 'Human IDFi is a privacy-preserving identity verification solution integrating zero-knowledge proofs to achieve compliance without compromising personal data.',
   keywords: [
-    'whale network', 'whalecosystem', 'crypto ecosystem', 'institutional web3',
-    'blockchain monitor', 'crypto tracking', 'on-chain analytics', 'defi',
-    'web3 analytics', 'smart contracts', 'crypto data', 'whale ecosystem'
+    'identity verification', 'zero-knowledge proofs', 'privacy', 'kyc',
+    'compliance', 'digital identity', 'zkp', 'human idfi', 'humanity ledger'
   ],
-  authors: [{ name: 'Whale Network' }],
-  creator: 'Whale Network',
-  publisher: 'Whale Network',
-  metadataBase: new URL('https://whalecosystem.io'),
+  authors: [{ name: 'Humanity Ledger' }],
+  creator: 'Humanity Ledger',
+  publisher: 'Humanity Ledger',
+  metadataBase: new URL('https://humanidfi.com'),
   alternates: {
     canonical: '/',
   },
@@ -72,20 +71,20 @@ export const metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'Whale Network',
+    title: 'Human IDFi',
     statusBarStyle: 'default',
   },
   openGraph: {
-    title: 'Whale Network  Institutional Blockchain Analytics & Web3 Ecosystem',
-    description: 'The ultimate on-chain analytics and institutional ecosystem for Web3. Whale Network provides real-time monitoring and a thriving community for blockchain professionals.',
-    url: 'https://whalecosystem.io',
-    siteName: 'Whale Network',
+    title: 'Human IDFi | Privacy-Preserving Identity Verification',
+    description: 'A privacy-preserving identity verification solution integrating zero-knowledge proofs to achieve compliance without compromising personal data.',
+    url: 'https://humanidfi.com',
+    siteName: 'Human IDFi',
     images: [
       {
         url: '/humanid_protocol_logo_1778714491433.png',
         width: 1200,
         height: 1200,
-        alt: 'Whale Network',
+        alt: 'Human IDFi Logo',
       },
     ],
     locale: 'en_US',
@@ -93,11 +92,11 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Whale Network  Institutional Web3 Ecosystem',
-    description: 'The ultimate on-chain analytics and institutional ecosystem for Web3.',
+    title: 'Human IDFi | Privacy-Preserving Identity Verification',
+    description: 'A privacy-preserving identity verification solution integrating zero-knowledge proofs.',
     images: ['/humanid_protocol_logo_1778714491433.png'],
-    site: '@whalecosystem',
-    creator: '@whalecosystem',
+    site: '@humanidfi',
+    creator: '@humanidfi',
   },
 }
 
@@ -125,37 +124,36 @@ export default async function RootLayout({
     "@graph": [
       {
         "@type": "WebSite",
-        "url": "https://whalecosystem.io/",
-        "name": "Whale Network",
-        "description": "The official institutional blockchain analytics and Web3 ecosystem. Whale Network is a secure, pristine, and authoritative platform.",
+        "url": "https://humanidfi.com/",
+        "name": "Human IDFi",
+        "description": "Privacy-preserving identity verification solution integrating zero-knowledge proofs.",
         "potentialAction": {
           "@type": "SearchAction",
           "target": {
             "@type": "EntryPoint",
-            "urlTemplate": "https://whalecosystem.io/?q={search_term_string}"
+            "urlTemplate": "https://humanidfi.com/?q={search_term_string}"
           },
           "query-input": "required name=search_term_string"
         },
         "publisher": {
-          "@id": "https://whalecosystem.io/#organization"
+          "@id": "https://humanidfi.com/#organization"
         }
       },
       {
         "@type": "Organization",
-        "@id": "https://whalecosystem.io/#organization",
-        "name": "Whale Network",
-        "alternateName": ["Whale Ecosystem", "Whalecosystem", "Whale Network Protocol"],
-        "url": "https://whalecosystem.io",
-        "logo": "https://whalecosystem.io/humanid_protocol_logo_1778714491433.png",
+        "@id": "https://humanidfi.com/#organization",
+        "name": "Humanity Ledger",
+        "alternateName": ["Human IDFi", "Humanity Ledger"],
+        "url": "https://humanidfi.com",
+        "logo": "https://humanidfi.com/humanid_protocol_logo_1778714491433.png",
         "sameAs": [
-          "https://twitter.com/whalecosystem",
           "https://github.com/atfortyseven-creations/Humanity-Ledger"
         ]
       },
       {
         "@type": "WebApplication",
-        "name": "Whale Network Ecosystem",
-        "applicationCategory": "FinanceApplication",
+        "name": "Human IDFi Platform",
+        "applicationCategory": "SecurityApplication",
         "operatingSystem": "Web",
         "offers": {
           "@type": "Offer",
@@ -163,15 +161,14 @@ export default async function RootLayout({
           "priceCurrency": "USD"
         },
         "creator": {
-          "@id": "https://whalecosystem.io/#organization"
+          "@id": "https://humanidfi.com/#organization"
         },
-        "description": "The official institutional platform for Web3 infrastructure, analytics, and ecosystem integration.",
+        "description": "Privacy-preserving identity verification and portfolio management.",
         "featureList": [
-          "On-Chain Analytics",
-          "Institutional Dashboard",
-          "Pristine White UI Infrastructure",
-          "Web3 Security Protocol",
-          "System Network Connectivity"
+          "Identity Verification",
+          "Zero-Knowledge Proofs",
+          "Compliance Tools",
+          "Privacy-Preserving Infrastructure"
         ]
       }
     ]

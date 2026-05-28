@@ -371,27 +371,37 @@ function HeroSection() {
         }}
       />
 
-      {/* ── CTA buttons ─────────────────────────────────────────────────── */}
-      <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full max-w-[880px] mx-auto pb-0">
+      {/* ── Text Content & CTA buttons ────────────────────────────────────────── */}
+      <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full max-w-[880px] mx-auto pb-0 pt-16">
         {mounted && (
           <motion.div
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1], delay: 0.1 }}
-            className="flex flex-col sm:flex-row items-center gap-3"
+            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+            className="flex flex-col items-center"
           >
-            <Link
-              href="/portfolio"
-              className="w-full sm:w-auto px-8 py-3.5 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors shadow-2xl"
-            >
-              Open Application
-            </Link>
-            <Link
-              href="/developers/api-docs"
-              className="w-full sm:w-auto px-8 py-3.5 border border-black/30 bg-white/80 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white hover:border-black/60 transition-colors shadow-xl"
-            >
-              Read Documentation
-            </Link>
+            <h1 className="text-[40px] md:text-[56px] font-black tracking-tight leading-[1.05] text-black mb-6">
+              Privacy-Preserving
+              <br />
+              <span className="text-black/70">Identity Verification</span>
+            </h1>
+            <p className="text-[16px] md:text-[18px] text-black/60 max-w-[600px] mb-10 font-medium">
+              Human IDFi integrates zero-knowledge proofs to help you achieve compliance and verify users without ever compromising personal data.
+            </p>
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <Link
+                href="/portfolio"
+                className="w-full sm:w-auto px-8 py-3.5 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors shadow-2xl"
+              >
+                Open Application
+              </Link>
+              <Link
+                href="/developers/api-docs"
+                className="w-full sm:w-auto px-8 py-3.5 border border-black/30 bg-white/80 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white hover:border-black/60 transition-colors shadow-xl"
+              >
+                Read Documentation
+              </Link>
+            </div>
           </motion.div>
         )}
       </div>
