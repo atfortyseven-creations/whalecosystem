@@ -20,6 +20,7 @@ import { ClientOverlays } from "@/components/layout/ClientOverlays";
 import { GlobalErrorBoundary } from "@/components/ui/GlobalErrorBoundary";
 import { ScrollProgressBar } from "@/components/ui/ScrollProgressBar";
 import { AntiTamperCore } from "@/components/security/AntiTamperCore";
+import { AztecProvider } from "@/context/AztecContext";
 
 import { WalletConnectProvider } from '@/components/walletconnect/WalletConnectProvider';
 
@@ -263,16 +264,18 @@ export default async function RootLayout({
           <GlobalErrorBoundary>
             <MobileEnforcer>
               <ClientLayout>
-                <CookieProvider>
-                  <ErrorSuppressor />
-                  <GoogleTagManager gtmId="GTM-52B9SCRM" />
-                  <AntiTamperCore />
-                  {children}
-                  <Toaster richColors position="top-right" />
-                  <CookieConsent />
-                  <ClientOverlays />
-                  <WalletConnectProvider />
-                </CookieProvider>
+                <AztecProvider>
+                  <CookieProvider>
+                    <ErrorSuppressor />
+                    <GoogleTagManager gtmId="GTM-52B9SCRM" />
+                    <AntiTamperCore />
+                    {children}
+                    <Toaster richColors position="top-right" />
+                    <CookieConsent />
+                    <ClientOverlays />
+                    <WalletConnectProvider />
+                  </CookieProvider>
+                </AztecProvider>
               </ClientLayout>
             </MobileEnforcer>
           </GlobalErrorBoundary>

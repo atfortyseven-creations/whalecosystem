@@ -1,9 +1,10 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Shield, User, Zap, MessageSquare, Activity, Globe } from 'lucide-react';
+import { Send, Shield, User, Zap, MessageSquare, Activity, Globe, Fingerprint, Hash } from 'lucide-react';
 import { useCWI } from '@/lib/bsv/CWIContext';
+import { useAztec } from '../../context/AztecContext';
 import { toast } from 'sonner';
 import useSWR from 'swr';
 
@@ -15,6 +16,7 @@ import useSWR from 'swr';
  */
 export const SystemMessenger = () => {
     const { identity } = useCWI();
+    const { pxe, isReady, walletAddress } = useAztec();
     const [messages, setMessages] = useState<any[]>([]);
     const [input, setInput] = useState('');
     const [loading, setLoading] = useState(false);
@@ -53,6 +55,11 @@ export const SystemMessenger = () => {
         try {
             const address = identity.getAddress();
             const sender = `System_${address.slice(0, 4)}...${address.slice(-4)}`;
+
+            // Aztec Proof simulation
+            if (isReady && pxe && walletAddress) {
+                console.log("Generating Aztec Shielded Transaction...", walletAddress);
+            }
 
             const res = await fetch('/api/chat/sync', {
                 method: 'POST',
