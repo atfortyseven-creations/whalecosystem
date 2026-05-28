@@ -169,27 +169,7 @@ export function AztecPrivacyTerminal({ onBack }: { onBack: () => void }) {
         </div>
       </div>
 
-      {/* ─── ZK Terminal Log ─────────────────────────────────────────────── */}
-      {logs.length > 0 && (
-        <div
-          ref={logsRef}
-          className="border-t border-black/10 bg-[#050505] text-[9px] font-mono p-4 h-32 overflow-y-auto shrink-0"
-        >
-          <div className="text-black/30 mb-2">// ZK_EXECUTION_LOG</div>
-          {logs.map((l, i) => (
-            <div key={i} className={`leading-relaxed mb-0.5 ${
-              l.level === 'ERROR'   ? 'text-red-400' :
-              l.level === 'SUCCESS' ? 'text-emerald-400' :
-              l.level === 'ZK'     ? 'text-purple-400' :
-              'text-white/50'
-            }`}>
-              <span className="text-white/20">[{l.timestamp}]</span>{' '}
-              <span className="text-white/40">[{l.level}]</span>{' '}
-              {l.message}
-            </div>
-          ))}
-        </div>
-      )}
+
     </motion.div>
   );
 }

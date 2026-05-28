@@ -24,6 +24,7 @@ const NAV_COLUMNS = [
     links: [
       { label: "Use Cases",       href: "/use-cases" },
       { label: "How it Works",    href: "/how-it-works" },
+      { label: "Architecture",    href: "/architecture" },
       { label: "Demo",            href: "/demo" },
       { label: "FAQ",             href: "/faq" },
     ]
@@ -32,12 +33,14 @@ const NAV_COLUMNS = [
     label: "DEVELOPERS",
     links: [
       { label: "Docs",            href: "/developers/api-docs" },
+      { label: "Whitepaper",      href: "/whitepaper" },
       { label: "GitHub",          href: "https://github.com/atfortyseven-creations/Humanity-Ledger", isExternal: true },
     ]
   },
   {
     label: "RESOURCES",
     links: [
+      { label: "About Us",        href: "/about-us" },
       { label: "Global Registry", href: "/registry" },
       { label: "Vision & Press",  href: "/vision" },
       { label: "Talk to Sales",   href: "/contact" },

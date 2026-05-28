@@ -141,8 +141,8 @@ export async function GET() {
       rawHash = {};
     }
 
-    // 2. Map ISO2 to Names
-    const byCountry: Record<string, number> = {};
+    // 2. Map ISO2 to Names and merge with BASE_CLOUDFLARE_TRAFFIC
+    const byCountry: Record<string, number> = { ...BASE_CLOUDFLARE_TRAFFIC };
     let totalRealTime = 0;
 
     for (const [code, val] of Object.entries(rawHash)) {

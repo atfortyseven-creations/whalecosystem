@@ -69,10 +69,12 @@ interface Tooltip {
 
 interface RealWorldMapProps {
   fullPage?: boolean;
+  isDark?: boolean;
 }
 
 export const RealWorldMap = memo(function RealWorldMap({
   fullPage = false,
+  isDark = false,
 }: RealWorldMapProps) {
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
@@ -134,9 +136,13 @@ export const RealWorldMap = memo(function RealWorldMap({
 
   return (
     <div
-      className={`relative bg-white overflow-hidden ${
-        fullPage ? "w-full flex flex-col h-full" : "w-full rounded-xl border border-black/10"
+      className={`relative overflow-hidden ${
+        fullPage ? "w-full flex flex-col h-full" : "w-full rounded-xl"
       }`}
+      style={{
+        backgroundColor: isDark ? "transparent" : "#fff",
+        border: fullPage ? "none" : isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)"
+      }}
     >
       {/* ── Map ── */}
       <div
@@ -149,7 +155,7 @@ export const RealWorldMap = memo(function RealWorldMap({
            display: "flex",
            alignItems: "center",
            justifyContent: "center",
-           backgroundColor: "#fff"
+           backgroundColor: isDark ? "transparent" : "#fff"
         }}
       >
         <ComposableMap
@@ -210,22 +216,32 @@ export const RealWorldMap = memo(function RealWorldMap({
               top: Math.max(tooltip.y - 8, 0),
             }}
           >
-            <div className="bg-white border border-black/15 shadow-xl rounded-xl p-3 w-56">
-              <p className="text-[13px] font-black text-black leading-tight">{tooltip.name}</p>
+            <div 
+              className="shadow-xl rounded-xl p-3 w-56"
+              style={{
+                backgroundColor: isDark ? "#111118" : "#fff",
+                border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.15)",
+                color: isDark ? "#fff" : "#000"
+              }}
+            >
+              <p className="text-[13px] font-black leading-tight" style={{ color: isDark ? "#fff" : "#000" }}>{tooltip.name}</p>
               <div className="flex items-center gap-2 mt-2">
                 <div
                   className="w-3 h-3 rounded-sm"
                   style={{ background: TIER_COLORS[tooltip.tier] }}
                 />
-                <span className="text-[10px] font-bold text-black/60">
+                <span className="text-[10px] font-bold" style={{ color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)" }}>
                   {TIER_LABELS[tooltip.tier]}
                 </span>
               </div>
-              <div className="mt-2 pt-2 border-t border-black/5 flex items-center gap-2">
+              <div 
+                className="mt-2 pt-2 flex items-center gap-2"
+                style={{ borderTop: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.05)" }}
+              >
                 {tooltip.count > 0 && (
                   <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse block" />
                 )}
-                <span className="text-[11px] font-black text-black font-mono">
+                <span className="text-[11px] font-black font-mono" style={{ color: isDark ? "#fff" : "#000" }}>
                   {tooltip.count.toLocaleString()} wallet{tooltip.count !== 1 ? "s" : ""} connected
                 </span>
               </div>
@@ -235,19 +251,31 @@ export const RealWorldMap = memo(function RealWorldMap({
 
         {/* ── Live stats overlay (top-right) ── */}
         <div className="absolute top-2 right-2 sm:top-3 sm:right-3 flex gap-2">
-          <div className="bg-white/95 backdrop-blur border border-black/10 shadow rounded-lg px-2 sm:px-4 py-2 text-center min-w-[80px] sm:min-w-[100px]">
-            <span className="text-[16px] sm:text-[22px] font-black text-black leading-none block font-mono">
+          <div 
+            className="backdrop-blur shadow rounded-lg px-2 sm:px-4 py-2 text-center min-w-[80px] sm:min-w-[100px]"
+            style={{
+              backgroundColor: isDark ? "rgba(17,17,24,0.95)" : "rgba(255,255,255,0.95)",
+              border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)"
+            }}
+          >
+            <span className="text-[16px] sm:text-[22px] font-black leading-none block font-mono" style={{ color: isDark ? "#fff" : "#000" }}>
               {stats.total.toLocaleString()}
             </span>
-            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-black/40 block mt-0.5">
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
               Connected Wallets
             </span>
           </div>
-          <div className="bg-white/95 backdrop-blur border border-black/10 shadow rounded-lg px-2 sm:px-4 py-2 text-center min-w-[80px] sm:min-w-[100px] hidden sm:block">
-            <span className="text-[16px] sm:text-[22px] font-black text-black leading-none block font-mono">
+          <div 
+            className="backdrop-blur shadow rounded-lg px-2 sm:px-4 py-2 text-center min-w-[80px] sm:min-w-[100px] hidden sm:block"
+            style={{
+              backgroundColor: isDark ? "rgba(17,17,24,0.95)" : "rgba(255,255,255,0.95)",
+              border: isDark ? "1px solid rgba(255,255,255,0.1)" : "1px solid rgba(0,0,0,0.1)"
+            }}
+          >
+            <span className="text-[16px] sm:text-[22px] font-black leading-none block font-mono" style={{ color: isDark ? "#fff" : "#000" }}>
               {stats.regions}
             </span>
-            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest text-black/40 block mt-0.5">
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
               Active Countries
             </span>
           </div>

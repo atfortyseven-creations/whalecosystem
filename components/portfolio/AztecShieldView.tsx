@@ -104,14 +104,7 @@ export function AztecShieldView({ address, onBack }: { address: string, onBack: 
                     {isShielding ? 'GENERATING ZK-PROOFS & BROADCASTING...' : 'EXECUTE ON-CHAIN SHIELD'}
                 </button>
 
-                {/* Console Output for On-Chain Diagnostics */}
-                <div className="bg-[#FAFAFA] border border-black/10 p-4 h-[200px] overflow-y-auto font-mono text-[9px] text-black/70 mt-6 shadow-inner">
-                    <div className="text-black/40 mb-2">// AZTEC_GATEWAY_TERMINAL</div>
-                    {logs.map((log, i) => (
-                        <div key={i} className="mb-1 leading-relaxed whitespace-pre-wrap">{log}</div>
-                    ))}
-                    {isShielding && <div className="animate-pulse mt-2">_</div>}
-                </div>
+
             </div>
         </motion.div>
     );

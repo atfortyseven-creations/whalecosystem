@@ -73,14 +73,14 @@ export function SmartAccountTerminal({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      <div className="bg-[#050505] text-[#00FF41] p-5 mb-6 relative overflow-hidden border border-black/20 shadow-xl">
+      <div className="bg-black/5 text-black p-5 mb-6 relative overflow-hidden border border-black/10">
         <div className="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
           <Layers size={120} strokeWidth={0.5} />
         </div>
         <h3 className="text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2">
           <Cpu size={12} /> Bundler Node Target: rpc.flashbots.net/fast
         </h3>
-        <p className="text-[9px] text-[#00FF41]/60 uppercase tracking-widest max-w-lg leading-relaxed">
+        <p className="text-[9px] text-black/60 uppercase tracking-widest max-w-lg leading-relaxed">
           Bypassing standard EOA Mempool. Constructing intent-based UserOperations for global EntryPoint execution.
         </p>
       </div>

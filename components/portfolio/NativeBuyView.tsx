@@ -174,20 +174,7 @@ export function NativeBuyView({ address, onBack }: any) {
                     </div>
                 </motion.div>
 
-                <AnimatePresence>
-                    {(logs.length > 0 || isPolling) && (
-                        <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="overflow-hidden">
-                            <div className="mt-4 border border-black/10  bg-black text-[#00FF41] p-3 h-32 overflow-y-auto text-[8px] font-mono tracking-widest uppercase flex flex-col gap-1" ref={executionLogsRef}>
-                                {logs.map((log, i) => (
-                                    <div key={i} className="opacity-80 hover:opacity-100">&gt; {log}</div>
-                                ))}
-                                {isPolling && (
-                                    <div className="opacity-60 animate-pulse">&gt; LISTENING FOR ON-CHAIN WEBHOOK EVENTS...</div>
-                                )}
-                            </div>
-                        </motion.div>
-                    )}
-                </AnimatePresence>
+
 
                 <div className="mt-auto pt-4">
                     <button 

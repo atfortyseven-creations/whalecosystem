@@ -265,13 +265,7 @@ export function NativeBridgeView({ address, onBack }: any) {
                     )}
                 </AnimatePresence>
 
-                {logs.length > 0 && (
-                    <div className="mt-4 border border-black/10  bg-black text-[#00FF41] p-3 h-24 overflow-y-auto text-[8px] font-mono tracking-widest uppercase flex flex-col gap-1" ref={executionLogsRef}>
-                        {logs.map((log, i) => (
-                            <div key={i} className="opacity-80 hover:opacity-100">&gt; {log}</div>
-                        ))}
-                    </div>
-                )}
+
 
                 <div className="mt-auto pt-6">
                     <button 

@@ -58,14 +58,14 @@ export function ContractDeployerView({ onBack }: { onBack: () => void }) {
         </button>
       </div>
 
-      <div className="bg-[#050505] text-[#00FF41] p-5 mb-6 relative overflow-hidden border border-black/20 shadow-xl">
+      <div className="bg-black/5 text-black p-5 mb-6 relative overflow-hidden border border-black/10">
         <div className="absolute right-0 top-0 opacity-10 transform translate-x-1/4 -translate-y-1/4">
           <Server size={120} strokeWidth={0.5} />
         </div>
         <h3 className="text-[10px] font-black uppercase tracking-widest mb-2 flex items-center gap-2">
           <Activity size={12} /> Execution Environment: {activeNetwork.toUpperCase()}
         </h3>
-        <p className="text-[9px] text-[#00FF41]/60 uppercase tracking-widest max-w-lg leading-relaxed">
+        <p className="text-[9px] text-black/60 uppercase tracking-widest max-w-lg leading-relaxed">
           WARNING: Direct bytecode deployment bypasses compiler safety checks. Ensure your bytecode is properly compiled for the EVM target. Transaction `to` field will be null.
         </p>
       </div>
