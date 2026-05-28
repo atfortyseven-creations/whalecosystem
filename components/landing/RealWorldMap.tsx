@@ -375,8 +375,8 @@ function buildSparkPoints(series: { value: number }[], w: number, h: number): st
                   </span>
                   <span className="text-[11px] font-black text-black/70">
                     {tooltip.connections > 0 ? (
-                      <span className="flex items-center gap-1.5 text-[#00C076]">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+                      <span className="flex items-center gap-1.5 text-[#2563eb]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#2563eb] animate-pulse" />
                         LIVE TRAFFIC
                       </span>
                     ) : (
@@ -610,8 +610,8 @@ function buildSparkPoints(series: { value: number }[], w: number, h: number): st
             <span className="text-[8px] font-mono text-black/25">{globalStats.activeRegions} indexed regions</span>
           </div>
           <div className="flex items-center gap-1.5">
-            <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
-            <span className="text-[8px] font-black uppercase tracking-widest text-[#00C076]">Live Index Active</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-[#2563eb] animate-pulse" />
+            <span className="text-[8px] font-black uppercase tracking-widest text-[#2563eb]">Live Index Active</span>
           </div>
         </div>
       </div>
