@@ -2,9 +2,8 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { motion, AnimatePresence } from "framer-motion";
-import { CoreAuthGate } from "@/components/auth/CoreAuthGate";
-import { Shield, ArrowLeft } from "lucide-react";
+import { QuantumVaultOnboarding } from "@/components/auth/QuantumVaultOnboarding";
+import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
 export default function SignUpPage() {
@@ -16,6 +15,7 @@ export default function SignUpPage() {
   }, [router]);
 
   const handleComplete = useCallback(() => {
+    // When complete, the session is sealed and they go straight to portfolio
     router.replace("/portfolio");
   }, [router]);
 
@@ -28,13 +28,15 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="w-full h-[100dvh] flex flex-col bg-[#FFFFFF] text-[#0A0A0A] overflow-hidden relative">
+    <div className="w-full h-[100dvh] flex flex-col items-center justify-center bg-[#fafafa] text-[#0A0A0A] overflow-hidden relative p-4">
       <Link href="/login" className="absolute top-6 left-6 z-50 flex items-center gap-2 text-black/40 hover:text-black transition-colors group px-4 py-2 bg-white/50 backdrop-blur-md rounded-full border border-black/10 shadow-sm">
         <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold">Back to Login</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold">Abort Connection</span>
       </Link>
 
-      <CoreAuthGate onComplete={handleComplete} startAt="password" />
+      <div className="w-full max-w-5xl h-full max-h-[800px] flex items-center justify-center">
+        <QuantumVaultOnboarding onComplete={handleComplete} />
+      </div>
     </div>
   );
 }
