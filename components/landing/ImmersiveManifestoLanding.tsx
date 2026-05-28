@@ -386,7 +386,7 @@ function HeroSection() {
               <span className="text-black/70">Identity Verification</span>
             </h1>
             <p className="text-[16px] md:text-[18px] text-black/60 max-w-[600px] mb-10 font-medium">
-              Human IDFi integrates zero-knowledge proofs to help you achieve compliance and verify users without ever compromising personal data.
+              Whale Network integrates zero-knowledge proofs to help you achieve compliance and verify users without ever compromising personal data.
             </p>
             <div className="flex flex-col sm:flex-row items-center gap-3">
               <Link

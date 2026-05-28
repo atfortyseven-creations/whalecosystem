@@ -41,17 +41,17 @@ const robotoMono = Roboto_Mono({
 
 export const metadata = {
   title: {
-    default: 'Human IDFi | Privacy-Preserving Identity Verification',
-    template: '%s | Human IDFi'
+    default: 'Whale Network | Privacy-Preserving Identity Verification',
+    template: '%s | Whale Network'
   },
-  description: 'Human IDFi is a privacy-preserving identity verification solution integrating zero-knowledge proofs to achieve compliance without compromising personal data.',
+  description: 'Whale Network is a privacy-preserving identity verification solution integrating zero-knowledge proofs to achieve compliance without compromising personal data.',
   keywords: [
-    'identity verification', 'zero-knowledge proofs', 'privacy', 'kyc',
-    'compliance', 'digital identity', 'zkp', 'human idfi', 'humanity ledger'
+    'whale network', 'identity verification', 'zero-knowledge proofs', 'privacy', 'kyc',
+    'compliance', 'digital identity', 'zkp'
   ],
-  authors: [{ name: 'Humanity Ledger' }],
-  creator: 'Humanity Ledger',
-  publisher: 'Humanity Ledger',
+  authors: [{ name: 'Whale Network' }],
+  creator: 'Whale Network',
+  publisher: 'Whale Network',
   metadataBase: new URL('https://humanidfi.com'),
   alternates: {
     canonical: '/',
@@ -71,20 +71,20 @@ export const metadata = {
   },
   appleWebApp: {
     capable: true,
-    title: 'Human IDFi',
+    title: 'Whale Network',
     statusBarStyle: 'default',
   },
   openGraph: {
-    title: 'Human IDFi | Privacy-Preserving Identity Verification',
+    title: 'Whale Network | Privacy-Preserving Identity Verification',
     description: 'A privacy-preserving identity verification solution integrating zero-knowledge proofs to achieve compliance without compromising personal data.',
     url: 'https://humanidfi.com',
-    siteName: 'Human IDFi',
+    siteName: 'Whale Network',
     images: [
       {
         url: '/humanid_protocol_logo_1778714491433.png',
         width: 1200,
         height: 1200,
-        alt: 'Human IDFi Logo',
+        alt: 'Whale Network Logo',
       },
     ],
     locale: 'en_US',
@@ -92,11 +92,11 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Human IDFi | Privacy-Preserving Identity Verification',
+    title: 'Whale Network | Privacy-Preserving Identity Verification',
     description: 'A privacy-preserving identity verification solution integrating zero-knowledge proofs.',
     images: ['/humanid_protocol_logo_1778714491433.png'],
-    site: '@humanidfi',
-    creator: '@humanidfi',
+    site: '@whalenetwork',
+    creator: '@whalenetwork',
   },
 }
 
@@ -125,7 +125,7 @@ export default async function RootLayout({
       {
         "@type": "WebSite",
         "url": "https://humanidfi.com/",
-        "name": "Human IDFi",
+        "name": "Whale Network",
         "description": "Privacy-preserving identity verification solution integrating zero-knowledge proofs.",
         "potentialAction": {
           "@type": "SearchAction",
@@ -142,8 +142,8 @@ export default async function RootLayout({
       {
         "@type": "Organization",
         "@id": "https://humanidfi.com/#organization",
-        "name": "Humanity Ledger",
-        "alternateName": ["Human IDFi", "Humanity Ledger"],
+        "name": "Whale Network",
+        "alternateName": ["Whale Ecosystem", "Whale Network Protocol"],
         "url": "https://humanidfi.com",
         "logo": "https://humanidfi.com/humanid_protocol_logo_1778714491433.png",
         "sameAs": [
@@ -152,7 +152,7 @@ export default async function RootLayout({
       },
       {
         "@type": "WebApplication",
-        "name": "Human IDFi Platform",
+        "name": "Whale Network Platform",
         "applicationCategory": "SecurityApplication",
         "operatingSystem": "Web",
         "offers": {
@@ -169,6 +169,32 @@ export default async function RootLayout({
           "Zero-Knowledge Proofs",
           "Compliance Tools",
           "Privacy-Preserving Infrastructure"
+        ]
+      },
+      {
+        "@type": "ItemList",
+        "itemListElement": [
+          {
+            "@type": "SiteNavigationElement",
+            "position": 1,
+            "name": "Docs",
+            "description": "Whale Network SDK enables privacy-preserving identity verification.",
+            "url": "https://humanidfi.com/developers/api-docs"
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "position": 2,
+            "name": "Portfolio App",
+            "description": "Track cross-chain capital flows and asset balances locally. No server ever sees your complete portfolio.",
+            "url": "https://humanidfi.com/portfolio"
+          },
+          {
+            "@type": "SiteNavigationElement",
+            "position": 3,
+            "name": "Whale Network Registry Explorer",
+            "description": "Explore countries with supported documents, view coverage and node density.",
+            "url": "https://humanidfi.com/registry"
+          }
         ]
       }
     ]
