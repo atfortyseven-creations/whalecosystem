@@ -141,8 +141,8 @@ export async function GET() {
       rawHash = {};
     }
 
-    // 2. Map ISO2 to Names and add base traffic
-    const byCountry = { ...BASE_CLOUDFLARE_TRAFFIC };
+    // 2. Map ISO2 to Names
+    const byCountry: Record<string, number> = {};
     let totalRealTime = 0;
 
     for (const [code, val] of Object.entries(rawHash)) {
@@ -171,9 +171,9 @@ export async function GET() {
     );
   } catch (err: any) {
     console.error("[wallet-connections] Error:", err?.message);
-    const fallbackTotal = Object.values(BASE_CLOUDFLARE_TRAFFIC).reduce((a, b) => a + b, 0);
+    const fallbackTotal = 0;
     return NextResponse.json(
-      { byCountry: BASE_CLOUDFLARE_TRAFFIC, total: fallbackTotal, activeRegions: Object.keys(BASE_CLOUDFLARE_TRAFFIC).length },
+      { byCountry: {}, total: fallbackTotal, activeRegions: 0 },
       { status: 200 }
     );
   }

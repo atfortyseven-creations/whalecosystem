@@ -15,13 +15,6 @@ export default function GlobalRegistryMapPage() {
     <div className="w-full min-h-[calc(100vh-64px)] bg-white flex flex-col relative overflow-visible font-mono text-black">
       
       {/* Light Grid Background */}
-      <div 
-        className="absolute inset-0 pointer-events-none opacity-[0.03]" 
-        style={{ 
-          backgroundImage: 'linear-gradient(rgba(0,0,0,1) 1px, transparent 1px), linear-gradient(90deg, rgba(0,0,0,1) 1px, transparent 1px)', 
-          backgroundSize: '40px 40px' 
-        }}
-      />
 
       {/* Header */}
       <div className="w-full px-8 pt-10 pb-6 flex flex-col md:flex-row md:items-end md:justify-between gap-6 relative z-10">
@@ -69,7 +62,7 @@ export default function GlobalRegistryMapPage() {
       </div>
 
       {/* Bottom Bar */}
-      <div className="w-full border-t border-black/10 bg-white/90 backdrop-blur-xl relative z-10">
+      <div className="mt-auto w-full border-t border-black/10 bg-white/90 backdrop-blur-xl relative z-10">
         <div className="w-full px-8 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-2 h-2 rounded-full bg-[#2563eb] animate-pulse" />

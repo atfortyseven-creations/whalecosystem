@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useSettingsStore, SystemSettings } from '@/lib/store/useSettingsStore';
 import { useSystemTranslation } from '@/hooks/useSystemTranslation';
 import { Loader2 } from 'lucide-react';
-import { useDisconnect } from 'wagmi';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { toast } from 'sonner';
 
 // We will construct categories inside the component to use the hook.
@@ -15,7 +15,7 @@ export function TerminalSettingsPanel() {
   const { t } = useSystemTranslation();
   const { isLoading, updateSetting, fetchSettings } = store;
   const [activeTab, setActiveTab] = useState('general');
-  const { disconnect } = useDisconnect();
+  const { nuclearDisconnect } = useSystemSignOut();
 
   const CATEGORIES = [
     { id: 'general', label: t('GENERAL_SETTINGS') },
@@ -23,21 +23,8 @@ export function TerminalSettingsPanel() {
     { id: 'privacy', label: t('PRIVACY_SECURITY') },
   ];
 
-  const handleTotalDisconnect = () => {
-    try {
-      disconnect();
-    } catch {}
-    
-    document.cookie = "whale_session=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "system_handshake=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "next-auth.session-token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    document.cookie = "humanid_ref=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;";
-    
-    localStorage.clear();
-    sessionStorage.clear();
-    
-    toast.success(t('ALL_SESSIONS_TERMINATED'));
-    window.location.replace("/connect");
+  const handleTotalDisconnect = async () => {
+    await nuclearDisconnect();
   };
 
   useEffect(() => {

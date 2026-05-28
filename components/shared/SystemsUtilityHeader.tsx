@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Bell, User } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
-import { useDisconnect } from 'wagmi';
+import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { useUIStore } from '@/lib/store/ui-store';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
 import { CurrencySwitcher } from './CurrencySwitcher';
@@ -15,7 +15,7 @@ import { CurrencySwitcher } from './CurrencySwitcher';
 export function SystemsUtilityHeader() {
     const { address, isConnected } = useSystemAccount();
     const { activePanel, setActivePanel } = useUIStore();
-    const { disconnect } = useDisconnect();
+    const { nuclearDisconnect } = useSystemSignOut();
     const router = useRouter();
 
     const icons: any[] = [];
@@ -104,7 +104,7 @@ export function SystemsUtilityHeader() {
                     onClick={(e) => {
                         e.preventDefault();
                         e.stopPropagation();
-                        disconnect();
+                        nuclearDisconnect();
                     }}
                     className="ml-2 px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-red-100 transition-colors shadow-sm"
                 >
