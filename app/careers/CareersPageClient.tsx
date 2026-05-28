@@ -114,7 +114,7 @@ export function CareersPageClient() {
   return (
     <LegalDocLayout
       title="Careers"
-      subtitle="Join our global team and help build the most accessible, secure, and technologically advanced decentralised finance platform in the world."
+      subtitle="Join our global team and help build the most accessible, secure, and technologically advanced infrastructure for the Humanity Ledger."
       lastUpdated="May 25, 2026"
       category="Company"
       toc={TOC}
@@ -229,7 +229,7 @@ export function CareersPageClient() {
                             </li>
                           ))}
                         </ul>
-                        <button className="px-6 py-3 bg-black text-white text-[11px] font-bold font-mono uppercase tracking-widest rounded-lg hover:bg-black/80 transition-colors">
+                        <button className="px-6 py-3 bg-black text-white text-[11px] font-bold font-mono uppercase tracking-widest hover:bg-black/80 transition-colors">
                           Apply for this Role
                         </button>
                       </div>

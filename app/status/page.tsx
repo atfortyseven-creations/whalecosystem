@@ -135,7 +135,7 @@ export default function StatusPage() {
 
         {/* Header Text */}
         <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
-            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-6 py-2 bg-white border border-black/10 rounded-full mb-8 shadow-sm">
+            <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-6 py-2 border border-black/10 rounded-full mb-8">
                 <Server size={14} className="text-black" />
                 <span className="text-xs uppercase tracking-widest font-bold text-black/60">System Status</span>
             </motion.div>
@@ -151,15 +151,15 @@ export default function StatusPage() {
 
         {/* OVERALL STATUS HERO */}
         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, type: 'spring' }} className="w-full">
-          <div className={`w-full rounded-3xl bg-white border border-black/10 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700 shadow-md`}>
-            <div className={`p-6 rounded-full ${overallCfg.bg} border ${overallCfg.border} flex items-center justify-center mb-2`}>
+          <div className={`w-full bg-white border border-black/10 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700`}>
+            <div className={`p-6 rounded-full border border-black/10 flex items-center justify-center mb-2`}>
               <OverallIcon size={48} className={overallCfg.text} />
             </div>
             
             <div>
-              <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight ${overallCfg.text} text-balance leading-tight`}>
+              <h1 className={`text-2xl sm:text-3xl md:text-4xl font-extrabold tracking-tight text-black text-balance leading-tight`}>
                 {overall === 'operational'
-                  ? 'Whale Alert Network working perfectly.'
+                  ? 'Humanity Ledger nodes operational.'
                   : overall === 'degraded'
                   ? 'Degraded Performance'
                   : overall === 'outage'
@@ -184,7 +184,7 @@ export default function StatusPage() {
               <button
                 onClick={fetchHealth}
                 disabled={loading}
-                className="flex items-center justify-center gap-2 px-8 py-3 bg-black hover:bg-black/80 text-white rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-md active:scale-95 disabled:opacity-50"
+                className="flex items-center justify-center gap-2 px-8 py-3 bg-black hover:bg-black/80 text-white text-xs font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
               >
                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
                 {loading ? 'Updating' : 'Refresh Now'}
@@ -222,7 +222,7 @@ export default function StatusPage() {
                 icon: ShieldAlert
               },
             ].map((m, i) => (
-              <div key={m.label} className="bg-white border border-black/10 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3 shadow-sm hover:shadow-md transition-all">
+              <div key={m.label} className="bg-white border border-black/10 p-6 flex flex-col items-center justify-center text-center gap-3 transition-all hover:bg-black/[0.02]">
                 <div className="flex items-center justify-center gap-2">
                     <m.icon size={16} className="text-black/50" />
                     <span className="text-xs font-bold uppercase tracking-widest text-black/50">{m.label}</span>
@@ -247,7 +247,7 @@ export default function StatusPage() {
             {loading && !health && (
               <>
                 {[...Array(6)].map((_, i) => (
-                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={`skeleton-${i}`} className="w-full h-24 rounded-2xl bg-white border border-black/10 shadow-sm animate-pulse" />
+                  <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} key={`skeleton-${i}`} className="w-full h-24 bg-white border border-black/10 animate-pulse" />
                 ))}
               </>
             )}
@@ -265,12 +265,12 @@ export default function StatusPage() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.08 + (i * 0.06), ease: [0.16, 1, 0.3, 1] }}
                   key={svc.name}
-                  className={`w-full bg-gradient-to-r ${gradientClass} border border-black/[0.07] rounded-2xl overflow-hidden hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 group`}
+                  className={`w-full bg-white border border-black/10 overflow-hidden hover:-translate-y-0.5 transition-all duration-300 group`}
                 >
                   <div className="px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-4">
                     {/* Left: icon + name */}
                     <div className="flex items-center gap-4 min-w-0">
-                      <div className={`w-12 h-12 rounded-2xl bg-white border border-black/[0.07] flex items-center justify-center shadow-sm shrink-0 group-hover:scale-105 transition-transform`}>
+                      <div className={`w-12 h-12 border border-black/10 flex items-center justify-center shrink-0 transition-transform`}>
                         <ComponentIcon size={22} className={accentClass} strokeWidth={1.8} />
                       </div>
                       <div className="min-w-0">
@@ -291,7 +291,7 @@ export default function StatusPage() {
                         </span>
                       )}
                       <span
-                        className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest px-3.5 py-2 rounded-full border ${cfg.bg} ${cfg.border} ${cfg.text}`}
+                        className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest px-3.5 py-2 border ${cfg.bg} ${cfg.border} ${cfg.text}`}
                       >
                         <StatusIcon size={13} />
                         {cfg.label}

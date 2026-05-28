@@ -328,7 +328,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
 
         </AnimatePresence>
 
-        <div className={`flex fixed inset-0 bg-transparent text-[#050505] dark:text-[#FFFFFF] font-sans selection:bg-[#00FF55]/20 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''} lg:scale-[1.4] lg:origin-top-left lg:w-[71.428%] lg:h-[71.428%]`}>
+        <div className={`flex fixed inset-0 bg-white text-[#050505] font-sans selection:bg-black/10 group/shell overflow-hidden transition-all duration-300 ${isSessionLocked ? 'scale-[0.99] pointer-events-none' : ''}`}>
 
             
             {/*  Persistent Pro Sidebar (True Desktop Only)  */}
@@ -337,7 +337,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             <motion.aside 
                 animate={{ width: isCollapsed ? 64 : 240 }}
                 transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-                className={`hidden lg:flex sticky top-0 h-full border-r border-[#E5E5E5] dark:border-white/10 bg-white/70 dark:bg-[#0A0A0A]/70 backdrop-blur-2xl flex-col z-50 shrink-0`}
+                className={`hidden lg:flex sticky top-0 h-full border-r border-black/[0.07] bg-white flex-col z-50 shrink-0`}
             >
                 {/* Logo area */}
                 {!isCollapsed && (
@@ -391,7 +391,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
             <div className="flex-1 flex flex-col min-w-0 relative h-full">
                 
                 {/*  Top Master Bar  */}
-                <header className="sticky top-0 border-b border-black/[0.06] dark:border-white/10 bg-white/60 dark:bg-[#0A0A0A]/60 backdrop-blur-2xl flex items-center justify-between px-6 z-40 shrink-0 shadow-[0_4px_30px_rgba(0,0,0,0.02)] transition-colors duration-300" style={{ minHeight: 'calc(56px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
+                <header className="sticky top-0 border-b border-black/[0.07] bg-white/95 backdrop-blur-xl flex items-center justify-between px-6 z-40 shrink-0" style={{ minHeight: 'calc(56px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
                     <button
                         onClick={() => setIsPaletteOpen(true)}
                         className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0A0A0A] hover:bg-black/[0.02] dark:hover:bg-white/5 hover:border-black/20 dark:hover:border-white/20 hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
@@ -470,7 +470,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     </div>
                 </header>
 
-                <main className="flex-1 flex flex-col min-h-0 transition-colors duration-300 bg-white dark:bg-[#0A0A0A] relative">
+                <main className="flex-1 flex flex-col min-h-0 bg-white relative">
                     <div className="absolute inset-0 pointer-events-none -z-10" />
 
                     {/* Scroll container: flex-1 + min-h-0 = bounded by parent, never bleeds to document */}
@@ -512,7 +512,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 {/* Uses fixed positioning so scroll content is never clipped by the nav bar. */}
                 {/* A spacer div above (inside scroll container) reserves the equivalent height.*/}
                 {showMobileNav && (
-                    <nav className={`mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 dark:border-white/10 bg-[#FFFFFF] dark:bg-[#050505] items-center justify-around px-1 z-50 transition-colors`} style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+                     <nav className="mobile-bottom-nav lg:hidden flex fixed bottom-0 left-0 right-0 border-t border-black/10 bg-[#FFFFFF] items-center justify-around px-1 z-50 transition-colors" style={{ height: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
                          {[
                             { id: 'gold',        icon: Icon.identity, label: 'Identity' },
                             { id: 'markets',     icon: Icon.markets,  label: 'Markets' },
@@ -550,19 +550,19 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 )}
 
                 {/*  Status Bar  */}
-                <footer className="hidden md:flex h-7 border-t border-black/10 dark:border-white/10 bg-white dark:bg-[#111111] items-center justify-between px-6 shrink-0 transition-colors duration-300">
-                    <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5 min-w-[120px]">
+                <footer className="hidden md:flex h-7 border-t border-black/[0.07] bg-white items-center justify-between px-6 shrink-0">
+                    <div className="flex items-center gap-4 text-[9px] font-black text-black/40 uppercase tracking-widest">
+                        <span className="flex items-center gap-1.5">
                             Latency:
-                            <span className={latency > 150 ? 'text-[#FF3B30]' : 'text-[#00FF55]'}>
+                            <span className="text-black/70">
                                 {latency > 0 ? `${latency}ms` : '12ms'}
                             </span>
                         </span>
-                        <span className="flex items-center gap-1.5">Servers: <span className="text-[#050505] dark:text-white">{nodeStatus}</span></span>
+                        <span className="flex items-center gap-1.5">Servers: <span className="text-black/80">{nodeStatus}</span></span>
                     </div>
-                    <div className="flex items-center gap-4 text-[9px] font-black text-[#888888] uppercase tracking-widest">
-                        <span className="flex items-center gap-1.5">Connected</span>
-                        <span className="text-[#888888]">© 2026 Whale Alert Network</span>
+                    <div className="flex items-center gap-4 text-[9px] font-black text-black/35 uppercase tracking-widest">
+                        <span>Connected</span>
+                        <span>© 2026 Humanity Ledger</span>
                     </div>
                 </footer>
             </div>
@@ -643,7 +643,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     exit={{ y: "100%" }}
                     transition={{ type: "spring", damping: 25, stiffness: 220 }}
                     onClick={(e) => e.stopPropagation()}
-                    className="w-full max-w-md bg-white dark:bg-[#0A0A0A] rounded-t-[32px] border-t border-black/10 dark:border-white/10 shadow-[0_-12px_40px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden max-h-[85vh]"
+                    className="w-full max-w-md bg-white rounded-t-[28px] border-t border-black/[0.08] shadow-[0_-12px_40px_rgba(0,0,0,0.10)] flex flex-col overflow-hidden max-h-[85vh]"
                 >
                     {/* Header line handle */}
                     <div className="flex justify-center py-3">

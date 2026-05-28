@@ -4,9 +4,9 @@ import { ROADMAP_SECTIONS } from '@/lib/content/footerPagesAztec';
 export default function RoadmapPage() {
   return (
     <AztecDocPage
-      eyebrow="Protocol · Strategic Roadmap"
-      title="Strategic Roadmap"
-      subtitle="Sequential implementation phases for the Humanity Ledger protocol on the Aztec Network, from cryptographic infrastructure to full institutional adoption."
+      eyebrow="Protocol · System Architecture"
+      title="System Architecture"
+      subtitle="Five-phase implementation plan for the Humanity Ledger protocol on the Aztec Network. Each phase builds on verified foundations, from cryptographic infrastructure to full institutional adoption."
       sections={ROADMAP_SECTIONS}
     />
   );

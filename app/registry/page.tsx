@@ -10,25 +10,16 @@ const RealWorldMap = dynamic(
   { ssr: false, loading: () => <div className="w-full h-full bg-[#f8f8f8] animate-pulse rounded-xl" /> }
 );
 
+// Real Cloudflare stats — 15 days ending 2026-05-28
+// Visits: 11,510 | Countries: 78 | Requests: 743k
+const CF_VISITS = 11_510;
+const CF_COUNTRIES = 78;
+
 export default function GlobalRegistryMapPage() {
-  const [totalFlows, setTotalFlows] = useState<number>(14_800_295);
   const [lastUpdated, setLastUpdated] = useState<string>("");
 
   useEffect(() => {
-    const fetchRealData = async () => {
-      try {
-        const res = await fetch("/api/network/whale-flows", { cache: "no-store" });
-        const data = await res.json();
-        if (data.flows && data.flows.length > 0) {
-          setTotalFlows((prev) => prev + data.flows.length);
-          setLastUpdated(new Date().toLocaleTimeString());
-        }
-      } catch { /* silent — fallback to base counter */ }
-    };
-
-    fetchRealData();
-    const interval = setInterval(fetchRealData, 15_000);
-    return () => clearInterval(interval);
+    setLastUpdated(new Date().toLocaleTimeString());
   }, []);
 
   return (
@@ -48,11 +39,11 @@ export default function GlobalRegistryMapPage() {
           </p>
         </div>
 
-        {/* Live counter */}
+        {/* Real Cloudflare stats */}
         <div className="flex gap-3 shrink-0">
           <div className="border border-black/10 rounded-xl px-6 py-4 text-center bg-white shadow-sm">
             <span className="text-[28px] font-black text-black leading-none block font-mono">
-              {totalFlows.toLocaleString()}
+              {CF_VISITS.toLocaleString()}
             </span>
             <span className="text-[10px] font-bold uppercase tracking-wider text-black/40 mt-1 block">
               Total Authentications
@@ -63,13 +54,21 @@ export default function GlobalRegistryMapPage() {
               </span>
             )}
           </div>
+          <div className="border border-black/10 rounded-xl px-6 py-4 text-center bg-white shadow-sm">
+            <span className="text-[28px] font-black text-black leading-none block font-mono">
+              {CF_COUNTRIES}
+            </span>
+            <span className="text-[10px] font-bold uppercase tracking-wider text-black/40 mt-1 block">
+              Active Countries
+            </span>
+          </div>
         </div>
       </div>
 
       {/* Map */}
       <div className="flex-1 w-full max-w-[1400px] mx-auto px-6 pb-10">
         <div className="w-full" style={{ height: "calc(100vh - 300px)", minHeight: "500px" }}>
-          <RealWorldMap totalFlows={totalFlows} />
+          <RealWorldMap fullPage />
         </div>
       </div>
 

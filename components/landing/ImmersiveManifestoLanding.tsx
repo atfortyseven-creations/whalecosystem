@@ -313,60 +313,56 @@ function HeroSection() {
 
   return (
     <section
-      className="relative w-full flex flex-col items-center justify-center overflow-hidden pt-14 bg-white"
+      className="relative w-full flex flex-col items-center justify-center overflow-hidden pt-14"
       style={{
-        /* Use 100dvh as primary value — it accounts for mobile browser chrome.
-           --vh polyfill updates after mount to correct any mismatch. */
         height: '100dvh',
         minHeight: '600px',
+        backgroundColor: '#ffffff',
       }}
     >
       {/* ── Global pixelated-rendering rule ─────────────────────────────── */}
       <style dangerouslySetInnerHTML={{ __html: `
         .hero-pixel-img {
-          image-rendering: -webkit-optimize-contrast; /* Safari */
-          image-rendering: crisp-edges;               /* Firefox */
-          image-rendering: pixelated;                 /* Chrome / modern */
-          -ms-interpolation-mode: nearest-neighbor;   /* IE11 */
+          image-rendering: -webkit-optimize-contrast;
+          image-rendering: crisp-edges;
+          image-rendering: pixelated;
+          -ms-interpolation-mode: nearest-neighbor;
         }
-        /* dvh polyfill via JS — updated on resize */
         @supports (height: 100dvh) {
           .hero-section-dvh { height: 100dvh !important; }
         }
       `}} />
 
-      {/* ── Maximum-quality pixel-art background ────────────────────────── */}
       {/*
-        • `loading="eager"` — do not defer this image; it's above the fold.
-        • `fetchpriority="high"` — browser puts this at the top of the network
-          queue, ahead of scripts and lower-priority images.
-        • `decoding="sync"` — decode before rendering the page, preventing a
-          flash of black on fast connections.
-        • `draggable="false"` — prevents accidental drag-selection.
-        • The image is served unmodified (next.config: unoptimized: true),
-          so every original pixel reaches the browser intact.
+        Devine Lu Linvega monochrome pixel-art wallpaper.
+        object-fit: contain — preserves every pixel at native size,
+        no scaling up, no cropping. Centered horizontally and vertically.
       */}
       <img
-        src="/system-shots/3679-wandtattoo-weltkarte-einfach-einzel.png"
-        alt="Humanity Ledger Global Network"
+        src="/system-shots/Devine-Lu-Linvega-monochrome-pixel-art-illustration-arch-2268374-wallhere.com.jpg"
+        alt="Humanity Ledger"
         loading="eager"
-        // @ts-ignore — fetchpriority is a valid HTML attribute
+        // @ts-ignore
         fetchpriority="high"
         decoding="sync"
         draggable="false"
-        className="absolute inset-0 w-full h-full select-none opacity-15"
+        className="hero-pixel-img absolute select-none"
         style={{
-          objectFit: 'cover',
-          objectPosition: 'center',
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          maxWidth: '100%',
+          maxHeight: '100%',
+          width: 'auto',
+          height: 'auto',
+          objectFit: 'contain',
+          opacity: 0.18,
         }}
       />
 
-      {/* ── dvh polyfill for mobile browser-chrome correction ───────────── */}
-      {mounted && (
-        <DvhPolyfill />
-      )}
+      {mounted && <DvhPolyfill />}
 
-      {/* ── Bottom fade to white content below ──────────────────────────── */}
+      {/* ── Bottom fade to white ──────────────────────────────────────────── */}
       <div
         className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
         style={{
@@ -697,8 +693,31 @@ function FAQSection() {
 
 function FinalCTASection() {
   return (
-    <section className="w-full bg-[#000000] py-32 md:py-48">
-      <div className="w-full max-w-[800px] mx-auto px-6 flex flex-col items-center text-center">
+    <section className="w-full relative overflow-hidden" style={{ minHeight: '540px' }}>
+      {/*
+        8597294-hd_1920_1080_30fps.mp4 — perfectly fitted without zoom.
+        object-fit: contain keeps the full frame visible at its native
+        1920×1080 aspect ratio. The black letterbox areas complete the look.
+      */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 w-full h-full"
+        style={{
+          objectFit: 'contain',
+          objectPosition: 'center',
+          background: '#000000',
+        }}
+      >
+        <source src="/system-shots/8597294-hd_1920_1080_30fps.mp4" type="video/mp4" />
+      </video>
+
+      {/* Overlay so text stays readable */}
+      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+
+      <div className="relative z-10 w-full max-w-[800px] mx-auto px-6 py-32 md:py-48 flex flex-col items-center text-center">
         <h2 className="text-[40px] md:text-[60px] font-black tracking-tighter leading-[1] text-white mb-6">
           Ready to reclaim
           <br />
@@ -710,15 +729,15 @@ function FinalCTASection() {
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Link
             href="/portfolio"
-            className="w-full sm:w-auto px-10 py-4 bg-white text-black text-[14px] font-black uppercase tracking-wider hover:bg-white/90 transition-transform active:scale-95 rounded-full"
+            className="w-full sm:w-auto px-10 py-4 bg-white text-black text-[14px] font-black uppercase tracking-wider hover:bg-white/90 transition-transform active:scale-95"
           >
             Open Application
           </Link>
           <Link
             href="/developers/api-docs"
-            className="w-full sm:w-auto px-10 py-4 border border-white/20 text-white text-[14px] font-black uppercase tracking-wider hover:bg-white/10 transition-transform active:scale-95 rounded-full"
+            className="w-full sm:w-auto px-10 py-4 border border-white/30 text-white text-[14px] font-black uppercase tracking-wider hover:bg-white/10 transition-transform active:scale-95"
           >
-            Read the Docs
+            Read Documentation
           </Link>
         </div>
       </div>

@@ -354,54 +354,100 @@ export const SECURITY_SECTIONS: AztecDocSection[] = [
 
 export const ROADMAP_SECTIONS: AztecDocSection[] = [
   {
-    title: 'Development Philosophy',
+    title: 'System Architecture',
     paragraphs: [
-      'The Humanity Ledger roadmap is structured to build on verified foundations. Each phase delivers specific, testable capabilities before the next phase begins. We do not deploy components to production until they have been independently audited and formally verified where applicable.',
-      'The roadmap is governed by milestone-based funding. Treasury disbursements for each phase require a community vote verifying that the previous phase\'s deliverables meet the defined acceptance criteria. This structure prevents speculative development and ensures that protocol resources are directed toward delivering working, audited code.',
+      'The Humanity Ledger architecture is built in five sequential phases. Each phase delivers specific, audited capabilities before the next begins. The protocol does not deploy components to production until they have been independently verified.',
+      'Every phase is structured around a concrete problem, a defined solution, a measurable deliverable, and an integrity guarantee. Progress is governed by milestone-based funding: each phase requires community verification of the previous phase before treasury resources are released.',
     ],
   },
   {
-    title: 'Phase 1: Core Protocol (Delivered)',
+    id: 'phase-1',
+    title: 'Phase 1 — Cryptographic Infrastructure',
     paragraphs: [
-      'Phase 1 established the foundational infrastructure of the Humanity Ledger protocol. All components in this phase have been deployed, audited, and are operational on the Aztec Network.',
+      'Phase 1 establishes the post-quantum and hybrid cryptographic layer. The current elliptic curve system (BN254) is vulnerable to future quantum computing advances. This phase introduces the cryptographic foundations that will make the protocol resistant to those advances before they become threats.',
     ],
     bullets: [
-      'Aztec PXE integration: The local Private Execution Environment is initialized and integrated into the client. All private state transitions are generated and proven on the user device.',
-      'Core Noir circuits: The primary circuit set — private transfers, note commitments, nullifier generation — is deployed and operational.',
-      'Wallet connectivity: EIP-1193 compatible wallet integration supporting MetaMask and hardware wallets.',
-      'Whale Network v1: Real-time capital flow monitoring operational across 20+ blockchain networks.',
-      'ZK identity layer: World ID integration and biometric liveness proof support for Sybil-resistant access.',
-      'Block explorer: Privacy-respecting explorer for Aztec L2 state — viewable commitments, no data exposure.',
-      'Alert engine: Configurable alert conditions with sub-second delivery on matching events.',
+      'Lattice-based cryptography for state anchoring on Ethereum L1, replacing elliptic curve assumptions with structures resistant to Shor\'s algorithm.',
+      'STARK and FRI proof integration inside Noir circuits, removing the trusted setup requirement from the existing SNARK system.',
+      'CRYSTALS-Dilithium digital signatures replacing ECDSA for user authorization, using the NIST post-quantum standard.',
+      'Falcon signature support for high-frequency interactions where Dilithium signature sizes create overhead.',
+      'SPHINCS+ hash-based signatures as a fallback for treasury and governance keys, providing mathematical resilience against future cryptographic advances.',
+      'Quantum random number generation via hardware entropy oracles connected to the Aztec network.',
+      'Circuit architecture structured to be compatible with future quantum annealing processors.',
+      'Hybrid key exchange combining classical X25519 with CRYSTALS-Kyber for all encrypted communications.',
     ],
   },
   {
-    title: 'Phase 2: Compliance and Institutional Tooling (In Progress)',
+    id: 'phase-2',
+    title: 'Phase 2 — Privacy Infrastructure',
     paragraphs: [
-      'Phase 2 focuses on the tools required for institutional participation in the protocol. These components are in active development, with target delivery in Q4 2025.',
+      'Phase 2 extends the privacy model beyond transaction shielding to cover identity, computation, and cross-chain movement. The goal is to make every interaction with the protocol — not just asset transfers — completely opaque to external observers.',
     ],
     bullets: [
-      'Selective disclosure SDK: Viewing key generation and ZK range proofs for regulatory and audit compliance. Supports W3C Verifiable Credential issuance and verification.',
-      'Threshold multi-signature: M-of-N authorization proven inside a Noir circuit. Designed for treasury governance and institutional custody.',
-      'Cross-chain bridge: Encrypted asset transfers between Aztec L2 and Ethereum L1 using ZK bridge contracts.',
-      'Portfolio dashboard: Aggregated private portfolio view with shielded balance display and position analytics.',
-      'Compliance API: Endpoints for issuing and consuming Verifiable Credentials for regulated financial activity.',
+      'Partially homomorphic encryption for multi-note transactions, allowing balance validation without decrypting private inputs inside the circuit.',
+      'Zero-knowledge biometric verification: hardware hashes of biometric data validated locally, proving human uniqueness without transmitting any biometric information.',
+      'Client-side proof generation using web workers and local trusted execution environments, enabling complex proofs on mobile devices in under five seconds.',
+      'Selective disclosure: viewing key generation and ZK range proofs for regulators and auditors, with user-controlled scope.',
+      'Shadow note synchronization across multiple devices using an end-to-end encrypted channel, enabling instant state sync without exposing private data.',
+      'Anti-correlation layer: statistical noise injection to prevent timing and volume analysis from revealing transactional patterns.',
+      'Stealth addresses: each transaction generates a unique, single-use address, making it impossible to link sender and receiver on the public record.',
+      'Private cross-chain bridges: ZK proofs release funds on secondary chains to fresh addresses without revealing origin amounts or destinations.',
     ],
   },
   {
-    title: 'Phase 3: Scale Applications (Planned — 2026)',
+    id: 'phase-3',
+    title: 'Phase 3 — Institutional Security',
     paragraphs: [
-      'Phase 3 introduces large-scale financial applications building on the privacy infrastructure established in phases 1 and 2. Delivery is planned across Q1 and Q2 2026.',
+      'Phase 3 establishes the security architecture required for institutional participation. This phase addresses the gap between the security requirements of professional financial entities and the trust models currently available in decentralized systems.',
     ],
     bullets: [
-      'Real-world asset integration: Tokenization of RWAs on Aztec under smart contract custody, with ZK attestation of underlying asset validity.',
-      'Dark pool liquidity: Blind order matching using ZK proofs and multi-party computation. Order intent is not published before matching. MEV extraction is structurally impossible.',
-      'Decentralized governance: Full community control of protocol parameters, circuit upgrades, and treasury allocation via cryptographic voting.',
-      'Developer SDK: Embeddable SDK for browser and mobile environments. PXE initialization, proving, and submission abstracted into a clean developer interface.',
-      'Developer sandbox: Local CLI and GUI environment for simulating Aztec L1/L2. Full visibility into note flow, nullifier generation, and witness construction for debugging.',
+      'Multi-layer defense: circuit logic, L1 verification, API rate limiting, and L2 timelocks operating independently — requiring simultaneous failure of all four to produce an exploit.',
+      'Continuous formal verification of all Noir circuits in the CI/CD pipeline, producing mathematical certificates on every deployment.',
+      'Continuous fuzzing and symbolic execution running against Barretenberg witnesses to identify underconstrained conditions before they can be exploited.',
+      'Post-quantum key management: Shamir\'s Secret Sharing partition schemes secured with lattice-based cryptography, providing 99.999% custody uptime for protocol treasury keys.',
+      'Hardware security module integration with Intel SGX and AWS Nitro Enclaves for all server-side cryptographic operations.',
+      'Non-extractable key architecture using device hardware modules, eliminating mnemonic phrase exposure as an attack surface.',
+      'Decentralized gateway deployment via IPFS for the frontend interface, with Tor and I2P routing integration in the client.',
+      'ZK circuit-breakers: smart contracts that automatically pause flows when proofs detect anomalies, without requiring administrative intervention.',
+      'Threshold ZK signatures: M-of-N institutional authorization proven inside a circuit without revealing the total number of signers or their identities.',
+    ],
+  },
+  {
+    id: 'phase-4',
+    title: 'Phase 4 — Analytics and Market Tools',
+    paragraphs: [
+      'Phase 4 builds the financial intelligence layer on top of the privacy infrastructure. The goal is to provide institutional-grade market analysis tools that operate without compromising user privacy — either the privacy of the analyst or the privacy of the subjects being analyzed.',
+    ],
+    bullets: [
+      'Private data streams using Private Information Retrieval: the user filters alert data locally on their device; the server transmits everything without knowing what is relevant to the client.',
+      'Dark pool liquidity: blind order matching using ZK proofs and multi-party computation. Order intent is never published before matching. Front-running is structurally impossible.',
+      'ZK signal generation: verified holders emit directional signals cryptographically, proving capital under management without revealing identity.',
+      'Encrypted mempool routing: transaction intents are routed as encrypted data; the sequencer orders bytes, and state is decrypted only after block ordering is finalized.',
+      'Real-world asset integration: tokenization of traditional assets under smart contract custody, with ZK attestation of underlying asset validity.',
+      'Private compliance APIs: Verifiable Credentials issued and consumed without transmitting passport data, name, or wallet address to the platform.',
+      'Forensic ZK algorithms: investigators run queries that return only the specific pre-approved information, without accessing legitimate user data.',
+      'Capital flow obfuscation: randomized batching and time-lock fragmentation on L1 deposits, converting observable bridge entry patterns into statistical noise.',
+    ],
+  },
+  {
+    id: 'phase-5',
+    title: 'Phase 5 — Adoption and Ecosystem',
+    paragraphs: [
+      'Phase 5 focuses on making the protocol accessible to developers, institutions, and users without requiring expertise in zero-knowledge cryptography. The goal is to reduce integration friction to the point where building on Humanity Ledger is no more complex than integrating any other financial API.',
+    ],
+    bullets: [
+      'Open-source post-quantum libraries for Noir: published packages containing optimized lattice-based hash and signature implementations for the broader developer community.',
+      'L1 to L2 bridge expansion: async bridge patterns for DeFi on Ethereum L1, enabling unified interactions from L2 without exposing amounts or counterparties.',
+      'Drop-in browser and mobile SDK: initializes the proving environment and private state management invisibly in the background, removing the requirement for users to manage a local node.',
+      'Institutional onboarding framework: compliance manuals, enterprise SLAs, tax audit guides, and integration documentation for hedge funds and custodians.',
+      'Developer sandbox: local CLI and GUI environment for simulating Aztec state, with full visibility into note flow, nullifier generation, and witness construction.',
+      'Educational programs: interactive modules teaching the Noir language and the fundamentals of private state design to university and developer communities.',
+      'Milestone-lock development structure: treasury disbursements cryptographically gated on verified proof of delivery for each roadmap commitment.',
+      'Macro metrics dashboard: network-level analytics (total active proofs, transaction throughput, private notes created) without exposing individual user data.',
     ],
   },
 ];
+
 
 // ─── API REFERENCE ────────────────────────────────────────────────────────────
 

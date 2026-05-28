@@ -4,6 +4,7 @@ import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { getGbRpc, getGbWss } from '@/lib/blockchain/getblock-registry';
 import CryptoJS from 'crypto-js';
+import { TransactionManager } from '@/lib/tx-manager';
 
 // 100M-User Scalability & Enterprise Grid Configuration
 export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche';
@@ -111,6 +112,7 @@ interface WalletState {
   unlockVault: (password: string) => boolean;
   lockVault: () => void;
   _encryptAndSave: () => void;
+  getConnectedWallet: () => Promise<ethers.Wallet | null>;
 }
 
 export const useWalletStore = create<WalletState>()(
@@ -503,6 +505,11 @@ export const useWalletStore = create<WalletState>()(
           }
 
           toast.loading("Broadcasting Transaction...", { id: "tx-broadcast" });
+          
+          const txManager = new TransactionManager(wallet);
+          const safeNonce = await txManager.getSafeNextNonce();
+          txParams.nonce = safeNonce;
+
           const tx = await wallet.sendTransaction(txParams);
 
           toast.success("Broadcast Successful", { 
@@ -520,6 +527,17 @@ export const useWalletStore = create<WalletState>()(
           });
           return null;
         }
+      },
+
+      getConnectedWallet: async () => {
+          const { privateKey, activeNetwork, activeProtocol, isLocked } = get();
+          if (isLocked || !privateKey) return null;
+          const networkData = NETWORKS[activeNetwork];
+          let rpcUrl = get().customRpcUrl || networkData.rpc;
+          const provider = activeProtocol === 'WSS' 
+            ? new ethers.WebSocketProvider(networkData.wss)
+            : new ethers.JsonRpcProvider(rpcUrl);
+          return new ethers.Wallet(privateKey, provider);
       },
       
       syncAddress: (addr: string | null) => {
