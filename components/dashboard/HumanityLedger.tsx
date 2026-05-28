@@ -23,24 +23,24 @@ interface RoadmapEdge {
 }
 
 const NODES: RoadmapNode[] = [
-  // January 2026
-  { id: 'm1-ledger', title: 'Humanity Ledger Expansion', status: 'live', quarter: 'January 2026', description: 'Specialized backend development and RPC node infrastructure for complex, private indexing of Aztec network data.', x: 100, y: 140 },
-  { id: 'm1-circuit', title: 'Aztec Testnet Integration', status: 'live', quarter: 'January 2026', description: 'Develop Noir circuits for Whale Chat messaging logic and private state management.', x: 100, y: 300 },
+  // Live
+  { id: 'm1-connect', title: 'ZK Connect Logic', status: 'live', quarter: 'Currently Live', description: 'Real-time Aztec network connection and EIP-712 wallet generation using Zustand and Wagmi.', x: 100, y: 140 },
+  { id: 'm1-ui', title: 'Whale Network UI', status: 'live', quarter: 'Currently Live', description: 'Monochrome minimalist terminal interface completely deployed with 60FPS zero-lag GPU animations.', x: 100, y: 300 },
   
-  // May 2026
-  { id: 'm2-audit', title: 'Security Audits', status: 'building', quarter: 'May 2026', description: 'Independent professional audits for our Noir circuits and account contracts.', x: 450, y: 140 },
-  { id: 'm2-beta', title: 'Testnet Beta Launch', status: 'building', quarter: 'May 2026', description: 'Fully functional, testnet-ready dashboard and wallet interface deployed for public beta testing.', x: 450, y: 300 },
+  // Building
+  { id: 'm2-portfolio', title: 'Portfolio State Proofs', status: 'building', quarter: 'In Progress', description: 'Integration with Noir circuits to read balances and UTXOs seamlessly without leaking metadata.', x: 450, y: 140 },
+  { id: 'm2-registry', title: 'Global Network State', status: 'building', quarter: 'In Progress', description: 'Live monitoring of Aztec network nodes, privacy sets, and encrypted transaction streams.', x: 450, y: 300 },
 
-  // Jan 2027
-  { id: 'm3-mobile', title: 'Mobile Finalization', status: 'planned', quarter: '01/01/2027', description: 'Native iOS/Android apps finalization. ZK-secured QR synchronization flawlessly across devices.', x: 800, y: 140 },
-  { id: 'm3-mainnet', title: 'Final Mainnet Launch', status: 'planned', quarter: '01/01/2027', description: 'Seamless, privacy-preserving cross-device wallet experience deployed to Aztec mainnet.', x: 800, y: 300 },
+  // Planned
+  { id: 'm3-mobile', title: 'Mobile Finalization', status: 'planned', quarter: 'Upcoming', description: 'Native iOS/Android apps finalization. ZK-secured QR synchronization flawlessly across devices.', x: 800, y: 140 },
+  { id: 'm3-mainnet', title: 'Final Mainnet Launch', status: 'planned', quarter: 'Upcoming', description: 'Seamless, privacy-preserving cross-device wallet experience deployed to Aztec mainnet.', x: 800, y: 300 },
 ];
 
 const EDGES: RoadmapEdge[] = [
-  { from: 'm1-ledger', to: 'm2-audit' },
-  { from: 'm1-circuit', to: 'm2-beta' },
-  { from: 'm2-audit', to: 'm3-mobile' },
-  { from: 'm2-beta', to: 'm3-mainnet' },
+  { from: 'm1-connect', to: 'm2-portfolio' },
+  { from: 'm1-ui', to: 'm2-registry' },
+  { from: 'm2-portfolio', to: 'm3-mobile' },
+  { from: 'm2-registry', to: 'm3-mainnet' },
 ];
 
 const STATUS_CONFIG = {
@@ -181,9 +181,9 @@ function RoadmapCanvas() {
         >
           {/* Quarter labels */}
           {[
-            { label: 'January 2026', x: 100 },
-            { label: 'May 2026', x: 450 },
-            { label: '01/01/2027', x: 800 },
+            { label: 'Currently Live', x: 100 },
+            { label: 'In Progress', x: 450 },
+            { label: 'Upcoming', x: 800 },
           ].map(q => (
 
             <div
@@ -291,112 +291,14 @@ function RoadmapCanvas() {
 function ImplementationManifest() {
   return (
     <div className="w-full bg-[#FAFAFA] border-t border-black/10 px-6 py-16 sm:px-12 sm:py-24">
-      <div className="max-w-[1200px] mx-auto">
-        <div className="mb-12">
-          <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 block mb-3">System Architecture</span>
-          <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-black uppercase">VOSS 2026 Implementation Manifest</h2>
-          <p className="text-[14px] text-black/50 mt-4 max-w-2xl leading-relaxed font-medium">
-            Comprehensive registry of the Aztec Network integrations, cryptographic security upgrades, and terminal architecture synchronizations deployed in the current phase.
-          </p>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12">
-          {/* Item 1 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">15-Phase Aztec Infrastructure Integration</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Successfully engineered and integrated 15 Aztec-native Noir circuits, smart contracts, and full frontend logic. Established the foundational zero-knowledge layer for the Humanity Ledger, enabling private messaging, portfolio state proofs, and secure asset execution.
-            </p>
-          </div>
-
-          {/* Item 2 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">Military-Grade AES-256-GCM Encryption</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Replaced legacy scrypt mechanisms with pure Web Crypto API implementation. All private keys and 12-word mnemonic phrases are now encrypted locally using PBKDF2 (SHA-256, 600,000 iterations) and AES-256-GCM. Absolute zero-knowledge preservation.
-            </p>
-          </div>
-
-          {/* Item 3 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">State Synchronization Bug Fix</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Eradicated the `/connect` infinite redirect loop. The Wallet Generation Wizard now seamlessly executes `importWallet(privateKey)` alongside `localStorage` JSON serialization, achieving absolute synchronization between physical storage, session flags, and the global Zustand memory tree in real-time.
-            </p>
-          </div>
-
-          {/* Item 4 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">Global Terminology Normalization</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Executed a comprehensive systemic purge of retail cryptocurrency jargon ("Web3", "Crypto", "DApp", "NFT"). All interfaces now strictly adhere to institutional lexicon ("System Identity", "Protocol", "Network", "Nodes") for unparalleled professional coherence.
-            </p>
-          </div>
-
-          {/* Item 5 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">Strict Monochrome Aesthetic Lock</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Eliminated all distracting colors, gradients, emojis, and unnecessary symbols. Enforced a maximalist-minimalism visual doctrine (Blanco y Negro), establishing a sterile, high-end, data-dense institutional terminal environment.
-            </p>
-          </div>
-
-          {/* Item 6 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">Noir Project Authorship Alignment</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Automatically traversed all `Nargo.toml` files within the `noir-projects` directory to standardize metadata, ensuring "Whale Alert Network" is correctly recognized as the architect of all deployed circuits.
-            </p>
-          </div>
-
-          {/* Item 7 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">Wagmi SSR Hydration Backoff Routine</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Re-engineered the `useSystemConnect` auto-reconnect logic with a true exponential backoff algorithm. Resolved race conditions in Next.js 15 SSR where the WagmiProvider fails to mount on the first tick, guaranteeing 100% stable connection re-establishment on slow devices.
-            </p>
-          </div>
-
-          {/* Item 8 */}
-          <div className="space-y-3">
-            <div className="flex items-center gap-3 border-b border-black/5 pb-2">
-              <span className="w-2 h-2 bg-black rounded-full" />
-              <h3 className="text-[14px] font-black uppercase tracking-widest text-black">Zero-Lag Performance Contract (iOS)</h3>
-            </div>
-            <p className="text-[13px] text-black/60 leading-relaxed font-medium">
-              Stripped expensive CSS operations (`backdrop-filter`, `animate-pulse`, `blur()`) from animated components and promoted all moving layers to the GPU via `translateZ(0)`. Ensuring consistent 60FPS scrolling performance across low-tier mobile hardware and iPads.
-            </p>
-          </div>
-        </div>
-
+      <div className="w-full max-w-none mx-auto">
         {/* ─── 5-PHASE AZTEC MASTER ROADMAP ─── */}
-        <div className="mt-24 border-t border-black/10 pt-16">
-          <div className="mb-16">
+        <div className="pt-8">
+          <div className="mb-16 max-w-5xl">
             <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 block mb-3">Master Strategy</span>
-            <h2 className="text-3xl sm:text-4xl font-black tracking-tighter text-black uppercase">Aztec Ecosystem 5-Phase Roadmap</h2>
-            <p className="text-[14px] text-black/50 mt-4 max-w-3xl leading-relaxed font-medium">
-              The complete, unredacted 50-point architectural evolution of Humanity Ledger. Every problem, solution, contribution, and integrity guarantee meticulously documented for absolute approval from the Aztec Network Grant Committee.
+            <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-black uppercase">Aztec Ecosystem 5-Phase Roadmap</h2>
+            <p className="text-[14px] sm:text-[16px] text-black/50 mt-6 leading-relaxed font-medium">
+              The complete, unredacted 50-point architectural evolution of Whale Network. Every problem, solution, contribution, and integrity guarantee meticulously documented for absolute approval from the Aztec Network Grant Committee.
             </p>
           </div>
 
@@ -416,7 +318,7 @@ function ImplementationManifest() {
                   </div>
 
                   {/* Phase Items */}
-                  <div className="grid grid-cols-1 xl:grid-cols-2 gap-x-12 gap-y-16">
+                  <div className="grid grid-cols-1 gap-y-20">
                     {phaseItems.map((item) => (
                       <div key={item.id} className="group">
                         <div className="flex gap-4">
@@ -490,12 +392,12 @@ export default function HumanityLedger() {
         </div>
       </div>
 
-      {/* Fullscreen Roadmap Canvas Container */}
-      <div className="relative w-full shrink-0 h-[75vh] min-h-[500px]">
+      {/* Fullscreen Roadmap Canvas Container - Real Time Panel */}
+      <div className="relative w-full shrink-0 h-[60vh] min-h-[400px]">
         <RoadmapCanvas />
       </div>
 
-      {/* VOSS 2026 Implementation Manifest */}
+      {/* 5-Phase Master Roadmap Full Screen */}
       <ImplementationManifest />
     </div>
   );
