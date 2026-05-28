@@ -97,18 +97,14 @@ export function useSystemSignOut() {
             console.warn('[System:Logout] Wagmi disconnect failed:', e);
         }
 
-        // 5. NextAuth SignOut (if applicable)
+        // 5. NextAuth SignOut (if applicable) - Fire and forget to prevent blocking
         try {
-            await signOut({ redirect: false });
+            signOut({ redirect: false }).catch(() => {});
         } catch (e) {}
 
-        // 6. Hard Redirect
+        // 6. Hard Redirect - Instant
         console.log('%c[System] Session Purged. Redirecting...', 'color:#00A36C');
-        
-        // Brief delay to ensure storage writes/clears are committed
-        setTimeout(() => {
-            window.location.href = '/';
-        }, 300);
+        window.location.replace('/');
 
     }, [disconnect]);
 

@@ -166,7 +166,7 @@ export function HDAccountManager({ onBack }: { onBack: () => void }) {
 
       {!mnemonic && (
         <div className="border border-amber-200 bg-amber-50 p-5 text-[10px] font-bold uppercase tracking-widest text-amber-700">
-          ⚠ Seed phrase not available in current session. Unlock vault or import wallet with mnemonic.
+          ATTENTION — Seed phrase not available in current session. Unlock vault or import wallet with mnemonic.
         </div>
       )}
 
