@@ -72,6 +72,9 @@ interface RealWorldMapProps {
   isDark?: boolean;
 }
 
+let cachedCountryData: Record<string, number> = {};
+let cachedStats = { total: 0, regions: 0 };
+
 export const RealWorldMap = memo(function RealWorldMap({
   fullPage = false,
   isDark = false,
@@ -79,8 +82,8 @@ export const RealWorldMap = memo(function RealWorldMap({
   const wrapperRef = useRef<HTMLDivElement>(null);
   const [tooltip, setTooltip] = useState<Tooltip | null>(null);
   // countryName → wallet count
-  const [countryData, setCountryData] = useState<Record<string, number>>({});
-  const [stats, setStats] = useState({ total: 0, regions: 0 });
+  const [countryData, setCountryData] = useState<Record<string, number>>(cachedCountryData);
+  const [stats, setStats] = useState(cachedStats);
 
   // ── Poll real wallet-connection data every 15 s ───────────────────────────
   useEffect(() => {
@@ -95,11 +98,18 @@ export const RealWorldMap = memo(function RealWorldMap({
         const { byCountry, total, activeRegions } = await res.json();
         if (!mounted) return;
 
-        setCountryData(byCountry);
-        setStats((prev) => ({
-          total: prev.total > (total ?? 0) ? prev.total : (total ?? 0),
-          regions: activeRegions ?? Object.keys(byCountry).length,
-        }));
+        if (byCountry) {
+          cachedCountryData = byCountry;
+          setCountryData(byCountry);
+        }
+        setStats((prev) => {
+          const newStats = {
+            total: prev.total > (total ?? 0) ? prev.total : (total ?? 0),
+            regions: activeRegions ?? (byCountry ? Object.keys(byCountry).length : 0),
+          };
+          cachedStats = newStats;
+          return newStats;
+        });
       } catch {}
     };
 

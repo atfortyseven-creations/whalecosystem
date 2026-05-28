@@ -1379,24 +1379,30 @@ export function MobileLanding() {
 
               return (
                 <>
-                  {/* Humanity Ledger Native Login */}
+                  {/* Humanity Ledger — Iniciar Sesión */}
                   <WalletOption
                     logo="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
-                    name="Humanity Ledger"
+                    name="Iniciar Sesión con Humanity Ledger"
                     badge="Native System Login"
-                    loading={connecting === 'humanity-ledger'}
+                    loading={connecting === 'humanity-ledger-login'}
                     onClick={() => {
-                        setConnecting('humanity-ledger');
-                        // Expert check: Route to login if a vault already exists, otherwise sign-up
-                        let hasAccount = false;
-                        try {
-                          hasAccount = !!localStorage.getItem("system_accounts") || 
-                                       !!localStorage.getItem("system_keystore") || 
-                                       !!localStorage.getItem("system_vault_v1");
-                        } catch(e) {}
-                        router.push(hasAccount ? "/login" : "/sign-up");
+                        setConnecting('humanity-ledger-login');
+                        router.push("/login");
                     }}
                     delay={0.1}
+                  />
+
+                  {/* Humanity Ledger — Crear Cuenta */}
+                  <WalletOption
+                    logo="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
+                    name="Crear Cuenta en Humanity Ledger"
+                    badge="Nuevo usuario · Registro"
+                    loading={connecting === 'humanity-ledger-signup'}
+                    onClick={() => {
+                        setConnecting('humanity-ledger-signup');
+                        router.push("/sign-up");
+                    }}
+                    delay={0.18}
                   />
 
                   {/* Universal WC v2 */}

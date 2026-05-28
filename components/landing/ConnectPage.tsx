@@ -46,14 +46,16 @@ const DESKTOP_WALLETS = [
   { id: "metamask", name: "MetaMask", badge: "Browser Extension", logo: "/wallets/metamask.svg", rdns: "io.metamask", installUrl: "https://metamask.io/download/", delay: 0 },
   { id: "coinbase", name: "Coinbase Wallet", badge: "Browser Extension", logo: "/wallets/coinbase.png", rdns: "com.coinbase.wallet", installUrl: "https://www.coinbase.com/wallet", delay: 0.08 },
   { id: "rainbow", name: "Rainbow", badge: "Browser Extension", logo: "/wallets/rainbow.png", rdns: "me.rainbow", installUrl: "https://rainbow.me/extension", delay: 0.16 },
-  { id: "humanity-ledger", name: "Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", rdns: null, installUrl: null, delay: 0.24 },
+  { id: "humanity-ledger-login", name: "Iniciar Sesión con Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", rdns: null, installUrl: null, delay: 0.24 },
+  { id: "humanity-ledger-signup", name: "Crear Cuenta en Humanity Ledger", badge: "Nuevo usuario · Registro", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", rdns: null, installUrl: null, delay: 0.30 },
 ];
 
 const MOBILE_WALLETS = [
   { id: "metamask-mobile", name: "MetaMask", badge: "Tap to open app", logo: "/wallets/metamask.svg", delay: 0 },
   { id: "coinbase-mobile", name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.png", delay: 0.08 },
   { id: "rainbow-mobile", name: "Rainbow", badge: "Tap to open app", logo: "/wallets/rainbow.png", delay: 0.16 },
-  { id: "humanity-ledger-mobile", name: "Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", delay: 0.24 },
+  { id: "humanity-ledger-login-mobile", name: "Iniciar Sesión con Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", delay: 0.24 },
+  { id: "humanity-ledger-signup-mobile", name: "Crear Cuenta en Humanity Ledger", badge: "Nuevo usuario · Registro", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", delay: 0.30 },
 ];
 
 function WalletButton({ logo, name, badge, onClick, loading = false, delay = 0, extraIcon }: {
@@ -381,14 +383,12 @@ export default function ConnectPage() {
   }, [isConnected, address, mounted, setLinked, signMessageAsync, authStatus]);
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
-    if (walletId === "humanity-ledger") {
-        let hasAccount = false;
-        try {
-          hasAccount = !!localStorage.getItem("system_accounts") || 
-                       !!localStorage.getItem("system_keystore") || 
-                       !!localStorage.getItem("system_vault_v1");
-        } catch(e) {}
-        router.push(hasAccount ? "/login" : "/sign-up");
+    if (walletId === "humanity-ledger-login") {
+        router.push("/login");
+        return;
+    }
+    if (walletId === "humanity-ledger-signup") {
+        router.push("/sign-up");
         return;
     }
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
@@ -405,14 +405,12 @@ export default function ConnectPage() {
   }, [connect, connectors, openAppKit]);
 
   const handleMobileWallet = useCallback((walletId: string) => {
-    if (walletId === "humanity-ledger-mobile") {
-        let hasAccount = false;
-        try {
-          hasAccount = !!localStorage.getItem("system_accounts") || 
-                       !!localStorage.getItem("system_keystore") || 
-                       !!localStorage.getItem("system_vault_v1");
-        } catch(e) {}
-        router.push(hasAccount ? "/login" : "/sign-up");
+    if (walletId === "humanity-ledger-login-mobile") {
+        router.push("/login");
+        return;
+    }
+    if (walletId === "humanity-ledger-signup-mobile") {
+        router.push("/sign-up");
         return;
     }
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
