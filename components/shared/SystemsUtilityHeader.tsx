@@ -62,8 +62,6 @@ export function SystemsUtilityHeader() {
                         e.stopPropagation();
                         if (!isConnected) {
                             router.push('/connect');
-                        } else {
-                            setSettingsOpen(true);
                         }
                     }}
                     className="flex items-center gap-2.5 pl-3.5 pr-1.5 py-1.5 rounded-full transition-all border cursor-pointer group"
@@ -100,6 +98,19 @@ export function SystemsUtilityHeader() {
 
                 {/* Removed Ivory Dropdown in favor of Global Settings drawer */}
             </div>
+
+            {isConnected && (
+                <button
+                    onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        disconnect();
+                    }}
+                    className="ml-2 px-4 py-2 bg-red-50 text-red-600 border border-red-100 rounded-full text-[9px] font-black uppercase tracking-widest hover:bg-red-100 transition-colors shadow-sm"
+                >
+                    Disconnect
+                </button>
+            )}
         </div>
     );
 }

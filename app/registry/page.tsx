@@ -62,8 +62,8 @@ export default function GlobalRegistryMapPage() {
       </div>
 
       {/* Map Area */}
-      <div className="flex-1 w-full px-8 pb-10 relative z-10 flex flex-col">
-        <div className="w-full flex-1 relative rounded-xl border border-black/10 overflow-hidden shadow-sm bg-white min-h-[800px] flex flex-col">
+      <div className="flex-1 w-full px-4 sm:px-8 pb-10 relative z-10 flex flex-col items-center justify-center">
+        <div className="w-full lg:w-[80%] xl:w-[70%] relative rounded-xl border border-black/10 overflow-hidden shadow-sm bg-white flex flex-col">
           <RealWorldMap fullPage />
         </div>
       </div>

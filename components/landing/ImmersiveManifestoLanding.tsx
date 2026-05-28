@@ -351,11 +351,9 @@ function HeroSection() {
           top: '50%',
           left: '50%',
           transform: 'translate(-50%, -50%)',
-          maxWidth: '100%',
-          maxHeight: '100%',
-          width: 'auto',
-          height: 'auto',
-          objectFit: 'contain',
+          width: '100%',
+          height: '100%',
+          objectFit: 'cover',
           opacity: 0.18,
         }}
       />

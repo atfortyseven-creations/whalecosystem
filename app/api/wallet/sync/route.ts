@@ -116,6 +116,22 @@ export async function POST(req: NextRequest) {
         httpOnly: false // false so the frontend can read it if needed, but issued by backend
     });
 
+    // --- REAL-TIME CLOUDFLARE GEOLOCATION & ANALYTICS ---
+    try {
+        const country = req.headers.get('cf-ipcountry') || req.headers.get('x-vercel-ip-country') || 'UNKNOWN';
+        if (country !== 'UNKNOWN') {
+            const { redisClient } = await import('@/lib/redis/client');
+            // Track unique wallets per country
+            const isNew = await (redisClient as any).sadd(`wc:unique_country_wallets:${country}`, userId).catch(() => 0);
+            if (isNew) {
+                // Keep the old fast hincrby for the global map
+                await (redisClient as any).hincrby('wc:country', country, 1).catch(() => {});
+            }
+        }
+    } catch (e) {
+        console.error('[WalletSync] Failed to update telemetry:', e);
+    }
+
     return response;
 
   } catch (error: any) {

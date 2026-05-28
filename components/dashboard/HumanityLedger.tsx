@@ -286,94 +286,6 @@ function RoadmapCanvas() {
   );
 }
 
-// ─── Implementation Changelog ───────────────────────────────────────────────────
-
-function ImplementationManifest() {
-  return (
-    <div className="w-full bg-[#FAFAFA] border-t border-black/10 px-6 py-16 sm:px-12 sm:py-24">
-      <div className="w-full max-w-none mx-auto">
-        {/* ─── 5-PHASE AZTEC MASTER ROADMAP ─── */}
-        <div className="pt-8">
-          <div className="mb-16 max-w-5xl">
-            <span className="text-[10px] font-black uppercase tracking-[0.3em] text-black/40 block mb-3">Master Strategy</span>
-            <h2 className="text-3xl sm:text-5xl font-black tracking-tighter text-black uppercase">Aztec Ecosystem 5-Phase Roadmap</h2>
-            <p className="text-[14px] sm:text-[16px] text-black/50 mt-6 leading-relaxed font-medium">
-              The complete, unredacted 50-point architectural evolution of Whale Network. Every problem, solution, contribution, and integrity guarantee meticulously documented for absolute approval from the Aztec Network Grant Committee.
-            </p>
-          </div>
-
-          <div className="space-y-20">
-            {[1, 2, 3, 4, 5].map((phaseNum) => {
-              const phaseItems = AZTEC_ROADMAP.filter(item => item.phase === phaseNum);
-              if (phaseItems.length === 0) return null;
-              
-              const phaseTitle = phaseItems[0].phaseTitle;
-
-              return (
-                <div key={phaseNum} className="relative">
-                  {/* Phase Header */}
-                  <div className="sticky top-0 bg-[#FAFAFA]/90 backdrop-blur-xl py-6 mb-8 z-10 border-b border-black/10 flex items-end gap-6">
-                    <span className="text-6xl font-black text-black/10 leading-none">0{phaseNum}</span>
-                    <h3 className="text-xl font-black uppercase tracking-widest text-black pb-1">{phaseTitle}</h3>
-                  </div>
-
-                  {/* Phase Items */}
-                  <div className="grid grid-cols-1 gap-y-20">
-                    {phaseItems.map((item) => (
-                      <div key={item.id} className="group">
-                        <div className="flex gap-4">
-                          <div className="font-mono text-[10px] font-black text-black/20 mt-1">
-                            {item.id.toString().padStart(2, '0')}
-                          </div>
-                          <div className="space-y-5 flex-1">
-                            <h4 className="text-[15px] font-black uppercase tracking-tight text-black">{item.title}</h4>
-                            
-                            <div className="space-y-3">
-                              <div>
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 block mb-1">The Problem</span>
-                                <p className="text-[13px] text-black/70 leading-relaxed font-medium">{item.problem}</p>
-                              </div>
-                              
-                              <div className="p-3 bg-black/[0.03] rounded-xl border border-black/5">
-                                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black block mb-1">The Solution</span>
-                                <p className="text-[13px] text-black/80 leading-relaxed font-medium">{item.solution}</p>
-                              </div>
-
-                              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
-                                <div>
-                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 block mb-1">Contribution</span>
-                                  <p className="text-[12px] text-black/60 leading-relaxed font-medium">{item.contribution}</p>
-                                </div>
-                                <div>
-                                  <span className="text-[10px] font-black uppercase tracking-[0.2em] text-black/40 block mb-1">Deliverable</span>
-                                  <p className="text-[12px] text-black/60 leading-relaxed font-medium">{item.deliverable}</p>
-                                </div>
-                              </div>
-
-                              <div className="pt-2">
-                                <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-black text-white rounded-lg">
-                                  <span className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
-                                  <span className="text-[9px] font-black uppercase tracking-widest text-white/90">Integrity Guarantee</span>
-                                </div>
-                                <p className="text-[13px] text-black/80 leading-relaxed font-bold mt-2">{item.integrity}</p>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export default function HumanityLedger() {
@@ -393,12 +305,9 @@ export default function HumanityLedger() {
       </div>
 
       {/* Fullscreen Roadmap Canvas Container - Real Time Panel */}
-      <div className="relative w-full shrink-0 h-[60vh] min-h-[400px]">
+      <div className="relative w-full flex-1">
         <RoadmapCanvas />
       </div>
-
-      {/* 5-Phase Master Roadmap Full Screen */}
-      <ImplementationManifest />
     </div>
   );
 }
