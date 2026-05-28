@@ -39,26 +39,26 @@ export function GlobalSettingsModal() {
                         animate={{ x: 0 }}
                         exit={{ x: "100%" }}
                         transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-                        className="fixed top-0 right-0 h-full w-full sm:w-[90vw] max-w-[800px] bg-white dark:bg-[#0A0A0A] border-l border-black/10 dark:border-white/10 z-[99999] shadow-2xl flex flex-col overflow-hidden transition-colors duration-300"
+                        className="fixed top-0 right-0 h-full w-full sm:w-[90vw] max-w-[800px] bg-white  border-l border-black/10  z-[99999] shadow-2xl flex flex-col overflow-hidden transition-colors duration-300"
                     >
-                        <div className="flex items-center justify-between px-6 py-4 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#111111]">
+                        <div className="flex items-center justify-between px-6 py-4 border-b border-black/10  bg-white ">
                              <div className="flex items-center gap-3">
-                                 <div className="w-8 h-8 rounded-lg bg-black dark:bg-white flex items-center justify-center text-white dark:text-black">
+                                 <div className="w-8 h-8 rounded-lg bg-black  flex items-center justify-center text-white ">
                                     <Settings size={16} />
                                  </div>
                                  <div className="flex flex-col">
-                                    <h2 className="text-[13px] font-black text-black dark:text-white uppercase tracking-widest">Global Terminal Parameters</h2>
+                                    <h2 className="text-[13px] font-black text-black  uppercase tracking-widest">Global Terminal Parameters</h2>
                                  </div>
                              </div>
                              <div className="flex items-center gap-4">
-                                <button onClick={handleDisconnect} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50 dark:bg-red-950/20 text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-100 dark:hover:bg-red-900/40 transition-colors">
+                                <button onClick={handleDisconnect} className="flex items-center gap-2 px-4 py-2 rounded-xl bg-red-50  text-red-500 text-[10px] font-black uppercase tracking-widest hover:bg-red-100  transition-colors">
                                     <LogOut size={14} /> Sever Connection
                                 </button>
-                                <button onClick={() => setSettingsOpen(false)} className="p-2 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors bg-black/5 dark:bg-white/5 rounded-full"><X size={18} /></button>
+                                <button onClick={() => setSettingsOpen(false)} className="p-2 text-black/40 hover:text-black   transition-colors bg-black/5  rounded-full"><X size={18} /></button>
                              </div>
                         </div>
 
-                        <div className="flex-1 overflow-y-auto relative bg-[#FFFFFF] dark:bg-[#0A0A0A]">
+                        <div className="flex-1 overflow-y-auto relative bg-[#FFFFFF] ">
                              {/* Render the full comprehensive Terminal Settings Panel perfectly inside the modal */}
                              <TerminalSettingsPanel />
                         </div>

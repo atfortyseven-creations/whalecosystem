@@ -22,7 +22,7 @@ export function QuantumEntropyVisualizer({ active }: { active: boolean }) {
 
   return (
     <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
-      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50 dark:to-black/50" />
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent to-white/50 " />
       {nodes.map((node, i) => (
         <motion.div
           key={i}
@@ -39,7 +39,7 @@ export function QuantumEntropyVisualizer({ active }: { active: boolean }) {
             delay: node.delay,
             ease: "easeInOut"
           }}
-          className="absolute rounded-full bg-black/10 dark:bg-white/10 backdrop-blur-3xl"
+          className="absolute rounded-full bg-black/10  backdrop-blur-3xl"
           style={{
             width: node.size,
             height: node.size,

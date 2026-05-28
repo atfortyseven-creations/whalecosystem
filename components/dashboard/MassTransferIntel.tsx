@@ -62,9 +62,9 @@ function EventRow({ event }: { event: any }) {
   };
 
   return (
-    <div className="flex flex-col border-b border-[#E5E5E5] dark:border-white/10 hover:bg-[#FFFFFF] dark:hover:bg-[#1A1A1A] transition-colors bg-white dark:bg-[#111111] group p-4">
+    <div className="flex flex-col border-b border-[#E5E5E5]  hover:bg-[#FFFFFF]  transition-colors bg-white  group p-4">
       {/* Top bar */}
-      <div className="flex items-center justify-between mb-3 pb-2 border-b border-dashed border-[#F0F0F0] dark:border-white/10">
+      <div className="flex items-center justify-between mb-3 pb-2 border-b border-dashed border-[#F0F0F0] ">
         <div className="flex items-center gap-3">
           <span
             className="text-[9px] font-black uppercase tracking-widest px-2 py-0.5 rounded-sm"
@@ -72,7 +72,7 @@ function EventRow({ event }: { event: any }) {
           >
             {tCfg.label}
           </span>
-          <span className="text-[10px] font-mono font-black tracking-widest text-[#050505] dark:text-white">
+          <span className="text-[10px] font-mono font-black tracking-widest text-[#050505] ">
             {event.action}
           </span>
           <span className="text-[9px] font-mono text-[#888888] flex items-center gap-1">
@@ -86,7 +86,7 @@ function EventRow({ event }: { event: any }) {
           <span className="uppercase flex items-center gap-1">
             {event.gasPriceGwei} Gwei
           </span>
-          <span className="uppercase text-[#050505] dark:text-white font-black border border-[#E5E5E5] dark:border-white/10 px-1.5 py-0.5 rounded-sm">
+          <span className="uppercase text-[#050505]  font-black border border-[#E5E5E5]  px-1.5 py-0.5 rounded-sm">
             {event.chain}
           </span>
         </div>
@@ -99,14 +99,14 @@ function EventRow({ event }: { event: any }) {
           <div className="flex items-center gap-2">
             <span className="text-[9px] text-[#888888] uppercase w-8">From</span>
             <a href={getExplorer(event.chain, "address", event.from)} target="_blank" rel="noreferrer"
-              className="text-[11px] font-mono text-[#050505] dark:text-white hover:underline">
+              className="text-[11px] font-mono text-[#050505]  hover:underline">
               {shortAddr(event.from)}
             </a>
           </div>
           <div className="flex items-center gap-2">
             <span className="text-[9px] text-[#888888] uppercase w-8">To</span>
             <a href={getExplorer(event.chain, "address", event.to)} target="_blank" rel="noreferrer"
-              className="text-[11px] font-mono text-[#050505] dark:text-white hover:underline">
+              className="text-[11px] font-mono text-[#050505]  hover:underline">
               {shortAddr(event.to)}
             </a>
           </div>
@@ -114,7 +114,7 @@ function EventRow({ event }: { event: any }) {
 
         {/* Value */}
         <div className="flex flex-col items-center justify-center w-1/3">
-          <div className="text-xl font-black font-mono tracking-tighter text-[#050505] dark:text-white">
+          <div className="text-xl font-black font-mono tracking-tighter text-[#050505] ">
             {formatUsd(Number(event.usdValue) || 0)}
           </div>
           <div className="text-[11px] font-black text-[#555555] mt-1 flex items-center gap-1.5">
@@ -128,15 +128,15 @@ function EventRow({ event }: { event: any }) {
           <div className="flex items-center gap-2 text-[#888888]">
             <span className="uppercase">Hash</span>
             <a href={getExplorer(event.chain, "tx", event.hash)} target="_blank" rel="noreferrer"
-              className="text-[#050505] dark:text-white hover:underline">
+              className="text-[#050505]  hover:underline">
               {shortAddr(event.hash)}
             </a>
-            <button onClick={() => copy(event.hash)} className="hover:text-[#050505] dark:hover:text-white transition-colors" title="Copy hash">
+            <button onClick={() => copy(event.hash)} className="hover:text-[#050505]  transition-colors" title="Copy hash">
               [COPY]
             </button>
           </div>
           {event.method && event.method !== "Native Transfer" && (
-            <div className="flex items-center gap-1 uppercase bg-[#F5F5F5] dark:bg-white/10 px-2 py-0.5 rounded text-[#050505] dark:text-white border border-[#E5E5E5] dark:border-white/10">
+            <div className="flex items-center gap-1 uppercase bg-[#F5F5F5]  px-2 py-0.5 rounded text-[#050505]  border border-[#E5E5E5] ">
               {event.method}
             </div>
           )}
@@ -144,22 +144,22 @@ function EventRow({ event }: { event: any }) {
       </div>
 
       {/* TX Hash strip */}
-      <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0] dark:border-white/10 flex items-center justify-between text-[9px] font-mono bg-[#FFFFFF] dark:bg-[#1A1A1A] px-3 py-2 rounded-sm border border-[#E5E5E5] dark:border-white/10">
+      <div className="mt-3 pt-3 border-t border-dashed border-[#F0F0F0]  flex items-center justify-between text-[9px] font-mono bg-[#FFFFFF]  px-3 py-2 rounded-sm border border-[#E5E5E5] ">
         <div className="flex items-center gap-3">
           <span className="uppercase text-[#888888] font-black tracking-widest flex items-center gap-1.5">
             TX Hash
           </span>
-          <span className="text-[#050505] dark:text-white max-w-[240px] truncate" title={event.hash}>
+          <span className="text-[#050505]  max-w-[240px] truncate" title={event.hash}>
             {event.hash}
           </span>
-          <button onClick={() => copy(event.hash)} className="hover:text-[#050505] dark:hover:text-white text-[#888888] transition-colors">
+          <button onClick={() => copy(event.hash)} className="hover:text-[#050505]  text-[#888888] transition-colors">
             [COPY]
           </button>
           {copied && <span className="text-[#00C076] font-black">COPIED</span>}
         </div>
         <div className="flex items-center gap-3">
           <span className="text-[#888888] uppercase tracking-widest">
-            Type: <span className="text-[#050505] dark:text-white font-black">ECDSA secp256k1</span>
+            Type: <span className="text-[#050505]  font-black">ECDSA secp256k1</span>
           </span>
           <span className="flex items-center gap-1.5 uppercase font-black tracking-widest text-[#00C076]">
             <div className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
@@ -189,12 +189,12 @@ function SummaryCards({ events }: { events: any[] }) {
   return (
     <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-8">
       {cards.map(({ label, value, sub, isNum }) => (
-        <div key={label} className="p-6 border border-[#E0E0E0] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] rounded-sm">
+        <div key={label} className="p-6 border border-[#E0E0E0]  bg-[#FFFFFF]  rounded-sm">
           <div className="text-[9px] font-black uppercase tracking-widest text-[#888888] mb-2">{label}</div>
           <AnimatedCounter
             value={value}
             format={isNum ? (v) => Math.floor(v).toString() : formatUsd}
-            className="text-2xl font-bold font-mono tracking-tighter text-[#050505] dark:text-white mb-1 block"
+            className="text-2xl font-bold font-mono tracking-tighter text-[#050505]  mb-1 block"
           />
           <div className="text-[10px] font-mono text-[#888888]">{sub}</div>
         </div>
@@ -334,10 +334,10 @@ export function MassTransferIntel() {
   }, [events, chainFilter, floorPreset, sortBy]);
 
   return (
-    <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#050505] dark:text-white font-sans">
+    <div className="h-full min-h-0 flex flex-col bg-[#FFFFFF]  text-[#050505]  font-sans">
 
       {/*  Header  */}
-      <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] gap-4 shrink-0">
+      <div className="flex flex-wrap items-center justify-between px-8 py-6 border-b border-[#E5E5E5]  bg-white  gap-4 shrink-0">
         <div className="flex-1">
           <button
             onClick={handleSync}
@@ -360,8 +360,8 @@ export function MassTransferIntel() {
                 onClick={() => setFloorPreset(p.value)}
                 className={`px-2.5 py-1 text-[9px] font-black uppercase tracking-widest border transition-colors rounded-sm ${
                   floorPreset === p.value
-                    ? "bg-[#050505] dark:bg-white text-white dark:text-black border-[#050505] dark:border-white"
-                    : "bg-white dark:bg-[#1A1A1A] text-[#888888] dark:text-[#AAAAAA] border-[#E5E5E5] dark:border-white/10 hover:border-[#050505] dark:hover:border-white hover:text-[#050505] dark:hover:text-white"
+                    ? "bg-[#050505]  text-white  border-[#050505] "
+                    : "bg-white  text-[#888888]  border-[#E5E5E5]  hover:border-[#050505]  hover:text-[#050505] "
                 }`}
               >
                 {p.label}
@@ -375,8 +375,8 @@ export function MassTransferIntel() {
             onClick={() => setIsSonarActive(p => !p)}
             className={`px-4 py-2 border text-[10px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors ${
               isSonarActive
-                ? "border-[#050505] dark:border-white bg-[#050505] dark:bg-white text-white dark:text-black"
-                : "border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#1A1A1A] hover:bg-[#F0F0F0] dark:hover:bg-[#222] text-[#050505] dark:text-white"
+                ? "border-[#050505]  bg-[#050505]  text-white "
+                : "border-[#E5E5E5]  bg-white  hover:bg-[#F0F0F0]  text-[#050505] "
             }`}
           >
             {isSonarActive ? "SONAR ON" : "SONAR OFF"}
@@ -386,7 +386,7 @@ export function MassTransferIntel() {
           <select
             value={chainFilter || ""}
             onChange={e => setChainFilter(e.target.value === "" ? null : e.target.value)}
-            className="px-4 py-2 border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#1A1A1A] text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
+            className="px-4 py-2 border border-[#E5E5E5]  bg-white  text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
           >
             <option value="">OMNICHAIN (ALL)</option>
             {availableChains.map(chain => (
@@ -398,7 +398,7 @@ export function MassTransferIntel() {
           <select
             value={sortBy}
             onChange={e => setSortBy(e.target.value as any)}
-            className="px-4 py-2 border border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#1A1A1A] text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
+            className="px-4 py-2 border border-[#E5E5E5]  bg-white  text-[10px] font-black uppercase tracking-widest outline-none cursor-pointer"
           >
             <option value="time_desc">CHRONOLOGICAL</option>
             <option value="usd_desc">MAGNITUDE</option>
@@ -411,13 +411,13 @@ export function MassTransferIntel() {
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full text-[#888888] gap-4">
             <Loader2 className="animate-spin" size={32} />
-            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505] dark:text-white">INITIALIZING LEDGER</p>
+            <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505] ">INITIALIZING LEDGER</p>
             <p className="text-[9px] font-mono uppercase tracking-[0.1em]">ESTABLISHING RPC LINK</p>
           </div>
         ) : error ? (
           <div className="h-48 flex flex-col items-center justify-center gap-3">
-            <p className="text-[11px] font-black text-[#050505] dark:text-white uppercase tracking-[0.3em]">Telemetry Failure</p>
-            <button onClick={handleSync} className="text-[10px] font-black uppercase tracking-widest underline text-[#050505] dark:text-white">
+            <p className="text-[11px] font-black text-[#050505]  uppercase tracking-[0.3em]">Telemetry Failure</p>
+            <button onClick={handleSync} className="text-[10px] font-black uppercase tracking-widest underline text-[#050505] ">
               Retry
             </button>
           </div>
@@ -425,18 +425,18 @@ export function MassTransferIntel() {
           <div className="w-full mx-auto">
             <SummaryCards events={events} />
 
-            <div className="bg-white dark:bg-[#111111] border border-[#E0E0E0] dark:border-white/10 rounded flex flex-col shadow-sm">
+            <div className="bg-white  border border-[#E0E0E0]  rounded flex flex-col shadow-sm">
               {/* Table header */}
-              <div className="px-5 py-3 bg-[#FFFFFF] dark:bg-[#1A1A1A] border-b border-[#E0E0E0] dark:border-white/10 flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
+              <div className="px-5 py-3 bg-[#FFFFFF]  border-b border-[#E0E0E0]  flex items-center justify-between text-[9px] font-bold uppercase tracking-widest text-[#A0A0A0]">
                 <span>TRANSMISSIONS ({filtered.length})</span>
                 <div className="flex items-center gap-3">
                   {floorPreset > 0 && (
-                    <span className="text-[#050505] dark:text-white font-black">
+                    <span className="text-[#050505]  font-black">
                       FLOOR: {formatUsd(floorPreset)}
                     </span>
                   )}
                   {chainFilter && (
-                    <span className="text-[#050505] dark:text-white font-black">{chainFilter}</span>
+                    <span className="text-[#050505]  font-black">{chainFilter}</span>
                   )}
                   <span className="flex items-center gap-2">
                     Verified Stream
@@ -452,7 +452,7 @@ export function MassTransferIntel() {
                   {floorPreset > 0 && (
                     <button
                       onClick={() => setFloorPreset(0)}
-                      className="text-[9px] font-black uppercase tracking-widest text-[#050505] dark:text-white underline"
+                      className="text-[9px] font-black uppercase tracking-widest text-[#050505]  underline"
                     >
                       Clear floor filter
                     </button>

@@ -47,9 +47,7 @@ export function MorphoYieldDashboard() {
 
   useEffect(() => {
     let isMounted = true;
-    let intervalId: NodeJS.Timeout;
-    
-    // Simulate high-fidelity local data stream to guarantee operational stability
+    // Real-time infrastructure binding (Static without backend feed)
     const timer = setTimeout(() => {
       if (!isMounted) return;
       
@@ -61,33 +59,11 @@ export function MorphoYieldDashboard() {
       ];
       setPools(initialPools);
       setLoading(false);
-
-      // Make it real-time by adding a dynamic fluctuation interval
-      intervalId = setInterval(() => {
-        if (!isMounted) return;
-        setPools(prevPools => prevPools.map(pool => {
-          // Fluctuate TVL by +/- 0.5%
-          const tvlChange = pool.tvl * (Math.random() * 0.01 - 0.005);
-          // Fluctuate APY by +/- 0.1%
-          const apyChange = (Math.random() * 0.2 - 0.1);
-          // Fluctuate Utilization by +/- 1%
-          const utilChange = Math.floor(Math.random() * 3 - 1);
-          
-          return {
-            ...pool,
-            tvl: pool.tvl + tvlChange,
-            apy: Math.max(0, parseFloat((pool.apy + apyChange).toFixed(2))),
-            utilization: Math.max(0, Math.min(100, pool.utilization + utilChange))
-          };
-        }));
-      }, 3500);
-
     }, 1200);
 
     return () => {
       isMounted = false;
       clearTimeout(timer);
-      if (intervalId) clearInterval(intervalId);
     };
   }, []);
 

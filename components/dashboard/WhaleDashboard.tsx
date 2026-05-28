@@ -17,7 +17,7 @@ import { GoldTicketPanel } from '@/components/dashboard/GoldTicketPanel';
 // --- Dynamic Module Registry ---
 const LoadingPanel = () => (
   <div className="w-full h-full min-h-[400px] flex items-center justify-center bg-transparent">
-    <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />
+    <div className="w-6 h-6 border-2 border-[#050505]  border-t-transparent rounded-full animate-spin" />
   </div>
 );
 
@@ -96,8 +96,8 @@ export default function WhaleDashboard() {
     // ZK Guard Clause
     if (isChecking) {
         return (
-            <div className="min-h-screen bg-[#FFFFFF] dark:bg-[#0A0A0A] flex items-center justify-center">
-                <div className="w-6 h-6 border-2 border-[#050505] dark:border-white border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-[#FFFFFF]  flex items-center justify-center">
+                <div className="w-6 h-6 border-2 border-[#050505]  border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }

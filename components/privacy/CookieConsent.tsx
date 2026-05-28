@@ -44,15 +44,15 @@ export function CookieConsent() {
                 <div className="w-full max-w-2xl mx-auto pointer-events-auto relative">
                     {/* Card */}
                     <div
-                        className="relative rounded-2xl overflow-hidden bg-white dark:bg-[#0A0A0A] border border-black/5 dark:border-white/5 shadow-2xl"
+                        className="relative rounded-2xl overflow-hidden bg-white  border border-black/5  shadow-2xl"
                     >
                         <div className="relative z-10 flex flex-col sm:flex-row items-start sm:items-center gap-4 p-5 sm:p-6">
                             {/* Text */}
                             <div className="flex-1 min-w-0">
-                                <p className="text-[12px] font-bold text-black dark:text-white mb-1.5">
+                                <p className="text-[12px] font-bold text-black  mb-1.5">
                                     Cookie Preferences
                                 </p>
-                                <p className="text-[11px] text-black/60 dark:text-white/60 leading-relaxed font-sans">
+                                <p className="text-[11px] text-black/60  leading-relaxed font-sans">
                                     We use essential cookies for session integrity and optional analytics to improve your experience. Your data is never sold.
                                 </p>
                             </div>
@@ -61,13 +61,13 @@ export function CookieConsent() {
                             <div className="flex items-center gap-2.5 shrink-0 w-full sm:w-auto mt-2 sm:mt-0">
                                 <button
                                     onClick={handleEssential}
-                                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-200 active:scale-[0.97] bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60 hover:text-black hover:dark:text-white hover:bg-black/10 hover:dark:bg-white/10"
+                                    className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-200 active:scale-[0.97] bg-black/5  text-black/60  hover:text-black hover: hover:bg-black/10 hover:"
                                 >
                                     Essential Only
                                 </button>
                                 <button
                                     onClick={handleAcceptAll}
-                                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-200 active:scale-[0.97] bg-black text-white dark:bg-white dark:text-black hover:opacity-90"
+                                    className="flex-1 sm:flex-none px-5 py-2.5 rounded-xl text-[11px] font-semibold transition-all duration-200 active:scale-[0.97] bg-black text-white   hover:opacity-90"
                                 >
                                     Accept All
                                 </button>

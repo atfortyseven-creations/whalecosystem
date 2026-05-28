@@ -155,11 +155,11 @@ export default function AztecMempoolSpace() {
     }, [blockNumber, publicClient]);
 
     return (
-        <div className="absolute inset-0 flex flex-col bg-[#FFFFFF] dark:bg-[#0A0A0A] text-[#050505] dark:text-[#FFFFFF] font-sans overflow-hidden">
-            <div className="shrink-0 pt-4 px-2 bg-white dark:bg-[#111111]">
+        <div className="absolute inset-0 flex flex-col bg-[#FFFFFF]  text-[#050505]  font-sans overflow-hidden">
+            <div className="shrink-0 pt-4 px-2 bg-white ">
                 <ModuleHeader moduleId="markets" />
             </div>
-            <div className="flex items-center justify-center px-8 pb-8 border-b border-[#E5E5E5] dark:border-white/10 bg-white dark:bg-[#111111] shrink-0 -mt-8">
+            <div className="flex items-center justify-center px-8 pb-8 border-b border-[#E5E5E5]  bg-white  shrink-0 -mt-8">
 
 
                 <div className="flex items-center justify-center gap-8 w-full max-w-4xl">
@@ -170,14 +170,14 @@ export default function AztecMempoolSpace() {
                         { label: 'Vol (Session)', val: globalStats.totalEthMoved, unit: 'ETH', isNum: true, format: (v: number) => `${v.toFixed(1)} ETH` },
                     ].map((stat, i) => (
                         <div key={i} className="flex flex-col items-center">
-                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] dark:text-[#AAAAAA] mb-1.5">{stat.label}</span>
+                            <span className="text-[9px] font-black uppercase tracking-widest text-[#888888]  mb-1.5">{stat.label}</span>
                             <div className="flex items-end gap-1">
                                 <AnimatedCounter 
                                     value={stat.val}
                                     format={stat.format ? stat.format : (v) => Math.floor(v).toString()}
-                                    className="text-2xl font-bold font-mono tracking-tighter text-[#050505] dark:text-white leading-none"
+                                    className="text-2xl font-bold font-mono tracking-tighter text-[#050505]  leading-none"
                                 />
-                                <span className="text-[9px] text-[#A0A0A0] dark:text-[#AAAAAA] font-bold uppercase mb-[2px]">{stat.unit}</span>
+                                <span className="text-[9px] text-[#A0A0A0]  font-bold uppercase mb-[2px]">{stat.unit}</span>
                             </div>
                         </div>
                     ))}
@@ -185,18 +185,18 @@ export default function AztecMempoolSpace() {
             </div>
 
             <div className="flex-1 flex overflow-hidden">
-                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#0A0A0A] relative">
+                <div className="w-2/3 p-8 flex flex-col border-r border-[#E5E5E5]  bg-[#FFFFFF]  relative">
                     <div className="flex items-center gap-3 mb-8 shrink-0">
-                        <div className="px-4 py-1.5 rounded-lg border border-emerald-500/20 text-[9px] font-black text-emerald-600 dark:text-emerald-400 uppercase tracking-widest bg-emerald-50 dark:bg-emerald-500/10">
+                        <div className="px-4 py-1.5 rounded-lg border border-emerald-500/20 text-[9px] font-black text-emerald-600  uppercase tracking-widest bg-emerald-50 ">
                             LIVE: ETHEREUM MAINNET
                         </div>
-                        <h3 className="text-sm font-black text-[#050505] dark:text-white uppercase tracking-[0.2em]">Latest Network Blocks</h3>
+                        <h3 className="text-sm font-black text-[#050505]  uppercase tracking-[0.2em]">Latest Network Blocks</h3>
                     </div>
 
                     <div className="absolute bottom-12 left-8 right-8 flex items-end justify-end gap-6 overflow-visible">
                         {blocks.length === 0 && (
                             <div className="absolute inset-0 flex items-center justify-center">
-                                <div className="text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Syncing Ethereum L1 State...</div>
+                                <div className="text-[10px] font-mono font-bold text-[#888888]  uppercase tracking-[0.2em] animate-pulse">Syncing Ethereum L1 State...</div>
                             </div>
                         )}
                         <AnimatePresence mode="popLayout">
@@ -209,26 +209,26 @@ export default function AztecMempoolSpace() {
                                         animate={{ opacity: 1, x: 0, y: 0, scale: 1 }}
                                         exit={{ opacity: 0, scale: 0.8 }}
                                         onClick={() => setSelectedBlock(block)}
-                                        className={`shrink-0 w-64 h-80 bg-white dark:bg-[#1A1A1A] border-2 border-[#388E3C] rounded-xl flex flex-col overflow-hidden relative shadow-md hover:shadow-xl dark:shadow-none transition-shadow text-left`}
+                                        className={`shrink-0 w-64 h-80 bg-white  border-2 border-[#388E3C] rounded-xl flex flex-col overflow-hidden relative shadow-md hover:shadow-xl  transition-shadow text-left`}
                                     >
                                         <motion.div
                                             initial={{ opacity: 0, scale: 0.8 }}
                                             animate={{ opacity: [0, 1, 0], scale: [0.8, 1.1, 1] }}
                                             transition={{ duration: 1.5, ease: "easeOut" }}
-                                            className="absolute inset-0 bg-[#E8F5E9] dark:bg-[#E8F5E9]/10 z-0 pointer-events-none"
+                                            className="absolute inset-0 bg-[#E8F5E9]  z-0 pointer-events-none"
                                         />
 
-                                        <div className="p-4 border-b border-[#E5E5E5] dark:border-white/10 relative z-10 bg-white/95 dark:bg-[#111111]/95 backdrop-blur-sm shadow-sm w-full">
+                                        <div className="p-4 border-b border-[#E5E5E5]  relative z-10 bg-white/95  backdrop-blur-sm shadow-sm w-full">
                                             <div className="flex justify-between items-center mb-3">
-                                                <span className="text-[10px] font-black text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest">Block #{block.id}</span>
-                                                <span className={`text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest bg-[#E8F5E9] text-[#388E3C] dark:bg-[#E8F5E9]/20`}>
+                                                <span className="text-[10px] font-black text-[#888888]  uppercase tracking-widest">Block #{block.id}</span>
+                                                <span className={`text-[9px] px-2.5 py-1 rounded-full font-black uppercase tracking-widest bg-[#E8F5E9] text-[#388E3C] `}>
                                                     {block.status}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between items-end">
                                                 <div>
-                                                    <span className="text-2xl font-black font-mono text-[#050505] dark:text-white tracking-tighter">{block.txCount}</span>
-                                                    <span className="text-[10px] text-[#888888] dark:text-[#AAAAAA] ml-1 font-bold">TXS</span>
+                                                    <span className="text-2xl font-black font-mono text-[#050505]  tracking-tighter">{block.txCount}</span>
+                                                    <span className="text-[10px] text-[#888888]  ml-1 font-bold">TXS</span>
                                                 </div>
                                                 <span className="text-[11px] font-mono font-black text-[#388E3C]">{Math.floor(block.gasUsedPct)}% GAS</span>
                                             </div>
@@ -241,12 +241,12 @@ export default function AztecMempoolSpace() {
                                                     initial={{ opacity: 0, scale: 0.5 }}
                                                     animate={{ opacity: 1, scale: 1 }}
                                                     transition={{ delay: i * 0.005 }}
-                                                    className={`w-full aspect-square rounded-[3px] border bg-[#E8F5E9] border-[#C8E6C9] dark:bg-[#E8F5E9]/10 dark:border-[#C8E6C9]/20`}
+                                                    className={`w-full aspect-square rounded-[3px] border bg-[#E8F5E9] border-[#C8E6C9]  `}
                                                 />
                                             ))}
                                         </div>
                                         
-                                        <div className={`p-3 text-center border-t border-[#E5E5E5] dark:border-white/10 relative z-10 w-full bg-[#FAFAFA] dark:bg-[#1A1A1A]`}>
+                                        <div className={`p-3 text-center border-t border-[#E5E5E5]  relative z-10 w-full bg-[#FAFAFA] `}>
                                             <p className={`text-[9px] uppercase tracking-widest font-black text-[#388E3C]`}>
                                                 Verified on L1
                                             </p>
@@ -258,16 +258,16 @@ export default function AztecMempoolSpace() {
                     </div>
                 </div>
 
-                <div className="w-1/3 p-8 flex flex-col bg-white dark:bg-[#111111]">
-                    <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E5E5E5] dark:border-white/10">
+                <div className="w-1/3 p-8 flex flex-col bg-white ">
+                    <div className="flex items-center justify-between mb-8 pb-4 border-b border-[#E5E5E5] ">
                         <div className="flex items-center gap-3">
-                            <span className="text-[11px] font-black text-[#050505] dark:text-white uppercase tracking-widest">WHALE TRANSACTIONS</span>
+                            <span className="text-[11px] font-black text-[#050505]  uppercase tracking-widest">WHALE TRANSACTIONS</span>
                         </div>
                     </div>
 
                     <div className="flex-1 overflow-y-auto no-scrollbar flex flex-col gap-3">
                         {transactions.length === 0 && (
-                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Awaiting Whale Transfers...</div>
+                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888]  uppercase tracking-[0.2em] animate-pulse">Awaiting Whale Transfers...</div>
                         )}
                         <AnimatePresence>
                             {transactions.map(tx => {
@@ -279,24 +279,24 @@ export default function AztecMempoolSpace() {
                                         animate={{ opacity: 1, x: 0 }}
                                         exit={{ opacity: 0, scale: 0.95, transition: { duration: 0.2 } }}
                                         onClick={() => setSelectedTx(tx)}
-                                        className="bg-[#FAFAFA] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-sm p-4 hover:bg-[#F0F0F0] dark:hover:bg-[#222] transition-colors group text-left w-full"
+                                        className="bg-[#FAFAFA]  border border-[#E5E5E5]  rounded-sm p-4 hover:bg-[#F0F0F0]  transition-colors group text-left w-full"
                                     >
-                                        <div className="flex justify-between items-start mb-3 border-b border-[#E5E5E5] dark:border-white/10 border-dashed pb-2">
+                                        <div className="flex justify-between items-start mb-3 border-b border-[#E5E5E5]  border-dashed pb-2">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-mono text-black/30 dark:text-white/30">{tx.time}</span>
-                                                <span className="text-black/20 dark:text-white/20 text-[12px]"></span>
-                                                <span className="text-[11px] font-mono text-[#050505] dark:text-white">{tx.hash.slice(0,14)}...</span>
+                                                <span className="text-[10px] font-mono text-black/30 ">{tx.time}</span>
+                                                <span className="text-black/20  text-[12px]"></span>
+                                                <span className="text-[11px] font-mono text-[#050505] ">{tx.hash.slice(0,14)}...</span>
                                             </div>
                                             <span className="text-[10px] font-mono text-[#00C076] font-black">{tx.valueEth.toFixed(2)} ETH</span>
                                         </div>
 
                                         <div className="flex items-center justify-between gap-3">
                                             <div className="flex items-center gap-2">
-                                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40">
+                                                <span className="text-[10px] font-black uppercase tracking-widest text-black/40 ">
                                                     Transfer
                                                 </span>
                                             </div>
-                                            <div className={`px-2 py-0.5 rounded-sm border text-[8px] font-black uppercase tracking-widest bg-[#E8F5E9] dark:bg-[#E8F5E9]/10 text-[#388E3C] border-[#C8E6C9] dark:border-[#C8E6C9]/20`}>
+                                            <div className={`px-2 py-0.5 rounded-sm border text-[8px] font-black uppercase tracking-widest bg-[#E8F5E9]  text-[#388E3C] border-[#C8E6C9] `}>
                                                 CONFIRMED
                                             </div>
                                         </div>
@@ -314,28 +314,28 @@ export default function AztecMempoolSpace() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 dark:bg-black/90 backdrop-blur-md"
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90  backdrop-blur-md"
                     >
                         <motion.div 
                             initial={{ scale: 0.95, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.95, y: 20 }}
-                            className="w-full max-w-2xl bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded shadow-xl overflow-hidden relative"
+                            className="w-full max-w-2xl bg-white  border border-[#E5E5E5]  rounded shadow-xl overflow-hidden relative"
                         >
                             <button 
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505] dark:hover:text-white hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-all"
+                                className="absolute top-6 right-6 w-8 h-8 rounded flex items-center justify-center text-[#888888] hover:text-[#050505]  hover:bg-[#FFFFFF]  transition-all"
                             >
                                 X
                             </button>
 
                             <div className="p-8 md:p-10">
-                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
-                                    <div className="w-12 h-12 bg-[#FFFFFF] dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded flex items-center justify-center">
-                                        <div className="w-5 h-5 bg-black dark:bg-white" />
+                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] ">
+                                    <div className="w-12 h-12 bg-[#FFFFFF]  border border-[#E5E5E5]  rounded flex items-center justify-center">
+                                        <div className="w-5 h-5 bg-black " />
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">
+                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] ">
                                             {selectedBlock ? 'BLOCK DETAILS' : 'TRANSACTION DETAILS'}
                                         </h3>
                                         <p className="text-[9px] text-[#A0A0A0] font-bold tracking-[0.2em] uppercase">Verified Ethereum L1 Data</p>
@@ -371,7 +371,7 @@ export default function AztecMempoolSpace() {
                                         href={selectedBlock ? `https://etherscan.io/block/${selectedBlock.id}` : `https://etherscan.io/tx/${selectedTx?.hash}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="flex-1 py-3 bg-[#050505] dark:bg-white text-white dark:text-black rounded font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#A0A0A0] transition-colors text-center"
+                                        className="flex-1 py-3 bg-[#050505]  text-white  rounded font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#A0A0A0] transition-colors text-center"
                                     >
                                         VERIFY ON ETHERSCAN
                                     </a>
@@ -387,14 +387,14 @@ export default function AztecMempoolSpace() {
 
 function DetailRow({ label, value, copy, green }: any) {
     return (
-        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] dark:border-white/10">
-            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] dark:text-[#AAAAAA]">{label}</span>
+        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] ">
+            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] ">{label}</span>
             <div className="flex items-center gap-3">
-                <span className={`text-[12px] font-mono ${green ? 'text-[#00C076] font-bold' : 'text-[#050505] dark:text-[#CCCCCC]'}`}>
+                <span className={`text-[12px] font-mono ${green ? 'text-[#00C076] font-bold' : 'text-[#050505] '}`}>
                     {value}
                 </span>
                 {copy && (
-                    <button className="p-2 hover:bg-black/5 dark:hover:bg-white/5 rounded-xl transition-all text-black/10 dark:text-white/10 hover:text-black dark:hover:text-white">
+                    <button className="p-2 hover:bg-black/5  rounded-xl transition-all text-black/10  hover:text-black ">
                         [COPY]
                     </button>
                 )}

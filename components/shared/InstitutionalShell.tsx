@@ -37,7 +37,7 @@ export function InstitutionalShell({
       />
 
       {/*  Layer 2: Dark readability wash  */}
-      <div className="fixed inset-0 pointer-events-none -z-10 bg-black/40 dark:bg-black/80" />
+      <div className="fixed inset-0 pointer-events-none -z-10 bg-black/40 " />
 
       {/*  Main content  */}
       <div className="flex-1 relative z-10">
@@ -79,17 +79,17 @@ export function InstitutionalShell({
         />
 
         {/* Layer C: Dark mode overlay (hidden in light mode) */}
-        <div className="absolute inset-0 z-[2] pointer-events-none hidden dark:block" style={{ background: '#050810', opacity: 0.80 }} />
+        <div className="absolute inset-0 z-[2] pointer-events-none hidden " style={{ background: '#050810', opacity: 0.80 }} />
 
         {/* Footer band */}
-        <div className="relative z-20 border-t border-black/10 dark:border-white/10 px-6 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/65 dark:bg-black/65 backdrop-blur-xl mt-48 md:mt-64">
+        <div className="relative z-20 border-t border-black/10  px-6 md:px-10 py-5 flex flex-col md:flex-row items-center justify-between gap-4 bg-white/65  backdrop-blur-xl mt-48 md:mt-64">
           <div className="flex items-center gap-3">
             <WhaleLogo className="w-5 h-5" />
-            <span className="font-mono text-[9px] uppercase tracking-widest text-black/60 dark:text-white/60 font-black">
+            <span className="font-mono text-[9px] uppercase tracking-widest text-black/60  font-black">
               Immutable Data · Zero-Trust Verification · Extreme Precision
             </span>
           </div>
-          <span className="font-mono text-[9px] uppercase tracking-widest text-black/40 dark:text-white/40 font-bold text-center md:text-right">
+          <span className="font-mono text-[9px] uppercase tracking-widest text-black/40  font-bold text-center md:text-right">
             Privacy by Void · No data stored · All communication is end-to-end verified
           </span>
         </div>

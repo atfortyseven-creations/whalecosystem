@@ -159,7 +159,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
         className={`relative group px-4 py-3 rounded-2xl cursor-default select-text transition-all backdrop-blur-md border ${
           msg.isMine
             ? 'bg-black/90 text-white border-black/20 rounded-br-sm shadow-[0_4px_24px_rgba(0,0,0,0.12)]'
-            : 'bg-white/80 dark:bg-black/20 border-black/10 dark:border-white/10 text-black dark:text-white rounded-bl-sm shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
+            : 'bg-white/80  border-black/10  text-black  rounded-bl-sm shadow-[0_4px_24px_rgba(0,0,0,0.04)]'
         } ${msg.isDestructing ? 'opacity-60' : ''}`}
       >
         {/* Reply Quote preview inside bubble */}
@@ -167,7 +167,7 @@ function MessageBubble({ msg, replyToMsg, onContextMenu, onReact, settings }: {
           <div className={`mb-2 pl-2 border-l-2 text-[11px] font-mono leading-snug rounded p-1.5 flex flex-col gap-0.5 max-w-[280px] ${
             msg.isMine 
               ? 'border-white/30 text-white/75 bg-white/10' 
-              : 'border-black/20 dark:border-white/20 text-black/60 dark:text-white/60 bg-black/[0.03] dark:bg-white/[0.03]'
+              : 'border-black/20  text-black/60  bg-black/[0.03] '
           }`}>
             <span className="font-bold text-[9px] uppercase tracking-wider opacity-60">
               {replyToMsg.isMine ? 'You' : 'Peer Address'}
@@ -413,7 +413,7 @@ function LocationBubble({
     return (
       <div className={`mt-1 p-3 rounded-xl border ${isMine ? 'bg-white/5 border-white/10 opacity-50' : 'bg-black/[0.02] border-black/5 opacity-50'}`}>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-black/10 dark:bg-white/10">
+          <div className="w-10 h-10 rounded-full flex items-center justify-center shrink-0 bg-black/10 ">
             
           </div>
           <div>

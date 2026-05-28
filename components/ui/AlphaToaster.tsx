@@ -87,7 +87,7 @@ export function AlphaToaster() {
                         transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                         className="pointer-events-auto"
                     >
-                        <div className="relative group overflow-hidden bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col min-w-[360px]">
+                        <div className="relative group overflow-hidden bg-white  border border-black/10  rounded-2xl shadow-[0_32px_64px_-16px_rgba(0,0,0,0.5)] flex flex-col min-w-[360px]">
                             
                             {/* Subtle Ambient Glow (Non-transparent container now helps contrast) */}
                             <div className={`absolute -top-[50%] -right-[50%] w-[100%] h-[100%] blur-[100px] rounded-full opacity-10 pointer-events-none transition-colors duration-700 ${
@@ -102,7 +102,7 @@ export function AlphaToaster() {
                                         }`}>
                                             System Signal
                                         </span>
-                                        <h3 className="text-[17px] font-bold text-black dark:text-white tracking-tight">
+                                        <h3 className="text-[17px] font-bold text-black  tracking-tight">
                                             {sanitizeLabel(activeAlert.label)}
                                         </h3>
                                     </div>
@@ -117,7 +117,7 @@ export function AlphaToaster() {
                                                 {isBuy(activeAlert.action) ? 'BUY' : 'SELL'}
                                             </span>
                                         </div>
-                                        <button onClick={() => setActiveAlert(null)} className="text-black/10 dark:text-white/10 hover:text-black dark:hover:text-white transition-colors">
+                                        <button onClick={() => setActiveAlert(null)} className="text-black/10  hover:text-black  transition-colors">
                                             <X size={16} />
                                         </button>
                                     </div>
@@ -125,37 +125,37 @@ export function AlphaToaster() {
 
                                 <div className="grid grid-cols-2 gap-10 mb-8">
                                     <div className="flex flex-col gap-1">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-black/20 dark:text-white/20">Valuation</span>
-                                        <span className="text-[20px] font-mono font-black text-black dark:text-white tracking-tighter">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-black/20 ">Valuation</span>
+                                        <span className="text-[20px] font-mono font-black text-black  tracking-tighter">
                                             {formatEUR(activeAlert.usdNum || 0)}
                                         </span>
                                     </div>
                                     <div className="flex flex-col gap-1 items-end text-right">
-                                        <span className="text-[9px] font-bold uppercase tracking-widest text-black/20 dark:text-white/20">Asset Cluster</span>
-                                        <span className="text-[15px] font-mono font-bold text-black dark:text-white tracking-tight truncate max-w-[140px]">
+                                        <span className="text-[9px] font-bold uppercase tracking-widest text-black/20 ">Asset Cluster</span>
+                                        <span className="text-[15px] font-mono font-bold text-black  tracking-tight truncate max-w-[140px]">
                                             {Number(activeAlert.amount).toLocaleString(undefined, { maximumFractionDigits: 0 })} <span className="text-[11px] opacity-40">{activeAlert.token}</span>
                                         </span>
                                     </div>
                                 </div>
 
-                                <div className="flex items-center justify-between pt-6 border-t border-black/5 dark:border-white/5">
+                                <div className="flex items-center justify-between pt-6 border-t border-black/5 ">
                                     <a 
                                         href={`https://etherscan.io/tx/${activeAlert.hash}`}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="group/link flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors duration-300"
+                                        className="group/link flex items-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black/40  hover:text-black  transition-colors duration-300"
                                     >
                                         VERIFY ON CIPHER
                                         <ExternalLink size={11} className="group-hover/link:translate-x-0.5 group-hover/link:-translate-y-0.5 transition-transform duration-300" />
                                     </a>
-                                    <code className="text-[9px] font-mono text-black/20 dark:text-white/20 uppercase tracking-tighter">
+                                    <code className="text-[9px] font-mono text-black/20  uppercase tracking-tighter">
                                         {activeAlert.hash.slice(0, 6)}...{activeAlert.hash.slice(-4)}
                                     </code>
                                 </div>
                             </div>
 
                             {/* Minimal Progress Bar */}
-                            <div className="h-[3px] w-full bg-black/5 dark:bg-white/5">
+                            <div className="h-[3px] w-full bg-black/5 ">
                                 <motion.div 
                                     initial={{ width: "100%" }}
                                     animate={{ width: "0%" }}

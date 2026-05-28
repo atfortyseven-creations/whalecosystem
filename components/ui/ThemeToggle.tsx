@@ -15,7 +15,7 @@ export function ThemeToggle() {
 
   // Placeholder: same size, no layout shift while mounting
   if (!mounted) {
-    return <div className="w-10 h-10 rounded-full border border-black/10 dark:border-white/10 bg-transparent shrink-0" aria-hidden />;
+    return <div className="w-10 h-10 rounded-full border border-black/10  bg-transparent shrink-0" aria-hidden />;
   }
 
   return (
@@ -25,9 +25,9 @@ export function ThemeToggle() {
       className="
         relative flex items-center justify-center
         w-10 h-10 rounded-full shrink-0
-        border border-black/10 dark:border-white/10
-        bg-white dark:bg-black
-        text-black dark:text-white
+        border border-black/10 
+        bg-white 
+        text-black 
         shadow-sm
         [transition:background-color_250ms_ease,border-color_250ms_ease,transform_120ms_ease]
         hover:scale-105 active:scale-95

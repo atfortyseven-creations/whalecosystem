@@ -177,86 +177,86 @@ export function NativeBridgeView({ address, onBack }: any) {
 
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="flex flex-col max-w-xl mx-auto w-full pt-8 px-6 pb-20 font-mono min-h-full flex-1">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10 dark:border-white/10">
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10 ">
                 <div>
-                    <h2 className="text-lg font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-2">
+                    <h2 className="text-lg font-black uppercase tracking-widest text-black  flex items-center gap-2">
                         Cross-Chain Bridge
                         <span className="flex h-2 w-2 rounded-full bg-blue-500 animate-pulse"></span>
                     </h2>
-                    <p className="text-[10px] uppercase text-black/50 dark:text-white/50 tracking-widest mt-1">L0 / Stargate Cross-Chain Protocol</p>
+                    <p className="text-[10px] uppercase text-black/50  tracking-widest mt-1">L0 / Stargate Cross-Chain Protocol</p>
                 </div>
-                <button onClick={onBack} className="text-[10px] uppercase font-bold tracking-widest border border-black/10 dark:border-white/10 px-3 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
+                <button onClick={onBack} className="text-[10px] uppercase font-bold tracking-widest border border-black/10  px-3 py-1 hover:bg-black hover:text-white   transition-colors">
                     CLOSE
                 </button>
             </div>
 
             <div className="flex-1 flex flex-col min-h-0 space-y-4">
                 
-                <div className="border border-black/10 dark:border-white/10 p-5 bg-white dark:bg-[#0a0a0a] relative group transition-colors">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-3 block flex items-center gap-2">
+                <div className="border border-black/10  p-5 bg-white  relative group transition-colors">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40  mb-3 block flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-red-500 block"></span> SOURCE LEDGER
                     </label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <select 
                             value={fromChain}
                             disabled
-                            className="w-full sm:w-auto bg-transparent font-black uppercase tracking-widest text-sm outline-none cursor-not-allowed text-black/50 dark:text-white/50"
+                            className="w-full sm:w-auto bg-transparent font-black uppercase tracking-widest text-sm outline-none cursor-not-allowed text-black/50 "
                         >
                             {CHAINS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
-                        <span className="text-[9px] font-bold tracking-widest uppercase text-black/30 dark:text-white/30 border border-black/10 dark:border-white/10 px-2 py-1">Synced to Wallet</span>
+                        <span className="text-[9px] font-bold tracking-widest uppercase text-black/30  border border-black/10  px-2 py-1">Synced to Wallet</span>
                     </div>
-                    <div className="mt-5 border-t border-black/5 dark:border-white/5 pt-5">
+                    <div className="mt-5 border-t border-black/5  pt-5">
                         <input 
                             type="number" 
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
                             placeholder="0.00"
-                            className="w-full bg-transparent text-4xl font-light outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black dark:text-white"
+                            className="w-full bg-transparent text-4xl font-light outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black "
                         />
                     </div>
                 </div>
 
                 <div className="flex justify-center -my-3 relative z-10">
-                    <div className="bg-white dark:bg-black border border-black/10 dark:border-white/10 p-2 rounded-full shadow-md">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-black/40 dark:text-white/40"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                    <div className="bg-white  border border-black/10  p-2 rounded-full shadow-md">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-black/40 "><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                     </div>
                 </div>
 
-                <div className="border border-black/10 dark:border-white/10 p-5 bg-black/5 dark:bg-white/5 transition-colors">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-3 block flex items-center gap-2">
+                <div className="border border-black/10  p-5 bg-black/5  transition-colors">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40  mb-3 block flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-green-500 block"></span> DESTINATION LEDGER
                     </label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <select 
                             value={toChain}
                             onChange={(e) => setToChain(e.target.value)}
-                            className="w-full sm:w-auto bg-white dark:bg-black border border-black/10 dark:border-white/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:border-black/30 dark:hover:border-white/30 text-black dark:text-white"
+                            className="w-full sm:w-auto bg-white  border border-black/10  px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none cursor-pointer hover:border-black/30  text-black "
                         >
-                            {CHAINS.map(c => <option key={c.id} value={c.id} className="bg-white dark:bg-black">{c.name}</option>)}
+                            {CHAINS.map(c => <option key={c.id} value={c.id} className="bg-white ">{c.name}</option>)}
                         </select>
                     </div>
-                    <div className="mt-5 border-t border-black/10 dark:border-white/10 pt-5 flex justify-between items-center text-[10px] font-bold text-black/60 dark:text-white/60 uppercase tracking-widest">
+                    <div className="mt-5 border-t border-black/10  pt-5 flex justify-between items-center text-[10px] font-bold text-black/60  uppercase tracking-widest">
                         <span>Expected Receipt</span>
-                        <span className="text-black dark:text-white text-2xl font-light">{amount || "0.00"}</span>
+                        <span className="text-black  text-2xl font-light">{amount || "0.00"}</span>
                     </div>
                 </div>
 
                 <AnimatePresence>
                     {amount && parseFloat(amount) > 0 && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                            <div className="border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-[#0a0a0a] mt-4 text-[10px] uppercase font-mono tracking-widest space-y-3">
-                                <div className="flex justify-between text-black/60 dark:text-white/60">
+                            <div className="border border-black/10  p-4 bg-white  mt-4 text-[10px] uppercase font-mono tracking-widest space-y-3">
+                                <div className="flex justify-between text-black/60 ">
                                     <span>Oracle Subnet</span>
-                                    <span className="text-black dark:text-white font-bold flex items-center gap-1">LayerZero V2</span>
+                                    <span className="text-black  font-bold flex items-center gap-1">LayerZero V2</span>
                                 </div>
-                                <div className="flex justify-between text-black/60 dark:text-white/60">
+                                <div className="flex justify-between text-black/60 ">
                                     <span>Validation Period</span>
                                     <span className="text-[#00C076] font-bold">~ 2 - 5 Minutes</span>
                                 </div>
-                                <div className="flex justify-between text-black/60 dark:text-white/60">
+                                <div className="flex justify-between text-black/60 ">
                                     <span>L0 Relayer Cost</span>
-                                    <span className="text-black dark:text-white font-bold">
+                                    <span className="text-black  font-bold">
                                         {isEstimating ? 'Estimating...' : `~ ${lzFee} ETH`}
                                     </span>
                                 </div>
@@ -266,7 +266,7 @@ export function NativeBridgeView({ address, onBack }: any) {
                 </AnimatePresence>
 
                 {logs.length > 0 && (
-                    <div className="mt-4 border border-black/10 dark:border-white/10 bg-black text-[#00FF41] p-3 h-24 overflow-y-auto text-[8px] font-mono tracking-widest uppercase flex flex-col gap-1" ref={executionLogsRef}>
+                    <div className="mt-4 border border-black/10  bg-black text-[#00FF41] p-3 h-24 overflow-y-auto text-[8px] font-mono tracking-widest uppercase flex flex-col gap-1" ref={executionLogsRef}>
                         {logs.map((log, i) => (
                             <div key={i} className="opacity-80 hover:opacity-100">&gt; {log}</div>
                         ))}
@@ -277,12 +277,12 @@ export function NativeBridgeView({ address, onBack }: any) {
                     <button 
                         onClick={executeBridge}
                         disabled={isBridging || !amount || fromChain === toChain}
-                        className="w-full py-5 bg-black text-white dark:bg-white dark:text-black font-black text-[12px] uppercase tracking-[0.3em] transition-all hover:bg-black/90 dark:hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-2xl"
+                        className="w-full py-5 bg-black text-white   font-black text-[12px] uppercase tracking-[0.3em] transition-all hover:bg-black/90  disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-2xl"
                     >
                         {isBridging ? 'EXECUTING CROSS-CHAIN...' : 'SIGN & BRIDGE'}
                     </button>
                     
-                    <div className="mt-4 flex items-start gap-2 text-[8px] uppercase tracking-[0.2em] text-black/40 dark:text-white/40 text-center justify-center">
+                    <div className="mt-4 flex items-start gap-2 text-[8px] uppercase tracking-[0.2em] text-black/40  text-center justify-center">
                         <p>100% ON-CHAIN EXECUTION. OMNICHAIN VALIDATION ACTIVE.</p>
                     </div>
                 </div>

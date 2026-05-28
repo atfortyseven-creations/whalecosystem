@@ -178,7 +178,7 @@ export default function MarketTable() {
     };
 
     return (
-        <div className="w-full bg-black/80 dark:bg-neutral-900/50 backdrop-blur-xl rounded-[2.5rem] border border-white/20 overflow-hidden shadow-2xl">
+        <div className="w-full bg-black/80  backdrop-blur-xl rounded-[2.5rem] border border-white/20 overflow-hidden shadow-2xl">
             {/* Pagination Header */}
             <div className="p-6 bg-black/20 border-b border-white/10 flex items-center justify-between">
                 <div className="flex items-center gap-3">

@@ -102,15 +102,15 @@ export function NativeBuyView({ address, onBack }: any) {
 
     return (
         <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="flex flex-col max-w-xl mx-auto w-full pt-8 px-6 pb-20 font-mono min-h-full flex-1">
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10 dark:border-white/10">
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10 ">
                 <div>
-                    <h2 className="text-lg font-black uppercase tracking-widest text-black dark:text-white flex items-center gap-2">
+                    <h2 className="text-lg font-black uppercase tracking-widest text-black  flex items-center gap-2">
                         Capital Ingress
                         <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse"></span>
                     </h2>
-                    <p className="text-[10px] uppercase text-black/50 dark:text-white/50 tracking-widest mt-1">Fiat-to-Crypto Gateway Engine</p>
+                    <p className="text-[10px] uppercase text-black/50  tracking-widest mt-1">Fiat-to-Crypto Gateway Engine</p>
                 </div>
-                <button onClick={onBack} className="text-[10px] uppercase font-bold tracking-widest border border-black/10 dark:border-white/10 px-3 py-1 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors">
+                <button onClick={onBack} className="text-[10px] uppercase font-bold tracking-widest border border-black/10  px-3 py-1 hover:bg-black hover:text-white   transition-colors">
                     CLOSE
                 </button>
             </div>
@@ -118,9 +118,9 @@ export function NativeBuyView({ address, onBack }: any) {
             <div className="flex-1 flex flex-col min-h-0 space-y-4">
                 
                 {/* Visual Dashboard */}
-                <div className="bg-black text-white dark:bg-white dark:text-black p-6 relative overflow-hidden transition-colors shadow-2xl">
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 dark:bg-black/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
-                    <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50 dark:text-black/50 mb-6 flex items-center gap-2">
+                <div className="bg-black text-white   p-6 relative overflow-hidden transition-colors shadow-2xl">
+                    <div className="absolute top-0 right-0 w-32 h-32 bg-white/10  rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+                    <h3 className="text-[9px] font-bold uppercase tracking-[0.2em] text-white/50  mb-6 flex items-center gap-2">
                         <span className="w-1.5 h-1.5 bg-emerald-500 block animate-pulse"></span> DEPOSIT TARGET IDENTITY
                     </h3>
                     <div className="flex items-center gap-4 mb-2 relative z-10">
@@ -128,8 +128,8 @@ export function NativeBuyView({ address, onBack }: any) {
                             {address ? `${address.slice(0, 12)}...${address.slice(-10)}` : 'WALLET_NOT_CONNECTED'}
                         </span>
                     </div>
-                    <div className="flex items-center justify-between mt-4 border-t border-white/10 dark:border-black/10 pt-4 relative z-10">
-                        <span className="text-[9px] uppercase tracking-widest text-emerald-400 dark:text-emerald-600 font-bold">
+                    <div className="flex items-center justify-between mt-4 border-t border-white/10  pt-4 relative z-10">
+                        <span className="text-[9px] uppercase tracking-widest text-emerald-400  font-bold">
                             CRYPTOGRAPHICALLY VERIFIED
                         </span>
                         <span className="text-[9px] font-mono opacity-50">L1/L2 SECURE</span>
@@ -137,32 +137,32 @@ export function NativeBuyView({ address, onBack }: any) {
                 </div>
 
                 {/* Amount Input */}
-                <div className="border border-black/10 dark:border-white/10 p-6 bg-white dark:bg-[#0a0a0a] transition-colors group">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 dark:text-white/40 mb-4 block">Fiat Allocation</label>
+                <div className="border border-black/10  p-6 bg-white  transition-colors group">
+                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40  mb-4 block">Fiat Allocation</label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                        <span className="hidden sm:block text-2xl font-light tracking-widest text-black/40 dark:text-white/40">$</span>
+                        <span className="hidden sm:block text-2xl font-light tracking-widest text-black/40 ">$</span>
                         <input 
                             type="number" 
                             value={fiatAmount}
                             onChange={(e) => setFiatAmount(e.target.value)}
                             placeholder="1000"
-                            className="bg-transparent text-5xl font-light outline-none w-full sm:flex-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black dark:text-white transition-colors"
+                            className="bg-transparent text-5xl font-light outline-none w-full sm:flex-1 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black  transition-colors"
                         />
-                        <span className="text-lg font-bold tracking-widest text-black/40 dark:text-white/40">USD</span>
+                        <span className="text-lg font-bold tracking-widest text-black/40 ">USD</span>
                     </div>
                 </div>
 
                 {/* Routing Details */}
-                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border border-black/10 dark:border-white/10 p-4 bg-black/5 dark:bg-white/5 text-[10px] uppercase font-mono tracking-widest space-y-3">
-                    <div className="flex justify-between text-black/60 dark:text-white/60">
+                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="border border-black/10  p-4 bg-black/5  text-[10px] uppercase font-mono tracking-widest space-y-3">
+                    <div className="flex justify-between text-black/60 ">
                         <span>Liquidity Provider</span>
-                        <span className="text-black dark:text-white font-bold flex items-center gap-1">Moonpay Integration</span>
+                        <span className="text-black  font-bold flex items-center gap-1">Moonpay Integration</span>
                     </div>
-                    <div className="flex justify-between text-black/60 dark:text-white/60">
+                    <div className="flex justify-between text-black/60 ">
                         <span>Target Ledger</span>
-                        <span className="text-black dark:text-white font-bold">{activeNetwork} ({cryptoCurrencyCode.toUpperCase()})</span>
+                        <span className="text-black  font-bold">{activeNetwork} ({cryptoCurrencyCode.toUpperCase()})</span>
                     </div>
-                    <div className="flex justify-between text-black/60 dark:text-white/60">
+                    <div className="flex justify-between text-black/60 ">
                         <span>Settlement Time</span>
                         <span className="text-[#00C076] font-bold">~ 2 - 5 Minutes</span>
                     </div>
@@ -171,7 +171,7 @@ export function NativeBuyView({ address, onBack }: any) {
                 <AnimatePresence>
                     {(logs.length > 0 || isPolling) && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="overflow-hidden">
-                            <div className="mt-4 border border-black/10 dark:border-white/10 bg-black text-[#00FF41] p-3 h-32 overflow-y-auto text-[8px] font-mono tracking-widest uppercase flex flex-col gap-1" ref={executionLogsRef}>
+                            <div className="mt-4 border border-black/10  bg-black text-[#00FF41] p-3 h-32 overflow-y-auto text-[8px] font-mono tracking-widest uppercase flex flex-col gap-1" ref={executionLogsRef}>
                                 {logs.map((log, i) => (
                                     <div key={i} className="opacity-80 hover:opacity-100">&gt; {log}</div>
                                 ))}
@@ -187,12 +187,12 @@ export function NativeBuyView({ address, onBack }: any) {
                     <button 
                         onClick={handlePurchase}
                         disabled={isInitializing || isPolling}
-                        className="w-full py-6 bg-black text-white dark:bg-white dark:text-black font-black text-[12px] uppercase tracking-[0.3em] transition-all hover:bg-black/90 dark:hover:bg-white/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-2xl"
+                        className="w-full py-6 bg-black text-white   font-black text-[12px] uppercase tracking-[0.3em] transition-all hover:bg-black/90  disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-2xl"
                     >
                         {isPolling ? 'AWAITING FIAT SETTLEMENT...' : 'INITIALIZE SECURE INGRESS'}
                     </button>
                     
-                    <div className="mt-5 flex items-start gap-2 text-[8px] uppercase tracking-[0.2em] text-black/40 dark:text-white/40 text-center justify-center px-4 leading-relaxed">
+                    <div className="mt-5 flex items-start gap-2 text-[8px] uppercase tracking-[0.2em] text-black/40  text-center justify-center px-4 leading-relaxed">
                         <p>TO ENSURE MAXIMUM SECURITY AND ISOLATION, THE PAYMENT TERMINAL WILL OPEN IN AN ENCRYPTED POPUP ENVIRONMENT OUTSIDE THE MAIN THREAD.</p>
                     </div>
                 </div>

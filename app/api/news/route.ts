@@ -55,71 +55,33 @@ function decodeHTMLEntities(text: string): string {
 }
 
 /**
- * Generates deterministic BTC sentiment metrics based on the title
+ * Real keyword-based BTC sentiment analysis — NO hash randomness, NO fabrication.
+ * Purely derived from title keywords. Returns honest neutral when no signal found.
  */
-function generateBtcSentiment(title: string) {
-  let hash = 0;
-  for (let i = 0; i < title.length; i++) hash = title.charCodeAt(i) + ((hash << 5) - hash);
-  
-  // Create a realistic spread: most news is slightly bullish or slightly bearish
-  let baseBullish = 35 + (Math.abs(hash) % 50); // 35 to 85%
-  
-  // If title has negative keywords, invert it
-  const lowerTitle = title.toLowerCase();
-  if (lowerTitle.match(/(crash|sell|dump|hack|sec|ban|lawsuit|bear|drop|plunge)/)) {
-      baseBullish = 10 + (Math.abs(hash) % 30); // 10 to 40%
-  } else if (lowerTitle.match(/(buy|pump|bull|etf|approve|ath|surge|soar|adopt)/)) {
-      baseBullish = 70 + (Math.abs(hash) % 25); // 70 to 95%
+function analyzeSentiment(title: string): { btcBullish: number; btcBearish: number; sentiment: MarketSentiment } {
+  const lower = title.toLowerCase();
+  const bearishSignals = (lower.match(/(crash|hack|exploit|lawsuit|sec|ban|bearish|dump|drop|plunge|sell.off|liquidat|sanction|fear|warning|alert|theft|rug|scam|fraud|slump|collapse|decline|losing|loss)/g) || []).length;
+  const bullishSignals = (lower.match(/(rally|surge|soar|adopt|approve|etf|ath|breakout|bull|buy|accumulate|launch|partner|integration|upgrade|milestone|record|growth|rise|gain|recover)/g) || []).length;
+
+  if (bearishSignals > bullishSignals) {
+    const confidence = Math.min(90, 50 + bearishSignals * 12);
+    return { btcBullish: 100 - confidence, btcBearish: confidence, sentiment: 'bearish' };
   }
-
-  return {
-      btcBullish: baseBullish,
-      btcBearish: 100 - baseBullish,
-      sentiment: (baseBullish > 60 ? 'bullish' : baseBullish < 40 ? 'bearish' : 'neutral') as MarketSentiment
-  };
+  if (bullishSignals > bearishSignals) {
+    const confidence = Math.min(90, 50 + bullishSignals * 12);
+    return { btcBullish: confidence, btcBearish: 100 - confidence, sentiment: 'bullish' };
+  }
+  return { btcBullish: 50, btcBearish: 50, sentiment: 'neutral' };
 }
 
-function cleanAnalysis(text: string): string {
-  if (!text) return "";
-  return text
-    .replace(/Executive Brief|Global Analytics Network|WAN Analytics Node|Semantic Sentiment:\s*\w+|Executive Assessment Frame|Systemic Weight|Market Trajectory|Domain Vector|Macro-Institutional/gi, "")
-    .replace(/\d+\s*\/100/g, "")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-}
+// [REMOVED] generateDeepAnalysis was a simulation engine generating fake AI analysis text.
+// All descriptions now come directly from real RSS feed <description> fields or are left empty.
+// No fabrication allowed per system mandate.
 
-function generateDeepAnalysis(title: string, domain: string): string {
-  let hash = 0;
-  for (let i = 0; i < title.length; i++) hash = title.charCodeAt(i) + ((hash << 5) - hash);
-  const idx = Math.abs(hash) % 4;
-
-  const templates: string[][] = [
-    [
-      `The recent report published by ${domain} under the headline "${title}" highlights a significant movement in the market. We observe that several large investors are restructuring their positions, which typically indicates a phase of accumulation or distribution in major digital assets. This means we could see notable changes in prices over the coming days as the market absorbs this information.`,
-      `Currently, the market shows an increase in large-volume transfers to cold storage wallets, a pattern that historically precedes periods of increased activity and volatility. It is important to consider that these movements suggest institutional investors are preparing for the long term, reducing the available supply on major exchanges.`,
-      `For investors, this is a key moment to review support and resistance levels on their charts. We recommend maintaining clear risk management strategies and avoiding the excessive use of leverage while the main market direction is established.`
-    ],
-    [
-      `The recent news from ${domain} titled "${title}" addresses topics that could have a significant impact on regulation and overall ecosystem confidence. When such news emerges, the market tends to react quickly, adjusting risk levels and moving capital toward assets considered safer.`,
-      `We have noticed that, in the face of uncertainty, many users and financial entities begin to reduce their exposure to high-volatility assets and prefer to seek refuge in more stable options. This can temporarily cause lower liquidity in certain markets, leading to sharper price movements than usual.`,
-      `It is advisable for market participants to remain calm and evaluate how these regulatory or structural changes directly affect their portfolios. Maintaining an adequate margin of safety is fundamental to navigating these periods of industry adjustment.`
-    ],
-    [
-      `The report from ${domain} regarding "${title}" reflects an interesting trend in the use of decentralized finance (DeFi) and capital distribution. Recently, there has been a notable movement of funds toward more concentrated liquidity pools, indicating that users are seeking to maximize their yields or protect themselves from potential market fluctuations.`,
-      `This type of capital rotation can affect interest rates on lending platforms and the total value locked (TVL) across various protocols. As large participants move their assets, the rest of the market typically follows the trend, adjusting their own positions to adapt to new liquidity and profitability conditions.`,
-      `For those using lending platforms or leveraged strategies, it is crucial to monitor account health closely. Current conditions require attention to detail to avoid unnecessary liquidations due to temporary congestion or sudden market jumps.`
-    ],
-    [
-      `The information shared by ${domain} about "${title}" coincides with an increase in the activity of large wallets that had been dormant for some time. When these historical investors decide to move their funds, it generally signals a cycle shift or a response to new global macroeconomic conditions.`,
-      `These movements are often accompanied by significant withdrawals from centralized exchanges to personal custody solutions. This action reduces the amount of assets available for immediate purchase, which can push prices upward if demand remains constant. Additionally, it indicates a positive long-term outlook from these key participants.`,
-      `We recommend all users to remain patient and make informed decisions. In times when large investors reorganize their capital, the best strategies are typically those based on portfolio preservation and careful analysis of long-term trends, avoiding hasty reactions to short-term price changes.`
-    ]
-  ];
-
-  return templates[idx].join('\n\n');
-}
-
-//  Extractor de RSS SIN IMÁGENES 
+/**
+ * Real RSS feed parser — extracts title, link, pubDate, and real description from feed items.
+ * No fake analysis, no simulated text. Description comes directly from RSS <description> tag.
+ */
 async function fetchRSSFeed(url: string, sourceName: string): Promise<UINewsArticle[]> {
   try {
     const res = await fetch(url, {
@@ -148,15 +110,22 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<UINewsArti
 
       const pubDate = item.match(/<pubDate>(.*?)<\/pubDate>/)?.[1]?.trim() ?? '';
 
+      // Extract REAL description from RSS — strip HTML tags but keep the actual text
+      const rawDesc = (
+        item.match(/<description><!\[CDATA\[([\s\S]*?)\]\]><\/description>/) ??
+        item.match(/<description>([\s\S]*?)<\/description>/)
+      )?.[1]?.trim() ?? '';
+      const cleanDesc = decodeHTMLEntities(rawDesc.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()).slice(0, 500);
+
       if (!title || !link) continue;
 
       const cleanTitle = decodeHTMLEntities(title);
-      const sentimentData = generateBtcSentiment(cleanTitle);
+      const sentimentData = analyzeSentiment(cleanTitle);
 
       articles.push({
         id:          `rss-${Buffer.from(link).toString('base64').slice(0, 16)}`,
         title:       cleanTitle,
-        description: cleanAnalysis(generateDeepAnalysis(cleanTitle, sourceName)),
+        description: cleanDesc, // REAL description from RSS, not fabricated
         date:        pubDate ? new Date(pubDate).toISOString() : new Date().toISOString(),
         url:         link,
         source:      sourceName,
@@ -165,7 +134,7 @@ async function fetchRSSFeed(url: string, sourceName: string): Promise<UINewsArti
         btcBearish:  sentimentData.btcBearish
       });
 
-      if (articles.length >= 25) break; // Increased fetch count
+      if (articles.length >= 30) break;
     }
 
     return articles;
@@ -202,49 +171,13 @@ async function persistToDB(articles: UINewsArticle[]) {
   }
 }
 
-function padTo300(articles: UINewsArticle[]) {
-    const d = new Date().toISOString();
-    const customArticles: UINewsArticle[] = [];
-
-    const target = 300;
-    let baseArticles = [...customArticles, ...articles];
-
-    let result = [...baseArticles];
-    if (result.length >= target) return result.slice(0, target);
-    
-    const initialLength = result.length;
-    let i = 0;
-    while(result.length < target) {
-        const base = result[i % initialLength];
-        const newId = `pad-${result.length}`;
-        const sentimentData = generateBtcSentiment(base.title);
-        
-        result.push({
-            ...base,
-            id: newId,
-            title: base.title + ` [Analysis Node ${result.length}]`,
-            date: new Date(new Date(base.date).getTime() - ((result.length * 3600000) % 86400000)).toISOString(),
-            sentiment: sentimentData.sentiment,
-            btcBullish: sentimentData.btcBullish,
-            btcBearish: sentimentData.btcBearish
-        });
-        i++;
-    }
-    return result;
-}
-
+/**
+ * GET /api/news
+ * Returns REAL articles only — no fabrication, no padding.
+ * Sources: CryptoPanic API (primary) → RSS feeds (fallback)
+ */
 export async function GET() {
-  const originalResponse = await GET_internal();
-  try {
-    const text = await originalResponse.clone().text();
-    const json = safeJsonParse<any>(text, null, 'NEWS_GET_INTERNAL_CLONE');
-    if (json && json.articles) {
-        const padded = padTo300(json.articles);
-        return NextResponse.json({ ...json, count: padded.length, articles: padded });
-    }
-  } catch (e) {
-  }
-  return originalResponse;
+  return GET_internal();
 }
 
 async function GET_internal() {
@@ -266,12 +199,16 @@ async function GET_internal() {
         if (results.length > 0) {
           const articles: UINewsArticle[] = results.slice(0, 50).map(item => {
             const clean   = decodeHTMLEntities(item.title.replace(/<[^>]*>?/gm, ''));
-            const srcName = item.source?.title || item.domain || 'Whale-Node';
+            const srcName = item.source?.title || item.domain || 'CryptoPanic';
             const artId   = `cp-${item.id}`;
-            const sentimentData = generateBtcSentiment(clean);
+            const sentimentData = analyzeSentiment(clean);
+            // CryptoPanic provides real description via metadata — use it, never fabricate
+            const realDesc = item.metadata?.description
+              ? decodeHTMLEntities(item.metadata.description.slice(0, 500))
+              : '';
             return {
               id: artId, title: clean,
-              description: cleanAnalysis(generateDeepAnalysis(clean, srcName)),
+              description: realDesc,
               date: new Date(item.published_at).toISOString(),
               url: item.url, source: srcName,
               sentiment: sentimentData.sentiment,

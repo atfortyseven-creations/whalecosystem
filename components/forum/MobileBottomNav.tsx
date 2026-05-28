@@ -7,7 +7,7 @@ export function MobileBottomNav() {
     const pathname = usePathname();
 
     return (
-        <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-slate-200/60 dark:border-white/10 bg-white/90 dark:bg-black/90 backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
+        <nav className="mobile-bottom-nav lg:hidden fixed bottom-0 left-0 right-0 border-t border-slate-200/60  bg-white/90  backdrop-blur-md flex items-center justify-around px-1 shrink-0 z-50 transition-colors w-full" style={{ minHeight: 'calc(64px + env(safe-area-inset-bottom, 0px))', paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}>
             {[
                 { id: 'markets',     icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>, label: 'Telemetry' },
                 { id: 'portfolio',   icon: <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>, label: 'Portfolio' },

@@ -65,14 +65,14 @@ export function DropdownNav() {
                     }}
                     transition={{ duration: 0.3 }}
                 >
-                    <span className="text-lg font-black tracking-tight text-[#1F1F1F] dark:text-white">
+                    <span className="text-lg font-black tracking-tight text-[#1F1F1F] ">
                         Whale Alert Network
                     </span>
                     <motion.div
                         animate={{ rotate: isOpen ? 180 : 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                        <ChevronDown className="w-5 h-5 text-[#1F1F1F] dark:text-white" />
+                        <ChevronDown className="w-5 h-5 text-[#1F1F1F] " />
                     </motion.div>
                 </motion.button>
 
@@ -94,14 +94,14 @@ export function DropdownNav() {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: -10, scale: 0.95 }}
                                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                                className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-80 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/20 dark:border-white/10 overflow-hidden z-50 pointer-events-auto"
+                                className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-80 bg-white/80  backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/20  overflow-hidden z-50 pointer-events-auto"
                             >
                                 {/* Exit Button / Header */}
-                                <div className="p-4 border-b border-gray-200 dark:border-white/10 flex justify-between items-center">
+                                <div className="p-4 border-b border-gray-200  flex justify-between items-center">
                                     <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-gray-400">Quick Navigation</h3>
                                     <button
                                         onClick={() => setIsOpen(false)}
-                                        className="p-1.5 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors"
+                                        className="p-1.5 rounded-full hover:bg-gray-100  transition-colors"
                                     >
                                         <X size={16} className="text-gray-400" />
                                     </button>
@@ -117,7 +117,7 @@ export function DropdownNav() {
                                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                                                 link.isVIP
                                                     ? 'bg-gradient-to-r from-black to-gray-800 text-white hover:scale-[1.02] shadow-lg'
-                                                    : 'hover:bg-gray-100 dark:hover:bg-white/10 text-[#1F1F1F] dark:text-white'
+                                                    : 'hover:bg-gray-100  text-[#1F1F1F] '
                                             }`}
                                         >
                                             <div className="w-5 flex justify-center">{link.icon}</div>
@@ -127,7 +127,7 @@ export function DropdownNav() {
                                 </div>
 
                                 {/* Divider */}
-                                <div className="h-px bg-gradient-to-r from-transparent via-gray-200 dark:via-white/10 to-transparent" />
+                                <div className="h-px bg-gradient-to-r from-transparent via-gray-200  to-transparent" />
 
                                 {/* Utility Buttons Grid */}
                                 <div className="p-4">
@@ -138,12 +138,12 @@ export function DropdownNav() {
                                                 setShowNotifications(true);
                                                 setIsOpen(false);
                                             }}
-                                            className="relative flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-all border border-transparent hover:border-gray-200 dark:hover:border-white/10"
+                                            className="relative flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50  hover:bg-gray-100  transition-all border border-transparent hover:border-gray-200 "
                                         >
                                             <div className="relative">
-                                                <Bell size={18} className="text-[#1F1F1F] dark:text-white" />
+                                                <Bell size={18} className="text-[#1F1F1F] " />
                                                 {unreadCount > 0 && (
-                                                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white dark:border-[#1F1F1F]" />
+                                                    <span className="absolute -top-1 -right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-white " />
                                                 )}
                                             </div>
                                             <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">Alertas</span>
@@ -152,7 +152,7 @@ export function DropdownNav() {
                                         {/* Stealth Mode */}
                                         <button
                                             onClick={toggleStealthMode}
-                                            className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-all border border-transparent hover:border-gray-200 dark:hover:border-white/10"
+                                            className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50  hover:bg-gray-100  transition-all border border-transparent hover:border-gray-200 "
                                         >
                                             {isStealthMode ? <EyeOff size={18} /> : <Eye size={18} />}
                                             <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">
@@ -164,18 +164,18 @@ export function DropdownNav() {
                                         <Link
                                             href="/settings"
                                             onClick={() => setIsOpen(false)}
-                                            className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-all border border-transparent hover:border-gray-200 dark:hover:border-white/10"
+                                            className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50  hover:bg-gray-100  transition-all border border-transparent hover:border-gray-200 "
                                         >
-                                            <Settings size={18} className="text-[#1F1F1F] dark:text-white" />
+                                            <Settings size={18} className="text-[#1F1F1F] " />
                                             <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">Config</span>
                                         </Link>
 
                                         {/* Language */}
                                         <button
                                             onClick={toggleLanguage}
-                                            className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50 dark:bg-white/5 hover:bg-gray-100 dark:hover:bg-white/10 transition-all border border-transparent hover:border-gray-200 dark:hover:border-white/10"
+                                            className="flex flex-col items-center justify-center gap-1 p-3 rounded-2xl bg-gray-50  hover:bg-gray-100  transition-all border border-transparent hover:border-gray-200 "
                                         >
-                                            <Globe size={18} className="text-[#1F1F1F] dark:text-white" />
+                                            <Globe size={18} className="text-[#1F1F1F] " />
                                             <span className="text-[10px] font-black uppercase tracking-wider text-gray-500">
                                                 {language}
                                             </span>
@@ -190,7 +190,7 @@ export function DropdownNav() {
                                             appKit.open();
                                             setIsOpen(false);
                                         }}
-                                        className="w-full bg-[#1F1F1F] dark:bg-white dark:text-[#1F1F1F] text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-95 transition-all shadow-xl flex items-center justify-center gap-3"
+                                        className="w-full bg-[#1F1F1F]   text-white px-6 py-4 rounded-2xl font-black text-xs uppercase tracking-[0.2em] hover:scale-[1.02] active:scale-95 transition-all shadow-xl flex items-center justify-center gap-3"
                                     >
                                         {isConnected ? (
                                             <>
@@ -224,10 +224,10 @@ export function DropdownNav() {
                             animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: 100 }}
                             transition={{ duration: 0.3, ease: "easeOut" }}
-                            className="absolute right-4 top-4 bottom-4 w-[calc(100%-2rem)] max-w-96 bg-white dark:bg-[#1F1F1F] rounded-3xl shadow-2xl border border-white/20 overflow-hidden flex flex-col"
+                            className="absolute right-4 top-4 bottom-4 w-[calc(100%-2rem)] max-w-96 bg-white  rounded-3xl shadow-2xl border border-white/20 overflow-hidden flex flex-col"
                         >
-                            <div className="p-4 border-b border-gray-100 dark:border-white/10 flex justify-between items-center bg-gray-50/50 dark:bg-white/5">
-                                <h3 className="font-bold text-gray-900 dark:text-white">Notificaciones</h3>
+                            <div className="p-4 border-b border-gray-100  flex justify-between items-center bg-gray-50/50 ">
+                                <h3 className="font-bold text-gray-900 ">Notificaciones</h3>
                                 {unreadCount > 0 && (
                                     <button 
                                         onClick={markAllRead}
@@ -256,14 +256,14 @@ export function DropdownNav() {
                                                 key={n.id} 
                                                 className={`p-4 rounded-xl border transition-all ${
                                                     !n.read 
-                                                        ? 'bg-blue-50/50 dark:bg-blue-950/20 border-blue-100 dark:border-blue-900/50' 
-                                                        : 'bg-gray-50/50 dark:bg-white/5 border-gray-100 dark:border-white/10'
+                                                        ? 'bg-blue-50/50  border-blue-100 ' 
+                                                        : 'bg-gray-50/50  border-gray-100 '
                                                 }`}
                                             >
-                                                <h4 className={`text-sm mb-1 ${!n.read ? 'font-bold' : 'font-medium'} text-gray-900 dark:text-white`}>
+                                                <h4 className={`text-sm mb-1 ${!n.read ? 'font-bold' : 'font-medium'} text-gray-900 `}>
                                                     {n.title}
                                                 </h4>
-                                                <p className="text-xs text-gray-600 dark:text-gray-400 mb-2 leading-relaxed">
+                                                <p className="text-xs text-gray-600  mb-2 leading-relaxed">
                                                     {n.message}
                                                 </p>
                                                 <span className="text-[10px] text-gray-400 font-medium">

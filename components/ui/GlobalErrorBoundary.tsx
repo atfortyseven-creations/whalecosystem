@@ -38,11 +38,11 @@ export class GlobalErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-white dark:bg-[#050505] flex items-center justify-center p-6 transition-colors duration-500">
-          <div className="max-w-md w-full bg-white dark:bg-[#0D0D0D] border border-black/10 dark:border-white/10 p-10 shadow-2xl relative overflow-hidden group">
+        <div className="min-h-screen bg-white  flex items-center justify-center p-6 transition-colors duration-500">
+          <div className="max-w-md w-full bg-white  border border-black/10  p-10 shadow-2xl relative overflow-hidden group">
             
             {/* Background pattern */}
-            <div className="absolute inset-0 opacity-[0.03] dark:opacity-[0.05] pointer-events-none select-none">
+            <div className="absolute inset-0 opacity-[0.03]  pointer-events-none select-none">
                 <svg width="100%" height="100%">
                     <pattern id="error-grid" width="40" height="40" patternUnits="userSpaceOnUse">
                         <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="1" />
@@ -56,11 +56,11 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 <ShieldAlert className="text-red-500" size={36} />
               </div>
               
-              <h1 className="font-sans text-2xl font-black text-black dark:text-white uppercase tracking-tighter mb-4">
+              <h1 className="font-sans text-2xl font-black text-black  uppercase tracking-tighter mb-4">
                 Critical Node Failure
               </h1>
               
-              <p className="font-mono text-[11px] text-black/40 dark:text-white/40 uppercase tracking-widest leading-relaxed mb-8">
+              <p className="font-mono text-[11px] text-black/40  uppercase tracking-widest leading-relaxed mb-8">
                 The terminal has encountered a module decoupling error. 
                 System state has been preserved.
               </p>
@@ -68,7 +68,7 @@ export class GlobalErrorBoundary extends Component<Props, State> {
               <div className="w-full space-y-3">
                 <button
                   onClick={this.handleReset}
-                  className="w-full flex items-center justify-center gap-3 py-4 bg-black dark:bg-white text-white dark:text-black font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-opacity"
+                  className="w-full flex items-center justify-center gap-3 py-4 bg-black  text-white  font-black uppercase tracking-[0.2em] text-[10px] hover:opacity-80 transition-opacity"
                 >
                   <RefreshCw size={14} />
                   Re-initialize Core
@@ -76,15 +76,15 @@ export class GlobalErrorBoundary extends Component<Props, State> {
                 
                 <button
                   onClick={this.handleGoHome}
-                  className="w-full flex items-center justify-center gap-3 py-4 border border-black/10 dark:border-white/10 text-black dark:text-white font-black uppercase tracking-[0.2em] text-[10px] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center justify-center gap-3 py-4 border border-black/10  text-black  font-black uppercase tracking-[0.2em] text-[10px] hover:bg-black/5  transition-colors"
                 >
                   <Home size={14} />
                   Return to Landing
                 </button>
               </div>
 
-              <div className="mt-10 pt-8 border-t border-black/5 dark:border-white/5 w-full">
-                <p className="font-mono text-[8px] text-black/40 dark:text-white/40 uppercase tracking-[0.4em] font-black break-all">
+              <div className="mt-10 pt-8 border-t border-black/5  w-full">
+                <p className="font-mono text-[8px] text-black/40  uppercase tracking-[0.4em] font-black break-all">
                     Error Integrity: {this.state.error?.message || "Unknown"}
                 </p>
               </div>

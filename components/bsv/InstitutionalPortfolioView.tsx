@@ -53,12 +53,52 @@ export function InstitutionalPortfolioView() {
         if (!address) return;
         setLoading(true);
         try {
+            // 1. Refresh native balance (ETH/MATIC) via wagmi store
             await updateBalance();
-            setQdBalance("0");
-            setEntropyIndex("0.000");
+
+            // 2. Fetch real on-chain ERC-20 token balances via getblock-engine
+            const onchainRes = await fetch(`/api/portfolio/onchain?address=${address}`, {
+                cache: 'no-store',
+                signal: AbortSignal.timeout(12000),
+            });
+            if (onchainRes.ok) {
+                const onchainData = await onchainRes.json();
+                if (onchainData.ok && Array.isArray(onchainData.tokens)) {
+                    // Find QDs token balance from real on-chain data
+                    const qdsToken = onchainData.tokens.find(
+                        (t: any) => t.symbol === 'QDs' || t.symbol === 'QDS'
+                    );
+                    if (qdsToken) {
+                        setQdBalance(qdsToken.balance.toFixed(4));
+                    } else {
+                        setQdBalance('0');
+                    }
+                }
+            }
+
+            // 3. Compute entropy index from real on-chain transaction frequency via Etherscan
+            try {
+                const blockRes = await fetch(
+                    `/api/portfolio/chain-activity?address=${address}&type=txlist`,
+                    { cache: 'no-store', signal: AbortSignal.timeout(6000) }
+                );
+                if (blockRes.ok) {
+                    const blockData = await blockRes.json();
+                    // Etherscan returns { status: '1', result: [...transactions] }
+                    const txList = Array.isArray(blockData?.result) ? blockData.result : [];
+                    // Entropy index = normalized recent tx frequency (0.000 to 1.000)
+                    const txCount = txList.length;
+                    const entropyVal = Math.min(1, txCount / 50);
+                    setEntropyIndex(entropyVal.toFixed(3));
+                }
+            } catch {
+                // Non-critical: entropy index stays at previous value
+            }
         } catch (e) {
-            console.error("[PORTFOLIO] Sync failure:", e);
-        } finally { setLoading(false); }
+            console.error('[PORTFOLIO] On-chain sync failure:', e);
+        } finally {
+            setLoading(false);
+        }
     }, [address, updateBalance]);
 
     useEffect(() => {
@@ -174,15 +214,15 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     <p className="text-[10px] font-bold uppercase tracking-widest text-black/60">Terminating Session...</p>
                 </div>
             )}
-            <header className="flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-6 gap-6 md:gap-0 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#050505] relative z-10 shadow-none transition-colors">
+            <header className="flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-6 gap-6 md:gap-0 border-b border-black/10  bg-white  relative z-10 shadow-none transition-colors">
                 <div className="flex flex-col gap-1 w-full md:w-1/3">
-                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 dark:text-white/40">
+                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 ">
                         NETWORK CONNECTION
                     </span>
                     <button onClick={onNetworkClick} className="flex items-center gap-2 hover:opacity-70 transition-opacity mt-1">
-                        <span className="text-[14px] uppercase tracking-widest font-black text-black dark:text-white">{address ? networkInfo.name : 'OFFLINE'}</span>
+                        <span className="text-[14px] uppercase tracking-widest font-black text-black ">{address ? networkInfo.name : 'OFFLINE'}</span>
                         {feeData?.formatted?.gasPrice && (
-                            <span className="text-[9px] font-mono text-black/50 dark:text-white/50 ml-2 px-1.5 py-0.5 border border-black/15 dark:border-white/15 rounded">
+                            <span className="text-[9px] font-mono text-black/50  ml-2 px-1.5 py-0.5 border border-black/15  rounded">
                                 {parseFloat(feeData.formatted.gasPrice).toFixed(1)} GWEI
                             </span>
                         )}
@@ -190,21 +230,21 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 </div>
 
                 <div className="flex flex-col items-start md:items-center justify-center w-full md:w-1/3">
-                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/30 dark:text-white/30">
+                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/30 ">
                         HUMANITY LEDGER
                     </span>
                 </div>
 
                 {address && (
                     <div className="flex flex-wrap gap-2 md:gap-4 items-center md:justify-end w-full md:w-1/3 mt-2 md:mt-0">
-                        <button onClick={onRefresh} disabled={loading} className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 px-3 py-1.5 rounded">
+                        <button onClick={onRefresh} disabled={loading} className="text-[10px] font-black uppercase tracking-widest text-black/40  hover:text-black  transition-colors border border-transparent hover:border-black/10  px-3 py-1.5 rounded">
                             {loading ? 'SYNCING...' : 'REFRESH'}
                         </button>
-                        <button onClick={onSettingsClick} className="text-[10px] font-black uppercase tracking-widest text-black/40 dark:text-white/40 hover:text-black dark:hover:text-white transition-colors border border-transparent hover:border-black/10 dark:hover:border-white/10 px-3 py-1.5 rounded">
+                        <button onClick={onSettingsClick} className="text-[10px] font-black uppercase tracking-widest text-black/40  hover:text-black  transition-colors border border-transparent hover:border-black/10  px-3 py-1.5 rounded">
                             SETTINGS
                         </button>
-                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/20 dark:border-white/20 px-4 py-1.5 hover:bg-black hover:text-white dark:hover:bg-white dark:hover:text-black transition-colors group bg-white dark:bg-[#050505]">
-                            <span className="text-[10px] font-black uppercase tracking-widest text-black group-hover:text-white dark:text-white dark:group-hover:text-black transition-colors">VAULT MANAGER</span>
+                        <button onClick={onAccountsClick} className="flex items-center gap-2 border border-black/20  px-4 py-1.5 hover:bg-black hover:text-white   transition-colors group bg-white ">
+                            <span className="text-[10px] font-black uppercase tracking-widest text-black group-hover:text-white   transition-colors">VAULT MANAGER</span>
                         </button>
                         <button onClick={handleDisconnect} className="text-red-500 hover:text-white hover:bg-red-500 uppercase text-[9px] font-black tracking-widest ml-2 border border-red-500 px-4 py-1.5 transition-colors">
                             DISCONNECT
@@ -213,43 +253,43 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 )}
             </header>
 
-            <section className="px-4 md:px-8 pt-8 md:pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-white dark:bg-[#050505] transition-colors border-b border-black/5 dark:border-white/5">
-                <div className="absolute inset-0 pointer-events-none opacity-[0.02] dark:opacity-[0.05]" style={{ backgroundImage: 'radial-gradient(circle at center, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+            <section className="px-4 md:px-8 pt-8 md:pt-16 pb-12 flex flex-col items-center text-center relative z-10 bg-white  transition-colors border-b border-black/5 ">
+                <div className="absolute inset-0 pointer-events-none opacity-[0.02] " style={{ backgroundImage: 'radial-gradient(circle at center, #000 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
                 
                 <div className="relative inline-flex items-baseline justify-center mb-4">
-                    <h1 className="font-light tracking-tighter text-black dark:text-white drop-shadow-sm" style={{ fontSize: 'clamp(4rem, 12vw, 7rem)' }}>
+                    <h1 className="font-light tracking-tighter text-black  drop-shadow-sm" style={{ fontSize: 'clamp(4rem, 12vw, 7rem)' }}>
                         {balance}
                     </h1>
-                    <span className="absolute left-full text-2xl md:text-3xl ml-2 md:ml-4 font-black uppercase tracking-[0.2em] text-black/30 dark:text-white/30 bottom-6 md:bottom-8">{networkInfo.currency}</span>
+                    <span className="absolute left-full text-2xl md:text-3xl ml-2 md:ml-4 font-black uppercase tracking-[0.2em] text-black/30  bottom-6 md:bottom-8">{networkInfo.currency}</span>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-8 md:mb-12 w-full max-w-2xl mx-auto">
-                    <p className="text-black/60 dark:text-white/60 text-[12px] tracking-[0.2em] font-mono uppercase border border-black/10 dark:border-white/10 bg-white dark:bg-black px-6 py-2 shadow-sm whitespace-nowrap">{balanceFiat} USD</p>
-                    <span className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-[9px] font-black uppercase tracking-widest shadow-lg">
+                    <p className="text-black/60  text-[12px] tracking-[0.2em] font-mono uppercase border border-black/10  bg-white  px-6 py-2 shadow-sm whitespace-nowrap">{balanceFiat} USD</p>
+                    <span className="px-4 py-2 bg-black text-white   text-[9px] font-black uppercase tracking-widest shadow-lg">
                         LIVE ON-CHAIN
                     </span>
                 </div>
 
                 {address ? (
                     <div className="flex flex-col items-center gap-3 w-full max-w-lg">
-                        <button onClick={copy} className="w-full bg-black text-white dark:bg-white dark:text-black px-6 py-5 flex items-center justify-between hover:bg-black/90 dark:hover:bg-white/90 transition-all group shadow-xl">
+                        <button onClick={copy} className="w-full bg-black text-white   px-6 py-5 flex items-center justify-between hover:bg-black/90  transition-all group shadow-xl">
                             <div className="flex flex-col items-start">
                                 <span className="text-[8px] uppercase tracking-[0.3em] opacity-50 mb-1">CRYPTOGRAPHIC IDENTITY</span>
                                 <code className="text-base font-mono tracking-widest">{truncate(address, 24)}</code>
                             </div>
-                            <span className="text-[10px] uppercase font-black tracking-[0.2em] opacity-50 group-hover:opacity-100 bg-white/10 dark:bg-black/10 px-3 py-1 rounded">{copied ? 'COPIED' : 'COPY'}</span>
+                            <span className="text-[10px] uppercase font-black tracking-[0.2em] opacity-50 group-hover:opacity-100 bg-white/10  px-3 py-1 rounded">{copied ? 'COPIED' : 'COPY'}</span>
                         </button>
                         <div className="flex flex-col sm:flex-row gap-3 w-full">
-                            <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="flex-1 border border-black/10 dark:border-white/10 bg-white dark:bg-[#0a0a0a] px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all">
+                            <a href={`${scannerBase}/address/${address}`} target="_blank" rel="noopener noreferrer" className="flex-1 border border-black/10  bg-white  px-6 py-4 flex items-center justify-center gap-2 text-[10px] font-black uppercase tracking-[0.2em] text-black  hover:bg-black/5  transition-all">
                                 INSPECT ON EXPLORER
                             </a>
                         </div>
                     </div>
                 ) : (
-                    <div className="flex flex-col items-center gap-6 mt-4 p-12 bg-white dark:bg-[#0a0a0a] border border-black/10 dark:border-white/10 max-w-md shadow-2xl relative overflow-hidden">
-                        <div className="absolute top-0 right-0 w-32 h-32 bg-black/5 dark:bg-white/5 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
-                        <h4 className="text-base font-black uppercase tracking-[0.2em] text-black dark:text-white">WALLET NOT CONNECTED</h4>
-                        <p className="text-xs text-black/50 dark:text-white/50 leading-relaxed font-mono">A cryptographic key pair is required to interact with the EVM layer. Create or import an account to proceed.</p>
-                        <button onClick={onCreate} className="w-full bg-black text-white dark:bg-white dark:text-black px-8 py-5 text-[12px] uppercase tracking-[0.3em] font-black hover:bg-black/90 dark:hover:bg-white/90 transition-all mt-4 shadow-xl">
+                    <div className="flex flex-col items-center gap-6 mt-4 p-12 bg-white  border border-black/10  max-w-md shadow-2xl relative overflow-hidden">
+                        <div className="absolute top-0 right-0 w-32 h-32 bg-black/5  rounded-full blur-3xl -translate-y-1/2 translate-x-1/4"></div>
+                        <h4 className="text-base font-black uppercase tracking-[0.2em] text-black ">WALLET NOT CONNECTED</h4>
+                        <p className="text-xs text-black/50  leading-relaxed font-mono">A cryptographic key pair is required to interact with the EVM layer. Create or import an account to proceed.</p>
+                        <button onClick={onCreate} className="w-full bg-black text-white   px-8 py-5 text-[12px] uppercase tracking-[0.3em] font-black hover:bg-black/90  transition-all mt-4 shadow-xl">
                             CONNECT WALLET
                         </button>
                     </div>

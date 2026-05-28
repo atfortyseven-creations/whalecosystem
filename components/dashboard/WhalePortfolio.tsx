@@ -135,30 +135,30 @@ export function WhalePortfolio() {
             {/*  Legendary Title  */}
             <div className="px-2">
                 <ScrollFloat 
-                    textClassName="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none text-[#050505] dark:text-white"
+                    textClassName="text-4xl md:text-6xl font-black tracking-tighter uppercase leading-none text-[#050505] "
                     animationDuration={1}
                     stagger={0.03}
                 >
                     Capital Registry
                 </ScrollFloat>
                 <div className="flex items-center gap-2 mt-2 opacity-40">
-                    <div className="w-1.5 h-1.5 rounded-full bg-[#050505] dark:bg-white" />
-                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] dark:text-white">Institutional Depth Tracking Active</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-[#050505] " />
+                    <span className="text-[10px] font-mono font-bold uppercase tracking-[0.2em] ">Institutional Depth Tracking Active</span>
                 </div>
             </div>
 
             {/*  Header Stats  */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 {[
-                    { label: 'Total Whale AUM',   value: whaleLoading ? '' : fmt(totalAUM), colorClass: 'text-[#050505] dark:text-white', icon: <DollarSign size={16}/> },
-                    { label: 'Whale Txns 30d',    value: whaleLoading ? '' : totalTxns.toLocaleString(), colorClass: 'text-[#050505] dark:text-white', icon: <Activity size={16}/> },
+                    { label: 'Total Whale AUM',   value: whaleLoading ? '' : fmt(totalAUM), colorClass: 'text-[#050505] ', icon: <DollarSign size={16}/> },
+                    { label: 'Whale Txns 30d',    value: whaleLoading ? '' : totalTxns.toLocaleString(), colorClass: 'text-[#050505] ', icon: <Activity size={16}/> },
                     { label: 'Smart Money Inflow', value: whaleLoading ? '' : fmt(netFlowsUSD), colorClass: 'text-[#00C076]', icon: <TrendingUp size={16}/> },
                     { label: 'Avg Alpha Score',   value: whaleLoading ? '' : avgAlpha.toFixed(1), colorClass: 'text-[#D4AF37]', icon: <Zap size={16}/> },
                 ].map((s, i) => (
-                    <div key={i} className="bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
+                    <div key={i} className="bg-white  border border-[#E5E5E5]  rounded-3xl p-6 shadow-sm hover:shadow-md transition-shadow">
                         <div className="flex items-center gap-2 mb-3">
                             <span className={s.colorClass}>{s.icon}</span>
-                            <span className="text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-widest">{s.label}</span>
+                            <span className="text-[9px] font-black text-[#888888]  uppercase tracking-widest">{s.label}</span>
                         </div>
                         <div className={`text-3xl font-black font-mono tracking-tighter ${s.colorClass}`}>{s.value}</div>
                     </div>
@@ -166,12 +166,12 @@ export function WhalePortfolio() {
             </div>
 
             {/*  Card  */}
-            <div className="bg-white dark:bg-[#0A0A0A] border border-[#E5E5E5] dark:border-white/10 rounded-3xl overflow-hidden shadow-sm">
-                <div className="px-6 py-4 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
-                    <div className="flex bg-[#F0F0F0] dark:bg-[#1A1A1A] p-1 rounded-2xl border border-[#E5E5E5] dark:border-white/10">
+            <div className="bg-white  border border-[#E5E5E5]  rounded-3xl overflow-hidden shadow-sm">
+                <div className="px-6 py-4 border-b border-[#E5E5E5]  bg-[#FFFFFF]  flex items-center gap-4 flex-wrap">
+                    <div className="flex bg-[#F0F0F0]  p-1 rounded-2xl border border-[#E5E5E5] ">
                         {(['leaderboard', 'portfolio'] as const).map(v => (
                             <button key={v} onClick={() => setView(v)}
-                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-white dark:bg-[#050505] text-[#050505] dark:text-white shadow-sm border border-[#E5E5E5] dark:border-white/10' : 'text-[#888888] dark:text-white/40 hover:text-[#050505] dark:hover:text-white'}`}>
+                                className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${view === v ? 'bg-white  text-[#050505]  shadow-sm border border-[#E5E5E5] ' : 'text-[#888888]  hover:text-[#050505] '}`}>
                                 {v === 'leaderboard' ? 'Leaderboard' : 'Portfolio'}
                             </button>
                         ))}
@@ -183,12 +183,12 @@ export function WhalePortfolio() {
                         </span>
                     )}
                     <div className="relative flex-1 min-w-[200px] max-w-xs">
-                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888] dark:text-white/40"/>
+                        <Search size={14} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#888888] "/>
                         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search entity grid"
-                            className="w-full bg-white dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-full pl-10 pr-4 py-2 text-[11px] font-mono text-[#050505] dark:text-white outline-none focus:border-[#050505] dark:focus:border-white transition-all"
+                            className="w-full bg-white  border border-[#E5E5E5]  rounded-full pl-10 pr-4 py-2 text-[11px] font-mono text-[#050505]  outline-none focus:border-[#050505]  transition-all"
                         />
                     </div>
-                    <button onClick={refresh} className="ml-auto p-2 bg-white dark:bg-[#111111] rounded-full border border-[#E5E5E5] dark:border-white/10 text-[#888888] dark:text-white/40 hover:text-[#050505] dark:hover:text-white transition-all">
+                    <button onClick={refresh} className="ml-auto p-2 bg-white  rounded-full border border-[#E5E5E5]  text-[#888888]  hover:text-[#050505]  transition-all">
                         <RefreshCw size={14} className={whaleLoading ? 'animate-spin' : ''}/>
                     </button>
                 </div>
@@ -197,13 +197,13 @@ export function WhalePortfolio() {
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
-                                <tr className="text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.2em] bg-[#FFFFFF] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10">
+                                <tr className="text-[9px] font-black text-[#888888]  uppercase tracking-[0.2em] bg-[#FFFFFF]  border-b border-[#E5E5E5] ">
                                     {['#', 'Entity Profile', 'Net Worth', '24h Change', 'Type', 'Top Alpha Holding', 'Win Rate', 'PnL (30d)'].map((h, i) => (
                                         <th key={h} className={`px-6 py-4 font-black ${i >= 2 ? 'text-right' : ''}`}>{h}</th>
                                     ))}
                                 </tr>
                             </thead>
-                            <tbody className="divide-y divide-[#F0F0F0] dark:divide-white/5">
+                            <tbody className="divide-y divide-[#F0F0F0] ">
                                 {filteredWhales.map((w) => (
                                     <WhaleRow key={w.rank} w={w} />
                                 ))}
@@ -215,8 +215,8 @@ export function WhalePortfolio() {
                          <div className="w-16 h-16 rounded-3xl bg-teal-500/10 border border-teal-500/20 flex items-center justify-center mb-6">
                             <Wallet size={28} className="text-teal-500" />
                          </div>
-                         <h3 className="text-lg font-black uppercase tracking-tighter mb-2 dark:text-white">Portfolio Authentication Required</h3>
-                         <p className="text-[11px] text-[#888888] dark:text-white/60 max-w-xs uppercase font-bold tracking-widest leading-loose">Establish a secure session connection to sync your on-chain assets into the terminal.</p>
+                         <h3 className="text-lg font-black uppercase tracking-tighter mb-2 ">Portfolio Authentication Required</h3>
+                         <p className="text-[11px] text-[#888888]  max-w-xs uppercase font-bold tracking-widest leading-loose">Establish a secure session connection to sync your on-chain assets into the terminal.</p>
                     </div>
                 )}
             </div>
@@ -229,39 +229,39 @@ function WhaleRow({ w }: { w: WhaleEntity }) {
     const { ensName, ensAvatar } = useSystemENS(w.address as `0x${string}`);
 
     return (
-        <tr className="hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-colors group">
-            <td className="px-6 py-4 text-[10px] font-black text-[#888888] dark:text-white/60">{w.rank}</td>
+        <tr className="hover:bg-[#FFFFFF]  transition-colors group">
+            <td className="px-6 py-4 text-[10px] font-black text-[#888888] ">{w.rank}</td>
             <td className="px-6 py-4">
                 <div className="flex items-center gap-3">
                     {ensAvatar ? (
                         /* eslint-disable-next-line @next/next/no-img-element */
-                        <img src={ensAvatar} alt={w.label} className="w-8 h-8 rounded-full border border-[#E5E5E5] dark:border-white/10 object-cover shadow-sm" />
+                        <img src={ensAvatar} alt={w.label} className="w-8 h-8 rounded-full border border-[#E5E5E5]  object-cover shadow-sm" />
                     ) : (
-                        <div className="w-8 h-8 rounded-full bg-[#050505] dark:bg-white flex items-center justify-center text-[10px] font-black text-white dark:text-black shadow-sm">
+                        <div className="w-8 h-8 rounded-full bg-[#050505]  flex items-center justify-center text-[10px] font-black text-white  shadow-sm">
                             {w.label[0]}
                         </div>
                     )}
                     <div>
                         <div className="flex items-center gap-2">
-                            <div className="text-[12px] font-black text-[#050505] dark:text-white uppercase tracking-tight">{w.label}</div>
+                            <div className="text-[12px] font-black text-[#050505]  uppercase tracking-tight">{w.label}</div>
                             {ensName && (
                                 <span className="px-1.5 py-0.5 bg-[#0052FF]/10 text-[#0052FF] rounded-md text-[8px] font-black font-mono tracking-wider">
                                     {ensName}
                                 </span>
                             )}
                         </div>
-                        <div className="text-[9px] font-mono text-[#888888] dark:text-white/60">{w.address.slice(0, 12)}...{w.address.slice(-6)}</div>
+                        <div className="text-[9px] font-mono text-[#888888] ">{w.address.slice(0, 12)}...{w.address.slice(-6)}</div>
                     </div>
                 </div>
             </td>
-            <td className="px-6 py-4 text-right text-[11px] font-black font-mono dark:text-white">{fmt(w.netWorthUSD)}</td>
+            <td className="px-6 py-4 text-right text-[11px] font-black font-mono ">{fmt(w.netWorthUSD)}</td>
             <td className={`px-6 py-4 text-right text-[11px] font-black font-mono ${pctColor(w.change24h)}`}>{pctFmt(w.change24h)}</td>
             <td className="px-6 py-4 text-right">
-                <span className="text-[8px] px-2 py-1 rounded-full bg-[#F0F0F0] dark:bg-white/10 text-[#888888] dark:text-white/60 font-black uppercase tracking-wider">{w.category}</span>
+                <span className="text-[8px] px-2 py-1 rounded-full bg-[#F0F0F0]  text-[#888888]  font-black uppercase tracking-wider">{w.category}</span>
             </td>
             <td className="px-6 py-4 text-right">
-                <div className="text-[11px] font-black text-[#050505] dark:text-white">{w.topHolding}</div>
-                <div className="text-[8px] text-[#888888] dark:text-white/60 uppercase tracking-widest">{w.topHoldingPct}% DOMINANCE</div>
+                <div className="text-[11px] font-black text-[#050505] ">{w.topHolding}</div>
+                <div className="text-[8px] text-[#888888]  uppercase tracking-widest">{w.topHoldingPct}% DOMINANCE</div>
             </td>
             <td className="px-6 py-4 text-right text-[11px] font-black font-mono text-[#00C076]">{w.winRate}%</td>
             <td className={`px-6 py-4 text-right text-[11px] font-black font-mono ${pctColor(w.pnl30d)}`}>{fmt(w.pnl30d)}</td>

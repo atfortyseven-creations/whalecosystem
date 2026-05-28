@@ -44,7 +44,7 @@ export const TokenLogo: React.FC<TokenLogoProps> = ({ symbol, address, logoURI, 
 
     if (!imgSrc || hasError) {
         return (
-            <div className={cn("flex items-center justify-center font-black uppercase tracking-tight bg-black/5 dark:bg-white/10 text-black/60 dark:text-white/60", className, fallbackClassName)}>
+            <div className={cn("flex items-center justify-center font-black uppercase tracking-tight bg-black/5  text-black/60 ", className, fallbackClassName)}>
                 {typeof symbol === 'string' ? symbol.slice(0, 2) : '?'}
             </div>
         );

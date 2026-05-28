@@ -59,14 +59,14 @@ export function DropdownNav() {
                     }}
                     transition={{ duration: 0.3 }}
                 >
-                    <span className="text-lg font-black tracking-tight text-[#1F1F1F] dark:text-white">
+                    <span className="text-lg font-black tracking-tight text-[#1F1F1F] ">
                         Whale Alert Network
                     </span>
                     <motion.div
                         animate={{ rotate: isOpen ? 180 : 0 }}
                         transition={{ duration: 0.3, ease: "easeInOut" }}
                     >
-                        <ChevronDown className="w-5 h-5 text-[#1F1F1F] dark:text-white" />
+                        <ChevronDown className="w-5 h-5 text-[#1F1F1F] " />
                     </motion.div>
                 </motion.button>
 
@@ -90,17 +90,17 @@ export function DropdownNav() {
                                 animate={{ opacity: 1, y: 0, scale: 1 }}
                                 exit={{ opacity: 0, y: -10, scale: 0.98 }}
                                 transition={{ duration: 0.25, ease: [0.4, 0, 0.2, 1] }}
-                                className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-80 bg-white/95 dark:bg-[#1F1F1F]/95 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden z-50"
+                                className="absolute top-full mt-4 left-1/2 -translate-x-1/2 w-80 bg-white/95  backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/20 overflow-hidden z-50"
                             >
                                 {/* Exit Button */}
-                                <div className="p-4 border-b border-gray-200 dark:border-white/10 flex justify-between items-center">
+                                <div className="p-4 border-b border-gray-200  flex justify-between items-center">
                                     <h3 className="text-sm font-bold uppercase tracking-widest text-gray-400">Menú</h3>
                                     <button
                                         onClick={() => setIsOpen(false)}
-                                        className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-white/10 transition-colors group"
+                                        className="p-2 rounded-full hover:bg-gray-100  transition-colors group"
                                         aria-label="Cerrar menú"
                                     >
-                                        <X size={20} className="text-gray-400 group-hover:text-[#1F1F1F] dark:group-hover:text-white transition-colors" />
+                                        <X size={20} className="text-gray-400 group-hover:text-[#1F1F1F]  transition-colors" />
                                     </button>
                                 </div>
 
@@ -117,7 +117,7 @@ export function DropdownNav() {
                                             className={`flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                                                 link.isVIP
                                                     ? 'bg-gradient-to-r from-black to-gray-900 text-white hover:scale-105 shadow-lg'
-                                                    : 'hover:bg-gray-100 dark:hover:bg-white/10 text-[#1F1F1F] dark:text-white'
+                                                    : 'hover:bg-gray-100  text-[#1F1F1F] '
                                             }`}
                                         >
                                             {link.icon}
@@ -127,7 +127,7 @@ export function DropdownNav() {
                                 </div>
 
                                 {/* Divider */}
-                                <div className="h-px bg-gradient-to-r from-transparent via-gray-300 dark:via-white/20 to-transparent" />
+                                <div className="h-px bg-gradient-to-r from-transparent via-gray-300  to-transparent" />
 
                                 {/* Utility Buttons */}
                                 <div className="p-6 space-y-3">
@@ -143,13 +143,13 @@ export function DropdownNav() {
                                                 setActivePanel('notifications');
                                                 setIsOpen(false);
                                             }}
-                                            className="relative flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-100 dark:bg-white/10 hover:bg-gray-200 dark:hover:bg-white/20 transition-all"
+                                            className="relative flex items-center justify-center gap-2 p-3 rounded-xl bg-gray-100  hover:bg-gray-200  transition-all"
                                         >
-                                            <Bell size={18} className="text-[#1F1F1F] dark:text-white" />
+                                            <Bell size={18} className="text-[#1F1F1F] " />
                                             {unreadCount > 0 && (
                                                 <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border border-white animate-pulse" />
                                             )}
-                                            <span className="text-xs font-bold text-[#1F1F1F] dark:text-white">Alertas</span>
+                                            <span className="text-xs font-bold text-[#1F1F1F] ">Alertas</span>
                                         </button>
                                     </div>
                                 </div>

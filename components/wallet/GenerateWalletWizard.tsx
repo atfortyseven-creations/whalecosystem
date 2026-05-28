@@ -121,15 +121,15 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#FFFFFF]/80 dark:bg-black/80 backdrop-blur-md">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#FFFFFF]/80  backdrop-blur-md">
       <motion.div
         initial={{ opacity: 0, scale: 0.95, y: 10 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.95, y: 10 }}
-        className="w-full max-w-lg bg-white dark:bg-[#0A0A0A] rounded-[2.5rem] p-8 shadow-2xl border border-black/5 dark:border-white/5 relative overflow-hidden"
+        className="w-full max-w-lg bg-white  rounded-[2.5rem] p-8 shadow-2xl border border-black/5  relative overflow-hidden"
       >
         {/* Progress Bar */}
-        <div className="absolute top-0 left-0 w-full h-1 bg-black/5 dark:bg-white/5">
+        <div className="absolute top-0 left-0 w-full h-1 bg-black/5 ">
             <motion.div 
                 className="h-full bg-indigo-500"
                 initial={{ width: '25%' }}
@@ -138,7 +138,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
             />
         </div>
 
-        <button onClick={onCancel} className="absolute top-6 right-6 text-black/40 hover:text-black dark:text-white/40 dark:hover:text-white transition-colors">
+        <button onClick={onCancel} className="absolute top-6 right-6 text-black/40 hover:text-black   transition-colors">
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
         </button>
 
@@ -155,13 +155,13 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                 <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
               </div>
               <h2 className="text-2xl font-black uppercase tracking-tight mb-3 mt-4">Create Wallet</h2>
-              <p className="text-sm text-black/50 dark:text-white/50 mb-8 max-w-[280px] leading-relaxed">
+              <p className="text-sm text-black/50  mb-8 max-w-[280px] leading-relaxed">
                 Generate a fresh, secure non-custodial wallet instantly. Created locally, never leaves your browser.
               </p>
               
               <button
                 onClick={generateIdentity}
-                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
+                className="w-full h-14 bg-black  text-white  rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity"
               >
                 <Zap size={16} /> Create Wallet
               </button>
@@ -179,12 +179,12 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <div className="w-64 h-64 mb-6">
                 <RemoteLottie path="/system-shots/block abstract.json" />
               </div>
-              <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50 mb-6">
+              <h3 className="text-[10px] font-black uppercase tracking-widest text-black/50  mb-6">
                 Creating your secure wallet...
               </h3>
-              <div className="w-full max-w-[200px] h-1.5 bg-black/5 dark:bg-white/5 rounded-full overflow-hidden">
+              <div className="w-full max-w-[200px] h-1.5 bg-black/5  rounded-full overflow-hidden">
                 <motion.div
-                  className="h-full bg-black dark:bg-white rounded-full"
+                  className="h-full bg-black  rounded-full"
                   style={{ width: `${loadingProgress}%` }}
                 />
               </div>
@@ -214,39 +214,39 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               exit={{ opacity: 0, x: 20 }}
               className="flex flex-col pt-4"
             >
-              <div className="flex items-center gap-3 mb-6 border-b border-black/5 dark:border-white/5 pb-4">
-                 <div className="w-8 h-8 bg-amber-50 dark:bg-amber-500/10 text-amber-500 rounded-full flex items-center justify-center">
+              <div className="flex items-center gap-3 mb-6 border-b border-black/5  pb-4">
+                 <div className="w-8 h-8 bg-amber-50  text-amber-500 rounded-full flex items-center justify-center">
                     <Key size={14} />
                  </div>
                  <div>
                      <h2 className="text-lg font-black uppercase tracking-tight">Backup Required</h2>
-                     <p className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40 font-bold">Absolute Ownership</p>
+                     <p className="text-[10px] uppercase tracking-widest text-black/40  font-bold">Absolute Ownership</p>
                  </div>
               </div>
 
               <div className="space-y-4 mb-8">
-                  <div className="p-4 bg-black/5 dark:bg-white/5 rounded-xl border border-black/5 dark:border-white/5">
+                  <div className="p-4 bg-black/5  rounded-xl border border-black/5 ">
                       <div className="flex justify-between items-center mb-2">
-                          <span className="text-[10px] font-black uppercase tracking-widest text-black/50 dark:text-white/50">Recovery Phrase</span>
+                          <span className="text-[10px] font-black uppercase tracking-widest text-black/50 ">Recovery Phrase</span>
                           <button onClick={() => copyToClipboard(wallet.mnemonic, 'Seed Phrase')} className="text-indigo-500 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest hover:opacity-70"><Copy size={12}/> Copy</button>
                       </div>
                       <div className="grid grid-cols-3 gap-2">
                           {wallet.mnemonic.split(' ').map((word, i) => (
-                              <div key={i} className="bg-white dark:bg-black rounded-md py-2 px-3 flex gap-2 items-center border border-black/5 dark:border-white/5 shadow-sm">
-                                  <span className="text-[9px] text-black/30 dark:text-white/30 font-mono">{i+1}</span>
-                                  <span className="text-xs font-bold text-black/80 dark:text-white/80">{word}</span>
+                              <div key={i} className="bg-white  rounded-md py-2 px-3 flex gap-2 items-center border border-black/5  shadow-sm">
+                                  <span className="text-[9px] text-black/30  font-mono">{i+1}</span>
+                                  <span className="text-xs font-bold text-black/80 ">{word}</span>
                               </div>
                           ))}
                       </div>
                   </div>
 
-                  <div className="p-4 bg-rose-50 dark:bg-rose-500/10 rounded-xl border border-rose-100 dark:border-rose-500/20">
+                  <div className="p-4 bg-rose-50  rounded-xl border border-rose-100 ">
                       <div className="flex justify-between items-center mb-2">
                           <span className="text-[10px] font-black uppercase tracking-widest text-rose-500 flex items-center gap-1"><Lock size={12}/> Private Key</span>
                           <button onClick={() => copyToClipboard(wallet.privateKey, 'Private Key')} className="text-rose-500 flex items-center gap-1 text-[10px] font-bold uppercase tracking-widest hover:opacity-70"><Copy size={12}/> Copy</button>
                       </div>
-                      <div className="bg-white dark:bg-black rounded-md py-3 px-3 border border-rose-100 dark:border-rose-500/20 break-all shadow-sm font-mono text-[10px] text-black/70 dark:text-white/70 relative group cursor-pointer" onClick={() => copyToClipboard(wallet.privateKey, 'Private Key')}>
-                          <div className="absolute inset-0 bg-white/60 dark:bg-black/60 backdrop-blur-sm flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity">
+                      <div className="bg-white  rounded-md py-3 px-3 border border-rose-100  break-all shadow-sm font-mono text-[10px] text-black/70  relative group cursor-pointer" onClick={() => copyToClipboard(wallet.privateKey, 'Private Key')}>
+                          <div className="absolute inset-0 bg-white/60  backdrop-blur-sm flex items-center justify-center opacity-100 group-hover:opacity-0 transition-opacity">
                               <span className="flex items-center gap-2 text-xs font-bold font-sans text-rose-600"><EyeOff size={14}/> Hover to reveal</span>
                           </div>
                           {wallet.privateKey}
@@ -254,18 +254,18 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                   </div>
               </div>
 
-              <label className="flex items-center gap-3 cursor-pointer group mb-6 p-4 bg-black/5 dark:bg-white/5 rounded-xl">
-                  <div className={`w-5 h-5 rounded border ${saved ? 'bg-black border-black text-white dark:bg-white dark:border-white dark:text-black' : 'border-black/20 dark:border-white/20 bg-white dark:bg-black'} flex items-center justify-center transition-colors`}>
+              <label className="flex items-center gap-3 cursor-pointer group mb-6 p-4 bg-black/5  rounded-xl">
+                  <div className={`w-5 h-5 rounded border ${saved ? 'bg-black border-black text-white   ' : 'border-black/20  bg-white '} flex items-center justify-center transition-colors`}>
                       {saved && <CheckCircle2 size={14} />}
                   </div>
                   <input type="checkbox" className="hidden" checked={saved} onChange={(e) => setSaved(e.target.checked)} />
-                  <span className="text-xs font-bold text-black/70 dark:text-white/70">I have securely backed up my Mnemonic and Private Key.</span>
+                  <span className="text-xs font-bold text-black/70 ">I have securely backed up my Mnemonic and Private Key.</span>
               </label>
 
               <button
                 onClick={() => setStep(3)}
                 disabled={!saved}
-                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-full h-14 bg-black  text-white  rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 Continue to Security <MoveRight size={16} />
               </button>
@@ -280,18 +280,18 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               exit={{ opacity: 0, x: 20 }}
               className="flex flex-col pt-4"
             >
-              <div className="flex items-center gap-3 mb-6 border-b border-black/5 dark:border-white/5 pb-4">
-                 <div className="w-8 h-8 bg-indigo-50 dark:bg-indigo-500/10 text-indigo-500 rounded-full flex items-center justify-center">
+              <div className="flex items-center gap-3 mb-6 border-b border-black/5  pb-4">
+                 <div className="w-8 h-8 bg-indigo-50  text-indigo-500 rounded-full flex items-center justify-center">
                     <Lock size={14} />
                  </div>
                  <div>
                      <h2 className="text-lg font-black uppercase tracking-tight">Secure Wallet</h2>
-                     <p className="text-[10px] uppercase tracking-widest text-black/40 dark:text-white/40 font-bold">AES-GCM Encryption</p>
+                     <p className="text-[10px] uppercase tracking-widest text-black/40  font-bold">AES-GCM Encryption</p>
                  </div>
               </div>
 
               <div className="space-y-4 mb-8">
-                  <p className="text-sm text-black/60 dark:text-white/60 mb-2 font-medium">
+                  <p className="text-sm text-black/60  mb-2 font-medium">
                       Set a password to encrypt your recovery phrase on this device. Whale Alert cannot recover this password if you lose it.
                   </p>
                   
@@ -301,20 +301,20 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
                         value={password}
                         onChange={e => setPassword(e.target.value)}
                         placeholder="New Password (8+ characters)"
-                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-5 py-4 text-black dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500 transition-all placeholder:font-medium placeholder:text-black/30 dark:placeholder:text-white/30"
+                        className="w-full bg-black/5  border border-black/10  rounded-xl px-5 py-4 text-black  text-sm font-bold focus:outline-none focus:border-indigo-500 transition-all placeholder:font-medium placeholder:text-black/30 "
                       />
                       <input 
                         type="password" 
                         value={confirmPassword}
                         onChange={e => setConfirmPassword(e.target.value)}
                         placeholder="Confirm Password"
-                        className="w-full bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-xl px-5 py-4 text-black dark:text-white text-sm font-bold focus:outline-none focus:border-indigo-500 transition-all placeholder:font-medium placeholder:text-black/30 dark:placeholder:text-white/30"
+                        className="w-full bg-black/5  border border-black/10  rounded-xl px-5 py-4 text-black  text-sm font-bold focus:outline-none focus:border-indigo-500 transition-all placeholder:font-medium placeholder:text-black/30 "
                       />
                   </div>
                   
-                  <div className="flex items-start gap-2 mt-4 p-3 bg-amber-50 dark:bg-amber-500/10 rounded-lg border border-amber-200 dark:border-amber-500/20">
+                  <div className="flex items-start gap-2 mt-4 p-3 bg-amber-50  rounded-lg border border-amber-200 ">
                       <AlertTriangle size={16} className="text-amber-500 shrink-0 mt-0.5" />
-                      <p className="text-[11px] text-amber-700 dark:text-amber-400 leading-tight font-medium">
+                      <p className="text-[11px] text-amber-700  leading-tight font-medium">
                           Without this password, you will need your 12-word phrase to restore access.
                       </p>
                   </div>
@@ -323,7 +323,7 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               <button
                 onClick={handleSecureAndProceed}
                 disabled={password.length < 8 || password !== confirmPassword || isEncrypting}
-                className="w-full h-14 bg-black dark:bg-white text-white dark:text-black rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
+                className="w-full h-14 bg-black  text-white  rounded-xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-3 hover:opacity-90 transition-opacity disabled:opacity-30 disabled:cursor-not-allowed"
               >
                 {isEncrypting ? (
                   <>
@@ -351,8 +351,8 @@ export function GenerateWalletWizard({ onComplete, onCancel }: GenerateWalletWiz
               </div>
               <h2 className="text-2xl font-black uppercase tracking-tight mt-0 mb-2">Wallet Secured</h2>
               {/* Address directly below whale  zero gap = "pegada" */}
-              <div className="flex items-center gap-2 bg-black/5 dark:bg-white/5 px-4 py-2 rounded-2xl border border-black/5 dark:border-white/5 mb-8">
-                <p className="text-[11px] font-mono font-bold text-black/70 dark:text-white/70 break-all">
+              <div className="flex items-center gap-2 bg-black/5  px-4 py-2 rounded-2xl border border-black/5  mb-8">
+                <p className="text-[11px] font-mono font-bold text-black/70  break-all">
                   {wallet.address}
                 </p>
               </div>

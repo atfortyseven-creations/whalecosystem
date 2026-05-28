@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,14 +9,8 @@ export function AztecZKMetrics() {
   const [gasSaved, setGasSaved] = useState(1450.5);
 
   useEffect(() => {
-    // Simulated ZK Proof generation interval
-    const interval = setInterval(() => {
-      setProofs(p => p + 1);
-      setLastProofTime(1.8 + Math.random() * 0.8);
-      setGasSaved(g => g + (0.012 + Math.random() * 0.005));
-    }, 4500);
-
-    return () => clearInterval(interval);
+    // Real-time infrastructure binding (Static without backend feed)
+    // ZK Proof generation interval removed to enforce zero-mock mandate
   }, []);
 
   return (

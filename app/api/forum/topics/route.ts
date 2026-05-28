@@ -5,33 +5,36 @@ import { pinJSONToIPFS } from '@/lib/ipfs/pinata-client';
 import { verifyMessage } from 'viem';
 import crypto from 'crypto';
 
-export const revalidate = 15; // ISR: Serve from cache, revalidate every 15 seconds to save DB compute
+// ISR: Revalidate every 30 seconds for GET (topic listing)
+export const revalidate = 30;
+
+/**
+ * Module-level one-time test-topic cleanup.
+ * Runs ONCE when the module is first loaded by the Node.js process.
+ * CRITICAL: NEVER place DB mutations inside a GET handler. GET is idempotent.
+ */
+let _cleanupRan = false;
+if (typeof process !== 'undefined' && !_cleanupRan) {
+    _cleanupRan = true;
+    const TEST_TITLES = [
+        'Overview', '29', 'bitcoin', 'Macroeconomic Analytics',
+        'btc', '8', '2 seconds', '08', 'Hello',
+        'Zero-Knowledge Architecture', 'blockchain'
+    ];
+    // Fire and forget — never blocks a request
+    (prisma as any).forumTopic.deleteMany({ where: { title: { in: TEST_TITLES } } })
+        .catch(() => { /* Non-critical cleanup, silent failure is fine */ });
+}
 
 export async function GET(req: Request) {
     try {
         const { searchParams } = new URL(req.url);
 
-        // Cleanup test topics
-        try {
-            await (prisma as any).forumTopic.deleteMany({
-                where: {
-                    title: {
-                        in: [
-                            "Overview", "29", "bitcoin", "Macroeconomic Analytics", 
-                            "btc", "8", "2 seconds", "08", "Hello", 
-                            "Zero-Knowledge Architecture", "blockchain"
-                        ]
-                    }
-                }
-            });
-        } catch (err) {
-            console.error("Failed to delete test topics:", err);
-        }
-
         const categorySlug = searchParams.get('category');
         const tag = searchParams.get('tag');
+        const search = searchParams.get('search');
         const rawLimit = parseInt(searchParams.get('limit') || '30', 10);
-        const limit = Math.min(isNaN(rawLimit) ? 30 : rawLimit, 50); // Hard cap at 50 to prevent DoS
+        const limit = Math.min(isNaN(rawLimit) ? 30 : rawLimit, 50);
         const filter = searchParams.get('filter') || 'latest';
         const cursor = searchParams.get('cursor');
 
@@ -40,11 +43,20 @@ export async function GET(req: Request) {
         if (filter === 'top') orderBy = { views: 'desc' };
         if (filter === 'unread') orderBy = { views: 'asc' };
 
+        // Build where clause
+        const whereClause: any = {};
+        if (categorySlug) whereClause.category = { slug: categorySlug };
+        if (tag) whereClause.tags = { some: { name: tag } };
+        // Full-text search support via 'search' param (used by SearchModal)
+        if (search && search.trim().length >= 2) {
+            whereClause.OR = [
+                { title: { contains: search.trim(), mode: 'insensitive' } },
+                { content: { contains: search.trim(), mode: 'insensitive' } },
+            ];
+        }
+
         const topics = await (prisma as any).forumTopic.findMany({
-            where: {
-                ...(categorySlug ? { category: { slug: categorySlug } } : {}),
-                ...(tag ? { tags: { some: { name: tag } } } : {})
-            },
+            where: whereClause,
             include: {
                 category: true,
                 tags: true,
@@ -58,7 +70,7 @@ export async function GET(req: Request) {
                     }
                 },
                 _count: {
-                    select: { posts: true }
+                    select: { posts: true, likes: true }
                 }
             },
             orderBy,

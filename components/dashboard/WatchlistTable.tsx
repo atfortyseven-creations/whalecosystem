@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -60,7 +60,7 @@ export function WatchlistTable() {
                             roi: ((d.current_price - (d.current_price * 0.9)) / (d.current_price * 0.9)) * 100,
                             mcap: d.market_cap,
                             vol24h: d.total_volume,
-                            whaleConcentration: Math.floor(Math.random() * 40) + 10 // Realistic static mock for UI
+                            whaleConcentration: null // Zero-Mock Mandate
                         }
                     }));
                     setServerTokens(mappedTokens);
@@ -137,15 +137,15 @@ export function WatchlistTable() {
 
     return (
         <div className="w-full h-full min-h-0 flex flex-col p-0 overflow-hidden">
-        <div className="flex flex-col w-full flex-1 min-h-0 bg-[#FFFFFF] dark:bg-[#0A0A0A] rounded-2xl border border-[#E5E5E5] dark:border-white/10 shadow-sm overflow-hidden">
+        <div className="flex flex-col w-full flex-1 min-h-0 bg-[#FFFFFF] rounded-2xl border border-[#E5E5E5] shadow-sm overflow-hidden">
 
             {/*  Toolbar  */}
-            <div className="px-4 py-3 border-b border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] flex items-center gap-4 flex-wrap">
+            <div className="px-4 py-3 border-b border-[#E5E5E5] bg-[#FFFFFF] flex items-center gap-4 flex-wrap">
                 {/* View toggle */}
-                <div className="flex bg-[#F0F0F0] dark:bg-[#1A1A1A] p-1 rounded-xl border border-[#E5E5E5] dark:border-white/10">
+                <div className="flex bg-[#F0F0F0] p-1 rounded-xl border border-[#E5E5E5]">
                     {(['TOKENS', 'WALLETS'] as const).map(v => (
                         <button key={v} onClick={() => setView(v)}
-                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[9px] font-black tracking-widest uppercase transition-all ${view === v ? 'bg-white dark:bg-[#050505] text-[#050505] dark:text-white shadow-sm border border-[#E5E5E5] dark:border-white/10' : 'text-[#888888] hover:text-[#050505] dark:hover:text-white'}`}>
+                            className={`flex items-center gap-1.5 px-4 py-1.5 rounded-lg text-[9px] font-black tracking-widest uppercase transition-all ${view === v ? 'bg-white text-[#050505] shadow-sm border border-[#E5E5E5]' : 'text-[#888888] hover:text-[#050505]'}`}>
                             {v}
                         </button>
                     ))}
@@ -153,13 +153,13 @@ export function WatchlistTable() {
                 {/* Search */}
                 <div className="relative flex-1 min-w-[180px] max-w-xs">
                     <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Filter watchlist"
-                        className="w-full bg-white dark:bg-[#050505] border border-[#E5E5E5] dark:border-white/10 rounded-lg px-3 py-1.5 text-[11px] font-mono text-[#050505] dark:text-white outline-none focus:border-[#050505] dark:focus:border-white transition-all"
+                        className="w-full bg-white border border-[#E5E5E5] rounded-lg px-3 py-1.5 text-[11px] font-mono text-[#050505] outline-none focus:border-[#050505] transition-all"
                     />
                 </div>
                 {/* Add New - Disabled until API injection is complete */}
                 <button
                     disabled
-                    className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-[#E5E5E5] dark:bg-white/10 text-[#888888] dark:text-white/40 rounded-lg text-[9px] font-black uppercase tracking-widest cursor-not-allowed transition-colors"
+                    className="ml-auto flex items-center gap-1.5 px-4 py-2 bg-[#E5E5E5] text-[#888888] rounded-lg text-[9px] font-black uppercase tracking-widest cursor-not-allowed transition-colors"
                 >
                     Add
                 </button>
@@ -168,7 +168,7 @@ export function WatchlistTable() {
             {view === 'TOKENS' && (
                 <div className="flex-1 overflow-auto flex flex-col min-h-0">
                     <div className="min-w-[1200px] flex flex-col h-full">
-                        <div className="sticky top-0 z-10 grid bg-[#FFFFFF] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.18em]"
+                        <div className="sticky top-0 z-10 grid bg-[#FFFFFF] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
                             style={{ gridTemplateColumns: '2.5fr 1.5fr 1fr 1fr 1.2fr 1fr 1fr 1fr 0.8fr' }}>
                             {['Token', 'Current Price', '24h Chg', 'Entry Price', 'ROI', 'MCap', 'Vol 24h', 'Top-10 Hold.', ''].map((h, i) => (
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
@@ -183,12 +183,12 @@ export function WatchlistTable() {
                                 </div>
                             ) : error ? (
                                 <div className="h-full flex flex-col items-center justify-center">
-                                    <p className="text-[11px] font-black text-black/20 dark:text-white/20 uppercase tracking-[0.3em]">
+                                    <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
                                         Data Lake Unavailable
                                     </p>
                                 </div>
                             ) : tokensFiltered.length === 0 ? (
-                                <div className="p-12 text-center text-[#888888] dark:text-white/40 text-[10px] font-mono">NO TOKENS WATCHED</div>
+                                <div className="p-12 text-center text-[#888888] text-[10px] font-mono">NO TOKENS WATCHED</div>
                             ) : (
                                 <AutoSizer>
                                     {({ height, width }) => (
@@ -206,8 +206,8 @@ export function WatchlistTable() {
                                                 const md = t.marketData || {};
 
                                                 return (
-                                                    <div style={style} className="border-b border-[#F0F0F0] dark:border-white/5">
-                                                        <div className="grid hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-colors items-center h-full"
+                                                    <div style={style} className="border-b border-[#F0F0F0]">
+                                                        <div className="grid hover:bg-[#FFFFFF] transition-colors items-center h-full"
                                                             style={{ gridTemplateColumns: '2.5fr 1.5fr 1fr 1fr 1.2fr 1fr 1fr 1fr 0.8fr' }}>
                                                             {/* Token */}
                                                             <div className="px-3 flex items-center gap-2.5">
@@ -216,9 +216,9 @@ export function WatchlistTable() {
                                                                     {t.symbol ? t.symbol.charAt(0) : '?'}
                                                                 </div>
                                                                 <div className="flex flex-col min-w-0">
-                                                                    <span className="text-[11px] font-black text-[#050505] dark:text-white truncate">{t.symbol || 'UNK'}</span>
+                                                                    <span className="text-[11px] font-black text-[#050505] truncate">{t.symbol || 'UNK'}</span>
                                                                     <div className="flex items-center gap-1">
-                                                                        <span className="text-[8px] text-[#888888] dark:text-white/60 font-mono truncate">{t.name || 'Unknown'}</span>
+                                                                        <span className="text-[8px] text-[#888888] font-mono truncate">{t.name || 'Unknown'}</span>
                                                                         <span className="text-[7px] px-1 py-0.5 rounded border font-bold uppercase" style={{ color: CHAIN_COLORS[t.chain || 'ethereum'] || '#888', borderColor: (CHAIN_COLORS[t.chain || 'ethereum'] || '#888') + '55' }}>{t.chain || 'ethereum'}</span>
                                                                     </div>
                                                                 </div>
@@ -226,7 +226,7 @@ export function WatchlistTable() {
 
                                                             {/* Current Price */}
                                                             <div className="px-3 text-right">
-                                                                <span className="text-[11px] font-black font-mono text-[#050505] dark:text-white privacy-sensitive">
+                                                                <span className="text-[11px] font-black font-mono text-[#050505] privacy-sensitive">
                                                                     {md.currentPrice ? formatMoney(md.currentPrice, 6) : ''}
                                                                 </span>
                                                             </div>
@@ -238,7 +238,7 @@ export function WatchlistTable() {
 
                                                             {/* Entry Price */}
                                                             <div className="px-3 text-right">
-                                                                <span className="text-[10px] font-bold font-mono text-[#888888] dark:text-[#AAAAAA] privacy-sensitive">
+                                                                <span className="text-[10px] font-bold font-mono text-[#888888] privacy-sensitive">
                                                                     {t.entryPrice ? formatMoney(t.entryPrice, 6) : ''}
                                                                 </span>
                                                             </div>
@@ -249,23 +249,23 @@ export function WatchlistTable() {
                                                             </div>
 
                                                             {/* MCap */}
-                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] dark:text-white privacy-sensitive">
+                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] privacy-sensitive">
                                                                 {md.mcap ? formatLargeMoney(md.mcap) : ''}
                                                             </div>
 
                                                             {/* Vol 24h */}
-                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] dark:text-white privacy-sensitive">
+                                                            <div className="px-3 text-right text-[10px] font-bold font-mono text-[#050505] privacy-sensitive">
                                                                 {md.vol24h ? formatLargeMoney(md.vol24h) : ''}
                                                             </div>
 
                                                             {/* Top10 holders */}
-                                                            <div className={`px-3 text-right text-[10px] font-black font-mono ${(md.whaleConcentration ?? 0) > 40 ? 'text-[#FF9500]' : 'text-[#050505] dark:text-white'}`}>
+                                                            <div className={`px-3 text-right text-[10px] font-black font-mono ${(md.whaleConcentration ?? 0) > 40 ? 'text-[#FF9500]' : 'text-[#050505]'}`}>
                                                                 {md.whaleConcentration != null ? `${md.whaleConcentration}%` : ''}
                                                             </div>
 
                                                             {/* Delete / Save */}
                                                             <div className="px-3 flex justify-end">
-                                                                <button disabled className="p-1.5 text-[#E5E5E5] dark:text-white/10 rounded-lg transition-colors cursor-not-allowed">
+                                                                <button disabled className="p-1.5 text-[#E5E5E5] rounded-lg transition-colors cursor-not-allowed">
                                                                     DEL
                                                                 </button>
                                                             </div>
@@ -286,7 +286,7 @@ export function WatchlistTable() {
             {view === 'WALLETS' && (
                 <div className="flex-1 overflow-auto flex flex-col min-h-0">
                     <div className="min-w-[1200px] flex flex-col h-full">
-                        <div className="sticky top-0 z-10 grid bg-[#FFFFFF] dark:bg-[#111111] border-b border-[#E5E5E5] dark:border-white/10 text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-[0.18em]"
+                        <div className="sticky top-0 z-10 grid bg-[#FFFFFF] border-b border-[#E5E5E5] text-[9px] font-black text-[#888888] uppercase tracking-[0.18em]"
                             style={{ gridTemplateColumns: '2.2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr' }}>
                             {['Entity', 'Address', 'Net Worth', 'PnL 30d', 'Win Rate', 'DEX Ratio', 'Alpha Score', 'Last Active', ''].map((h, i) => (
                                 <div key={i} className={`px-3 py-2.5 ${i >= 2 ? 'text-right' : ''}`}>{h}</div>
@@ -301,12 +301,12 @@ export function WatchlistTable() {
                                 </div>
                             ) : error ? (
                                 <div className="h-full flex flex-col items-center justify-center">
-                                    <p className="text-[11px] font-black text-black/20 dark:text-white/20 uppercase tracking-[0.3em]">
+                                    <p className="text-[11px] font-black text-black/20 uppercase tracking-[0.3em]">
                                         Data Lake Unavailable
                                     </p>
                                 </div>
                             ) : walletsFiltered.length === 0 ? (
-                                <div className="p-12 text-center text-[#888888] dark:text-white/40 text-[10px] font-mono">NO ENTITIES WATCHED</div>
+                                <div className="p-12 text-center text-[#888888] text-[10px] font-mono">NO ENTITIES WATCHED</div>
                             ) : (
                                 <AutoSizer>
                                     {({ height, width }) => (
@@ -329,13 +329,13 @@ export function WatchlistTable() {
                                                         : `${Math.floor(minsAgo / 1440)}d ago`;
 
                                                 return (
-                                                    <div style={style} className="border-b border-[#F0F0F0] dark:border-white/5">
-                                                        <div className="grid hover:bg-[#FFFFFF] dark:hover:bg-white/5 transition-colors items-center h-full"
+                                                    <div style={style} className="border-b border-[#F0F0F0]">
+                                                        <div className="grid hover:bg-[#FFFFFF] transition-colors items-center h-full"
                                                             style={{ gridTemplateColumns: '2.2fr 2fr 1fr 1fr 1fr 1fr 1fr 1fr 0.8fr' }}>
                                                             {/* Entity */}
                                                             <div className="px-3 flex items-center gap-2">
                                                                 <div className="flex flex-col">
-                                                                    <span className="text-[11px] font-black text-[#050505] dark:text-white">{w.label || 'Unknown Wallet'}</span>
+                                                                    <span className="text-[11px] font-black text-[#050505]">{w.label || 'Unknown Wallet'}</span>
                                                                     <div className="flex gap-1 mt-0.5">
                                                                         {w.isWhale && <span className="text-[7px] px-1 py-0.5 rounded bg-[#627EEA]/10 text-[#627EEA] border border-[#627EEA]/20 font-black uppercase">Whale</span>}
                                                                         {w.isSmart && <span className="text-[7px] px-1 py-0.5 rounded bg-[#00C076]/10 text-[#00C076] border border-[#00C076]/20 font-black uppercase">Smart</span>}
@@ -346,13 +346,13 @@ export function WatchlistTable() {
 
                                                             {/* Address */}
                                                             <div className="px-3">
-                                                                <span className="text-[9px] font-mono text-[#888888] dark:text-white/60 privacy-sensitive">
+                                                                <span className="text-[9px] font-mono text-[#888888] privacy-sensitive">
                                                                     {w.address ? `${w.address.slice(0,8)}${w.address.slice(-6)}` : ''}
                                                                 </span>
                                                             </div>
 
                                                             {/* Net Worth */}
-                                                            <div className="px-3 text-right text-[10px] font-black font-mono text-[#050505] dark:text-white privacy-sensitive">
+                                                            <div className="px-3 text-right text-[10px] font-black font-mono text-[#050505] privacy-sensitive">
                                                                 {an.netWorthUSD ? formatLargeMoney(an.netWorthUSD) : ''}
                                                             </div>
 
@@ -362,33 +362,33 @@ export function WatchlistTable() {
                                                             </div>
 
                                                             {/* Win Rate */}
-                                                            <div className={`px-3 text-right text-[10px] font-black font-mono ${(an.winRate ?? 0) > 65 ? 'text-[#00C076]' : 'text-[#888888] dark:text-[#AAAAAA]'}`}>
+                                                            <div className={`px-3 text-right text-[10px] font-black font-mono ${(an.winRate ?? 0) > 65 ? 'text-[#00C076]' : 'text-[#888888]'}`}>
                                                                 {an.winRate ? `${an.winRate}%` : ''}
                                                             </div>
 
                                                             {/* DEX Ratio */}
                                                             <div className="px-3 text-right">
                                                                 <div className="flex flex-col items-end gap-0.5">
-                                                                    <span className="text-[10px] font-bold font-mono text-[#050505] dark:text-white">{an.dexCexRatio ? `${(an.dexCexRatio * 100).toFixed(0)}% DEX` : ''}</span>
-                                                                    {an.topProtocol && <span className="text-[8px] text-[#888888] dark:text-[#AAAAAA]">{an.topProtocol}</span>}
+                                                                    <span className="text-[10px] font-bold font-mono text-[#050505]">{an.dexCexRatio ? `${(an.dexCexRatio * 100).toFixed(0)}% DEX` : ''}</span>
+                                                                    {an.topProtocol && <span className="text-[8px] text-[#888888]">{an.topProtocol}</span>}
                                                                 </div>
                                                             </div>
 
                                                             {/* Alpha Score */}
                                                             <div className="px-3 text-right">
-                                                                <span className={`text-[10px] font-black font-mono flex items-center justify-end gap-1 ${(an.alphaScore ?? 0) > 70 ? 'text-[#D4AF37]' : 'text-[#888888] dark:text-[#AAAAAA]'}`}>
+                                                                <span className={`text-[10px] font-black font-mono flex items-center justify-end gap-1 ${(an.alphaScore ?? 0) > 70 ? 'text-[#D4AF37]' : 'text-[#888888]'}`}>
                                                                     {an.alphaScore != null ? an.alphaScore : ''}
                                                                 </span>
                                                             </div>
 
                                                             {/* Last Active */}
-                                                            <div className="px-3 text-right text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA]">
+                                                            <div className="px-3 text-right text-[9px] font-mono text-[#888888]">
                                                                 {lastActive}
                                                             </div>
 
                                                             {/* Delete */}
                                                             <div className="px-3 flex justify-end">
-                                                                <button disabled className="p-1.5 text-[#E5E5E5] dark:text-white/10 transition-colors cursor-not-allowed">
+                                                                <button disabled className="p-1.5 text-[#E5E5E5] transition-colors cursor-not-allowed">
                                                                     DEL
                                                                 </button>
                                                             </div>
@@ -406,7 +406,7 @@ export function WatchlistTable() {
             )}
 
             {/*  Footer  */}
-            <div className="px-6 py-4 border-t border-[#E5E5E5] dark:border-white/10 bg-[#FFFFFF] dark:bg-[#111111] rounded-b-2xl flex items-center justify-between text-[9px] font-black text-[#888888] dark:text-white/60 uppercase tracking-widest">
+            <div className="px-6 py-4 border-t border-[#E5E5E5] bg-[#FFFFFF] rounded-b-2xl flex items-center justify-between text-[9px] font-black text-[#888888] uppercase tracking-widest">
                 <span>{view === 'TOKENS' ? tokensFiltered.length : walletsFiltered.length} items · Enriched with live on-chain market data</span>
             </div>
         </div>

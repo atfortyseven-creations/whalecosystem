@@ -20,11 +20,11 @@ export function WhaleSonar() {
         <motion.div 
             initial={{ x: 300, opacity: 0 }}
             animate={{ x: 0, opacity: 1 }}
-            className="absolute top-4 right-4 bottom-4 w-80 bg-white/90 dark:bg-[#0c0c0c]/80 backdrop-blur-2xl border border-[#E5E5E5] dark:border-white/10 rounded-2xl flex flex-col overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.1)] dark:shadow-[0_20px_40px_rgba(0,0,0,0.5)] z-40 p-4"
+            className="absolute top-4 right-4 bottom-4 w-80 bg-white/90  backdrop-blur-2xl border border-[#E5E5E5]  rounded-2xl flex flex-col overflow-hidden shadow-[0_20px_40px_rgba(0,0,0,0.1)]  z-40 p-4"
         >
-            <div className="flex items-center gap-3 border-b border-[#E5E5E5] dark:border-white/10 pb-4 mb-4">
+            <div className="flex items-center gap-3 border-b border-[#E5E5E5]  pb-4 mb-4">
                 <Target size={18} className="text-[var(--aztec-orchid)] animate-pulse" />
-                <h2 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505] dark:text-white">Whale Sonar</h2>
+                <h2 className="text-sm font-aztec-mono font-black uppercase tracking-[0.2em] text-[#050505] ">Whale Sonar</h2>
             </div>
 
             {/* Financial Health Metrics */}
@@ -43,13 +43,13 @@ export function WhaleSonar() {
                 />
                 
                 {/* Exposure Radar (Simple CSS Representation) */}
-                <div className="bg-[#FFFFFF] dark:bg-[#1a1a1a] rounded-xl p-4 border border-[#E5E5E5] dark:border-white/5">
-                    <div className="text-[10px] uppercase font-mono tracking-widest text-[#888888] dark:text-white/40 mb-3 flex items-center justify-between">
+                <div className="bg-[#FFFFFF]  rounded-xl p-4 border border-[#E5E5E5] ">
+                    <div className="text-[10px] uppercase font-mono tracking-widest text-[#888888]  mb-3 flex items-center justify-between">
                         <span>Exposure Radar</span>
                         <Zap size={10} className="text-[var(--aztec-orchid)]" />
                     </div>
                     {/* Concentric rings to simulate radar */}
-                    <div className="relative w-full aspect-square bg-white dark:bg-[#0c0c0c] rounded-full border border-[#E5E5E5] dark:border-white/10 flex items-center justify-center overflow-hidden">
+                    <div className="relative w-full aspect-square bg-white  rounded-full border border-[#E5E5E5]  flex items-center justify-center overflow-hidden">
                         <div className="absolute w-2/3 h-2/3 rounded-full border border-[var(--aztec-orchid)]/20" />
                         <div className="absolute w-1/3 h-1/3 rounded-full border border-[var(--aztec-orchid)]/40" />
                         <div className="w-1 h-1 bg-[var(--aztec-chartreuse)] rounded-full shadow-[0_0_10px_var(--aztec-chartreuse)]" />
@@ -82,7 +82,7 @@ export function WhaleSonar() {
 
             {/* Threat Feed */}
             <div className="flex-1 overflow-hidden flex flex-col">
-                <div className="text-[10px] uppercase font-mono tracking-widest text-[#888888] dark:text-white/40 mb-3">Enviroment Scans</div>
+                <div className="text-[10px] uppercase font-mono tracking-widest text-[#888888]  mb-3">Enviroment Scans</div>
                 <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
                     <AnimatePresence>
                         {alerts.map((alert, idx) => (
@@ -119,12 +119,12 @@ export function WhaleSonar() {
 
 function MetricBox({ title, value, icon, color }: { title: string, value: string, icon: React.ReactNode, color: string }) {
     return (
-        <div className="bg-[#FFFFFF] dark:bg-[#1a1a1a] p-4 rounded-xl border border-[#E5E5E5] dark:border-white/5 flex items-center justify-between">
+        <div className="bg-[#FFFFFF]  p-4 rounded-xl border border-[#E5E5E5]  flex items-center justify-between">
             <div>
-                <div className="text-[9px] uppercase font-mono tracking-widest text-[#888888] dark:text-white/40 mb-1">{title}</div>
+                <div className="text-[9px] uppercase font-mono tracking-widest text-[#888888]  mb-1">{title}</div>
                 <div className={`text-xl font-aztec-serif font-black ${color}`}>{value}</div>
             </div>
-            <div className="w-8 h-8 rounded-full bg-white dark:bg-[#0c0c0c] flex items-center justify-center border border-[#E5E5E5] dark:border-white/5">
+            <div className="w-8 h-8 rounded-full bg-white  flex items-center justify-center border border-[#E5E5E5] ">
                 {icon}
             </div>
         </div>

@@ -187,7 +187,7 @@ export default function InstitutionalLedger() {
     }, [blockNumber, publicClient]);
 
     return (
-        <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white dark:bg-[#050505] text-[#050505] dark:text-white font-mono overflow-y-auto no-scrollbar transition-colors">
+        <div className="w-full h-full min-h-0 flex flex-col p-4 md:p-8 bg-white  text-[#050505]  font-mono overflow-y-auto no-scrollbar transition-colors">
             
             {/* Primary Action Row */}
             <div className="w-full flex justify-end mb-4 flex-shrink-0 max-w-[1400px] mx-auto">
@@ -204,21 +204,21 @@ export default function InstitutionalLedger() {
                 <div className="w-full relative group">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
                         {isSearching
-                            ? <Loader2 size={18} className="text-[#050505] dark:text-white animate-spin" />
-                            : <Search size={18} className="text-[#888888] dark:text-[#AAAAAA] group-focus-within:text-[#050505] dark:group-focus-within:text-white transition-colors" />}
+                            ? <Loader2 size={18} className="text-[#050505]  animate-spin" />
+                            : <Search size={18} className="text-[#888888]  group-focus-within:text-[#050505]  transition-colors" />}
                     </div>
                     <input
                         type="text"
                         value={searchQuery}
                         onChange={(e) => setSearchQuery(e.target.value)}
                         onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-                        className="w-full bg-[#F9F9F9] dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 focus:border-[#050505] dark:focus:border-white text-[#050505] dark:text-white p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0] dark:placeholder:text-white/40 rounded-xl shadow-sm"
+                        className="w-full bg-[#F9F9F9]  border border-[#E5E5E5]  focus:border-[#050505]  text-[#050505]  p-5 pl-14 outline-none transition-all text-[11px] font-mono uppercase tracking-[0.1em] placeholder:text-[#A0A0A0]  rounded-xl shadow-sm"
                         placeholder="ADDRESS / TX HASH / ENS"
                     />
                     <button
                         onClick={handleSearch}
                         disabled={isSearching}
-                        className="absolute inset-y-2 right-2 bg-[#050505] dark:bg-white hover:bg-[#FFFFFF] dark:hover:bg-[#E5E5E5] text-white dark:text-black px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
+                        className="absolute inset-y-2 right-2 bg-[#050505]  hover:bg-[#FFFFFF]  text-white  px-8 font-bold text-[10px] uppercase tracking-widest transition-all disabled:opacity-50 disabled:cursor-not-allowed rounded-lg"
                     >
                         {isSearching ? 'INDEXING...' : 'INITIATE'}
                     </button>
@@ -226,17 +226,17 @@ export default function InstitutionalLedger() {
 
                 {/* Search Results / Errors */}
                 {searchError && (
-                    <div className="w-full mt-4 border border-[#050505]/20 dark:border-white/20 bg-[#F9F9F9] dark:bg-[#111111] p-5 rounded-xl flex items-center gap-4 text-[#050505] dark:text-white">
+                    <div className="w-full mt-4 border border-[#050505]/20  bg-[#F9F9F9]  p-5 rounded-xl flex items-center gap-4 text-[#050505] ">
                         <AlertCircle size={16} className="shrink-0" />
                         <span className="text-[10px] font-bold uppercase tracking-[0.1em]">{searchError}</span>
                     </div>
                 )}
 
                 {searchResults !== null && (
-                    <div className="w-full mt-4 border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
-                        <div className="flex items-center justify-between p-5 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
+                    <div className="w-full mt-4 border border-[#E5E5E5]  bg-[#F9F9F9]  rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
+                        <div className="flex items-center justify-between p-5 bg-[#E5E5E5]/50  border-b border-[#E5E5E5] ">
                             <div className="flex items-center gap-3">
-                                <Zap size={14} className="text-[#050505] dark:text-white" />
+                                <Zap size={14} className="text-[#050505] " />
                                 <h2 className="text-[10px] font-bold uppercase tracking-[0.1em]">QUERY RESULTS</h2>
                             </div>
                             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">
@@ -244,25 +244,25 @@ export default function InstitutionalLedger() {
                             </span>
                         </div>
                         {searchResults.length === 0 ? (
-                            <div className="p-10 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em]">
+                            <div className="p-10 text-center text-[10px] font-mono font-bold text-[#888888]  uppercase tracking-[0.2em]">
                                 No results found for "{searchQuery}"
                             </div>
                         ) : (
-                            <div className="flex flex-col divide-y divide-[#E5E5E5] dark:divide-white/10">
+                            <div className="flex flex-col divide-y divide-[#E5E5E5] ">
                                 {searchResults.map((result: any, i: number) => {
                                     const entity = result.node || result.n || result;
                                     const label = result.label || entity._labels?.[0] || 'Entity';
                                     const name = entity.name || entity.address || entity.symbol || entity.id || 'Unknown';
                                     return (
-                                        <div key={i} className="flex items-center justify-between p-5 hover:bg-white dark:hover:bg-[#1A1A1A] transition-colors group cursor-pointer">
+                                        <div key={i} className="flex items-center justify-between p-5 hover:bg-white  transition-colors group cursor-pointer">
                                             <div className="flex flex-col gap-1">
-                                                <span className="text-[13px] text-[#050505] dark:text-white font-mono font-bold group-hover:text-[#888888] dark:group-hover:text-white/60 transition-colors">{name}</span>
+                                                <span className="text-[13px] text-[#050505]  font-mono font-bold group-hover:text-[#888888]  transition-colors">{name}</span>
                                                 {entity.description && (
-                                                    <span className="text-[9px] text-[#888888] dark:text-[#AAAAAA] font-bold uppercase tracking-widest">{entity.description}</span>
+                                                    <span className="text-[9px] text-[#888888]  font-bold uppercase tracking-widest">{entity.description}</span>
                                                 )}
                                             </div>
                                             <div className="flex items-center gap-4">
-                                                <span className="px-2.5 py-1 bg-[#E5E5E5] dark:bg-white/10 text-[9px] font-black text-[#050505] dark:text-white rounded-md uppercase tracking-widest">{label}</span>
+                                                <span className="px-2.5 py-1 bg-[#E5E5E5]  text-[9px] font-black text-[#050505]  rounded-md uppercase tracking-widest">{label}</span>
                                                 <ChevronRight size={14} className="text-[#888888] group-hover:translate-x-1 transition-all" />
                                             </div>
                                         </div>
@@ -275,7 +275,7 @@ export default function InstitutionalLedger() {
             </div>
 
             {/* Global Stats */}
-            <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between mt-8 border-y border-[#E5E5E5] dark:border-white/10 py-6 overflow-x-auto no-scrollbar">
+            <div className="max-w-[1400px] mx-auto w-full flex items-center justify-between mt-8 border-y border-[#E5E5E5]  py-6 overflow-x-auto no-scrollbar">
                 {[
                     { label: 'Network TPS', val: globalStats.tps, unit: 'tx/s', format: (v: number) => v.toFixed(2) },
                     { label: 'Avg Base Fee', val: globalStats.avgGasPrice, unit: 'GWEI', format: (v: number) => v.toFixed(2) },
@@ -283,14 +283,14 @@ export default function InstitutionalLedger() {
                     { label: 'Session Volume', val: globalStats.totalEthMoved, unit: 'ETH', format: (v: number) => `${v.toFixed(1)} ETH` },
                 ].map((stat, i) => (
                     <div key={i} className="flex flex-col min-w-[140px]">
-                        <span className="text-[9px] font-black uppercase tracking-widest text-[#888888] dark:text-[#AAAAAA] mb-1">{stat.label}</span>
+                        <span className="text-[9px] font-black uppercase tracking-widest text-[#888888]  mb-1">{stat.label}</span>
                         <div className="flex items-end gap-1">
                             <AnimatedCounter 
                                 value={stat.val}
                                 format={stat.format}
-                                className="text-xl md:text-2xl font-bold font-mono tracking-tighter text-[#050505] dark:text-white leading-none"
+                                className="text-xl md:text-2xl font-bold font-mono tracking-tighter text-[#050505]  leading-none"
                             />
-                            <span className="text-[9px] text-[#A0A0A0] dark:text-[#AAAAAA] font-bold uppercase mb-[2px]">{stat.unit}</span>
+                            <span className="text-[9px] text-[#A0A0A0]  font-bold uppercase mb-[2px]">{stat.unit}</span>
                         </div>
                     </div>
                 ))}
@@ -299,17 +299,17 @@ export default function InstitutionalLedger() {
             {/* Main Data Grids */}
             <div className="max-w-[1400px] mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8 pb-10">
                 {/* BLOCKS PANEL */}
-                <div className="border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm">
-                    <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
+                <div className="border border-[#E5E5E5]  bg-[#F9F9F9]  rounded-2xl overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50  border-b border-[#E5E5E5] ">
                         <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 overflow-hidden flex items-center justify-center dark:invert"><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
-                            <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">BLOCK TELEMETRY</h2>
+                            <div className="w-5 h-5 overflow-hidden flex items-center justify-center "><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] ">BLOCK TELEMETRY</h2>
                         </div>
                         <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">LIVE STREAMING</span>
                     </div>
                     <div className="flex flex-col">
                         {blocks.length === 0 && (
-                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
+                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888]  uppercase tracking-[0.2em] animate-pulse">Establishing Peer Link...</div>
                         )}
                         <AnimatePresence>
                             {blocks.map((block) => (
@@ -320,27 +320,27 @@ export default function InstitutionalLedger() {
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ duration: 0.8 }}
                                     onClick={() => setSelectedBlock(block)}
-                                    className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-white dark:hover:bg-[#1A1A1A] transition-all gap-4 group"
+                                    className="w-full flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5]  hover:bg-white  transition-all gap-4 group"
                                 >
                                     <div className="flex items-center gap-4 relative z-10">
-                                        <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:bg-[#050505] dark:group-hover:bg-white group-hover:text-white dark:group-hover:text-black transition-all">
+                                        <div className="w-12 h-12 bg-white  rounded-xl flex items-center justify-center border border-[#E5E5E5]  group-hover:bg-[#050505]  group-hover:text-white  transition-all">
                                             <Box size={16} />
                                         </div>
                                         <div className="flex flex-col gap-1 text-left">
-                                            <span className="text-lg font-mono font-black text-[#050505] dark:text-white group-hover:text-[#888888] dark:group-hover:text-white/80 transition-colors">{block.id}</span>
-                                            <span className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center gap-2">
+                                            <span className="text-lg font-mono font-black text-[#050505]  group-hover:text-[#888888]  transition-colors">{block.id}</span>
+                                            <span className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center gap-2">
                                                 <Clock size={10} /> {block.age}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-1.5 sm:text-right relative z-10">
-                                        <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-2">
-                                            <ShieldCheck size={10} className="text-[#050505] dark:text-white" /> 
-                                            VALIDATOR: <span className="text-[#050505] dark:text-white font-bold">{block.miner}</span>
+                                        <div className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center sm:justify-end gap-2">
+                                            <ShieldCheck size={10} className="text-[#050505] " /> 
+                                            VALIDATOR: <span className="text-[#050505]  font-bold">{block.miner}</span>
                                         </div>
-                                        <div className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center sm:justify-end gap-3">
+                                        <div className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center sm:justify-end gap-3">
                                             <span>{block.txCount} TXS</span>
-                                            <span className="h-2 w-[1px] bg-[#E5E5E5] dark:bg-white/10" />
+                                            <span className="h-2 w-[1px] bg-[#E5E5E5] " />
                                             <span>{block.sizeKb}</span>
                                         </div>
                                     </div>
@@ -351,44 +351,44 @@ export default function InstitutionalLedger() {
                 </div>
 
                 {/* TRANSACTIONS PANEL */}
-                <div className="border border-[#E5E5E5] dark:border-white/10 bg-[#F9F9F9] dark:bg-[#111111] rounded-2xl overflow-hidden shadow-sm">
-                    <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50 dark:bg-white/5 border-b border-[#E5E5E5] dark:border-white/10">
+                <div className="border border-[#E5E5E5]  bg-[#F9F9F9]  rounded-2xl overflow-hidden shadow-sm">
+                    <div className="flex items-center justify-between p-6 bg-[#E5E5E5]/50  border-b border-[#E5E5E5] ">
                         <div className="flex items-center gap-3">
-                            <div className="w-5 h-5 overflow-hidden flex items-center justify-center dark:invert"><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
-                            <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">TRANSACTION FLOWS</h2>
+                            <div className="w-5 h-5 overflow-hidden flex items-center justify-center "><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
+                            <h2 className="text-[10px] font-bold uppercase tracking-[0.1em] text-[#050505] ">TRANSACTION FLOWS</h2>
                         </div>
                         <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">MEMPOOL MONITOR</span>
                     </div>
                     <div className="flex flex-col">
                         {transactions.length === 0 && (
-                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888] dark:text-[#AAAAAA] uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
+                            <div className="p-12 text-center text-[10px] font-mono font-bold text-[#888888]  uppercase tracking-[0.2em] animate-pulse">Syncing Mempool Hub...</div>
                         )}
                         {transactions.slice(0, 10).map((tx, i) => (
                             <button 
                                 key={tx.id} 
                                 onClick={() => setSelectedTx(tx)}
-                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5] dark:border-white/10 hover:bg-white dark:hover:bg-[#1A1A1A] transition-all gap-4 group text-left"
+                                className="flex flex-col sm:flex-row items-start sm:items-center justify-between p-6 border-b border-[#E5E5E5]  hover:bg-white  transition-all gap-4 group text-left"
                             >
                                 <div className="flex items-center gap-4 min-w-0">
-                                    <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] rounded-xl flex items-center justify-center border border-[#E5E5E5] dark:border-white/10 group-hover:border-[#050505] dark:group-hover:border-white transition-all shrink-0">
-                                        <AlignLeft size={16} className="text-[#888888] dark:text-[#AAAAAA] group-hover:text-[#050505] dark:group-hover:text-white" />
+                                    <div className="w-12 h-12 bg-white  rounded-xl flex items-center justify-center border border-[#E5E5E5]  group-hover:border-[#050505]  transition-all shrink-0">
+                                        <AlignLeft size={16} className="text-[#888888]  group-hover:text-[#050505] " />
                                     </div>
                                     <div className="flex flex-col gap-1 min-w-0">
-                                        <span className="text-[11px] font-mono font-bold text-[#050505] dark:text-white truncate group-hover:text-[#888888] dark:group-hover:text-white/80 transition-colors">{tx.hash.substring(0,6) + '...' + tx.hash.substring(60)}</span>
-                                        <span className="text-[9px] font-mono text-[#888888] dark:text-[#AAAAAA] uppercase tracking-widest flex items-center gap-2">
+                                        <span className="text-[11px] font-mono font-bold text-[#050505]  truncate group-hover:text-[#888888]  transition-colors">{tx.hash.substring(0,6) + '...' + tx.hash.substring(60)}</span>
+                                        <span className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center gap-2">
                                             <Clock size={10} /> {tx.time}
                                         </span>
                                     </div>
                                 </div>
                                 <div className="flex flex-col gap-2 sm:text-right mt-2 sm:mt-0">
                                     <div className="flex items-center sm:justify-end gap-2 text-[9px] font-mono font-bold text-[#888888] uppercase tracking-widest">
-                                        <span className="text-[#888888] dark:text-[#AAAAAA]">{tx.from.substring(0,6) + '...'}</span>
-                                        <span className="text-[#E5E5E5] dark:text-white/10"></span>
-                                        <span className="text-[#050505] dark:text-white">{tx.to.substring(0,6) + '...'}</span>
+                                        <span className="text-[#888888] ">{tx.from.substring(0,6) + '...'}</span>
+                                        <span className="text-[#E5E5E5] "></span>
+                                        <span className="text-[#050505] ">{tx.to.substring(0,6) + '...'}</span>
                                     </div>
                                     <div className="flex items-center sm:justify-end gap-3">
-                                        <span className="px-2 py-0.5 bg-white dark:bg-white/10 border border-[#E5E5E5] dark:border-white/10 text-[8px] font-black text-[#050505] dark:text-white rounded-md uppercase tracking-widest">{tx.type}</span>
-                                        <span className="text-sm font-mono font-black text-[#050505] dark:text-white tracking-tighter">{tx.valueEth.toFixed(4)} ETH</span>
+                                        <span className="px-2 py-0.5 bg-white  border border-[#E5E5E5]  text-[8px] font-black text-[#050505]  rounded-md uppercase tracking-widest">{tx.type}</span>
+                                        <span className="text-sm font-mono font-black text-[#050505]  tracking-tighter">{tx.valueEth.toFixed(4)} ETH</span>
                                     </div>
                                 </div>
                             </button>
@@ -404,27 +404,27 @@ export default function InstitutionalLedger() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90 dark:bg-black/90 backdrop-blur-md"
+                        className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-white/90  backdrop-blur-md"
                     >
                         <motion.div 
                             initial={{ scale: 0.95, y: 20 }}
                             animate={{ scale: 1, y: 0 }}
                             exit={{ scale: 0.95, y: 20 }}
-                            className="w-full max-w-2xl bg-[#F9F9F9] dark:bg-[#111111] border border-[#E5E5E5] dark:border-white/10 rounded-2xl shadow-xl overflow-hidden relative"
+                            className="w-full max-w-2xl bg-[#F9F9F9]  border border-[#E5E5E5]  rounded-2xl shadow-xl overflow-hidden relative"
                         >
                             <button 
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
-                                className="absolute top-6 right-6 w-8 h-8 rounded-lg flex items-center justify-center text-[#888888] dark:text-[#AAAAAA] hover:text-[#050505] dark:hover:text-white hover:bg-white dark:hover:bg-white/5 transition-all"
+                                className="absolute top-6 right-6 w-8 h-8 rounded-lg flex items-center justify-center text-[#888888]  hover:text-[#050505]  hover:bg-white  transition-all"
                             >
                                 <X size={18} />
                             </button>
                             <div className="p-8 md:p-10">
-                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] dark:border-white/10">
-                                    <div className="w-12 h-12 bg-white dark:bg-[#1A1A1A] border border-[#E5E5E5] dark:border-white/10 rounded-xl flex items-center justify-center shadow-sm">
-                                        <div className="w-6 h-6 overflow-hidden flex items-center justify-center dark:invert"><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
+                                <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] ">
+                                    <div className="w-12 h-12 bg-white  border border-[#E5E5E5]  rounded-xl flex items-center justify-center shadow-sm">
+                                        <div className="w-6 h-6 overflow-hidden flex items-center justify-center "><RemoteLottie path="/system-shots/block abstract.json" className="w-full h-full object-cover scale-[1.1]" loop={true} /></div>
                                     </div>
                                     <div className="flex flex-col gap-1">
-                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] dark:text-white">
+                                        <h3 className="text-xl font-bold uppercase tracking-[0.1em] text-[#050505] ">
                                             {selectedBlock ? 'BLOCK DETAILS' : 'TRANSACTION DETAILS'}
                                         </h3>
                                         <p className="text-[9px] text-[#A0A0A0] font-bold tracking-[0.2em] uppercase">Verified Execution Layer Data</p>
@@ -458,7 +458,7 @@ export default function InstitutionalLedger() {
                                         href={selectedBlock ? `https://etherscan.io/block/${selectedBlock.id}` : `https://etherscan.io/tx/${selectedTx?.hash}`}
                                         target="_blank"
                                         rel="noreferrer"
-                                        className="flex-1 py-3 bg-[#050505] dark:bg-white text-white dark:text-black rounded-lg font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#888888] dark:hover:bg-[#E5E5E5] transition-colors text-center"
+                                        className="flex-1 py-3 bg-[#050505]  text-white  rounded-lg font-bold uppercase tracking-[0.2em] text-[10px] hover:bg-[#888888]  transition-colors text-center"
                                     >
                                         VERIFY EXTERNALLY
                                     </a>
@@ -480,10 +480,10 @@ interface DetailRowProps {
 
 function DetailRow({ label, value, bold }: DetailRowProps) {
     return (
-        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] dark:border-white/10">
-            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] dark:text-[#AAAAAA]">{label}</span>
+        <div className="flex items-center justify-between py-4 border-b border-[#E5E5E5] ">
+            <span className="text-[9px] font-bold uppercase tracking-[0.1em] text-[#888888] ">{label}</span>
             <div className="flex items-center gap-3">
-                <span className={`text-[12px] font-mono text-[#050505] dark:text-white ${bold ? 'font-bold' : ''}`}>
+                <span className={`text-[12px] font-mono text-[#050505]  ${bold ? 'font-bold' : ''}`}>
                     {value ?? '—'}
                 </span>
             </div>

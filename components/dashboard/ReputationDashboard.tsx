@@ -12,19 +12,39 @@ export function ReputationDashboard() {
   const [hasCredential, setHasCredential] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // Restore reliable deterministic local state to ensure flawless rendering
+  // Real on-chain data fetch for Reputation Score calculation
   useEffect(() => {
-    if (!isConnected) {
+    if (!isConnected || !address) {
       setLoading(false);
       return;
     }
-    const timer = setTimeout(() => {
-      const mockScore = address ? (address.charCodeAt(2) * address.charCodeAt(3)) % 1000 : 0;
-      setScore(mockScore > 400 ? mockScore : 400);
-      setHasCredential(mockScore % 2 === 0);
-      setLoading(false);
-    }, 1200);
-    return () => clearTimeout(timer);
+    const fetchOnChainData = async () => {
+      try {
+        const res = await fetch(`/api/portfolio/chain-activity?address=${address}&type=txlist`, {
+            cache: 'no-store',
+            signal: AbortSignal.timeout(6000)
+        });
+        if (res.ok) {
+            const data = await res.json();
+            const txList = Array.isArray(data?.result) ? data.result : [];
+            const txCount = txList.length;
+            
+            // Base score is 300, max score is 999. Add 5 points per transaction.
+            const calculatedScore = Math.min(999, 300 + (txCount * 5));
+            setScore(calculatedScore);
+            setHasCredential(txCount > 5); // Verified if they have more than 5 txs
+        } else {
+            setScore(0);
+            setHasCredential(false);
+        }
+      } catch (e) {
+          setScore(0);
+          setHasCredential(false);
+      } finally {
+          setLoading(false);
+      }
+    };
+    fetchOnChainData();
   }, [isConnected, address]);
 
   const issueCredential = async () => {

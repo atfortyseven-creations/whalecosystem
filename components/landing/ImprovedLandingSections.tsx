@@ -184,8 +184,8 @@ export function DownloadCTASection() {
         <section className="relative w-full py-32 overflow-hidden">
             {/* Ultra High Quality Lines Background for Download Zone */}
             <div className="absolute inset-0 z-0 pointer-events-none">
-                <Image src="/ios-android-hq.jpg" alt="Waves Pattern" fill className="object-cover object-center opacity-30 dark:opacity-20 mix-blend-multiply dark:mix-blend-screen" quality={100} priority />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#FFFFFF] via-transparent to-[#FFFFFF] dark:from-[#050505] dark:via-transparent dark:to-[#050505]" />
+                <Image src="/ios-android-hq.jpg" alt="Waves Pattern" fill className="object-cover object-center opacity-30  mix-blend-multiply " quality={100} priority />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#FFFFFF] via-transparent to-[#FFFFFF]   " />
             </div>
             
             <div className="max-w-4xl mx-auto px-6 text-center relative z-10">

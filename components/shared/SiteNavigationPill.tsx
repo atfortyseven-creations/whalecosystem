@@ -39,7 +39,7 @@ export function SiteNavigationPill() {
                 <div className={`w-1.5 h-1.5 rounded-full ${pathname.startsWith('/status') ? 'bg-[var(--aztec-orchid)] animate-pulse' : 'bg-[var(--aztec-ink)]/40'}`} />
                 Status
             </Link>
-            <div className="w-px h-4 bg-black/5 dark:bg-white/10" />
+            <div className="w-px h-4 bg-black/5 " />
             <Link 
                 href="/dashboard" 
                 target="_blank"

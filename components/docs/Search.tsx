@@ -61,25 +61,25 @@ export function Search({ theme }: SearchProps) {
       {isOpen && (
         <div className="fixed inset-0 z-[999] flex items-start justify-center pt-[15vh] px-4 bg-black/40 backdrop-blur-sm" onClick={() => setIsOpen(false)}>
           <div 
-            className="w-full max-w-[600px] bg-white dark:bg-[#0A0A0A] border border-black/10 dark:border-white/10 shadow-2xl rounded-2xl overflow-hidden flex flex-col"
+            className="w-full max-w-[600px] bg-white  border border-black/10  shadow-2xl rounded-2xl overflow-hidden flex flex-col"
             onClick={e => e.stopPropagation()}
           >
-            <div className="flex items-center px-4 py-4 border-b border-black/5 dark:border-white/5">
-              <SearchIcon size={18} className="text-black/40 dark:text-white/40 mr-3" />
+            <div className="flex items-center px-4 py-4 border-b border-black/5 ">
+              <SearchIcon size={18} className="text-black/40  mr-3" />
               <input 
                 autoFocus
                 type="text" 
                 placeholder="Search documentation, API, Noir..." 
                 value={query}
                 onChange={e => setQuery(e.target.value)}
-                className="flex-1 bg-transparent border-none outline-none font-mono text-[14px] text-black dark:text-white placeholder:text-black/30 dark:placeholder:text-white/30"
+                className="flex-1 bg-transparent border-none outline-none font-mono text-[14px] text-black  placeholder:text-black/30 "
               />
-              <button onClick={() => setIsOpen(false)} className="text-[10px] font-mono uppercase tracking-widest text-black/40 dark:text-white/40 px-2 py-1 bg-black/5 dark:bg-white/5 rounded">ESC</button>
+              <button onClick={() => setIsOpen(false)} className="text-[10px] font-mono uppercase tracking-widest text-black/40  px-2 py-1 bg-black/5  rounded">ESC</button>
             </div>
             
             <div className="max-h-[400px] overflow-y-auto p-2">
               {DOCUMENTATION_INDEX.length === 0 ? (
-                <div className="p-8 text-center text-[12px] font-mono text-black/40 dark:text-white/40">
+                <div className="p-8 text-center text-[12px] font-mono text-black/40 ">
                   No ZK proofs found for "{query}"
                 </div>
               ) : (
@@ -87,13 +87,13 @@ export function Search({ theme }: SearchProps) {
                   <a 
                     key={i} 
                     href={res.href}
-                    className="flex items-center justify-between p-4 rounded-xl hover:bg-black/5 dark:hover:bg-white/5 transition-colors cursor-pointer"
+                    className="flex items-center justify-between p-4 rounded-xl hover:bg-black/5  transition-colors cursor-pointer"
                   >
                     <div>
-                      <h4 className="font-bold text-[14px] text-black dark:text-white mb-1">{res.title}</h4>
-                      <p className="font-mono text-[10px] text-black/50 dark:text-white/50 uppercase tracking-widest">{res.section}</p>
+                      <h4 className="font-bold text-[14px] text-black  mb-1">{res.title}</h4>
+                      <p className="font-mono text-[10px] text-black/50  uppercase tracking-widest">{res.section}</p>
                     </div>
-                    <Command size={14} className="text-black/20 dark:text-white/20" />
+                    <Command size={14} className="text-black/20 " />
                   </a>
                 ))
               )}

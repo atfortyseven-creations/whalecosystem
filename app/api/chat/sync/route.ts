@@ -1,71 +1,90 @@
 import { NextResponse } from 'next/server';
+import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
 
-import { safeRedisGet, safeRedisSet } from '@/lib/redis/client';
-
 const REDIS_KEY = 'global:gossip:messages';
+// Maximum messages retained in the gossip buffer per channel
+const MAX_GOSSIP_MESSAGES = 50;
 
-// In-memory message fallback for the legendary demo
-// In production, this uses Redis (Upstash) to bridge the gap between PC and Mobile wallets
-const DEFAULT_MESSAGES = [
-    { id: '1', sender: 'SYSTEM', content: 'Whale Alert Network Link Established.', timestamp: new Date(Date.now() - 50000).toISOString(), type: 'SYS' },
-    { id: '2', sender: 'WhaleHunter_7', content: 'Detected massive ETH movement to Coinbase. Anyone checking the BSV bridge?', timestamp: new Date(Date.now() - 20000).toISOString(), type: 'USER' }
-];
-
-async function getMessages() {
-    const data = await safeRedisGet(REDIS_KEY);
-    if (!data || data === 'TIMEOUT') {
-        return DEFAULT_MESSAGES;
-    }
+/**
+ * Returns the current message buffer from Redis.
+ * Returns an EMPTY array if Redis is unavailable — never injects fabricated messages.
+ * Simulated/hardcoded fallback messages are strictly prohibited.
+ */
+async function getMessages(): Promise<any[]> {
     try {
-        return JSON.parse(data);
+        const data = await safeRedisGet(REDIS_KEY);
+        if (!data || data === 'TIMEOUT') return [];
+        const parsed = JSON.parse(data);
+        return Array.isArray(parsed) ? parsed : [];
     } catch {
-        return DEFAULT_MESSAGES;
+        return [];
     }
 }
 
 /**
- * Private GOSSIP - DECENTRALIZED MESSAGE RELAY
- * --------------------------------------------
- * Handles system peer-to-peer communication simulation.
- * Messages are ephemeral and cryptographically signed.
+ * GET /api/chat/sync
+ * Retrieves the live gossip message buffer from Redis.
+ * Returns empty array if Redis is offline — no fallback fabrications.
  */
 export async function GET() {
     const messages = await getMessages();
     return NextResponse.json({ messages });
 }
 
+/**
+ * POST /api/chat/sync
+ * Accepts a real signed message from an authenticated wallet.
+ * Fields:
+ *   - sender   (string) : display name or truncated address
+ *   - content  (string) : message text (max 2000 chars)
+ *   - address  (string) : EVM wallet address (0x...)
+ *   - signature (string): EIP-191 signature of content, used for future verification
+ *   - type     (string) : 'USER' | 'SYS'
+ */
 export async function POST(request: Request) {
     try {
-        const { sender, content, signature, address, type = 'USER' } = await request.json();
+        const body = await request.json();
+        const { sender, content, signature, address, type = 'USER' } = body;
 
-        if (!content || !sender) {
-            return NextResponse.json({ error: 'Empty transmission detected.' }, { status: 400 });
+        // Input validation
+        if (!content || !content.trim()) {
+            return NextResponse.json({ error: 'Message content is required.' }, { status: 400 });
+        }
+        if (!sender || !sender.trim()) {
+            return NextResponse.json({ error: 'Sender identity is required.' }, { status: 400 });
+        }
+        if (content.trim().length > 2000) {
+            return NextResponse.json({ error: 'Message exceeds maximum length of 2000 characters.' }, { status: 400 });
+        }
+        // Address validation: must be a valid 0x EVM address if provided
+        if (address && !/^0x[0-9a-fA-F]{40}$/.test(address)) {
+            return NextResponse.json({ error: 'Invalid EVM address format.' }, { status: 400 });
         }
 
         const newMessage = {
-            id: `msg_${Date.now()}`,
-            sender,
-            content,
-            signature,
-            address,
+            id:        `msg_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`,
+            sender:    sender.trim(),
+            content:   content.trim(),
+            signature: signature || null,   // EIP-191 sig stored for audit; not yet enforced server-side
+            address:   address || null,     // Originating wallet address
             timestamp: new Date().toISOString(),
-            type
+            type:      type === 'SYS' ? 'SYS' : 'USER',
         };
 
-        const existingMessages = await getMessages();
+        const existing = await getMessages();
 
-        // Add to buffer and keep only last 50 messages
-        const updatedMessages = [newMessage, ...existingMessages].slice(0, 50);
-        
-        await safeRedisSet(REDIS_KEY, JSON.stringify(updatedMessages));
+        // Prepend and cap at MAX_GOSSIP_MESSAGES
+        const updated = [newMessage, ...existing].slice(0, MAX_GOSSIP_MESSAGES);
+
+        await safeRedisSet(REDIS_KEY, JSON.stringify(updated));
 
         return NextResponse.json({ success: true, message: newMessage });
 
     } catch (error: any) {
-        console.error('[Gossip-Relay] Error:', error);
-        return NextResponse.json({ error: 'Relay Failure' }, { status: 500 });
+        console.error('[Gossip-Relay] POST error:', error?.message || error);
+        return NextResponse.json({ error: 'Internal relay failure.' }, { status: 500 });
     }
 }

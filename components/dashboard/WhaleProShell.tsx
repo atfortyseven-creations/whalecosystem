@@ -80,7 +80,7 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
             className={`relative w-full flex items-center justify-between py-2.5 px-3 rounded-xl group select-none outline-none transition-all duration-300 active:scale-95 ${
                 isActive 
                     ? 'bg-[#050505] shadow-md border border-[#1A1A1A]' 
-                    : 'bg-transparent border border-transparent hover:bg-black/[0.04] dark:hover:bg-white/[0.04]'
+                    : 'bg-transparent border border-transparent hover:bg-black/[0.04] '
             } ${isLocked ? 'opacity-70 grayscale' : ''}`}
         >
             <div className="relative flex items-center w-full">
@@ -89,13 +89,13 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
                 )}
 
                 {item.icon && (
-                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#888888] group-hover:text-[#050505] dark:group-hover:text-white'}`}>
+                    <span className={`shrink-0 transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#888888] group-hover:text-[#050505] '}`}>
                         {item.icon}
                     </span>
                 )}
 
                 {!isCollapsed && (
-                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#555555] dark:text-[#AAAAAA] group-hover:text-[#050505] dark:group-hover:text-white'}`}>
+                    <span className={`text-[11px] font-black uppercase tracking-widest flex-1 text-left leading-none truncate transition-colors duration-300 ${isActive ? 'text-[#FFFFFF]' : 'text-[#555555]  group-hover:text-[#050505] '}`}>
                         {item.label}
                     </span>
                 )}
@@ -345,8 +345,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <div className="flex items-center gap-2.5 px-3 py-2">
                             <img src="/official-whale-monochrome.png" className="w-6 h-6 shrink-0" alt="WAN" />
                             <div className="flex flex-col leading-none">
-                                <span className="text-[11px] font-black uppercase tracking-tight text-[#050505] dark:text-white">Whale Alert</span>
-                                <span className="text-[11px] font-black uppercase tracking-tight text-[#050505] dark:text-white">Network</span>
+                                <span className="text-[11px] font-black uppercase tracking-tight text-[#050505] ">Whale Alert</span>
+                                <span className="text-[11px] font-black uppercase tracking-tight text-[#050505] ">Network</span>
                             </div>
                         </div>
                     </div>
@@ -381,7 +381,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 <div className="px-2 pb-3 pt-1 shrink-0">
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
-                        className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10 dark:border-white/10 text-[#888888] hover:text-black dark:hover:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-all"                    >
+                        className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10  text-[#888888] hover:text-black  hover:bg-black/5  transition-all"                    >
                         {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
                     </button>
                 </div>
@@ -394,7 +394,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 <header className="sticky top-0 border-b border-black/[0.07] bg-white/95 backdrop-blur-xl flex items-center justify-between px-6 z-40 shrink-0" style={{ minHeight: 'calc(56px + env(safe-area-inset-top, 0px))', paddingTop: 'env(safe-area-inset-top, 0px)' }}>
                     <button
                         onClick={() => setIsPaletteOpen(true)}
-                        className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08] dark:border-white/10 bg-white dark:bg-[#0A0A0A] hover:bg-black/[0.02] dark:hover:bg-white/5 hover:border-black/20 dark:hover:border-white/20 hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
+                        className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08]  bg-white  hover:bg-black/[0.02]  hover:border-black/20  hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
                     >
                         <Search size={12} className="text-[#AAAAAA] group-hover:text-[#555] transition-colors shrink-0" />
                         <span className="text-[10px] text-[#AAAAAA] group-hover:text-[#555] font-medium transition-colors hidden sm:block pr-1">Search</span>
@@ -422,7 +422,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         <div className="lg:hidden flex-1 flex justify-center mx-4 relative">
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center gap-2 px-4 py-2 bg-black/5 dark:bg-white/10 rounded-full text-[13px] font-semibold text-[#050505] dark:text-white active:scale-95 transition-transform"
+                                className="flex items-center gap-2 px-4 py-2 bg-black/5  rounded-full text-[13px] font-semibold text-[#050505]  active:scale-95 transition-transform"
                             >
                                 {SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label || 'Menu'}
                                 <ChevronDown size={12} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
@@ -434,7 +434,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="absolute top-full mt-2 w-[220px] bg-white dark:bg-[#111111] border border-black/10 dark:border-white/10 rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
+                                        className="absolute top-full mt-2 w-[220px] bg-white  border border-black/10  rounded-2xl shadow-2xl overflow-hidden z-50 flex flex-col py-2"
                                         style={{ willChange: 'transform, opacity' }}
                                     >
                                         {SIDEBAR_ITEMS.filter(item => !item.requiresZK || isZkVerified).map(item => (
@@ -446,8 +446,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                                 }}
                                                 className={`px-4 py-3 text-left text-[13px] font-semibold transition-colors ${
                                                     activeTab === item.id
-                                                        ? 'bg-black text-white dark:bg-white dark:text-black'
-                                                        : 'text-[#050505] dark:text-white/80 hover:bg-black/5 dark:hover:bg-white/10'
+                                                        ? 'bg-black text-white  '
+                                                        : 'text-[#050505]  hover:bg-black/5 '
                                                 }`}
                                             >
                                                 {item.label}
@@ -532,12 +532,12 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                     }}
                                     style={{ minHeight: 0, minWidth: 0 }}
                                     className={`relative flex flex-col items-center justify-center flex-1 h-full space-y-1 transition-colors ${
-                                        isActive ? 'text-black dark:text-white' : 'text-[#888888] hover:text-black dark:hover:text-white'
+                                        isActive ? 'text-black ' : 'text-[#888888] hover:text-black '
                                     }`}
                                 >
                                     {/* PERF-20: Active indicator pill  WCAG AA contrast */}
                                     {isActive && (
-                                        <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505] dark:bg-white" />
+                                        <span className="absolute top-1 left-1/2 -translate-x-1/2 w-5 h-[3px] rounded-full bg-[#050505] " />
                                     )}
                                     <span className={isActive ? 'scale-110 transition-transform' : 'transition-transform'}>
                                         {tab.icon}
@@ -647,17 +647,17 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                 >
                     {/* Header line handle */}
                     <div className="flex justify-center py-3">
-                        <div className="w-12 h-1 rounded-full bg-black/10 dark:bg-white/10" />
+                        <div className="w-12 h-1 rounded-full bg-black/10 " />
                     </div>
 
                     {/* Title */}
-                    <div className="px-6 pb-4 flex justify-between items-center border-b border-black/5 dark:border-white/5">
+                    <div className="px-6 pb-4 flex justify-between items-center border-b border-black/5 ">
                         <div>
-                            <h3 className="text-[16px] font-bold text-black dark:text-white">Navigation</h3>
-                            <p className="text-[12px] text-black/40 dark:text-white/40 mt-0.5">Choose a section</p>
+                            <h3 className="text-[16px] font-bold text-black ">Navigation</h3>
+                            <p className="text-[12px] text-black/40  mt-0.5">Choose a section</p>
                         </div>
-                        <button onClick={() => setIsMenuDrawerOpen(false)} className="w-7 h-7 rounded-full hover:bg-black/5 dark:hover:bg-white/5 flex items-center justify-center transition-colors">
-                            <span className="text-black/50 dark:text-white/50 text-[17px] leading-none font-light">×</span>
+                        <button onClick={() => setIsMenuDrawerOpen(false)} className="w-7 h-7 rounded-full hover:bg-black/5  flex items-center justify-center transition-colors">
+                            <span className="text-black/50  text-[17px] leading-none font-light">×</span>
                         </button>
                     </div>
 
@@ -679,12 +679,12 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                     }}
                                     className={`w-full flex items-center justify-between p-4 rounded-2xl transition-all ${
                                         isActive 
-                                            ? 'bg-black text-white dark:bg-white dark:text-black' 
-                                            : 'bg-black/[0.02] hover:bg-black/[0.05] dark:bg-white/[0.02] dark:hover:bg-white/[0.05] text-black dark:text-white'
+                                            ? 'bg-black text-white  ' 
+                                            : 'bg-black/[0.02] hover:bg-black/[0.05]   text-black '
                                     } disabled:opacity-40 disabled:cursor-not-allowed`}
                                 >
                                     <div className="flex items-center gap-3.5">
-                                        <div className={isActive ? 'text-white dark:text-black' : 'text-black/50 dark:text-white/50'}>
+                                        <div className={isActive ? 'text-white ' : 'text-black/50 '}>
                                             {item.icon}
                                         </div>
                                         <span className="text-[14px] font-medium">{item.label}</span>
