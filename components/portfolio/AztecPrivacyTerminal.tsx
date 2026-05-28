@@ -37,7 +37,7 @@ interface TerminalLog {
 // ─── Main Component ───────────────────────────────────────────────────────────
 
 export function AztecPrivacyTerminal({ onBack }: { onBack: () => void }) {
-  const { getConnectedWallet, address, privateKey, balance, activeNetwork } = useWalletStore();
+  const { address, privateKey, balance, activeNetwork } = useWalletStore();
   const [step, setStep] = useState<AztecStep>('OVERVIEW');
   const [isLoading, setIsLoading] = useState(false);
   const [logs, setLogs] = useState<TerminalLog[]>([]);
@@ -72,16 +72,15 @@ export function AztecPrivacyTerminal({ onBack }: { onBack: () => void }) {
 
   // Poll pending deposit balance
   const refreshPendingDeposit = useCallback(async () => {
-    if (!address) return;
+    if (!address || !privateKey) return;
     try {
-      const wallet = await getConnectedWallet();
-      if (!wallet?.provider) return;
-      const pending = await readAztecPendingDeposit(wallet.provider, address);
+      const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
+      const pending = await readAztecPendingDeposit(provider, address);
       setPendingDeposit(pending);
     } catch (e) {
       console.warn("Could not read pending deposit:", e);
     }
-  }, [address, getConnectedWallet]);
+  }, [address, privateKey]);
 
   useEffect(() => {
     refreshPendingDeposit();
@@ -161,8 +160,8 @@ export function AztecPrivacyTerminal({ onBack }: { onBack: () => void }) {
               className="p-6 md:p-10"
             >
               {step === 'OVERVIEW' && <OverviewPanel address={address} balance={balance} pendingDeposit={pendingDeposit} viewingKey={viewingKey} onDeposit={() => setStep('DEPOSIT')} />}
-              {step === 'DEPOSIT' && <DepositPanel log={log} getConnectedWallet={getConnectedWallet} onSuccess={(hash) => { setLastTx(hash); refreshPendingDeposit(); setStep('PENDING'); }} />}
-              {step === 'REGISTER' && <RegisterPanel log={log} getConnectedWallet={getConnectedWallet} />}
+              {step === 'DEPOSIT' && <DepositPanel log={log} privateKey={privateKey} onSuccess={(hash) => { setLastTx(hash); refreshPendingDeposit(); setStep('PENDING'); }} />}
+              {step === 'REGISTER' && <RegisterPanel log={log} privateKey={privateKey} />}
               {step === 'TRANSFER' && <PrivateTransferPanel log={log} privateKey={privateKey} />}
               {step === 'PENDING' && <PendingPanel pendingDeposit={pendingDeposit} lastTx={lastTx} onRefresh={refreshPendingDeposit} />}
             </motion.div>
@@ -254,17 +253,19 @@ function OverviewPanel({ address, balance, pendingDeposit, viewingKey, onDeposit
   );
 }
 
-function DepositPanel({ log, getConnectedWallet, onSuccess }: any) {
+function DepositPanel({ log, privateKey, onSuccess }: any) {
   const [amount, setAmount] = useState('');
   const [isBusy, setIsBusy] = useState(false);
 
   const execute = async () => {
     if (!amount || parseFloat(amount) <= 0) return toast.error("Enter an amount greater than 0");
+    if (!privateKey) return toast.error("Wallet not connected", { description: "Please create or import a wallet first." });
     setIsBusy(true);
     try {
-      log("Connecting to wallet...", 'INFO');
-      const wallet = await getConnectedWallet();
-      if (!wallet) throw new Error("Wallet not unlocked.");
+      log("Connecting to Ethereum mainnet via public RPC...", 'INFO');
+      const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
+      const wallet = new ethers.Wallet(privateKey, provider);
+      if (!wallet) throw new Error("Could not construct wallet from private key.");
 
       log("Deriving Aztec viewing key from private key...", 'ZK');
       const { viewingKeyPublic } = deriveAztecViewingKey(wallet.privateKey);
@@ -345,16 +346,18 @@ function DepositPanel({ log, getConnectedWallet, onSuccess }: any) {
   );
 }
 
-function RegisterPanel({ log, getConnectedWallet }: any) {
+function RegisterPanel({ log, privateKey }: any) {
   const [isBusy, setIsBusy] = useState(false);
   const [result, setResult] = useState<{ signature: string; viewingKey: string } | null>(null);
 
   const execute = async () => {
+    if (!privateKey) return toast.error("Wallet not connected", { description: "Please create or import a wallet first." });
     setIsBusy(true);
     try {
       log("Initiating EIP-712 Aztec account registration...", 'INFO');
-      const wallet = await getConnectedWallet();
-      if (!wallet) throw new Error("Wallet not unlocked.");
+      const provider = new ethers.JsonRpcProvider('https://eth.llamarpc.com');
+      const wallet = new ethers.Wallet(privateKey, provider);
+      if (!wallet) throw new Error("Could not construct wallet from private key.");
 
       log(`Signing registration payload for ${wallet.address.slice(0, 8)}...`, 'ZK');
       const reg = await signAztecAccountRegistration(wallet);

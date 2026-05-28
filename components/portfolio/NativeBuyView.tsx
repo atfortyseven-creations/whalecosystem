@@ -50,7 +50,7 @@ export function NativeBuyView({ address, onBack }: any) {
             // Construct the real, functional on-ramp URL
             const baseUrl = "https://buy.moonpay.com/";
             const params = new URLSearchParams({
-                apiKey: 'pk_live_Y33J3rW4tZ9Z8W3t3W3Z8W3t3W3Z8W3t', 
+                apiKey: 'pk_test_1234567890abcdef1234567890abcdef', 
                 currencyCode: cryptoCurrencyCode,
                 walletAddress: address || '',
                 baseCurrencyCode: 'usd',
@@ -60,9 +60,15 @@ export function NativeBuyView({ address, onBack }: any) {
                 showWalletAddressForm: 'true'
             });
             
-            const popup = window.open(`${baseUrl}?${params.toString()}`, 'moonpay_secure', 'width=450,height=750,left=200,top=100');
+            // Use window.open with _blank to avoid popup blockers when not strictly in a click handler
+            const moonpayWindow = window.open(`${baseUrl}?${params.toString()}`, '_blank');
+            if (!moonpayWindow) {
+                addLog(`Popup blocked by browser. Redirecting directly...`);
+                window.location.href = `${baseUrl}?${params.toString()}`;
+            } else {
+                addLog(`Terminal opened. Awaiting user interaction...`);
+            }
             
-            addLog(`Popup generated. Awaiting user interaction...`);
             toast.success("Terminal Ready", { id: "fiat-tx" });
 
             setIsPolling(true);
@@ -72,7 +78,7 @@ export function NativeBuyView({ address, onBack }: any) {
             let attempts = 0;
             const pollInterval = setInterval(() => {
                 attempts++;
-                if (popup?.closed) {
+                if (moonpayWindow?.closed) {
                     clearInterval(pollInterval);
                     setIsPolling(false);
                     addLog(`Terminal closed by user.`);
@@ -83,7 +89,7 @@ export function NativeBuyView({ address, onBack }: any) {
                     addLog(`Polling mempool for pending incoming transactions...`);
                 }
 
-                // Simulate successful deposit after 12 intervals (approx 24 seconds) if popup stays open
+                // Simulate successful deposit after 12 intervals (approx 24 seconds) if terminal stays open
                 if (attempts > 12) {
                     clearInterval(pollInterval);
                     setIsPolling(false);

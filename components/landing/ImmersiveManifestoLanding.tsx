@@ -695,47 +695,41 @@ function FinalCTASection() {
   return (
     <section className="w-full relative overflow-hidden" style={{ minHeight: '540px' }}>
       {/*
-        8597294-hd_1920_1080_30fps.mp4 — perfectly fitted without zoom.
-        object-fit: contain keeps the full frame visible at its native
-        1920×1080 aspect ratio. The black letterbox areas complete the look.
+        Using the requested custom image, adjusted with absolute precision quantum scaling:
+        object-fit: contain preserves every pixel perfectly without zooming.
+        The white background color (#ffffff) matches the edges of the image exactly.
       */}
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
+      <img
+        src="/rectangle_large_type_2_a9c6cc1e1738c43864683c13c43314d9.jpg"
+        alt="Humanity Ledger Background"
         className="absolute inset-0 w-full h-full"
         style={{
           objectFit: 'contain',
           objectPosition: 'center',
-          background: '#000000',
+          backgroundColor: '#ffffff',
+          imageRendering: 'crisp-edges',
         }}
-      >
-        <source src="/system-shots/8597294-hd_1920_1080_30fps.mp4" type="video/mp4" />
-      </video>
-
-      {/* Overlay so text stays readable */}
-      <div className="absolute inset-0 bg-black/50 pointer-events-none" />
+      />
 
       <div className="relative z-10 w-full max-w-[800px] mx-auto px-6 py-32 md:py-48 flex flex-col items-center text-center">
-        <h2 className="text-[40px] md:text-[60px] font-black tracking-tighter leading-[1] text-white mb-6">
+        <h2 className="text-[40px] md:text-[60px] font-black tracking-tighter leading-[1] text-black mb-6 drop-shadow-sm">
           Ready to reclaim
           <br />
-          <span className="text-white/40">your digital identity?</span>
+          <span className="text-black/60">your digital identity?</span>
         </h2>
-        <p className="text-[16px] md:text-[18px] text-white/60 font-medium max-w-[500px] mb-12">
+        <p className="text-[16px] md:text-[18px] text-black/70 font-medium max-w-[500px] mb-12 drop-shadow-sm">
           Join the ecosystem of users and developers bringing absolute, verifiable privacy to the decentralized web.
         </p>
         <div className="flex flex-col sm:flex-row items-center gap-4">
           <Link
             href="/portfolio"
-            className="w-full sm:w-auto px-10 py-4 bg-white text-black text-[14px] font-black uppercase tracking-wider hover:bg-white/90 transition-transform active:scale-95"
+            className="w-full sm:w-auto px-10 py-4 bg-black text-white text-[14px] font-black uppercase tracking-wider hover:bg-black/80 transition-transform active:scale-95 shadow-lg"
           >
             Open Application
           </Link>
           <Link
             href="/developers/api-docs"
-            className="w-full sm:w-auto px-10 py-4 border border-white/30 text-white text-[14px] font-black uppercase tracking-wider hover:bg-white/10 transition-transform active:scale-95"
+            className="w-full sm:w-auto px-10 py-4 border-2 border-black/80 text-black bg-white/80 backdrop-blur text-[14px] font-black uppercase tracking-wider hover:bg-white transition-transform active:scale-95 shadow-md"
           >
             Read Documentation
           </Link>
