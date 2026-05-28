@@ -108,7 +108,7 @@ export function useSystemSignOut() {
         console.log('%c[System] Session Purged. Redirecting...', 'color:#00A36C');
         window.location.replace('/');
 
-    }, [disconnect]);
+    }, [disconnectAsync]);
 
     return { nuclearDisconnect };
 }

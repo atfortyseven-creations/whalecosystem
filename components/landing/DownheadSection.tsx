@@ -22,8 +22,14 @@ export const DownheadSection = () => {
     >
       <DownheadCursor containerRef={containerRef} />
       
-      {/* Decorative Background Grid */}
-      <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: 'radial-gradient(#fff 1px, transparent 1px)', backgroundSize: '40px 40px' }} />
+      {/* Background Image Perfectly Adjusted */}
+      <img 
+        src="/rectangle_large_type_2_a9c6cc1e1738c43864683c13c43314d9.jpg"
+        alt="Substrate Core Background"
+        className="absolute inset-0 w-full h-full object-cover object-center opacity-40 mix-blend-screen"
+      />
+      {/* Overlay to ensure text readability */}
+      <div className="absolute inset-0 bg-gradient-to-r from-[#050505] via-[#050505]/90 to-transparent" />
 
       <div className="max-w-[2560px] mx-auto px-12 relative z-10 text-left">
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-24 items-center">

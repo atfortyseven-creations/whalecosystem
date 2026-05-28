@@ -422,10 +422,10 @@ export default function ConnectPage() {
       <img
         src="/system-shots/monochrome-illustration-science-fiction-arch-pixel-art-Devine-Lu-Linvega-2268380-wallhere.com (1).jpg"
         alt="Architecture Background"
-        className="absolute inset-0 z-0 w-full h-full pointer-events-none scale-[1.05] translate-x-[2%]"
+        className="absolute inset-0 z-0 w-full h-full pointer-events-none"
         style={{
           objectFit: 'cover',
-          objectPosition: 'center',
+          objectPosition: 'right top',
           opacity: 1,
         }}
       />
