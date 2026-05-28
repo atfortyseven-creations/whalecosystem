@@ -74,7 +74,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   }, [phase]);
 
   // --------------------------------------------------------
-  // PHASE: ZK & PROOFS (Simulated complex operations)
+  // PHASE: CORE PROOFS (Complex operations)
   // --------------------------------------------------------
   useEffect(() => {
     if (phase === "PROOFS") {
@@ -84,7 +84,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
         await new Promise(r => setTimeout(r, 800));
         
         if (!isSubscribed) return;
-        addLog("INFO", "Compiling ZK-SNARK circuits for identity abstraction.");
+        addLog("INFO", "Compiling circuits for identity abstraction.");
         await new Promise(r => setTimeout(r, 1200));
 
         if (!isSubscribed) return;
@@ -109,7 +109,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
         await new Promise(r => setTimeout(r, 800));
 
         if (!isSubscribed) return;
-        addLog("SYSTEM", "Quantum Vault Generation Complete. Awaiting user sealing.");
+        addLog("SYSTEM", "Core Vault Generation Complete. Awaiting user sealing.");
         await new Promise(r => setTimeout(r, 1000));
         
         setPhase("MNEMONIC_BACKUP");
@@ -192,7 +192,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
               <Shield size={16} className="text-white" />
             </div>
             <div>
-              <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-black">Quantum Vault</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-black">Core Vault</h2>
               <p className="text-[9px] text-black/40 uppercase tracking-widest font-mono">Initialization Core v3.0.0</p>
             </div>
           </div>
@@ -210,7 +210,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Phase 2</span>
                 {["MNEMONIC_BACKUP", "MNEMONIC_VERIFY", "VAULT_SEAL", "COMPLETE"].includes(phase) ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Cpu size={12} className="text-black/40" />}
               </div>
-              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">ZK Identity Synthesis</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Identity Synthesis</h3>
             </div>
             <div className={`p-4 border transition-colors ${["MNEMONIC_BACKUP", "MNEMONIC_VERIFY"].includes(phase) ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
@@ -243,7 +243,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
               <div className="w-16 h-16 border-2 border-black flex items-center justify-center mb-6">
                 <Shield size={24} className="text-black" />
               </div>
-              <h1 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Deploy Sovereign Identity</h1>
+              <h1 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Deploy Institutional Identity</h1>
               <p className="text-[12px] font-medium text-black/60 max-w-sm mb-12 leading-relaxed">
                 You are about to deploy a purely on-chain, cryptographic identity. The system will now gather organic entropy from your environment to seed the generation algorithm.
               </p>
@@ -284,7 +284,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 <div className="absolute inset-0 border-[4px] border-t-black border-r-black border-b-transparent border-l-transparent rounded-full animate-spin" />
                 <Hash size={32} className="text-black animate-pulse" />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-black mb-2">Executing ZK Logic</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-black mb-2">Executing Logic</h2>
               <p className="text-[10px] font-mono text-black/50 uppercase tracking-widest">Compiling circuits and deriving BIP-44 path...</p>
             </motion.div>
           )}
@@ -413,7 +413,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 <CheckCircle2 size={64} className="text-black" />
               </motion.div>
               <h2 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Vault Secured</h2>
-              <p className="text-[12px] font-mono text-black/50 uppercase tracking-widest">Routing connection to main portfolio matrix...</p>
+              <p className="text-[12px] font-mono text-black/50 uppercase tracking-widest">Routing connection to main portfolio registry...</p>
               <div className="mt-8 flex gap-1">
                 <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                 <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />

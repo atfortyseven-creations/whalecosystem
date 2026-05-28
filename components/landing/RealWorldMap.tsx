@@ -321,7 +321,7 @@ export const RealWorldMap = memo(function RealWorldMap({
               <div className="bg-[#f8f9fa] border border-black/5 rounded p-2 mb-2 flex items-center justify-between">
                 <span className="text-[8px] font-black text-black/40 uppercase tracking-widest">Indexed By</span>
                 <span className="text-[9px] font-black text-[#f38020] uppercase tracking-wider flex items-center gap-1">
-                  ☁️ CLOUDFLARE
+                  CLOUDFLARE
                 </span>
               </div>
 
