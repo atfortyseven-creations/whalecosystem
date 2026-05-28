@@ -158,12 +158,12 @@ export const RealWorldMap = memo(function RealWorldMap({
            backgroundColor: isDark ? "transparent" : "#fff"
         }}
       >
-        <ComposableMap
+          <ComposableMap
           projection="geoNaturalEarth1"
           projectionConfig={{ scale: 160, center: [0, 0] }}
           width={800}
           height={400}
-          style={{ width: "100%", height: "auto", display: "block" }}
+          style={{ width: "100%", height: "100%", maxHeight: "100%", display: "block" }}
         >
           <ZoomableGroup zoom={1}>
             <Geographies geography={GEO_URL}>

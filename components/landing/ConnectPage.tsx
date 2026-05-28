@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 import { useAccount, useConnect, useDisconnect, useSignMessage } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
 import { useUIStore } from "@/lib/store/ui-store";
@@ -45,14 +46,14 @@ const DESKTOP_WALLETS = [
   { id: "metamask", name: "MetaMask", badge: "Browser Extension", logo: "/wallets/metamask.svg", rdns: "io.metamask", installUrl: "https://metamask.io/download/", delay: 0 },
   { id: "coinbase", name: "Coinbase Wallet", badge: "Browser Extension", logo: "/wallets/coinbase.png", rdns: "com.coinbase.wallet", installUrl: "https://www.coinbase.com/wallet", delay: 0.08 },
   { id: "rainbow", name: "Rainbow", badge: "Browser Extension", logo: "/wallets/rainbow.png", rdns: "me.rainbow", installUrl: "https://rainbow.me/extension", delay: 0.16 },
-  { id: "humanity-ledger", name: "ACCEDER CON Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", rdns: null, installUrl: null, delay: 0.24 },
+  { id: "humanity-ledger", name: "Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", rdns: null, installUrl: null, delay: 0.24 },
 ];
 
 const MOBILE_WALLETS = [
   { id: "metamask-mobile", name: "MetaMask", badge: "Tap to open app", logo: "/wallets/metamask.svg", delay: 0 },
   { id: "coinbase-mobile", name: "Coinbase Wallet", badge: "Tap to open app", logo: "/wallets/coinbase.png", delay: 0.08 },
   { id: "rainbow-mobile", name: "Rainbow", badge: "Tap to open app", logo: "/wallets/rainbow.png", delay: 0.16 },
-  { id: "humanity-ledger-mobile", name: "ACCEDER CON Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", delay: 0.24 },
+  { id: "humanity-ledger-mobile", name: "Humanity Ledger", badge: "Native System Login", logo: "/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png", delay: 0.24 },
 ];
 
 function WalletButton({ logo, name, badge, onClick, loading = false, delay = 0, extraIcon }: {
@@ -93,6 +94,7 @@ function WalletButton({ logo, name, badge, onClick, loading = false, delay = 0, 
 }
 
 export default function ConnectPage() {
+  const router = useRouter();
   const isMobile = useIsMobile();
   const { isConnected, address } = useAccount();
   const { connect, connectors, isPending, isError, error } = useConnect();
@@ -380,7 +382,13 @@ export default function ConnectPage() {
 
   const handleDesktopWallet = useCallback((walletId: string, rdns: string | null, installUrl: string | null) => {
     if (walletId === "humanity-ledger") {
-        window.location.href = "/sign-up";
+        let hasAccount = false;
+        try {
+          hasAccount = !!localStorage.getItem("system_accounts") || 
+                       !!localStorage.getItem("system_keystore") || 
+                       !!localStorage.getItem("system_vault_v1");
+        } catch(e) {}
+        router.push(hasAccount ? "/login" : "/sign-up");
         return;
     }
     try { sessionStorage.removeItem("__disconnected__"); } catch {}
@@ -398,7 +406,13 @@ export default function ConnectPage() {
 
   const handleMobileWallet = useCallback((walletId: string) => {
     if (walletId === "humanity-ledger-mobile") {
-        window.location.href = "/sign-up";
+        let hasAccount = false;
+        try {
+          hasAccount = !!localStorage.getItem("system_accounts") || 
+                       !!localStorage.getItem("system_keystore") || 
+                       !!localStorage.getItem("system_vault_v1");
+        } catch(e) {}
+        router.push(hasAccount ? "/login" : "/sign-up");
         return;
     }
     try { sessionStorage.removeItem("__disconnected__"); } catch {}

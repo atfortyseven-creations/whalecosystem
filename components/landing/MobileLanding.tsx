@@ -6,7 +6,7 @@ import dynamic from "next/dynamic";
 import { ZKBiometricGate } from "@/components/security/ZKBiometricGate";
 import { AztecArchitectureSection } from "./AztecArchitectureSection";
 import { SystemFooter } from "./SystemFooter";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAccount, useConnect, useSignMessage, useDisconnect, useReconnect, useBalance, useEnsName } from "wagmi";
 import { useAppKit } from "@reown/appkit/react";
@@ -661,6 +661,7 @@ function ConnectedScreen({
 }
 //  Main Component 
 export function MobileLanding() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const sessionParam = searchParams?.get('session');
 
@@ -1381,11 +1382,19 @@ export function MobileLanding() {
                   {/* Humanity Ledger Native Login */}
                   <WalletOption
                     logo="/system-shots/connect/Gemini_Generated_Image_dzte5edzte5edzte (1).png"
-                    name="ACCEDER CON Humanity Ledger"
+                    name="Humanity Ledger"
                     badge="Native System Login"
                     loading={connecting === 'humanity-ledger'}
                     onClick={() => {
-                        window.location.href = "/sign-up";
+                        setConnecting('humanity-ledger');
+                        // Expert check: Route to login if a vault already exists, otherwise sign-up
+                        let hasAccount = false;
+                        try {
+                          hasAccount = !!localStorage.getItem("system_accounts") || 
+                                       !!localStorage.getItem("system_keystore") || 
+                                       !!localStorage.getItem("system_vault_v1");
+                        } catch(e) {}
+                        router.push(hasAccount ? "/login" : "/sign-up");
                     }}
                     delay={0.1}
                   />
