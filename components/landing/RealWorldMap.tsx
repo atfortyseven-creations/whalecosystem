@@ -11,19 +11,29 @@ import {
 const GEO_URL =
   "https://cdn.jsdelivr.net/npm/world-atlas@2/countries-110m.json";
 
-// Blue palette — monochrome institutional blue
-const ACTIVITY_COLORS = {
-  full:    "#0a2a6e", // High volume — deep navy
-  partial: "#1d4ed8", // Medium volume — strong blue
-  limited: "#93c5fd", // Low volume — light blue
-  none:    "#f4f4f4", // No activity
+// Extremely granular blue palette for Cloudflare global indexing
+const ACTIVITY_COLORS: Record<string, string> = {
+  tier1: "#00102a", // > 500k
+  tier2: "#042054", // > 100k
+  tier3: "#0a3a8e", // > 5k
+  tier4: "#1d4ed8", // > 1k
+  tier5: "#3b82f6", // > 500
+  tier6: "#60a5fa", // > 100
+  tier7: "#93c5fd", // > 10
+  tier8: "#dbeafe", // > 0
+  none:  "#f4f4f4", // No activity
 };
 
-const ACTIVITY_LABELS = {
-  full:    "High Volume",
-  partial: "Medium Volume",
-  limited: "Low Volume",
-  none:    "No Logins Yet",
+const ACTIVITY_LABELS: Record<string, string> = {
+  tier1: "Tier 1: >500k",
+  tier2: "Tier 2: >100k",
+  tier3: "Tier 3: >5k",
+  tier4: "Tier 4: >1k",
+  tier5: "Tier 5: >500",
+  tier6: "Tier 6: >100",
+  tier7: "Tier 7: >10",
+  tier8: "Tier 8: <10",
+  none:  "Unindexed Region",
 };
 
 // ── Real Cloudflare traffic data (last 15 days) ─────────────────────────────
@@ -114,23 +124,30 @@ const CLOUDFLARE_TRAFFIC: Record<string, number> = {
   UY:      2, // Uruguay
 };
 
-function getLevel(requests: number): "full" | "partial" | "limited" | "none" {
-  if (requests > 50000) return "full";
-  if (requests > 1000)  return "partial";
-  if (requests > 0)     return "limited";
+type TrafficLevel = "tier1" | "tier2" | "tier3" | "tier4" | "tier5" | "tier6" | "tier7" | "tier8" | "none";
+
+function getLevel(requests: number): TrafficLevel {
+  if (requests >= 500000) return "tier1";
+  if (requests >= 100000) return "tier2";
+  if (requests >= 5000)   return "tier3";
+  if (requests >= 1000)   return "tier4";
+  if (requests >= 500)    return "tier5";
+  if (requests >= 100)    return "tier6";
+  if (requests >= 10)     return "tier7";
+  if (requests > 0)       return "tier8";
   return "none";
 }
 
 interface CountryData {
   countryCode: string;
   connections: number;
-  level: "full" | "partial" | "limited" | "none";
+  level: TrafficLevel;
   lastActive: string;
 }
 
 interface CountryTooltip {
   name: string;
-  level: "full" | "partial" | "limited" | "none";
+  level: TrafficLevel;
   connections: number;
   lastActive?: string;
   x: number;
@@ -286,19 +303,25 @@ export const RealWorldMap = memo(function RealWorldMap({
               top: Math.max(tooltip.y - 10, 0),
             }}
           >
-            <div className="bg-white border border-black/15 shadow-xl rounded-lg p-3 w-[240px]">
+            <div className="bg-white border border-black/15 shadow-xl rounded-lg p-3 w-[260px]">
               <div className="flex items-center justify-between mb-2">
                 <span className="text-[13px] font-black text-black truncate pr-2">
                   {tooltip.name}
                 </span>
                 <span
-                  className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded"
+                  className="text-[9px] font-black uppercase tracking-widest px-1.5 py-0.5 rounded border border-black/10"
                   style={{
                     background: ACTIVITY_COLORS[tooltip.level],
-                    color: tooltip.level === "none" ? "#555" : "#fff",
+                    color: tooltip.level === "none" || tooltip.level === "tier8" || tooltip.level === "tier7" || tooltip.level === "tier6" ? "#000" : "#fff",
                   }}
                 >
                   {ACTIVITY_LABELS[tooltip.level]}
+                </span>
+              </div>
+              <div className="bg-[#f8f9fa] border border-black/5 rounded p-2 mb-2 flex items-center justify-between">
+                <span className="text-[8px] font-black text-black/40 uppercase tracking-widest">Indexed By</span>
+                <span className="text-[9px] font-black text-[#f38020] uppercase tracking-wider flex items-center gap-1">
+                  ☁️ CLOUDFLARE
                 </span>
               </div>
 
@@ -313,13 +336,13 @@ export const RealWorldMap = memo(function RealWorldMap({
                 </div>
                 <div>
                   <span className="text-[9px] font-bold text-black/40 uppercase tracking-wider block mb-0.5">
-                    Status
+                    Live Status
                   </span>
                   <span className="text-[11px] font-black text-black/70">
                     {tooltip.connections > 0 ? (
-                      <span className="flex items-center gap-1.5">
-                        <span className="w-1.5 h-1.5 rounded-full bg-[#1d4ed8] animate-pulse" />
-                        Active
+                      <span className="flex items-center gap-1.5 text-[#00C076]">
+                        <span className="w-1.5 h-1.5 rounded-full bg-[#00C076] animate-pulse" />
+                        LIVE TRAFFIC
                       </span>
                     ) : (
                       "Dormant"
@@ -343,10 +366,10 @@ export const RealWorldMap = memo(function RealWorldMap({
             Network Activity
           </span>
           <div className="flex flex-col gap-1.5">
-            {(["full", "partial", "limited", "none"] as const).map((level) => (
+            {(["tier1", "tier2", "tier3", "tier4", "tier5", "tier6", "tier7", "tier8", "none"] as const).map((level) => (
               <div key={level} className="flex items-center gap-2">
                 <div
-                  className="w-3 h-3 rounded-sm"
+                  className="w-3 h-3 rounded-sm border border-black/10"
                   style={{ background: ACTIVITY_COLORS[level] }}
                 />
                 <span className="text-[10px] font-medium text-black/70">
