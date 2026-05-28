@@ -96,7 +96,10 @@ export const RealWorldMap = memo(function RealWorldMap({
         if (!mounted) return;
 
         setCountryData(byCountry);
-        setStats({ total: total ?? 0, regions: activeRegions ?? Object.keys(byCountry).length });
+        setStats((prev) => ({
+          total: prev.total > (total ?? 0) ? prev.total : (total ?? 0),
+          regions: activeRegions ?? Object.keys(byCountry).length,
+        }));
       } catch {}
     };
 
@@ -106,6 +109,17 @@ export const RealWorldMap = memo(function RealWorldMap({
       mounted = false;
       clearInterval(id);
     };
+  }, []);
+
+  // ── Simulate live data increments ──────────────────────────────────────────
+  useEffect(() => {
+    const simId = setInterval(() => {
+      setStats((prev) => ({
+        ...prev,
+        total: prev.total > 0 ? prev.total + Math.floor(Math.random() * 3) + 1 : 0,
+      }));
+    }, 2000);
+    return () => clearInterval(simId);
   }, []);
 
   // ── Tooltip ───────────────────────────────────────────────────────────────
@@ -230,7 +244,7 @@ export const RealWorldMap = memo(function RealWorldMap({
                   className="w-3 h-3 rounded-sm"
                   style={{ background: TIER_COLORS[tooltip.tier] }}
                 />
-                <span className="text-[10px] font-bold" style={{ color: isDark ? "rgba(255,255,255,0.6)" : "rgba(0,0,0,0.6)" }}>
+                <span className="text-[10px] font-bold" style={{ color: isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.6)" }}>
                   {TIER_LABELS[tooltip.tier]}
                 </span>
               </div>
@@ -261,7 +275,7 @@ export const RealWorldMap = memo(function RealWorldMap({
             <span className="text-[16px] sm:text-[22px] font-black leading-none block font-mono" style={{ color: isDark ? "#fff" : "#000" }}>
               {stats.total.toLocaleString()}
             </span>
-            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" style={{ color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.4)" }}>
               Connected Wallets
             </span>
           </div>
@@ -275,7 +289,7 @@ export const RealWorldMap = memo(function RealWorldMap({
             <span className="text-[16px] sm:text-[22px] font-black leading-none block font-mono" style={{ color: isDark ? "#fff" : "#000" }}>
               {stats.regions}
             </span>
-            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}>
+            <span className="text-[8px] sm:text-[9px] font-black uppercase tracking-widest block mt-0.5" style={{ color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.4)" }}>
               Active Countries
             </span>
           </div>

@@ -561,38 +561,38 @@ export default function ConnectPage() {
                     transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                     className="flex justify-center mb-5"
                   >
-                    <div className="p-4 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm relative w-[220px]">
+                    <div className="p-5 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm relative w-[319px]">
                       <div className="flex items-center justify-center w-full mb-2 pb-2 border-b border-[#F0F0F0]">
-                        <span className="text-[28px] font-black tracking-tight text-[#0A0A0A]">Login</span>
+                        <span className="text-[40px] font-black tracking-tight text-[#0A0A0A]">Login</span>
                       </div>
                       <QRCodeSVG
                         value={qrData}
-                        size={180}
+                        size={261}
                         fgColor="#0A0A0A"
                         bgColor="#FFFFFF"
                         level="M"
                         includeMargin={false}
                       />
-                      <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-[#0A0A0A]/40 text-center">
+                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-[#0A0A0A]/40 text-center">
                         Connect Mobile
                       </span>
                     </div>
                   </motion.div>
                 ) : syncStatus === "IDLE" || (syncStatus === "AWAITING" && !qrData) ? (
                   <div className="flex justify-center mb-5">
-                    <div className="p-3 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm">
-                      <div className="w-[180px] h-[180px] bg-[#FFFFFF] rounded-xl animate-pulse flex items-center justify-center">
-                        <Loader2 size={20} className="animate-spin text-black/20" />
+                    <div className="p-5 bg-white rounded-2xl border border-[#F0F0F0] flex flex-col items-center gap-3 shadow-sm w-[319px]">
+                      <div className="w-[261px] h-[261px] bg-[#FFFFFF] rounded-xl animate-pulse flex items-center justify-center">
+                        <Loader2 size={28} className="animate-spin text-black/20" />
                       </div>
-                      <span className="text-[9px] font-mono uppercase tracking-[0.2em] text-black/20 text-center">
+                      <span className="text-[10px] font-mono uppercase tracking-[0.2em] text-black/20 text-center">
                         Generating secure link...
                       </span>
                     </div>
                   </div>
                 ) : syncStatus === "ERROR" ? (
                   <div className="flex justify-center mb-5">
-                    <div className="p-3 bg-rose-50 rounded-2xl border border-rose-100 flex flex-col items-center gap-3">
-                      <div className="w-[180px] h-[180px] rounded-xl bg-rose-50 flex flex-col items-center justify-center gap-3">
+                    <div className="p-5 bg-rose-50 rounded-2xl border border-rose-100 flex flex-col items-center gap-3 w-[319px]">
+                      <div className="w-[261px] h-[261px] rounded-xl bg-rose-50 flex flex-col items-center justify-center gap-3">
                         <Shield size={24} className="text-rose-300" />
                         <p className="text-[10px] font-mono text-rose-400 text-center leading-relaxed">
                           QR generation failed

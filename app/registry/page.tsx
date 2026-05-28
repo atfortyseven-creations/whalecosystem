@@ -614,7 +614,7 @@ export default function RegistryPage() {
           backdropFilter: "blur(20px)",
         }}
       >
-        <div className="w-full px-5 h-[52px] flex items-center justify-between gap-3">
+        <div className="w-full px-4 min-h-[52px] py-2 flex flex-wrap items-center justify-between gap-3 sm:py-0">
 
           {/* Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
@@ -630,7 +630,7 @@ export default function RegistryPage() {
               </span>
               <span
                 className="text-[11px] font-medium ml-1.5"
-                style={{ color: isDark ? "rgba(255,255,255,0.4)" : "rgba(0,0,0,0.4)" }}
+                style={{ color: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.4)" }}
               >
                 Explorer
               </span>
@@ -638,18 +638,18 @@ export default function RegistryPage() {
           </div>
 
           {/* Center Tabs */}
-          <nav className="flex items-center gap-0.5">
+          <nav className="flex flex-1 items-center justify-center gap-1 overflow-x-auto no-scrollbar px-2 max-w-full">
             {TABS.map((tab) => {
               const active = activeTab === tab.id;
               return (
                 <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150"
+                  className="flex flex-1 sm:flex-none justify-center items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold uppercase tracking-[0.08em] transition-all duration-150 whitespace-nowrap"
                   style={{
                     backgroundColor: active
                       ? isDark
-                        ? "rgba(255,255,255,0.1)"
+                        ? "rgba(255,255,255,0.15)"
                         : "rgba(0,0,0,0.08)"
                       : "transparent",
                     color: active
@@ -657,12 +657,12 @@ export default function RegistryPage() {
                         ? "#ffffff"
                         : "#0f172a"
                       : isDark
-                      ? "rgba(255,255,255,0.45)"
-                      : "rgba(0,0,0,0.45)",
+                      ? "rgba(255,255,255,0.85)"
+                      : "rgba(0,0,0,0.55)",
                   }}
                 >
                   {tab.icon}
-                  <span className="hidden md:inline">{tab.label}</span>
+                  <span>{tab.label}</span>
                 </button>
               );
             })}
@@ -735,7 +735,7 @@ export default function RegistryPage() {
                                 ? "#fff"
                                 : "#0f172a"
                               : isDark
-                              ? "rgba(255,255,255,0.5)"
+                              ? "rgba(255,255,255,0.9)"
                               : "rgba(0,0,0,0.5)",
                         }}
                       >
@@ -766,7 +766,7 @@ export default function RegistryPage() {
               {lastRefreshed && !loading && (
                 <span
                   className="text-[9px] font-mono hidden lg:block"
-                  style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}
+                  style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}
                 >
                   {timeAgo(lastRefreshed.toISOString())}
                 </span>
@@ -781,7 +781,7 @@ export default function RegistryPage() {
                     ? "1px solid rgba(255,255,255,0.1)"
                     : "1px solid rgba(0,0,0,0.1)",
                   backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#fff",
-                  color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)",
+                  color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.55)",
                 }}
               >
                 <RefreshCw
@@ -801,7 +801,7 @@ export default function RegistryPage() {
                   ? "1px solid rgba(255,255,255,0.1)"
                   : "1px solid rgba(0,0,0,0.1)",
                 backgroundColor: isDark ? "rgba(255,255,255,0.04)" : "#fff",
-                color: isDark ? "rgba(255,255,255,0.55)" : "rgba(0,0,0,0.55)",
+                color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.55)",
               }}
             >
               {isDark ? <Sun size={13} /> : <Moon size={13} />}
@@ -864,7 +864,7 @@ export default function RegistryPage() {
                   className="text-[12px] mt-0.5"
                   style={{
                     color: isDark
-                      ? "rgba(255,255,255,0.45)"
+                      ? "rgba(255,255,255,0.85)"
                       : "rgba(0,0,0,0.45)",
                   }}
                 >
@@ -901,7 +901,7 @@ export default function RegistryPage() {
                     className="text-[12px] mt-0.5"
                     style={{
                       color: isDark
-                        ? "rgba(255,255,255,0.45)"
+                        ? "rgba(255,255,255,0.85)"
                         : "rgba(0,0,0,0.45)",
                     }}
                   >
@@ -918,7 +918,7 @@ export default function RegistryPage() {
                     className="absolute left-3 top-1/2 -translate-y-1/2"
                     style={{
                       color: isDark
-                        ? "rgba(255,255,255,0.3)"
+                        ? "rgba(255,255,255,0.7)"
                         : "rgba(0,0,0,0.3)",
                     }}
                   />
@@ -979,7 +979,7 @@ export default function RegistryPage() {
                             }`}
                             style={{
                               color: isDark
-                                ? "rgba(255,255,255,0.35)"
+                                ? "rgba(255,255,255,0.75)"
                                 : "rgba(0,0,0,0.35)",
                             }}
                           >
@@ -1025,7 +1025,7 @@ export default function RegistryPage() {
                               className="px-5 py-20 text-center text-[12px]"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.35)"
+                                  ? "rgba(255,255,255,0.75)"
                                   : "rgba(0,0,0,0.35)",
                               }}
                             >
@@ -1096,7 +1096,7 @@ export default function RegistryPage() {
                                   className="opacity-0 group-hover:opacity-100 transition-opacity"
                                   style={{
                                     color: isDark
-                                      ? "rgba(255,255,255,0.3)"
+                                      ? "rgba(255,255,255,0.7)"
                                       : "rgba(0,0,0,0.3)",
                                   }}
                                 >
@@ -1125,7 +1125,7 @@ export default function RegistryPage() {
                                 className="text-[11px] font-mono"
                                 style={{
                                   color: isDark
-                                    ? "rgba(255,255,255,0.5)"
+                                    ? "rgba(255,255,255,0.9)"
                                     : "rgba(0,0,0,0.5)",
                                 }}
                               >
@@ -1180,7 +1180,7 @@ export default function RegistryPage() {
                                 className="text-[11px]"
                                 style={{
                                   color: isDark
-                                    ? "rgba(255,255,255,0.4)"
+                                    ? "rgba(255,255,255,0.8)"
                                     : "rgba(0,0,0,0.4)",
                                 }}
                               >
@@ -1220,7 +1220,7 @@ export default function RegistryPage() {
                       className="text-[11px]"
                       style={{
                         color: isDark
-                          ? "rgba(255,255,255,0.35)"
+                          ? "rgba(255,255,255,0.75)"
                           : "rgba(0,0,0,0.35)",
                       }}
                     >
@@ -1274,7 +1274,7 @@ export default function RegistryPage() {
                                     ? "#0f172a"
                                     : "#fff"
                                   : isDark
-                                  ? "rgba(255,255,255,0.5)"
+                                  ? "rgba(255,255,255,0.9)"
                                   : "rgba(0,0,0,0.5)",
                                 border: active
                                   ? "none"
@@ -1335,7 +1335,7 @@ export default function RegistryPage() {
                   className="text-[12px] mt-0.5"
                   style={{
                     color: isDark
-                      ? "rgba(255,255,255,0.45)"
+                      ? "rgba(255,255,255,0.85)"
                       : "rgba(0,0,0,0.45)",
                   }}
                 >
@@ -1417,7 +1417,7 @@ export default function RegistryPage() {
                             className="text-[10px] font-mono"
                             style={{
                               color: isDark
-                                ? "rgba(255,255,255,0.35)"
+                                ? "rgba(255,255,255,0.75)"
                                 : "rgba(0,0,0,0.35)",
                             }}
                           >
@@ -1431,7 +1431,7 @@ export default function RegistryPage() {
                             className="text-[9px] font-black uppercase tracking-[0.12em] mb-1"
                             style={{
                               color: isDark
-                                ? "rgba(255,255,255,0.3)"
+                                ? "rgba(255,255,255,0.7)"
                                 : "rgba(0,0,0,0.3)",
                             }}
                           >
@@ -1479,7 +1479,7 @@ export default function RegistryPage() {
                               className="text-[10px] font-mono break-all leading-relaxed"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.5)"
+                                  ? "rgba(255,255,255,0.9)"
                                   : "rgba(0,0,0,0.5)",
                               }}
                             >
@@ -1502,7 +1502,7 @@ export default function RegistryPage() {
                               className="text-[9px] font-black uppercase tracking-[0.1em]"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.3)"
+                                  ? "rgba(255,255,255,0.7)"
                                   : "rgba(0,0,0,0.3)",
                               }}
                             >
@@ -1520,7 +1520,7 @@ export default function RegistryPage() {
                               className="text-[9px] font-black uppercase tracking-[0.1em]"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.3)"
+                                  ? "rgba(255,255,255,0.7)"
                                   : "rgba(0,0,0,0.3)",
                               }}
                             >
@@ -1575,7 +1575,7 @@ export default function RegistryPage() {
                   </h1>
                   <p
                     className="text-[12px] mt-1 max-w-2xl"
-                    style={{ color: isDark ? "rgba(255,255,255,0.45)" : "rgba(0,0,0,0.45)" }}
+                    style={{ color: isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.45)" }}
                   >
                     Live on-chain SNARK proofs from{" "}
                     <strong style={{ color: "#1E69FF" }}>zkSync Era</strong> and{" "}
@@ -1640,7 +1640,7 @@ export default function RegistryPage() {
                 >
                   <Zap size={28} className="mx-auto mb-3"
                     style={{ color: isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)" }} />
-                  <p className="text-[12px]" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>
+                  <p className="text-[12px]" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.35)" }}>
                     ZK RPC nodes are unreachable — check your connection or try refreshing.
                   </p>
                   <button
@@ -1696,7 +1696,7 @@ export default function RegistryPage() {
                             </span>
                           )}
                         </div>
-                        <span className="text-[10px] font-mono" style={{ color: isDark ? "rgba(255,255,255,0.35)" : "rgba(0,0,0,0.35)" }}>
+                        <span className="text-[10px] font-mono" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.35)" }}>
                           {timeAgo(entry.timestamp)}
                         </span>
                       </div>
@@ -1705,7 +1705,7 @@ export default function RegistryPage() {
                       <div className="flex items-start gap-5 mb-4">
                         <div>
                           <div className="text-[9px] font-black uppercase tracking-[0.12em] mb-1"
-                            style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}>Block</div>
+                            style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}>Block</div>
                           <div className="text-[15px] font-black font-mono" style={{ color: isDark ? "#fff" : "#0f172a" }}>
                             #{entry.blockNumber.toLocaleString()}
                           </div>
@@ -1713,7 +1713,7 @@ export default function RegistryPage() {
                         {entry.l1BatchNumber !== null && (
                           <div>
                             <div className="text-[9px] font-black uppercase tracking-[0.12em] mb-1"
-                              style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}>L1 Batch</div>
+                              style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}>L1 Batch</div>
                             <div className="text-[13px] font-black font-mono" style={{ color: entry.color }}>
                               #{entry.l1BatchNumber.toLocaleString()}
                             </div>
@@ -1738,14 +1738,14 @@ export default function RegistryPage() {
                             <button
                               onClick={() => copyToClipboard(value || "–", label)}
                               className="opacity-40 hover:opacity-100 transition-opacity"
-                              style={{ color: isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)" }}
+                              style={{ color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.5)" }}
                             >
                               <Copy size={9} />
                             </button>
                           </div>
                           <span
                             className="text-[10px] font-mono break-all leading-relaxed"
-                            style={{ color: accent ? entry.color : isDark ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.5)" }}
+                            style={{ color: accent ? entry.color : isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.5)" }}
                           >
                             {value ? truncate(value, 18, 10) : "–"}
                           </span>
@@ -1760,7 +1760,7 @@ export default function RegistryPage() {
                         {/* Proof status — computed from real stateRoot presence */}
                         <div>
                           <div className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
-                            style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}>State</div>
+                            style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}>State</div>
                           <div
                             className="text-[11px] font-black font-mono flex items-center gap-1"
                             style={{ color: entry.proofVerified ? "#10b981" : "#f59e0b" }}
@@ -1772,14 +1772,14 @@ export default function RegistryPage() {
                         </div>
                         <div className="text-right">
                           <div className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
-                            style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}>Gas</div>
+                            style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}>Gas</div>
                           <div className="text-[13px] font-black font-mono" style={{ color: isDark ? "#fff" : "#0f172a" }}>
                             {entry.gasUsedPct.toFixed(1)}%
                           </div>
                         </div>
                         <div className="text-right">
                           <div className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
-                            style={{ color: isDark ? "rgba(255,255,255,0.3)" : "rgba(0,0,0,0.3)" }}>Txns</div>
+                            style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}>Txns</div>
                           <div className="text-[13px] font-black font-mono" style={{ color: isDark ? "#fff" : "#0f172a" }}>
                             {entry.txCount}
                           </div>
@@ -1824,7 +1824,7 @@ export default function RegistryPage() {
                   className="text-[12px] mt-0.5"
                   style={{
                     color: isDark
-                      ? "rgba(255,255,255,0.45)"
+                      ? "rgba(255,255,255,0.85)"
                       : "rgba(0,0,0,0.45)",
                   }}
                 >
@@ -1892,7 +1892,7 @@ export default function RegistryPage() {
                         className="text-[9px] font-black uppercase tracking-[0.12em]"
                         style={{
                           color: isDark
-                            ? "rgba(255,255,255,0.35)"
+                            ? "rgba(255,255,255,0.75)"
                             : "rgba(0,0,0,0.35)",
                         }}
                       >
@@ -1951,7 +1951,7 @@ export default function RegistryPage() {
                     className="text-[11px] font-black uppercase tracking-[0.12em]"
                     style={{
                       color: isDark
-                        ? "rgba(255,255,255,0.5)"
+                        ? "rgba(255,255,255,0.9)"
                         : "rgba(0,0,0,0.5)",
                     }}
                   >
@@ -2011,7 +2011,7 @@ export default function RegistryPage() {
                               className="text-[10px] font-mono"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.35)"
+                                  ? "rgba(255,255,255,0.75)"
                                   : "rgba(0,0,0,0.35)",
                               }}
                             >
@@ -2027,7 +2027,7 @@ export default function RegistryPage() {
                               className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.3)"
+                                  ? "rgba(255,255,255,0.7)"
                                   : "rgba(0,0,0,0.3)",
                               }}
                             >
@@ -2045,7 +2045,7 @@ export default function RegistryPage() {
                               className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.3)"
+                                  ? "rgba(255,255,255,0.7)"
                                   : "rgba(0,0,0,0.3)",
                               }}
                             >
@@ -2065,7 +2065,7 @@ export default function RegistryPage() {
                               className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
                               style={{
                                 color: isDark
-                                  ? "rgba(255,255,255,0.3)"
+                                  ? "rgba(255,255,255,0.7)"
                                   : "rgba(0,0,0,0.3)",
                               }}
                             >
@@ -2120,7 +2120,7 @@ export default function RegistryPage() {
                   className="text-[11px] font-black uppercase tracking-[0.12em] mb-5"
                   style={{
                     color: isDark
-                      ? "rgba(255,255,255,0.4)"
+                      ? "rgba(255,255,255,0.8)"
                       : "rgba(0,0,0,0.4)",
                   }}
                 >
@@ -2150,7 +2150,7 @@ export default function RegistryPage() {
                         className="text-[9px] font-black uppercase tracking-[0.1em] mb-1"
                         style={{
                           color: isDark
-                            ? "rgba(255,255,255,0.3)"
+                            ? "rgba(255,255,255,0.7)"
                             : "rgba(0,0,0,0.3)",
                         }}
                       >
