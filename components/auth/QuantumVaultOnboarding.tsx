@@ -8,7 +8,7 @@ import { TerminalExecutionLog } from "./TerminalExecutionLog";
 import { useWalletStore } from "@/lib/store/wallet-store";
 import { 
   Shield, Key, Lock, CheckCircle2, ChevronRight, Activity, Cpu, 
-  EyeOff, Eye, RefreshCw, Hash
+  EyeOff, Eye, RefreshCw, Hash, Wallet
 } from "lucide-react";
 
 type OnboardingPhase = 
@@ -27,6 +27,8 @@ interface LogEntry {
   message: string;
   hash?: string;
 }
+
+import Link from "next/link";
 
 export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void }) {
   const { createWallet, setupPassword, accounts, mnemonic } = useWalletStore();
@@ -80,24 +82,24 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
     if (phase === "PROOFS") {
       let isSubscribed = true;
       const runProofs = async () => {
-        addLog("SYSTEM", "Initializing Cryptographic Kernel...");
+        addLog("SYSTEM", "Setting up wallet...");
         await new Promise(r => setTimeout(r, 800));
         
         if (!isSubscribed) return;
-        addLog("INFO", "Compiling circuits for identity abstraction.");
+        addLog("INFO", "Generating secure keys...");
         await new Promise(r => setTimeout(r, 1200));
 
         if (!isSubscribed) return;
         const fakeHash1 = ethers.keccak256(ethers.toUtf8Bytes(Date.now().toString()));
-        addLog("SUCCESS", "Circuit compilation successful.", fakeHash1);
+        addLog("SUCCESS", "Keys generated successfully.", fakeHash1);
         await new Promise(r => setTimeout(r, 800));
 
         if (!isSubscribed) return;
-        addLog("INFO", "Generating EIP-712 structured data for local registry.");
+        addLog("INFO", "Preparing account structures...");
         await new Promise(r => setTimeout(r, 1000));
 
         if (!isSubscribed) return;
-        addLog("INFO", "Injecting entropy pool into BIP-39 deriver...");
+        addLog("INFO", "Creating secure backup phrase...");
         
         // ACTUAL WALLET GENERATION HAPPENS HERE
         createWallet();
@@ -105,11 +107,11 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
         await new Promise(r => setTimeout(r, 1500));
         if (!isSubscribed) return;
         
-        addLog("SUCCESS", "BIP-44 HD Path Derived: m/44'/60'/0'/0/0");
+        addLog("SUCCESS", "Wallet successfully generated.");
         await new Promise(r => setTimeout(r, 800));
 
         if (!isSubscribed) return;
-        addLog("SYSTEM", "Core Vault Generation Complete. Awaiting user sealing.");
+        addLog("SYSTEM", "Generation complete. Awaiting password.");
         await new Promise(r => setTimeout(r, 1000));
         
         setPhase("MNEMONIC_BACKUP");
@@ -148,7 +150,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
     }
     
     if (isValid) {
-      toast.success("Cryptographic Proof Verified", { description: "Seed phrase match confirmed." });
+      toast.success("Backup Verified", { description: "Seed phrase match confirmed." });
       setPhase("VAULT_SEAL");
     } else {
       toast.error("Verification Failed", { description: "One or more words are incorrect." });
@@ -168,7 +170,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
       return;
     }
 
-    addLog("SYSTEM", "Initializing AES-GCM-256 Memory Encryption...");
+    addLog("SYSTEM", "Encrypting your wallet...");
     setPhase("COMPLETE");
 
     // Give UI a moment to show complete, then setup password which encrypts it
@@ -182,49 +184,49 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   // RENDERERS
   // --------------------------------------------------------
   return (
-    <div className="w-full max-w-4xl mx-auto flex flex-col md:flex-row h-full min-h-[600px] border border-black/10 bg-white shadow-2xl relative overflow-hidden">
+    <div className="w-full h-full flex flex-col md:flex-row bg-white relative overflow-hidden">
       
       {/* LEFT PANEL - Terminal / Aesthetic Info */}
       <div className="w-full md:w-[40%] bg-[#fafafa] border-r border-black/10 p-8 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-3 mb-8">
             <div className="w-8 h-8 bg-black flex items-center justify-center">
-              <Shield size={16} className="text-white" />
+              <Wallet size={16} className="text-white" />
             </div>
             <div>
-              <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-black">Core Vault</h2>
-              <p className="text-[9px] text-black/40 uppercase tracking-widest font-mono">Initialization Core v3.0.0</p>
+              <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-black">Wallet Setup</h2>
+              <p className="text-[9px] text-black/40 uppercase tracking-widest font-mono">Account Creation</p>
             </div>
           </div>
 
           <div className="space-y-4">
             <div className={`p-4 border transition-colors ${phase === "ENTROPY" ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Phase 1</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 1</span>
                 {phase !== "INTRO" && phase !== "ENTROPY" ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Activity size={12} className="text-black/40" />}
               </div>
-              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Entropy Aggregation</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">System Setup</h3>
             </div>
             <div className={`p-4 border transition-colors ${phase === "PROOFS" ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Phase 2</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 2</span>
                 {["MNEMONIC_BACKUP", "MNEMONIC_VERIFY", "VAULT_SEAL", "COMPLETE"].includes(phase) ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Cpu size={12} className="text-black/40" />}
               </div>
-              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Identity Synthesis</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Wallet Generation</h3>
             </div>
             <div className={`p-4 border transition-colors ${["MNEMONIC_BACKUP", "MNEMONIC_VERIFY"].includes(phase) ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Phase 3</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 3</span>
                 {["VAULT_SEAL", "COMPLETE"].includes(phase) ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Key size={12} className="text-black/40" />}
               </div>
-              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Cryptographic Backup</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Secret Backup</h3>
             </div>
             <div className={`p-4 border transition-colors ${phase === "VAULT_SEAL" ? "border-black bg-black/5" : "border-black/10"}`}>
               <div className="flex items-center justify-between mb-2">
-                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Phase 4</span>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-black/60">Step 4</span>
                 {phase === "COMPLETE" ? <CheckCircle2 size={12} className="text-emerald-500" /> : <Lock size={12} className="text-black/40" />}
               </div>
-              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">AES-256 Sealing</h3>
+              <h3 className="text-[12px] font-black uppercase tracking-wider text-black">Secure Password</h3>
             </div>
           </div>
         </div>
@@ -241,25 +243,28 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
           {phase === "INTRO" && (
             <motion.div key="intro" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col items-center text-center">
               <div className="w-16 h-16 border-2 border-black flex items-center justify-center mb-6">
-                <Shield size={24} className="text-black" />
+                <Wallet size={24} className="text-black" />
               </div>
-              <h1 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Deploy Institutional Identity</h1>
+              <h1 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Create Your Account</h1>
+              <Link href="/login" className="mb-6 px-6 py-2 border-2 border-black text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors">
+                Login with Humanity Ledger
+              </Link>
               <p className="text-[12px] font-medium text-black/60 max-w-sm mb-12 leading-relaxed">
-                You are about to deploy a purely on-chain, cryptographic identity. The system will now gather organic entropy from your environment to seed the generation algorithm.
+                You are about to create your secure wallet. The system will gather random data to generate your account securely.
               </p>
               <button 
                 onClick={() => setPhase("ENTROPY")}
                 className="group relative px-8 py-4 bg-black text-white font-black text-[10px] uppercase tracking-[0.3em] overflow-hidden transition-transform active:scale-95"
               >
                 <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                <span className="relative z-10 flex items-center gap-2">Initialize Core <ChevronRight size={14} /></span>
+                <span className="relative z-10 flex items-center gap-2">Start Setup <ChevronRight size={14} /></span>
               </button>
             </motion.div>
           )}
 
           {phase === "ENTROPY" && (
             <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full">
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-black mb-12">Move cursor to generate entropy</h2>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-black mb-12">Move your cursor to generate random data</h2>
               
               <div className="w-full max-w-md bg-[#f4f4f4] h-2 mb-4 overflow-hidden">
                 <div className="h-full bg-black transition-all duration-100 ease-out" style={{ width: `${entropyProgress}%` }} />
@@ -284,8 +289,8 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 <div className="absolute inset-0 border-[4px] border-t-black border-r-black border-b-transparent border-l-transparent rounded-full animate-spin" />
                 <Hash size={32} className="text-black animate-pulse" />
               </div>
-              <h2 className="text-[14px] font-black uppercase tracking-widest text-black mb-2">Executing Logic</h2>
-              <p className="text-[10px] font-mono text-black/50 uppercase tracking-widest">Compiling circuits and deriving BIP-44 path...</p>
+              <h2 className="text-[14px] font-black uppercase tracking-widest text-black mb-2">Setting Up</h2>
+              <p className="text-[10px] font-mono text-black/50 uppercase tracking-widest">Generating your unique wallet address...</p>
             </motion.div>
           )}
 
@@ -363,8 +368,8 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 <div className="w-16 h-16 mx-auto border-2 border-black flex items-center justify-center mb-6 bg-black">
                   <Lock size={24} className="text-white" />
                 </div>
-                <h2 className="text-[20px] font-black uppercase tracking-widest text-black mb-2">Seal The Vault</h2>
-                <p className="text-[11px] font-bold text-black/60 uppercase tracking-widest">Create a local cryptographic password. This encrypts your session in the browser memory using AES-GCM-256.</p>
+                <h2 className="text-[20px] font-black uppercase tracking-widest text-black mb-2">Set a Password</h2>
+                <p className="text-[11px] font-bold text-black/60 uppercase tracking-widest">Create a local password to encrypt and protect your account.</p>
               </div>
 
               <div className="space-y-6 max-w-sm mx-auto mb-10">
@@ -396,7 +401,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                   onClick={sealVault}
                   className="px-8 py-4 bg-black text-white font-black text-[10px] uppercase tracking-[0.2em] hover:bg-black/90 transition-all flex items-center gap-2"
                 >
-                  <Lock size={12} /> Encrypt & Finalize
+                  <Lock size={12} /> Complete Setup
                 </button>
               </div>
             </motion.div>
@@ -412,8 +417,8 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
               >
                 <CheckCircle2 size={64} className="text-black" />
               </motion.div>
-              <h2 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Vault Secured</h2>
-              <p className="text-[12px] font-mono text-black/50 uppercase tracking-widest">Routing connection to main portfolio registry...</p>
+              <h2 className="text-[24px] font-black uppercase tracking-widest text-black mb-4">Account Created</h2>
+              <p className="text-[12px] font-mono text-black/50 uppercase tracking-widest">Redirecting to your dashboard...</p>
               <div className="mt-8 flex gap-1">
                 <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
                 <div className="w-1.5 h-1.5 bg-black rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />

@@ -31,10 +31,10 @@ export default function SignUpPage() {
     <div className="w-full h-[100dvh] flex flex-col items-center justify-center bg-[#fafafa] text-[#0A0A0A] overflow-hidden relative p-4">
       <Link href="/login" className="absolute top-6 left-6 z-50 flex items-center gap-2 text-black/40 hover:text-black transition-colors group px-4 py-2 bg-white/50 backdrop-blur-md rounded-full border border-black/10 shadow-sm">
         <ArrowLeft size={15} className="group-hover:-translate-x-0.5 transition-transform" />
-        <span className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold">Abort Connection</span>
+        <span className="font-mono text-[10px] uppercase tracking-[0.2em] font-bold">Go Back</span>
       </Link>
 
-      <div className="w-full max-w-5xl h-full max-h-[800px] flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         <QuantumVaultOnboarding onComplete={handleComplete} />
       </div>
     </div>

@@ -111,16 +111,6 @@ export const RealWorldMap = memo(function RealWorldMap({
     };
   }, []);
 
-  // ── Simulate live data increments ──────────────────────────────────────────
-  useEffect(() => {
-    const simId = setInterval(() => {
-      setStats((prev) => ({
-        ...prev,
-        total: prev.total > 0 ? prev.total + Math.floor(Math.random() * 3) + 1 : 0,
-      }));
-    }, 2000);
-    return () => clearInterval(simId);
-  }, []);
 
   // ── Tooltip ───────────────────────────────────────────────────────────────
   const handleMouseMove = useCallback(

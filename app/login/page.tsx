@@ -21,19 +21,12 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [accounts, setAccounts] = useState<SystemAccount[]>([]);
 
-  const { importWallet } = useWalletStore();
+  const { unlockVault, encryptedVault } = useWalletStore();
   const { activateSystemVault } = useSystemConnect();
 
   useEffect(() => {
     setMounted(true);
-    try {
-      const stored = localStorage.getItem("system_accounts");
-      if (stored) {
-        setAccounts(JSON.parse(stored));
-      }
-    } catch {}
   }, []);
 
   const handleRedirect = useCallback(() => {
@@ -65,92 +58,40 @@ export default function LoginPage() {
     await new Promise((r) => setTimeout(r, 60)); // Yield to render
 
     try {
-      let targetBlob = "";
-      let isLegacyVault = false;
-      let targetAccount = accounts.length > 0 ? accounts[0] : null;
-
-      if (targetAccount) {
-        targetBlob = targetAccount.encryptedBlob;
-        if (
-          targetAccount.id === "legacy-1" &&
-          !localStorage.getItem("system_keystore") &&
-          localStorage.getItem("system_vault_v1")
-        ) {
-          isLegacyVault = true;
-        }
-      } else {
-        const ks = localStorage.getItem("system_keystore");
-        const vault = localStorage.getItem("system_vault_v1");
-        if (ks) targetBlob = ks;
-        else if (vault) {
-          targetBlob = vault;
-          isLegacyVault = true;
-        }
-      }
-
-      if (!targetBlob && !isLegacyVault) {
+      if (!encryptedVault) {
         toast.error("No wallet found. Please sign up.");
         router.push("/sign-up");
         return;
       }
 
-      let pk: string | null = null;
-      let addr: string | null = null;
+      const success = unlockVault(password);
+      
+      if (success) {
+        const { privateKey, address } = useWalletStore.getState();
+        if (privateKey && address) {
+          try {
+            sessionStorage.setItem("portfolio_unlocked", "true");
+            sessionStorage.setItem("system_wallet_addr", address.toLowerCase());
+          } catch {}
 
-      if (!isLegacyVault) {
-        try {
-          const { plaintext, wasLegacy } = await tryDecryptAny(targetBlob, password);
-          let walletObj: any;
-          if (wasLegacy) {
-            walletObj = new ethers.Wallet(plaintext);
-          } else {
-            walletObj = ethers.Wallet.fromPhrase(plaintext);
+          try {
+            await activateSystemVault(privateKey, address);
+          } catch (vaultErr) {}
+
+          try {
+            await fetch('/api/auth/system-verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address })
+            });
+          } catch (e) {
+            console.error('System verify failed:', e);
           }
-          pk = walletObj.privateKey;
-          addr = walletObj.address;
-        } catch (err: any) {
-          toast.error("Incorrect password");
-          setLoading(false);
-          return;
+
+          handleRedirect();
+        } else {
+          toast.error("Decryption succeeded but wallet data missing.");
         }
-      } else {
-        const { readStoredVaultKey } = await import("@/hooks/useSystemConnect");
-        const vaultPk = await readStoredVaultKey();
-        if (!vaultPk) {
-          toast.error("Vault corrupted");
-          setLoading(false);
-          return;
-        }
-        const walletObj: any = new ethers.Wallet(vaultPk);
-        pk = walletObj.privateKey;
-        addr = walletObj.address;
-      }
-
-      if (pk && addr) {
-        importWallet(pk, "System Main");
-        try {
-          sessionStorage.setItem("portfolio_unlocked", "true");
-          sessionStorage.setItem("system_wallet_addr", addr.toLowerCase());
-        } catch {}
-
-        try {
-          await activateSystemVault(pk, addr);
-        } catch (vaultErr) {}
-
-        try {
-          await fetch('/api/auth/system-verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ address: addr })
-          });
-        } catch (e) {
-          console.error('System verify failed:', e);
-        }
-
-        toast.success("Login successful");
-        handleRedirect();
-      } else {
-        throw new Error("Unable to get private key");
       }
     } catch (err) {
       toast.error("Login failed");

@@ -51,6 +51,21 @@ export async function POST(req: Request) {
       }
       const sessionId = `sess_${Math.abs(hashVal).toString(36)}`;
 
+      // --- REAL-TIME CLOUDFLARE GEOLOCATION FOR NETWORK MAP ---
+      try {
+        const country = req.headers.get('cf-ipcountry') || req.headers.get('x-vercel-ip-country') || 'UNKNOWN';
+        if (country !== 'UNKNOWN') {
+            const { redisClient } = await import('@/lib/redis/client');
+            // Track unique visitors per country using the sessionId
+            const isNew = await (redisClient as any).sadd(`wc:unique_country_visitors:${country}`, sessionId).catch(() => 0);
+            if (isNew) {
+                await (redisClient as any).hincrby('wc:country', country, 1).catch(() => {});
+            }
+        }
+      } catch (e) {
+        // Silently ignore telemetry failures
+      }
+
       try {
         const newLog = await prisma.userSessionLog.create({
           data: {
