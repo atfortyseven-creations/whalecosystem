@@ -2,7 +2,6 @@
 
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Shield, Lock, Clock, Fingerprint, ChevronRight, CheckCircle2, AlertTriangle } from 'lucide-react';
 import { useLanguage } from '@/lib/i18n/LanguageContext';
 
 export default function SecurityVault() {
@@ -27,12 +26,9 @@ export default function SecurityVault() {
             >
                 {/* Background Pattern */}
                 <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] opacity-20" />
-                <div className="absolute top-0 right-0 w-96 h-96 bg-blue-600/20 rounded-full blur-[100px] -translate-y-1/2 translate-x-1/2" />
-
                 <div className="relative z-10 grid md:grid-cols-2 gap-8 items-center">
                     <div>
-                        <div className="flex items-center gap-3 text-blue-400 font-bold uppercase tracking-widest text-sm mb-4">
-                            <Shield size={20} />
+                        <div className="text-white/50 font-bold uppercase tracking-widest text-sm mb-4">
                             {t.vault.title}
                         </div>
                         <h2 className="text-4xl md:text-5xl font-black tracking-tight mb-4">
@@ -44,9 +40,9 @@ export default function SecurityVault() {
                     </div>
 
                     <div className="bg-white/10 backdrop-blur-md rounded-3xl p-6 border border-white/10 space-y-4">
-                        <StatusRow icon={<Lock size={18} className="text-green-400"/>} label={t.vault.activeProtection} value="Active" />
-                        <StatusRow icon={<Clock size={18} className="text-blue-400"/>} label={t.vault.timeLock} value="24 Hours" />
-                        <StatusRow icon={<Fingerprint size={18} className="text-purple-400"/>} label={t.vault.biometric} value="Required" />
+                        <StatusRow label={t.vault.activeProtection} value="Active" />
+                        <StatusRow label={t.vault.timeLock} value="24 Hours" />
+                        <StatusRow label={t.vault.biometric} value="Required" />
                     </div>
                 </div>
             </motion.div>
@@ -65,9 +61,6 @@ export default function SecurityVault() {
                         <div>
                             <h3 className="text-xl font-bold text-[#1F1F1F] mb-1">{t.vault.dailyLimit}</h3>
                             <p className="text-[#1F1F1F]/50 text-sm">Max transaction without 2FA</p>
-                        </div>
-                        <div className="bg-blue-100 p-2 rounded-xl text-blue-600">
-                            <Shield size={24} />
                         </div>
                     </div>
 
@@ -105,7 +98,6 @@ export default function SecurityVault() {
                     <h3 className="text-xl font-bold text-[#1F1F1F] mb-6">{t.vault.advancedSettings}</h3>
 
                     <ToggleRow 
-                        icon={<Clock size={20} />}
                         label={t.vault.timeLock}
                         desc="Delay withdrawals > $5k by 24h"
                         active={timeLockEnabled}
@@ -113,15 +105,13 @@ export default function SecurityVault() {
                     />
 
                     <ToggleRow 
-                        icon={<Fingerprint size={20} />}
                         label={t.vault.biometric}
                         desc="FaceID required for all logins"
                         active={biometricEnabled}
                         onToggle={() => setBiometricEnabled(!biometricEnabled)}
                     />
 
-                    <div className="bg-orange-50 p-4 rounded-2xl border border-orange-100 flex gap-3 text-orange-800 text-sm">
-                        <AlertTriangle size={18} className="shrink-0" />
+                    <div className="bg-black/5 p-4 rounded-2xl border border-black/10 flex gap-3 text-black/60 text-sm">
                         <p>Disabling these features will require a 24-hour cooling off period.</p>
                     </div>
                 </motion.div>
@@ -130,11 +120,10 @@ export default function SecurityVault() {
     );
 }
 
-function StatusRow({ icon, label, value }: { icon: any, label: string, value: string }) {
+function StatusRow({ label, value }: { label: string, value: string }) {
     return (
         <div className="flex items-center justify-between pb-3 border-b border-white/10 last:border-0 last:pb-0">
             <div className="flex items-center gap-3 text-white/70 font-medium">
-                {icon}
                 {label}
             </div>
             <div className="font-bold text-white">{value}</div>
@@ -142,13 +131,10 @@ function StatusRow({ icon, label, value }: { icon: any, label: string, value: st
     )
 }
 
-function ToggleRow({ icon, label, desc, active, onToggle }: { icon: any, label: string, desc: string, active: boolean, onToggle: () => void }) {
+function ToggleRow({ label, desc, active, onToggle }: { label: string, desc: string, active: boolean, onToggle: () => void }) {
     return (
         <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-                <div className={`p-3 rounded-xl ${active ? 'bg-[#1F1F1F] text-white' : 'bg-gray-100 text-gray-500'}`}>
-                    {icon}
-                </div>
                 <div>
                     <div className="font-bold text-[#1F1F1F]">{label}</div>
                     <div className="text-xs text-[#1F1F1F]/50 font-medium">{desc}</div>
@@ -156,7 +142,7 @@ function ToggleRow({ icon, label, desc, active, onToggle }: { icon: any, label: 
             </div>
             <button 
                 onClick={onToggle}
-                className={`w-14 h-8 rounded-full p-1 transition-colors ${active ? 'bg-green-500' : 'bg-gray-200'}`}
+                className={`w-14 h-8 rounded-full p-1 transition-colors ${active ? 'bg-black' : 'bg-gray-200'}`}
             >
                 <div className={`w-6 h-6 rounded-full bg-white shadow-sm transition-transform ${active ? 'translate-x-6' : 'translate-x-0'}`} />
             </button>

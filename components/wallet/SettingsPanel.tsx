@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { DollarSign, Globe, Smartphone, Bell, Shield, Moon, ChevronRight, Key, ShieldCheck, Loader2, LogOut } from 'lucide-react';
 import { WalletConnectSessions } from '@/components/wallet/WalletConnectSessions';
 import BiometricGuard from '@/components/wallet/BiometricGuard';
 import { startRegistration } from '@simplewebauthn/browser';
@@ -58,24 +57,21 @@ export default function SettingsPanel() {
       <h2 className="text-2xl font-black text-[#1F1F1F]">Settings</h2>
 
       {/* Preferences */}
-      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+      <section className="bg-white rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
         <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Preferences</h3>
         
         <div className="space-y-1">
           <SettingsInfoRow 
-            icon={<DollarSign size={20} />} 
             label="Currency" 
             value={currency} 
             onClick={() => setCurrency(currency === 'USD' ? 'EUR' : 'USD')} 
           />
           <SettingsInfoRow 
-            icon={<Globe size={20} />} 
             label="Language" 
             value={language} 
             onClick={() => {}} 
           />
           <SettingsInfoRow 
-            icon={<Moon size={20} />} 
             label="Theme" 
             value={theme} 
             onClick={() => setTheme(theme === 'Light' ? 'Dark' : 'Light')} 
@@ -90,12 +86,11 @@ export default function SettingsPanel() {
       </section>
 
       {/* Security */}
-      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+      <section className="bg-white rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
         <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Security</h3>
         
         <div className="space-y-1">
           <SettingsToggleRow 
-            icon={<Smartphone size={20} />} 
             label="Biometric Auth" 
             enabled={true} 
             onToggle={() => {}} 
@@ -106,24 +101,18 @@ export default function SettingsPanel() {
             className="w-full flex items-center justify-between p-3 hover:bg-white/50 rounded-xl transition-all group"
           >
             <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-[#1F1F1F]/5 rounded-xl flex items-center justify-center text-[#1F1F1F] group-hover:bg-[#1F1F1F] group-hover:text-[#EAEADF] transition-colors">
-                <Key size={20} />
-                </div>
                 <div className="text-left">
                     <div className="font-bold text-[#1F1F1F]">Add Passkey</div>
                     <div className="text-xs text-[#1F1F1F]/50">For passwordless login</div>
                 </div>
             </div>
             <div className="flex items-center gap-2 text-[#1F1F1F]/60">
-                {isRegisteringPasskey ? (
+                {isRegisteringPasskey && (
                     <div className="animate-spin rounded-full h-4 w-4 border-2 border-[#1F1F1F] border-t-transparent" />
-                ) : (
-                    <ChevronRight size={16} />
                 )}
             </div>
           </button>
           <SettingsToggleRow 
-            icon={<Shield size={20} />} 
             label="Auto-Lock Timer" 
             sublabel="5 Minutes"
             enabled={true} 
@@ -133,29 +122,24 @@ export default function SettingsPanel() {
       </section>
 
       {/* Privacy & Reputation */}
-      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+      <section className="bg-white rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
         <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Privacy & Reputation</h3>
         
         <div className="space-y-4">
-          <div className="p-4 bg-white rounded-2xl border border-[#1F1F1F]/5 shadow-sm flex items-center justify-between">
+          <div className="p-4 bg-white rounded-2xl border border-[#1F1F1F]/10 shadow-sm flex items-center justify-between">
             <div>
               <div className="text-xs font-black uppercase tracking-widest text-[#1F1F1F]/50 mb-1">Privacy Score</div>
-              <div className="text-3xl font-black text-green-600 font-mono">98/100</div>
-            </div>
-            <div className="w-16 h-16 rounded-full border-4 border-green-500/20 border-t-green-500 flex items-center justify-center">
-               <ShieldCheck size={24} className="text-green-500" />
+              <div className="text-3xl font-black text-black font-mono">98/100</div>
             </div>
           </div>
           
           <div className="space-y-1">
             <SettingsInfoRow 
-              icon={<Globe size={20} />} 
               label="What can people see about me?" 
               value="Only ZK Proofs" 
               onClick={() => {}} 
             />
             <SettingsToggleRow 
-              icon={<Shield size={20} />} 
               label="Allow ZK Reputation Queries" 
               sublabel="Used for forum entry"
               enabled={true} 
@@ -166,18 +150,16 @@ export default function SettingsPanel() {
       </section>
 
       {/* Notifications */}
-      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+      <section className="bg-white rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
         <h3 className="text-sm font-bold text-[#1F1F1F]/50 uppercase mb-4 tracking-wider">Notifications</h3>
         
         <div className="space-y-1">
           <SettingsToggleRow 
-            icon={<Bell size={20} />} 
             label="Transaction Alerts" 
             enabled={true} 
             onToggle={() => {}} 
           />
           <SettingsToggleRow 
-            icon={<DollarSign size={20} />} 
             label="Price Alerts" 
             enabled={false} 
             onToggle={() => {}} 
@@ -186,9 +168,9 @@ export default function SettingsPanel() {
       </section>
 
       {/* Advanced Security Zone */}
-      <section className="bg-[#EAEADF] rounded-3xl p-6 border-2 border-red-500/10">
-        <h3 className="text-sm font-bold text-red-600 uppercase mb-4 tracking-wider flex items-center gap-2">
-            <Shield size={16} /> Danger Zone
+      <section className="bg-white rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+        <h3 className="text-sm font-bold text-[#1F1F1F] uppercase mb-4 tracking-wider flex items-center gap-2">
+            Danger Zone
         </h3>
         
         {!showSecret ? (
@@ -199,7 +181,7 @@ export default function SettingsPanel() {
                     <p className="font-mono text-lg font-bold text-[#1F1F1F]">
                         abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about
                     </p>
-                    <p className="text-xs text-red-500 font-bold">
+                    <p className="text-xs text-black font-bold">
                         DO NOT SHARE THIS PHRASE WITH ANYONE.
                     </p>
                     <button 
@@ -214,8 +196,8 @@ export default function SettingsPanel() {
       </section>
 
       {/* Session Connection */}
-      <section className="bg-red-500/5 rounded-3xl p-6 border-2 border-red-500/10">
-        <h3 className="text-sm font-bold text-red-600 uppercase mb-4 tracking-wider">Session Connection</h3>
+      <section className="bg-white rounded-3xl p-6 border-2 border-[#1F1F1F]/10">
+        <h3 className="text-sm font-bold text-[#1F1F1F] uppercase mb-4 tracking-wider">Session Connection</h3>
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h4 className="font-bold text-[#1F1F1F]">Active System Session</h4>
@@ -223,9 +205,9 @@ export default function SettingsPanel() {
           </div>
           <button 
             onClick={nuclearDisconnect}
-            className="px-5 py-3 bg-red-500 hover:bg-red-600 text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-colors shadow-lg shadow-red-500/10 flex items-center justify-center gap-2"
+            className="px-5 py-3 bg-[#1F1F1F] hover:bg-black text-white rounded-2xl text-xs font-black uppercase tracking-wider transition-colors flex items-center justify-center gap-2"
           >
-            <LogOut size={14} /> Disconnect Session
+            Disconnect Session
           </button>
         </div>
       </section>
@@ -247,13 +229,13 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
     return (
         <div className="relative group">
             {/* Glassmorphism Container */}
-            <div className="bg-red-500/5 backdrop-blur-xl border border-red-500/10 rounded-2xl p-6 space-y-4 transition-all hover:bg-red-500/10">
+            <div className="bg-black/5 backdrop-blur-xl border border-black/10 rounded-2xl p-6 space-y-4 transition-all hover:bg-black/10">
                 <div className="flex flex-col gap-2">
-                    <label className="text-xs font-black text-red-600 uppercase tracking-widest">
+                    <label className="text-xs font-black text-black uppercase tracking-widest">
                         Protocol Verification
                     </label>
                     <p className="text-sm text-[#1F1F1F]/60">
-                        Type <span className="font-mono font-bold bg-white/50 px-1 rounded text-red-500">{correctPhrase}</span> to reveal your recovery phrase.
+                        Type <span className="font-mono font-bold bg-white/50 px-1 rounded text-black">{correctPhrase}</span> to reveal your recovery phrase.
                     </p>
                 </div>
 
@@ -263,18 +245,8 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         placeholder="Type verification phrase..."
-                        className="w-full px-4 py-3 bg-white/60 border-2 border-transparent focus:border-red-500/20 rounded-xl outline-none font-bold text-[#1F1F1F] placeholder:text-[#1F1F1F]/20 transition-all"
+                        className="w-full px-4 py-3 bg-white/60 border-2 border-transparent focus:border-black/20 rounded-xl outline-none font-bold text-[#1F1F1F] placeholder:text-[#1F1F1F]/20 transition-all"
                     />
-                    
-                    {isMatched && (
-                        <motion.div 
-                            initial={{ opacity: 0, scale: 0.9 }}
-                            animate={{ opacity: 1, scale: 1 }}
-                            className="absolute right-2 top-1/2 -translate-y-1/2 text-green-500"
-                        >
-                            <ShieldCheck size={20} />
-                        </motion.div>
-                    )}
                 </div>
 
                 <motion.button
@@ -286,7 +258,7 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
                     }}
                     className={`w-full h-12 rounded-xl font-bold flex items-center justify-center gap-2 transition-all overflow-hidden relative ${
                         isMatched 
-                        ? 'bg-red-500 text-white cursor-pointer shadow-lg shadow-red-500/20' 
+                        ? 'bg-black text-white cursor-pointer shadow-lg shadow-black/20' 
                         : 'bg-gray-200 text-gray-400 cursor-not-allowed'
                     }`}
                 >
@@ -301,7 +273,6 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
                      )}
                      
                      <span className="relative z-10 flex items-center gap-2">
-                        {isMatched ? <Key size={18} /> : <Shield size={18} />}
                         {isMatched ? 'Click to Reveal' : 'Locked'}
                      </span>
                 </motion.button>
@@ -310,30 +281,23 @@ function DangerZoneReveal({ onSuccess }: { onSuccess: () => void }) {
     );
 }
 
-function SettingsInfoRow({ icon, label, value, onClick }: any) {
+function SettingsInfoRow({ label, value, onClick }: any) {
   return (
     <button onClick={onClick} className="w-full flex items-center justify-between p-3 hover:bg-white/50 rounded-xl transition-all group">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#1F1F1F]/5 rounded-xl flex items-center justify-center text-[#1F1F1F] group-hover:bg-[#1F1F1F] group-hover:text-[#EAEADF] transition-colors">
-          {icon}
-        </div>
         <span className="font-bold text-[#1F1F1F]">{label}</span>
       </div>
       <div className="flex items-center gap-2 text-[#1F1F1F]/60">
         <span className="text-sm">{value}</span>
-        <ChevronRight size={16} />
       </div>
     </button>
   );
 }
 
-function SettingsToggleRow({ icon, label, sublabel, enabled, onToggle }: any) {
+function SettingsToggleRow({ label, sublabel, enabled, onToggle }: any) {
   return (
     <div className="flex items-center justify-between p-3">
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-[#1F1F1F]/5 rounded-xl flex items-center justify-center text-[#1F1F1F]">
-          {icon}
-        </div>
         <div className="text-left">
           <div className="font-bold text-[#1F1F1F]">{label}</div>
           {sublabel && <div className="text-xs text-[#1F1F1F]/50">{sublabel}</div>}
@@ -346,7 +310,7 @@ function SettingsToggleRow({ icon, label, sublabel, enabled, onToggle }: any) {
           enabled ? 'bg-[#1F1F1F]' : 'bg-[#1F1F1F]/20'
         }`}
       >
-        <div className={`w-5 h-5 bg-[#EAEADF] rounded-full shadow-sm transition-all ${
+        <div className={`w-5 h-5 bg-white rounded-full shadow-sm transition-all ${
           enabled ? 'translate-x-5' : 'translate-x-0'
         }`} />
       </button>

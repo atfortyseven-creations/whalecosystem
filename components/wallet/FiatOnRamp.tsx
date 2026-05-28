@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { CreditCard, ExternalLink, RefreshCw, AlertCircle } from 'lucide-react';
 import { getMoonPayUrl } from '@/lib/wallet/fiat';
-import { useAccount } from 'wagmi';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 export default function FiatOnRamp() {
   const [amount, setAmount] = useState('10');
@@ -14,7 +14,7 @@ export default function FiatOnRamp() {
   const [isLoadingPrices, setIsLoadingPrices] = useState(true);
 
   // [PRODUCTION FIX] Use real connected wallet address instead of null address
-  const { address } = useAccount();
+  const { address } = useWalletStore();
   const walletAddress = address || '';
 
   // [PRODUCTION FIX] Fetch real-time prices instead of hardcoded values

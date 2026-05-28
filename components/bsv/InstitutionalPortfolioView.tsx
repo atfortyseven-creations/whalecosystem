@@ -30,6 +30,8 @@ import { TransactionManagerView } from '@/components/portfolio/TransactionManage
 import { HDAccountManager } from '@/components/portfolio/HDAccountManager';
 import { SmartAccountTerminal } from '@/components/portfolio/SmartAccountTerminal';
 import { OmnichainBridgeView } from '@/components/portfolio/OmnichainBridgeView';
+import { TransactionHistory } from '@/components/portfolio/TransactionHistory';
+import { QuantumDeFiPositions } from '@/components/portfolio/QuantumDeFiPositions';
 
 // Original minimalist VaultUnlockScreen (internal)
 function VaultUnlockScreen({ unlockVault }: { unlockVault: (pwd: string) => boolean }) {
