@@ -30,11 +30,11 @@ const ACTIVITY_LABELS = {
 // Source: Cloudflare Analytics — 78 countries, 743k requests, 11.5k visits
 // ISO-2 codes mapped to request volume
 const CLOUDFLARE_TRAFFIC: Record<string, number> = {
-  ES: 598740, // Spain
-  US: 109210, // United States
-  NL:   5980, // Netherlands
-  PE:   4900, // Peru
-  CA:   3490, // Canada
+  ES: 597445, // Spain       — confirmed Cloudflare (30d)
+  US: 109122, // United States — confirmed Cloudflare (30d)
+  NL:   6075, // Netherlands  — confirmed Cloudflare (30d)
+  PE:   4925, // Peru         — confirmed Cloudflare (30d)
+  CA:   3486, // Canada       — confirmed Cloudflare (30d)
   SG:   2300, // Singapore
   PT:   1940, // Portugal
   GB:   1680, // United Kingdom

@@ -171,34 +171,23 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
             )}
             <header className="flex flex-col md:flex-row md:items-center justify-between px-4 md:px-8 py-6 gap-6 md:gap-0 border-b border-black/10 dark:border-white/10 bg-white dark:bg-[#050505] relative z-10 shadow-none transition-colors">
                 <div className="flex flex-col gap-1 w-full md:w-1/3">
-                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 dark:text-white/40 flex items-center gap-2">
-                        <span className="w-1.5 h-1.5 bg-green-500 animate-pulse block"></span> 
+                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/40 dark:text-white/40">
                         NETWORK CONNECTION
                     </span>
                     <button onClick={onNetworkClick} className="flex items-center gap-2 hover:opacity-70 transition-opacity mt-1">
                         <span className="text-[14px] uppercase tracking-widest font-black text-black dark:text-white">{address ? networkInfo.name : 'OFFLINE'}</span>
                         {feeData?.formatted?.gasPrice && (
-                            <span className="text-[9px] font-mono text-[#00C076] ml-2 px-1.5 py-0.5 border border-[#00C076]/30 bg-[#00C076]/10 rounded flex items-center gap-1 shadow-[0_0_10px_rgba(0,192,118,0.2)]">
+                            <span className="text-[9px] font-mono text-black/50 dark:text-white/50 ml-2 px-1.5 py-0.5 border border-black/15 dark:border-white/15 rounded">
                                 {parseFloat(feeData.formatted.gasPrice).toFixed(1)} GWEI
                             </span>
                         )}
                     </button>
-                    <div className="flex items-center gap-4 mt-2">
-                        <div className="text-[8px] font-mono text-black/40 dark:text-white/40 tracking-widest uppercase">
-                             MEMPOOL LATENCY: {(Math.random() * 80 + 20).toFixed(1)} ms
-                        </div>
-                        <div className="text-[8px] font-mono text-black/40 dark:text-white/40 tracking-widest uppercase">
-                            BLOCK HEIGHT: {Math.floor(Date.now()/15000)}
-                        </div>
-                    </div>
                 </div>
 
                 <div className="flex flex-col items-start md:items-center justify-center w-full md:w-1/3">
-                    <div className="h-8 w-full max-w-[280px] md:w-64 bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 rounded-full flex items-center px-4 overflow-hidden relative">
-                        <div className="absolute top-0 left-0 h-full bg-black/10 dark:bg-white/10" style={{ width: `${Math.random() * 100}%`, transition: 'width 1s linear' }}></div>
-                        <span className="text-[8px] font-black tracking-[0.2em] uppercase text-black/50 dark:text-white/50 relative z-10">L1/L2 MEMPOOL SYNC</span>
-                        <span className="text-[8px] font-mono text-black dark:text-white ml-auto relative z-10">{Math.random().toFixed(2)} ms</span>
-                    </div>
+                    <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/30 dark:text-white/30">
+                        HUMANITY LEDGER
+                    </span>
                 </div>
 
                 {address && (
@@ -230,12 +219,8 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3 md:gap-4 mb-8 md:mb-12 w-full max-w-2xl mx-auto">
                     <p className="text-black/60 dark:text-white/60 text-[12px] tracking-[0.2em] font-mono uppercase border border-black/10 dark:border-white/10 bg-white dark:bg-black px-6 py-2 shadow-sm whitespace-nowrap">{balanceFiat} USD</p>
-                    <span className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-[9px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
-                        <span className="w-1.5 h-1.5 bg-[#00FF41] rounded-full animate-pulse block"></span>
+                    <span className="px-4 py-2 bg-black text-white dark:bg-white dark:text-black text-[9px] font-black uppercase tracking-widest shadow-lg">
                         LIVE ON-CHAIN
-                    </span>
-                    <span className="px-4 py-2 bg-black/5 dark:bg-white/5 text-black/60 dark:text-white/60 text-[9px] font-black uppercase tracking-widest font-mono border border-black/10 dark:border-white/10">
-                        NONCE: {Math.floor(Math.random() * 100)}
                     </span>
                 </div>
 
@@ -522,8 +507,7 @@ function CreateWalletView({ onBack, onCreated }: any) {
                 <div className="text-center space-y-6 py-2">
                     {!mnemonic ? (
                         <>
-                            <div className="w-16 h-16 border border-black flex items-center justify-center mx-auto text-black font-black text-2xl relative">
-                                <span className="absolute -inset-2 border border-black/20 animate-[spin_4s_linear_infinite]" />
+                            <div className="w-16 h-16 border border-black flex items-center justify-center mx-auto text-black font-black text-2xl">
                                 +
                             </div>
                             <div className="px-6">
@@ -542,7 +526,7 @@ function CreateWalletView({ onBack, onCreated }: any) {
                     ) : (
                         <div className="px-6 space-y-4">
                             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-red-600 border border-red-200 bg-red-50 p-3">
-                                ⚠ Secret Recovery Phrase
+                                ATTENTION — Secret Recovery Phrase
                             </h3>
                             <p className="text-[9px] font-mono text-black/60 text-left">
                                 This 12-word phrase is the MASTER KEY to all your accounts. Write it down offline. Never share it. If lost, your funds are permanently inaccessible.

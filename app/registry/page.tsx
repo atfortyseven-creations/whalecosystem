@@ -82,7 +82,7 @@ export default function GlobalRegistryMapPage() {
             href="/developers/api-docs"
             className="text-[11px] font-black uppercase tracking-wider text-black hover:opacity-60 transition-opacity"
           >
-            API Documentation →
+            API Documentation
           </Link>
         </div>
       </div>
