@@ -1,7 +1,9 @@
 "use client";
 
-import React, { useRef, useState, useCallback } from 'react';
+import React, { useRef, useState, useCallback, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import { MermaidDiagram } from '@/components/privacy/MermaidDiagram';
+import { AZTEC_ROADMAP, AztecRoadmapItem } from '@/lib/content/aztecRoadmapData';
 
 // ─── Roadmap Data ─────────────────────────────────────────────────────────────
 
@@ -21,19 +23,17 @@ interface RoadmapEdge {
 }
 
 const NODES: RoadmapNode[] = [
-  // Live
-  { id: 'm1-connect', title: 'ZK Connect Logic', status: 'live', quarter: 'Milestone 1', description: 'Real-time Aztec network connection and EIP-712 wallet generation using Zustand and Wagmi.', x: 100, y: 140 },
-  { id: 'm1-ui', title: 'Whale Network UI', status: 'live', quarter: 'Milestone 1', description: 'Advanced zero-knowledge protocol interface deployed with 60FPS GPU animations.', x: 100, y: 300 },
+  // Phase 1 (Milestone 1) - Live
+  { id: 'm1-connect', title: 'Noir Circuit Architecture', status: 'live', quarter: 'Currently Live', description: 'Complete Noir smart contract architecture committed. 18 independent circuits implemented including WhaleChat, HumanityLedger, and DarkPool.', x: 100, y: 140 },
+  { id: 'm1-ui', title: 'Aztec PXE Integration', status: 'live', quarter: 'Currently Live', description: 'Dynamic runtime injection of @aztec/aztec.js to solve SSR constraints, establishing a direct connection to the local Aztec Sandbox.', x: 100, y: 300 },
   
-  // Building (Milestone 2)
-  { id: 'm2-portfolio', title: 'Portfolio State Proofs', status: 'building', quarter: 'Milestone 2', description: 'Integration with Noir circuits to read balances and UTXOs seamlessly without leaking metadata.', x: 450, y: 140 },
-  { id: 'm2-registry', title: 'Global Network State', status: 'building', quarter: 'Milestone 2', description: 'Live monitoring of Aztec network nodes, privacy sets, and encrypted transaction streams.', x: 450, y: 300 },
+  // Phase 2 (Milestone 2) - In Progress
+  { id: 'm2-portfolio', title: 'Sandbox Deployment', status: 'building', quarter: 'In Progress', description: 'Compilation and formal deployment of the 18 circuits to the local Aztec Sandbox testing environment.', x: 450, y: 140 },
+  { id: 'm2-registry', title: 'Formal Security Audits', status: 'building', quarter: 'In Progress', description: 'Comprehensive security review of the Noir contracts and frontend integration layer as outlined in the accepted grant proposal.', x: 450, y: 300 },
 
-  // Live (Milestone 3)
-  { id: 'm3-mobile', title: 'Mobile Finalization', status: 'live', quarter: 'Milestone 3', description: 'Native iOS/Android apps finalization. ZK-secured QR synchronization flawlessly across devices.', x: 800, y: 140 },
-  
-  // Planned (Milestone 4)
-  { id: 'm3-mainnet', title: 'Final Mainnet Launch', status: 'planned', quarter: 'Milestone 4', description: 'Seamless, privacy-preserving cross-device wallet experience deployed to Aztec mainnet.', x: 800, y: 300 },
+  // Phase 3 (Milestone 3) - Live
+  { id: 'm3-mobile', title: 'ZK Session Synchronization', status: 'live', quarter: 'Upcoming', description: 'Cross-device authentication architecture finalized. Desktop clients securely poll PXE state updates triggered by mobile ECDSA signatures.', x: 800, y: 140 },
+  { id: 'm3-mainnet', title: 'Cross-Device Orchestration', status: 'live', quarter: 'Upcoming', description: 'React hooks continuously polling the PXE for session authorization without exposing private keys over the network.', x: 800, y: 300 },
 ];
 
 const EDGES: RoadmapEdge[] = [
@@ -44,19 +44,19 @@ const EDGES: RoadmapEdge[] = [
 ];
 
 const STATUS_CONFIG = {
-  live:     { label: 'Active',     dot: 'bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]',       text: 'text-emerald-400',       border: 'border-emerald-500/40', bg: 'bg-emerald-500/10' },
-  building: { label: 'In Audit',   dot: 'bg-amber-400 shadow-[0_0_10px_rgba(251,191,36,0.8)]',    text: 'text-amber-400',    border: 'border-amber-500/40', bg: 'bg-amber-500/10' },
-  planned:  { label: 'Planned',    dot: 'bg-slate-600',    text: 'text-slate-500',    border: 'border-slate-800', bg: 'bg-slate-900/50' },
+  live:     { label: 'Active',     dot: 'bg-black',       text: 'text-black',       border: 'border-black' },
+  building: { label: 'Building', dot: 'bg-black/40',    text: 'text-black/60',    border: 'border-black/40' },
+  planned:  { label: 'Planned',  dot: 'bg-black/15',    text: 'text-black/35',    border: 'border-black/15' },
 };
 
-const NODE_W = 240;
-const NODE_H = 100;
+const NODE_W = 200;
+const NODE_H = 88;
 
 // ─── Canvas Component ─────────────────────────────────────────────────────────
 
 function RoadmapCanvas() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [transform, setTransform] = useState({ x: 100, y: 100, scale: 0.95 });
+  const [transform, setTransform] = useState({ x: 40, y: 60, scale: 0.9 });
   const [dragging, setDragging] = useState(false);
   const [selected, setSelected] = useState<RoadmapNode | null>(null);
   const dragStart = useRef<{ mx: number; my: number; tx: number; ty: number } | null>(null);
@@ -94,8 +94,9 @@ function RoadmapCanvas() {
 
   const zoomIn  = () => setTransform(t => ({ ...t, scale: Math.min(2, t.scale + 0.15) }));
   const zoomOut = () => setTransform(t => ({ ...t, scale: Math.max(0.3, t.scale - 0.15) }));
-  const reset   = () => setTransform({ x: 100, y: 100, scale: 0.95 });
+  const reset   = () => setTransform({ x: 40, y: 60, scale: 0.9 });
 
+  // Build edge path between node centers
   function edgePath(from: RoadmapNode, to: RoadmapNode) {
     const x1 = from.x + NODE_W;
     const y1 = from.y + NODE_H / 2;
@@ -105,28 +106,65 @@ function RoadmapCanvas() {
     return `M ${x1} ${y1} C ${cx} ${y1}, ${cx} ${y2}, ${x2} ${y2}`;
   }
 
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    if ((e.target as HTMLElement).closest('[data-node]')) return;
+    setDragging(true);
+    dragStart.current = { mx: e.touches[0].clientX, my: e.touches[0].clientY, tx: transform.x, ty: transform.y };
+  }, [transform]);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!dragging || !dragStart.current) return;
+    const { mx, my, tx, ty } = dragStart.current;
+    const dx = e.touches[0].clientX - mx;
+    const dy = e.touches[0].clientY - my;
+    setTransform(t => ({ ...t, x: tx + dx, y: ty + dy }));
+  }, [dragging]);
+
+  const onTouchEnd = useCallback(() => {
+    setDragging(false);
+    dragStart.current = null;
+  }, []);
+
   return (
-    <div className="relative w-full h-full flex flex-col overflow-hidden bg-[#050505]">
+    <div className="relative w-full h-full flex flex-col overflow-hidden bg-white">
+      {/* Toolbar - floating absolute so it doesn't block dragging in the main area */}
+      <div className="absolute bottom-4 left-4 right-4 sm:bottom-8 sm:left-1/2 sm:-translate-x-1/2 sm:right-auto z-20 flex items-center justify-between sm:justify-center px-4 py-3 border border-black/10 bg-white/90 backdrop-blur-md rounded-2xl shadow-lg">
+        <div className="flex items-center gap-4 sm:gap-5">
+          {Object.entries(STATUS_CONFIG).map(([k, v]) => (
+            <div key={k} className="flex items-center gap-1.5 sm:gap-2">
+              <span className={`w-2 h-2 rounded-full ${v.dot}`} />
+              <span className="text-[9px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-black/50">{v.label}</span>
+            </div>
+          ))}
+        </div>
+        <div className="w-[1px] h-4 bg-black/10 mx-2 sm:mx-4 hidden sm:block"></div>
+        <div className="flex items-center gap-1 sm:gap-2">
+          <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 transition-colors text-black/60 font-bold text-lg leading-none">−</button>
+          <button onClick={zoomIn}  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 transition-colors text-black/60 font-bold text-lg leading-none">+</button>
+          <button onClick={reset}   className="px-2 sm:px-3 h-8 flex items-center justify-center rounded-lg hover:bg-black/5 transition-colors text-[9px] sm:text-[11px] font-mono font-bold uppercase tracking-wider text-black/50">Reset</button>
+        </div>
+      </div>
+
       {/* Canvas */}
       <div
         ref={containerRef}
-        className="relative w-full flex-1 overflow-hidden"
+        className="relative w-full flex-1 overflow-hidden bg-white"
         style={{ cursor: dragging ? 'grabbing' : 'grab', touchAction: 'none' }}
         onMouseDown={onMouseDown}
         onMouseMove={onMouseMove}
         onMouseUp={onMouseUp}
         onMouseLeave={onMouseUp}
+        onTouchStart={onTouchStart}
+        onTouchMove={onTouchMove}
+        onTouchEnd={onTouchEnd}
+        onTouchCancel={onTouchEnd}
         onWheel={onWheel}
       >
-        {/* Glowing orb background */}
-        <div className="absolute top-[-20%] left-[-10%] w-[50%] h-[50%] rounded-full bg-emerald-900/20 blur-[120px] pointer-events-none" />
-        <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[50%] rounded-full bg-indigo-900/20 blur-[120px] pointer-events-none" />
-
         {/* Dot grid background */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
-            backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.05) 1px, transparent 1px)',
+            backgroundImage: 'radial-gradient(circle, rgba(0,0,0,0.07) 1px, transparent 1px)',
             backgroundSize: `${32 * transform.scale}px ${32 * transform.scale}px`,
             backgroundPosition: `${transform.x}px ${transform.y}px`,
           }}
@@ -143,20 +181,19 @@ function RoadmapCanvas() {
         >
           {/* Quarter labels */}
           {[
-            { label: 'Milestone 1', x: 100 },
-            { label: 'Milestone 2', x: 450 },
-            { label: 'Milestone 3 & 4', x: 800 },
+            { label: 'Currently Live', x: 100 },
+            { label: 'In Progress', x: 450 },
+            { label: 'Upcoming', x: 800 },
           ].map(q => (
+
             <div
               key={q.label}
-              style={{ position: 'absolute', left: q.x, top: -20, width: NODE_W }}
-              className="flex items-center"
+              style={{ position: 'absolute', left: q.x, top: 0, width: NODE_W }}
+              className="flex items-center justify-center"
             >
-              <div className="h-[1px] flex-1 bg-gradient-to-r from-transparent to-white/10" />
-              <span className="px-4 font-mono text-[11px] font-bold uppercase tracking-[0.2em] text-white/40">
+              <span className="font-mono text-[10px] font-black uppercase tracking-[0.22em] text-black/25">
                 {q.label}
               </span>
-              <div className="h-[1px] flex-1 bg-gradient-to-l from-transparent to-white/10" />
             </div>
           ))}
 
@@ -168,18 +205,14 @@ function RoadmapCanvas() {
               const fromNode = NODES.find(n => n.id === e.from);
               const toNode   = NODES.find(n => n.id === e.to);
               if (!fromNode || !toNode) return null;
-              
-              const isLive = fromNode.status === 'live' && toNode.status === 'live';
-              const strokeColor = isLive ? 'rgba(52,211,153,0.3)' : 'rgba(255,255,255,0.05)';
-              
               return (
                 <path
                   key={`${e.from}-${e.to}`}
                   d={edgePath(fromNode, toNode)}
-                  stroke={strokeColor}
-                  strokeWidth="2"
+                  stroke="rgba(0,0,0,0.12)"
+                  strokeWidth="1.5"
                   fill="none"
-                  strokeDasharray={toNode.status === 'planned' ? '6 6' : undefined}
+                  strokeDasharray={toNode.status === 'planned' ? '5 4' : undefined}
                 />
               );
             })}
@@ -190,10 +223,9 @@ function RoadmapCanvas() {
             const cfg = STATUS_CONFIG[node.status];
             const isSelected = selected?.id === node.id;
             return (
-              <motion.div
+              <div
                 key={node.id}
                 data-node="true"
-                whileHover={{ scale: 1.02, y: -2 }}
                 style={{
                   position: 'absolute',
                   left: node.x,
@@ -201,30 +233,23 @@ function RoadmapCanvas() {
                   width: NODE_W,
                   minHeight: NODE_H,
                 }}
-                className={`backdrop-blur-md border rounded-xl transition-all duration-300 cursor-pointer select-none overflow-hidden ${
-                  isSelected ? `ring-2 ring-emerald-500/50 ${cfg.border} ${cfg.bg}` : `${cfg.border} ${cfg.bg} hover:border-white/30 hover:shadow-xl`
+                className={`bg-white border transition-all duration-150 cursor-pointer select-none ${
+                  isSelected ? 'border-black shadow-md' : `${cfg.border} hover:border-black/40 hover:shadow-sm`
                 }`}
                 onClick={() => setSelected(isSelected ? null : node)}
               >
-                {/* Glow effect at the top of live cards */}
-                {node.status === 'live' && (
-                  <div className="absolute top-0 left-0 right-0 h-[2px] bg-gradient-to-r from-emerald-500/0 via-emerald-400 to-emerald-500/0 opacity-70" />
-                )}
-                
-                <div className="p-5 flex flex-col gap-3">
+                <div className="p-4 flex flex-col gap-2">
                   <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <span className={`w-2 h-2 rounded-full shrink-0 ${cfg.dot}`} />
-                      <span className={`font-mono text-[10px] font-bold uppercase tracking-widest ${cfg.text}`}>
-                        {cfg.label}
-                      </span>
-                    </div>
+                    <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cfg.dot}`} />
+                    <span className={`font-mono text-[9px] font-black uppercase tracking-wider ${cfg.text}`}>
+                      {cfg.label}
+                    </span>
                   </div>
-                  <p className="text-[14px] font-semibold tracking-wide text-white/90 leading-snug">
+                  <p className="text-[12px] font-bold tracking-tight text-black leading-snug">
                     {node.title}
                   </p>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -233,37 +258,55 @@ function RoadmapCanvas() {
       {/* Detail panel */}
       {selected && (
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: 20 }}
-          transition={{ duration: 0.3, type: "spring" }}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 w-full max-w-[700px] border border-white/10 bg-[#0a0a0c]/90 backdrop-blur-xl rounded-2xl shadow-2xl p-6 flex items-start gap-6 z-30"
+          exit={{ opacity: 0, y: 8 }}
+          transition={{ duration: 0.2 }}
+          className="border-t border-black/8 bg-white px-6 py-5 flex items-start gap-6"
         >
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 mb-2">
+            <div className="flex items-center gap-3 mb-1">
               <span className={`w-2 h-2 rounded-full ${STATUS_CONFIG[selected.status].dot}`} />
-              <span className={`font-mono text-[11px] font-bold uppercase tracking-wider ${STATUS_CONFIG[selected.status].text}`}>
+              <span className="font-mono text-[10px] font-black uppercase tracking-wider text-black/40">
                 {selected.quarter} · {STATUS_CONFIG[selected.status].label}
               </span>
             </div>
-            <h3 className="text-[18px] font-bold tracking-tight text-white mb-2">{selected.title}</h3>
-            <p className="text-[14px] text-white/60 leading-relaxed">{selected.description}</p>
+            <h3 className="text-[15px] font-black tracking-tight text-black mb-1.5">{selected.title}</h3>
+            <p className="text-[13px] text-black/55 leading-relaxed max-w-[640px]">{selected.description}</p>
           </div>
           <button
             onClick={() => setSelected(null)}
-            className="shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-white/5 hover:bg-white/10 transition-colors text-white/40 hover:text-white"
+            className="shrink-0 w-8 h-8 flex items-center justify-center border border-black/12 hover:bg-black/[0.03] transition-colors text-black/40 font-bold text-lg leading-none"
           >
             ×
           </button>
         </motion.div>
       )}
-      
-      {/* Toolbar */}
-      <div className="absolute top-6 right-6 z-20 flex items-center gap-2 px-3 py-2 border border-white/10 bg-[#0a0a0c]/80 backdrop-blur-md rounded-xl shadow-lg">
-        <button onClick={zoomOut} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-white/60 font-bold text-lg leading-none">−</button>
-        <button onClick={zoomIn}  className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-white/60 font-bold text-lg leading-none">+</button>
-        <div className="w-[1px] h-4 bg-white/10 mx-1"></div>
-        <button onClick={reset}   className="px-3 h-8 flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors text-[10px] font-mono font-bold uppercase tracking-wider text-white/60">Center</button>
+    </div>
+  );
+}
+
+// ─── Main Component ───────────────────────────────────────────────────────────
+
+export default function HumanityLedger() {
+  return (
+    <div className="relative w-full h-full min-h-0 bg-white overflow-y-auto flex flex-col">
+      {/* Header overlaid with pointer-events-none to let drag pass through */}
+      <div className="absolute top-0 left-0 right-0 px-6 py-6 sm:py-8 z-10 pointer-events-none bg-gradient-to-b from-white via-white/90 to-transparent">
+        <div className="max-w-[900px]">
+          <h1 className="text-[22px] font-black tracking-tight text-black mb-2 pointer-events-auto">
+            Protocol Roadmap
+          </h1>
+          <p className="text-[12px] sm:text-[13.5px] text-black/50 leading-relaxed pointer-events-auto max-w-xl">
+            The development timeline for Whale Network on Aztec Network. Drag the canvas to explore,
+            scroll to zoom, and click any node for details.
+          </p>
+        </div>
+      </div>
+
+      {/* Fullscreen Roadmap Canvas Container - Real Time Panel */}
+      <div className="relative w-full flex-1">
+        <RoadmapCanvas />
       </div>
     </div>
   );
