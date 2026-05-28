@@ -1,3 +1,5 @@
+"use client";
+
 import { useState, useEffect, useCallback } from 'react';
 import { useAztec } from '../context/AztecContext';
 // import { ZKSessionSyncContract } from '../src/artifacts/ZKSessionSync.js';

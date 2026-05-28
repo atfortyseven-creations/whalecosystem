@@ -27,12 +27,14 @@ const NODES: RoadmapNode[] = [
   { id: 'm1-connect', title: 'ZK Connect Logic', status: 'live', quarter: 'Currently Live', description: 'Real-time Aztec network connection and EIP-712 wallet generation using Zustand and Wagmi.', x: 100, y: 140 },
   { id: 'm1-ui', title: 'Whale Network UI', status: 'live', quarter: 'Currently Live', description: 'Monochrome minimalist terminal interface completely deployed with 60FPS zero-lag GPU animations.', x: 100, y: 300 },
   
-  // Building
-  { id: 'm2-portfolio', title: 'Portfolio State Proofs', status: 'building', quarter: 'In Progress', description: 'Integration with Noir circuits to read balances and UTXOs seamlessly without leaking metadata.', x: 450, y: 140 },
-  { id: 'm2-registry', title: 'Global Network State', status: 'building', quarter: 'In Progress', description: 'Live monitoring of Aztec network nodes, privacy sets, and encrypted transaction streams.', x: 450, y: 300 },
+  // Live
+  { id: 'm2-portfolio', title: 'Portfolio State Proofs', status: 'live', quarter: 'Currently Live', description: 'Integration with Noir circuits to read balances and UTXOs seamlessly without leaking metadata.', x: 450, y: 140 },
+  { id: 'm2-registry', title: 'Global Network State', status: 'live', quarter: 'Currently Live', description: 'Live monitoring of Aztec network nodes, privacy sets, and encrypted transaction streams.', x: 450, y: 300 },
 
+  // Live (Accelerated)
+  { id: 'm3-mobile', title: 'Mobile Finalization', status: 'live', quarter: 'Currently Live', description: 'Native iOS/Android apps finalization. ZK-secured QR synchronization flawlessly across devices.', x: 800, y: 140 },
+  
   // Planned
-  { id: 'm3-mobile', title: 'Mobile Finalization', status: 'planned', quarter: 'Upcoming', description: 'Native iOS/Android apps finalization. ZK-secured QR synchronization flawlessly across devices.', x: 800, y: 140 },
   { id: 'm3-mainnet', title: 'Final Mainnet Launch', status: 'planned', quarter: 'Upcoming', description: 'Seamless, privacy-preserving cross-device wallet experience deployed to Aztec mainnet.', x: 800, y: 300 },
 ];
 
