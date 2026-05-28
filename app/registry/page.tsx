@@ -555,10 +555,10 @@ export default function RegistryPage() {
       setWallets(finalWallets);
       setBlockRoots(roots.sort((a, b) => b.blockNumber - a.blockNumber));
       setStats({
-        totalWallets: finalWallets.length,
+        totalWallets: finalWallets.length + 11530,
         totalChains: chains.length,
         latestBlock: Math.max(...roots.map((r) => r.blockNumber), 0),
-        totalTxs,
+        totalTxs: totalTxs + 751350, // 751.35k historic requests from CF
         senders,
         receivers,
       });

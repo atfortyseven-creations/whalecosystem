@@ -39,7 +39,7 @@ const LinkedGate = dynamic(
 // 
 // Routes that don't need the gate (public / landing)
 // 
-const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/sign-up', '/login', '/news', '/careers', '/chat'];
+const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/sign-up', '/login', '/news', '/careers', '/chat', '/sign-up'];
 
 // 
 // Routes that must NOT get the legacy black Downhead footer
@@ -325,15 +325,20 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       : 'relative z-10 w-full flex-1 flex flex-col overscroll-none';
 
   const showInstitutionalHeader =
-    pathname.startsWith('/dashboard') ||
-    pathname === '/ledger' ||
-    (pathname === '/portfolio' && isConnected) ||
-    pathname === '/support' ||
-    pathname === '/academy' ||
-    pathname === '/vip' ||
-    pathname === '/news' ||
-    pathname === '/careers' ||
-    pathname === '/';
+    !pathname.startsWith('/sign-up') &&
+    !pathname.startsWith('/login') &&
+    !pathname.startsWith('/connect') &&
+    (
+      pathname.startsWith('/dashboard') ||
+      pathname === '/ledger' ||
+      (pathname === '/portfolio' && isConnected) ||
+      pathname === '/support' ||
+      pathname === '/academy' ||
+      pathname === '/vip' ||
+      pathname === '/news' ||
+      pathname === '/careers' ||
+      pathname === '/'
+    );
 
   // /chat has its own full-screen header  never show the global one there
 

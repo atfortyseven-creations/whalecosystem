@@ -63,12 +63,12 @@ export function InstitutionalHeader() {
     const pathname = usePathname();
 
     const MENU_ITEMS = [
-      { label: t('NAV_DASHBOARD') || 'DASHBOARD', href: "/dashboard" },
+      { label: 'Dashboard', href: "/dashboard" },
       { label: 'TOKEN', href: "/qds" },
       { label: 'MAP', href: "/registry" },
-      { label: t('NAV_WHALE_CHAT') || 'WHALE CHAT', href: "/chat" },
-      { label: t('NAV_PORTFOLIO') || 'PORTFOLIO', href: "/portfolio" },
-      { label: t('NAV_COMMUNITY') || 'COMMUNITY', href: "#", subItems: [{ label: t('NAV_NEWS') || 'NEWS', href: "/news" }, { label: t('NAV_ACADEMY') || 'ACADEMY', href: "/academy" }, { label: t('NAV_FORUM') || 'FORUM', href: "/forum" }, { label: t('NAV_CAREERS') || 'CAREERS', href: "/careers" }] },
+      { label: 'Chat', href: "/chat" },
+      { label: 'Portfolio', href: "/portfolio" },
+      { label: 'Community', href: "#", subItems: [{ label: 'NEWS', href: "/news" }, { label: 'ACADEMY', href: "/academy" }, { label: 'FORUM', href: "/forum" }, { label: 'CAREERS', href: "/careers" }] },
       { label: 'STATUS', href: '/status' },
       { label: 'PRIVACY', href: '/privacy' }
     ];
