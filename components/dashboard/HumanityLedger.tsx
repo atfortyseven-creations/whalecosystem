@@ -23,17 +23,17 @@ interface RoadmapEdge {
 }
 
 const NODES: RoadmapNode[] = [
-  // Phase 1 (Milestone 1) - Live
-  { id: 'm1-connect', title: 'Noir Circuit Architecture', status: 'live', quarter: 'Currently Live', description: 'Complete Noir smart contract architecture committed. 18 independent circuits implemented including WhaleChat, HumanityLedger, and DarkPool.', x: 100, y: 140 },
-  { id: 'm1-ui', title: 'Aztec PXE Integration', status: 'live', quarter: 'Currently Live', description: 'Dynamic runtime injection of @aztec/aztec.js to solve SSR constraints, establishing a direct connection to the local Aztec Sandbox.', x: 100, y: 300 },
+  // Phase 1 (Milestone 1) - Live: Lo que se mandó al foro y está aceptado/implementado
+  { id: 'm1-connect', title: 'Wallet RFGP Proposal', status: 'live', quarter: 'Currently Live', description: 'Accepted Aztec Wallet RFGP proposal. Whale Network acting as a unified Web3 Command Center and privacy-preserving wallet for the Aztec ecosystem.', x: 100, y: 140 },
+  { id: 'm1-ui', title: 'PXE & Circuit Foundation', status: 'live', quarter: 'Currently Live', description: 'Dynamic PXE local integration via Next.js and 18 pure Noir contracts (Aztec.nr) deployed locally, fulfilling the core wallet logic requirements.', x: 100, y: 300 },
   
-  // Phase 2 (Milestone 2) - In Progress
-  { id: 'm2-portfolio', title: 'Sandbox Deployment', status: 'building', quarter: 'In Progress', description: 'Compilation and formal deployment of the 18 circuits to the local Aztec Sandbox testing environment.', x: 450, y: 140 },
-  { id: 'm2-registry', title: 'Formal Security Audits', status: 'building', quarter: 'In Progress', description: 'Comprehensive security review of the Noir contracts and frontend integration layer as outlined in the accepted grant proposal.', x: 450, y: 300 },
+  // Phase 2 (Milestone 2) - Building: Lo que falta por completar y qué se hará
+  { id: 'm2-portfolio', title: 'Security Audits', status: 'building', quarter: 'In Progress', description: 'Pending formal security audits of our Aztec.nr account contracts, authwits, and ZK session syncing mechanisms to ensure absolute user safety.', x: 450, y: 140 },
+  { id: 'm2-registry', title: 'Testnet Integration', status: 'building', quarter: 'In Progress', description: 'Future deployment of the wallet to the decentralized Aztec testnet, integrating Fee Juice, Paymasters, and seamless onboarding flows.', x: 450, y: 300 },
 
-  // Phase 3 (Milestone 3) - Live
-  { id: 'm3-mobile', title: 'ZK Session Synchronization', status: 'live', quarter: 'Upcoming', description: 'Cross-device authentication architecture finalized. Desktop clients securely poll PXE state updates triggered by mobile ECDSA signatures.', x: 800, y: 140 },
-  { id: 'm3-mainnet', title: 'Cross-Device Orchestration', status: 'live', quarter: 'Upcoming', description: 'React hooks continuously polling the PXE for session authorization without exposing private keys over the network.', x: 800, y: 300 },
+  // Phase 3 (Milestone 3) - Live: Lo que está completo y qué se hará (Sincronización)
+  { id: 'm3-mobile', title: 'Cross-Device Orchestration', status: 'live', quarter: 'Upcoming', description: 'ZK Session Sync architecture finalized. Desktop clients securely poll PXE state updates triggered by mobile device signatures.', x: 800, y: 140 },
+  { id: 'm3-mainnet', title: 'Mobile Finalization', status: 'live', quarter: 'Upcoming', description: 'Next steps include finalizing the native iOS/Android applications to act as biometric signers and QR-code synchronizers for the desktop wallet.', x: 800, y: 300 },
 ];
 
 const EDGES: RoadmapEdge[] = [
