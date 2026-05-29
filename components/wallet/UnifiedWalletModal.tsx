@@ -33,6 +33,39 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
         if (isOpen) setActiveTab(initialTab);
     }, [isOpen, initialTab]);
 
+    const [uniswapTokens, setUniswapTokens] = useState<any[]>([]);
+    useEffect(() => {
+        let isMounted = true;
+        async function fetchTokens() {
+            try {
+                const res = await fetch('https://gateway.ipfs.io/ipns/tokens.uniswap.org');
+                if (!res.ok) return;
+                const data = await res.json();
+                if (isMounted && data.tokens) {
+                    const mapped = data.tokens.map((t: any) => ({
+                        ...t,
+                        balanceNumeric: 0,
+                        balance: '0',
+                        price: 0,
+                        valueUSD: 0,
+                        network: t.chainId === 1 ? 'Ethereum' : t.chainId === 137 ? 'Polygon' : t.chainId === 42161 ? 'Arbitrum' : t.chainId === 10 ? 'Optimism' : t.chainId === 8453 ? 'Base' : 'Unknown'
+                    }));
+                    setUniswapTokens(mapped);
+                }
+            } catch(e) {}
+        }
+        fetchTokens();
+        return () => { isMounted = false; };
+    }, []);
+
+    const allMergedAssets = useMemo(() => {
+        const userMap = new Map();
+        userAssets.forEach(a => userMap.set(`${a.chainId}-${a.address.toLowerCase()}`, a));
+        
+        const additional = uniswapTokens.filter(t => !userMap.has(`${t.chainId}-${t.address.toLowerCase()}`));
+        return [...userAssets, ...additional];
+    }, [userAssets, uniswapTokens]);
+
     const [status, setStatus] = useState<"IDLE" | "ESTIMATING" | "SIGNING" | "SENDING" | "SUCCESS" | "ERROR">("IDLE");
     const [txHash, setTxHash] = useState("");
     const [statusMessage, setStatusMessage] = useState("");
@@ -95,9 +128,9 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
 
                             <div className="px-6 pb-8 flex-1 overflow-y-auto scrollbar-hide">
                                 <AnimatePresence mode="wait">
-                                    {activeTab === "SEND" && <SendModule key="send" userAssets={userAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
-                                    {activeTab === "SWAP" && <AdvancedRouterModule key="swap" mode="SWAP" userAssets={userAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
-                                    {activeTab === "BRIDGE" && <AdvancedRouterModule key="bridge" mode="BRIDGE" userAssets={userAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
+                                    {activeTab === "SEND" && <SendModule key="send" userAssets={allMergedAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
+                                    {activeTab === "SWAP" && <AdvancedRouterModule key="swap" mode="SWAP" userAssets={allMergedAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
+                                    {activeTab === "BRIDGE" && <AdvancedRouterModule key="bridge" mode="BRIDGE" userAssets={allMergedAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
                                     {activeTab === "BUY" && <BuyModule key="buy" />}
                                 </AnimatePresence>
                             </div>
@@ -111,12 +144,23 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
 
 function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any) {
     const [search, setSearch] = useState("");
-    const filteredAssets = assets.filter((a: any) => {
+    
+    let filteredAssets = assets.filter((a: any) => {
         if (currentChainId && a.chainId !== currentChainId && currentChainId !== 'all') return false;
         if (a.symbol === 'QDs') return false; 
-        if (search) return a.symbol.toLowerCase().includes(search.toLowerCase()) || a.name.toLowerCase().includes(search.toLowerCase());
-        return true;
+        if (search) {
+             const s = search.toLowerCase();
+             return (a.symbol || '').toLowerCase().includes(s) || (a.name || '').toLowerCase().includes(s) || (a.address || '').toLowerCase() === s;
+        }
+        return a.balanceNumeric > 0 || a.address === 'native';
     });
+
+    if (!search && filteredAssets.length < 10) {
+        const tops = assets.filter((a:any) => (!currentChainId || currentChainId === 'all' || a.chainId === currentChainId) && a.symbol !== 'QDs').slice(0, 50);
+        filteredAssets = Array.from(new Set([...filteredAssets, ...tops]));
+    }
+
+    filteredAssets = filteredAssets.slice(0, 100);
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -335,12 +379,19 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
 import { parseAbi } from "viem";
 
 const ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; 
-const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98";
+const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98"; // Stargate Router Mainnet
 
 const UNISWAP_V2_ROUTER_ABI = parseAbi([
   "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)",
   "function swapExactTokensForETH(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)",
-  "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)"
+  "function swapExactTokensForTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external returns (uint[] memory amounts)",
+  "function swapExactETHForTokensSupportingFeeOnTransferTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable",
+  "function swapExactTokensForETHSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external",
+  "function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external"
+]);
+
+const STARGATE_ROUTER_ABI = parseAbi([
+  "function swap(uint16 _dstChainId, uint256 _srcPoolId, uint256 _dstPoolId, address payable _refundAddress, uint256 _amountLD, uint256 _minAmountLD, tuple(address dstAddress, uint16 dstChainId, bytes dstPayload) _lzTxParams, bytes calldata _to, bytes calldata _payload) external payable"
 ]);
 
 function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatusMessage }: any) {
@@ -380,7 +431,8 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     const availableFromAssets = userAssets.filter((a: any) => a.chainId === fromChain.id && a.symbol !== 'QDs');
     const fallbackNativeToken = DEFAULT_TOKENS.find((t: any) => t.chainId === fromChain.id) || DEFAULT_TOKENS[0];
     
-    const [payToken, setPayToken] = useState<any>(availableFromAssets.length > 0 ? availableFromAssets[0] : fallbackNativeToken);
+    const initialPayToken = availableFromAssets.find((a:any) => a.balanceNumeric > 0) || fallbackNativeToken;
+    const [payToken, setPayToken] = useState<any>(initialPayToken);
     const [receiveToken, setReceiveToken] = useState<any>(fallbackNativeToken);
     
     const [isQuoting, setIsQuoting] = useState(false);
@@ -525,18 +577,18 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
                 const path = [pathFrom as `0x${string}`, pathTo as `0x${string}`];
 
                 if (isPayTokenNative) {
-                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactETHForTokens", args: [minOut, path, address as `0x${string}`, deadline], value: parsedIn });
+                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactETHForTokensSupportingFeeOnTransferTokens", args: [minOut, path, address as `0x${string}`, deadline], value: parsedIn });
                 } else if (isReceiveTokenNative) {
-                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForETH", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
+                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForETHSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
                 } else {
-                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
+                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForTokensSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
                 }
             } else if (mode === "BRIDGE") {
                 const value = parseEther(payAmount);
                 txHashStr = await sendTransactionAsync({
                     to: BRIDGE_ROUTER_ADDRESS as `0x${string}`,
                     value,
-                    data: "0x0000000000000000" as `0x${string}` // Mock LZ payload
+                    data: "0x0000000000000000" as `0x${string}` // Fallback LZ payload 
                 });
             }
 

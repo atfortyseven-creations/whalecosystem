@@ -312,10 +312,10 @@ function HeroSection() {
 
   return (
     <section
-      className="relative w-full flex flex-col items-center justify-center overflow-hidden pt-14"
+      className="relative w-full flex flex-col items-center justify-center overflow-hidden flex-shrink-0"
       style={{
-        height: '100dvh',
-        minHeight: '600px',
+        height: 'calc(100dvh - 64px)',
+        minHeight: '560px',
         backgroundColor: '#ffffff',
       }}
     >
@@ -327,16 +327,8 @@ function HeroSection() {
           image-rendering: pixelated;
           -ms-interpolation-mode: nearest-neighbor;
         }
-        @supports (height: 100dvh) {
-          .hero-section-dvh { height: 100dvh !important; }
-        }
       `}} />
 
-      {/*
-        Devine Lu Linvega monochrome pixel-art wallpaper.
-        object-fit: contain — preserves every pixel at native size,
-        no scaling up, no cropping. Centered horizontally and vertically.
-      */}
       <img
         src="/system-shots/Devine-Lu-Linvega-monochrome-pixel-art-illustration-arch-2268374-wallhere.com.jpg"
         alt="Humanity Ledger"
@@ -353,7 +345,7 @@ function HeroSection() {
           width: '100%',
           height: '100%',
           objectFit: 'cover',
-          opacity: 0.18,
+          opacity: 0.12,
         }}
       />
 
@@ -363,55 +355,48 @@ function HeroSection() {
       <div
         className="absolute inset-x-0 bottom-0 pointer-events-none z-10"
         style={{
-          height: '220px',
+          height: '180px',
           background: 'linear-gradient(to top, #ffffff 0%, rgba(255,255,255,0.85) 40%, transparent 100%)',
         }}
       />
 
-      {/* ── Text Content & CTA buttons ────────────────────────────────────────── */}
-      <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full max-w-[880px] mx-auto pb-0 pt-16">
-        {mounted && (
-          <motion.div
-            initial={{ opacity: 0, y: 14 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
-            className="flex flex-col items-center"
-          >
-            <h1 className="text-[40px] md:text-[56px] font-black tracking-tight leading-[1.05] text-black mb-6">
-              Privacy-Preserving
-              <br />
-              <span className="text-black/70">Identity Verification</span>
-            </h1>
-            <p className="text-[16px] md:text-[18px] text-black/60 max-w-[600px] mb-10 font-medium">
-              Whale Network integrates zero-knowledge proofs to help you achieve compliance and verify users without ever compromising personal data.
-            </p>
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              <Link
-                href="/portfolio"
-                className="w-full sm:w-auto px-8 py-3.5 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors shadow-2xl"
-              >
-                Open Application
-              </Link>
-              <Link
-                href="/developers/api-docs"
-                className="w-full sm:w-auto px-8 py-3.5 border border-black/30 bg-white/80 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white hover:border-black/60 transition-colors shadow-xl"
-              >
-                Read Documentation
-              </Link>
-            </div>
-          </motion.div>
-        )}
+      {/* ── Text Content & CTA — always visible, no mounted gate ─────────── */}
+      <div className="relative z-20 flex flex-col items-center justify-center text-center px-6 w-full max-w-[880px] mx-auto">
+        <motion.div
+          initial={{ opacity: 0, y: 14 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          className="flex flex-col items-center"
+        >
+          <h1 className="text-[40px] md:text-[56px] font-black tracking-tight leading-[1.05] text-black mb-6">
+            Privacy-Preserving
+            <br />
+            <span className="text-black/70">Identity Verification</span>
+          </h1>
+          <p className="text-[16px] md:text-[18px] text-black/60 max-w-[600px] mb-10 font-medium">
+            Whale Network integrates zero-knowledge proofs to help you achieve compliance and verify users without ever compromising personal data.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <Link
+              href="/portfolio"
+              className="w-full sm:w-auto px-8 py-3.5 bg-black text-white text-[13px] font-semibold hover:bg-black/85 transition-colors shadow-2xl"
+            >
+              Open Application
+            </Link>
+            <Link
+              href="/developers/api-docs"
+              className="w-full sm:w-auto px-8 py-3.5 border border-black/30 bg-white/80 backdrop-blur-md text-black text-[13px] font-semibold hover:bg-white hover:border-black/60 transition-colors shadow-xl"
+            >
+              Read Documentation
+            </Link>
+          </div>
+        </motion.div>
       </div>
 
       {/* ── Scroll cue ──────────────────────────────────────────────────── */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 2.2, duration: 1 }}
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30 pointer-events-none"
-      >
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 z-30 pointer-events-none">
         <div className="w-[1px] h-12 bg-gradient-to-b from-black/30 to-transparent" />
-      </motion.div>
+      </div>
     </section>
   );
 }

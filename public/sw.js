@@ -1,84 +1,101 @@
 /**
- * System Service Worker  Axioma 452
- * 
- * Workbox-compatible service worker with:
- *   - Offline shell caching (stale-while-revalidate for pages)
- *   - Network-first for API routes (never serve stale on-chain data)
- *   - Cache-first for static assets (immutable hashes)
- *   - Ed25519 signed update manifest verification
- *   - Atomic cache update (never partial)
- * 
+ * System Service Worker — Axioma 452 v3
+ *
+ * KEY FIX: CACHE_VERSION is now a build timestamp injected at build time.
+ * On every Railway deploy, a new timestamp is embedded, which causes the SW
+ * activate event to delete ALL old caches — eliminating ChunkLoadErrors.
+ *
+ * Strategy:
+ *   - JS/CSS chunks (.next/static): Network-first (never serve stale hashed chunks)
+ *   - Images/fonts: Cache-first (truly immutable by filename hash)
+ *   - HTML pages: Network-first (always get fresh HTML from server)
+ *   - API routes: Network-only (never cache dynamic data)
  */
 
-const CACHE_VERSION = 'system-v1';
-const STATIC_CACHE  = `${CACHE_VERSION}-static`;
-const PAGE_CACHE    = `${CACHE_VERSION}-pages`;
+// ─── CRITICAL: This timestamp changes on EVERY build ────────────────────────
+// Format: ISO string replaced by build script / CI. Falls back to deployment
+// URL parameter so Railway's CDN can distinguish builds.
+const BUILD_ID = self.registration.scope + '?v=' + Date.now().toString(36);
+const CACHE_VERSION = 'system-v3-' + (typeof __BUILD_TIMESTAMP__ !== 'undefined'
+  ? __BUILD_TIMESTAMP__
+  : Math.random().toString(36).slice(2));
 
-//  Assets to pre-cache on install 
-const PRECACHE_URLS = [
-  '/',
-  '/connect',
-  '/pricing',
-  '/offline',
-  '/manifest.json',
-];
+const STATIC_CACHE = `${CACHE_VERSION}-static`;
+const PAGE_CACHE   = `${CACHE_VERSION}-pages`;
 
-//  Cache strategies 
-const API_ROUTES    = ['/api/'];
-const STATIC_EXTS   = ['.js', '.css', '.woff2', '.png', '.jpg', '.svg', '.ico'];
-
-//  Install: pre-cache shell 
+// ─── Install: skip waiting immediately so new SW takes over fast ─────────────
 self.addEventListener('install', (event) => {
-  event.waitUntil(
-    caches.open(STATIC_CACHE).then((cache) =>
-      cache.addAll(PRECACHE_URLS).catch((err) => {
-        console.warn('[SW] Pre-cache partial failure (expected on first deploy):', err);
-      })
-    ).then(() => self.skipWaiting())
-  );
+  // Skip waiting — do NOT pre-cache. Pre-caching on install causes stale
+  // content to be served immediately. We load-on-demand instead.
+  self.skipWaiting();
 });
 
-//  Activate: purge stale caches 
+// ─── Activate: DELETE ALL old caches from previous versions ─────────────────
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) =>
       Promise.all(
         keys
           .filter((key) => key !== STATIC_CACHE && key !== PAGE_CACHE)
-          .map((key) => caches.delete(key))
+          .map((key) => {
+            console.log('[SW] Deleting stale cache:', key);
+            return caches.delete(key);
+          })
       )
-    ).then(() => self.clients.claim())
+    ).then(() => {
+      console.log('[SW] Activated. Cache version:', CACHE_VERSION);
+      return self.clients.claim();
+    })
   );
 });
 
-//  Fetch: routing strategy 
+// ─── Fetch: routing strategies ───────────────────────────────────────────────
 self.addEventListener('fetch', (event) => {
   const { request } = event;
   const url = new URL(request.url);
 
-  // 1. Skip non-GET and cross-origin
+  // Skip non-GET and cross-origin
   if (request.method !== 'GET' || url.origin !== location.origin) return;
 
-  // 2. API routes  Network-first (never serve stale chain data)
-  if (API_ROUTES.some((prefix) => url.pathname.startsWith(prefix))) {
-    event.respondWith(networkFirst(request));
+  // 1. API routes → Network-only (never cache live data)
+  if (url.pathname.startsWith('/api/')) {
+    // Don't intercept — let browser handle natively
     return;
   }
 
-  // 3. Static assets (hashed filenames)  Cache-first
-  if (STATIC_EXTS.some((ext) => url.pathname.endsWith(ext))) {
+  // 2. Next.js JS/CSS chunks (_next/static) → Network-first
+  // These have content-hashed filenames, so network version is always "fresh".
+  // But we must NOT serve stale versions after a new deploy — that's what
+  // causes ChunkLoadErrors. Network-first ensures we always try network first.
+  if (url.pathname.startsWith('/_next/static/')) {
+    event.respondWith(networkFirstWithCache(request, STATIC_CACHE));
+    return;
+  }
+
+  // 3. Public static assets (images, fonts, icons) → Cache-first
+  // These are truly static and safe to cache aggressively.
+  const staticExts = ['.png', '.jpg', '.jpeg', '.webp', '.svg', '.ico', '.woff2', '.woff', '.ttf'];
+  if (staticExts.some((ext) => url.pathname.endsWith(ext))) {
     event.respondWith(cacheFirst(request, STATIC_CACHE));
     return;
   }
 
-  // 4. HTML pages  Stale-while-revalidate
-  event.respondWith(staleWhileRevalidate(request, PAGE_CACHE));
+  // 4. HTML navigation requests → Network-first (always fresh HTML)
+  // This ensures users get the latest build's HTML which references correct chunks.
+  if (request.mode === 'navigate') {
+    event.respondWith(networkFirstWithFallback(request, PAGE_CACHE));
+    return;
+  }
 });
 
-//  Strategy: Network-first 
-async function networkFirst(request) {
+// ─── Strategy: Network-first with cache fallback ─────────────────────────────
+async function networkFirstWithCache(request, cacheName) {
   try {
     const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, response.clone());
+    }
     return response;
   } catch {
     const cached = await caches.match(request);
@@ -86,62 +103,75 @@ async function networkFirst(request) {
   }
 }
 
-//  Strategy: Cache-first 
+// ─── Strategy: Network-first for HTML with cache fallback ────────────────────
+async function networkFirstWithFallback(request, cacheName) {
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, response.clone());
+    }
+    return response;
+  } catch {
+    const cached = await caches.match(request);
+    if (cached) return cached;
+    return offlineFallback();
+  }
+}
+
+// ─── Strategy: Cache-first for truly static assets ───────────────────────────
 async function cacheFirst(request, cacheName) {
   const cached = await caches.match(request);
   if (cached) return cached;
-  const response = await fetch(request);
-  if (response.ok) {
-    const cache = await caches.open(cacheName);
-    cache.put(request, response.clone());
-  }
-  return response;
-}
-
-//  Strategy: Stale-while-revalidate 
-async function staleWhileRevalidate(request, cacheName) {
-  const cache    = await caches.open(cacheName);
-  const cached   = await cache.match(request);
-  const fetchPromise = fetch(request).then((response) => {
-    if (response.ok) cache.put(request, response.clone());
+  try {
+    const response = await fetch(request);
+    if (response.ok) {
+      const cache = await caches.open(cacheName);
+      cache.put(request, response.clone());
+    }
     return response;
-  }).catch(() => null);
-
-  return cached ?? fetchPromise ?? offlineFallback();
+  } catch {
+    return offlineFallback();
+  }
 }
 
-//  Offline fallback 
+// ─── Offline fallback ────────────────────────────────────────────────────────
 function offlineFallback() {
   return new Response(
     `<!DOCTYPE html><html lang="en"><head><meta charset="utf-8">
-    <title>System Terminal  Offline</title>
+    <title>Whale Network — Offline</title>
     <style>
-      body{margin:0;background:#050505;color:#fff;font-family:monospace;
-           display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:16px;}
+      body{margin:0;background:#ffffff;color:#050505;font-family:monospace;
+           display:flex;align-items:center;justify-content:center;min-height:100vh;
+           flex-direction:column;gap:16px;}
       h1{font-size:14px;letter-spacing:.2em;text-transform:uppercase;opacity:.6;}
-      p{font-size:11px;opacity:.3;letter-spacing:.1em;text-transform:uppercase;}
+      p{font-size:11px;opacity:.4;letter-spacing:.1em;text-transform:uppercase;}
     </style>
     </head><body>
-      <h1>System Terminal</h1>
-      <p>Offline  Reconnect to resume analytics feed</p>
+      <h1>Whale Network</h1>
+      <p>Offline — Reconnect to resume</p>
     </body></html>`,
     { headers: { 'Content-Type': 'text/html' } }
   );
 }
 
-//  Background sync: queue failed API mutations 
-self.addEventListener('sync', (event) => {
-  if (event.tag === 'system-mutation-sync') {
-    event.waitUntil(replaySyncQueue());
+// ─── Message: force cache clear from app ─────────────────────────────────────
+// Called from the ChunkLoadError recovery script in app/layout.tsx
+self.addEventListener('message', (event) => {
+  if (event.data?.type === 'CLEAR_ALL_CACHES') {
+    caches.keys().then((keys) => {
+      Promise.all(keys.map((key) => caches.delete(key))).then(() => {
+        console.log('[SW] All caches cleared by app request');
+        event.ports[0]?.postMessage({ done: true });
+      });
+    });
+  }
+  if (event.data?.type === 'SKIP_WAITING') {
+    self.skipWaiting();
   }
 });
 
-async function replaySyncQueue() {
-  // In production: drain IndexedDB mutation queue and retry
-  console.log('[SW] Background sync: replaying queued mutations');
-}
-
-//  Push notifications (wallet-tier gated) 
+// ─── Push notifications ───────────────────────────────────────────────────────
 self.addEventListener('push', (event) => {
   if (!event.data) return;
   try {

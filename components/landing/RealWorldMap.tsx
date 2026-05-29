@@ -13,15 +13,15 @@ const GEO_URL =
 
 // ── Tier colours (dark navy = highest activity) ──────────────────────────────
 const TIER_COLORS: Record<string, string> = {
-  tier1: "#00102a",
-  tier2: "#042054",
-  tier3: "#0a3a8e",
-  tier4: "#1d4ed8",
-  tier5: "#3b82f6",
-  tier6: "#60a5fa",
-  tier7: "#93c5fd",
-  tier8: "#dbeafe",
-  none: "#f0f0f0",
+  tier1: "#111111",
+  tier2: "#333333",
+  tier3: "#555555",
+  tier4: "#777777",
+  tier5: "#999999",
+  tier6: "#AAAAAA",
+  tier7: "#CCCCCC",
+  tier8: "#DDDDDD",
+  none: "#F5F5F5",
 };
 
 const TIER_LABELS: Record<string, string> = {
@@ -198,14 +198,14 @@ export const RealWorldMap = memo(function RealWorldMap({
                       onTouchEnd={handleMouseLeave}
                       style={{
                         default: {
-                          fill,
-                          stroke: "#ffffff",
+                          fill: isDark ? "rgba(255,255,255," + (tier === "tier1" ? 1 : tier === "tier2" ? 0.8 : tier === "tier3" ? 0.6 : tier === "tier4" ? 0.4 : tier === "tier5" ? 0.3 : tier === "tier6" ? 0.2 : tier === "tier7" ? 0.1 : tier === "tier8" ? 0.05 : 0.02) + ")" : "rgba(0,0,0," + (tier === "tier1" ? 1 : tier === "tier2" ? 0.8 : tier === "tier3" ? 0.6 : tier === "tier4" ? 0.4 : tier === "tier5" ? 0.3 : tier === "tier6" ? 0.2 : tier === "tier7" ? 0.1 : tier === "tier8" ? 0.05 : 0.02) + ")",
+                          stroke: isDark ? "rgba(0,0,0,0.5)" : "#ffffff",
                           strokeWidth: 0.5,
                           outline: "none",
                         },
                         hover: {
-                          fill: tier === "none" ? "#e5e7eb" : fill,
-                          stroke: "#ffffff",
+                          fill: tier === "none" ? "#e5e7eb" : isDark ? "rgba(255,255,255," + (tier === "tier1" ? 1 : tier === "tier2" ? 0.8 : tier === "tier3" ? 0.6 : tier === "tier4" ? 0.4 : tier === "tier5" ? 0.3 : tier === "tier6" ? 0.2 : tier === "tier7" ? 0.1 : tier === "tier8" ? 0.05 : 0.02) + ")" : "rgba(0,0,0," + (tier === "tier1" ? 1 : tier === "tier2" ? 0.8 : tier === "tier3" ? 0.6 : tier === "tier4" ? 0.4 : tier === "tier5" ? 0.3 : tier === "tier6" ? 0.2 : tier === "tier7" ? 0.1 : tier === "tier8" ? 0.05 : 0.02) + ")",
+                          stroke: isDark ? "rgba(0,0,0,0.5)" : "#ffffff",
                           strokeWidth: 0.5,
                           outline: "none",
                           cursor: "pointer",
@@ -242,7 +242,7 @@ export const RealWorldMap = memo(function RealWorldMap({
               <div className="flex items-center gap-2 mt-2">
                 <div
                   className="w-3 h-3 rounded-sm"
-                  style={{ background: TIER_COLORS[tooltip.tier] }}
+                  style={{ background: isDark ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.8)" }}
                 />
                 <span className="text-[10px] font-bold" style={{ color: isDark ? "rgba(255,255,255,0.95)" : "rgba(0,0,0,0.6)" }}>
                   {TIER_LABELS[tooltip.tier]}
@@ -317,7 +317,7 @@ export const RealWorldMap = memo(function RealWorldMap({
               <div key={t} className="flex items-center gap-1.5">
                 <div
                   className="w-2.5 h-2.5 rounded-sm border border-black/10 shrink-0"
-                  style={{ background: TIER_COLORS[t] }}
+                  style={{ background: isDark ? "rgba(255,255,255," + (t === "tier1" ? 1 : t === "tier2" ? 0.8 : t === "tier3" ? 0.6 : t === "tier4" ? 0.4 : t === "tier5" ? 0.3 : t === "tier6" ? 0.2 : t === "tier7" ? 0.1 : t === "tier8" ? 0.05 : 0.02) + ")" : "rgba(0,0,0," + (t === "tier1" ? 1 : t === "tier2" ? 0.8 : t === "tier3" ? 0.6 : t === "tier4" ? 0.4 : t === "tier5" ? 0.3 : t === "tier6" ? 0.2 : t === "tier7" ? 0.1 : t === "tier8" ? 0.05 : 0.02) + ")" }}
                 />
                 <span className="text-[9px] text-black/60 font-medium">
                   {TIER_LABELS[t]}

@@ -19,11 +19,11 @@ export default function SecurityVault() {
             return;
         }
         setIsProcessing(true);
-        toast.loading("Decrypting Vault...", { id: 'decrypt' });
+        toast.loading("Decrypting...", { id: 'decrypt' });
         try {
             const success = await unlockVault(password);
             if (success) {
-                toast.success("Vault Unlocked!", { id: 'decrypt' });
+                toast.success("Accounts Unlocked!", { id: 'decrypt' });
                 setPassword('');
             } else {
                 toast.error("Incorrect password", { id: 'decrypt' });
@@ -38,7 +38,7 @@ export default function SecurityVault() {
 
     const deriveNewAccount = () => {
         if (isLocked || !mnemonic) {
-            toast.error("Vault must be unlocked and have a seed phrase");
+            toast.error("Must be unlocked and have a seed phrase");
             return;
         }
         try {
@@ -73,7 +73,7 @@ export default function SecurityVault() {
                 <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-8">
                     <div>
                         <h2 className="text-3xl font-black uppercase tracking-widest mb-2 flex items-center gap-3">
-                            <Shield className="w-8 h-8" /> Security Vault
+                            <Shield className="w-8 h-8" /> Accounts
                         </h2>
                         <p className="text-white/60 text-sm max-w-md font-mono">
                             Fully client-side BIP-39 mnemonic generation & AES-GCM encryption. Keys never leave your browser.
@@ -92,7 +92,7 @@ export default function SecurityVault() {
                 <div className="bg-white rounded-[32px] p-8 border border-black/10 shadow-sm">
                     {isLocked ? (
                         <div>
-                            <h3 className="text-xl font-black uppercase tracking-widest mb-4">Unlock Vault</h3>
+                            <h3 className="text-xl font-black uppercase tracking-widest mb-4">Unlock</h3>
                             <div className="space-y-4">
                                 <input 
                                     type="password" 
@@ -107,7 +107,7 @@ export default function SecurityVault() {
                                     className="w-full bg-black text-white font-black uppercase tracking-widest rounded-xl p-4 hover:bg-black/80 transition-all flex items-center justify-center gap-2"
                                 >
                                     {isProcessing ? <Lock className="animate-spin w-5 h-5" /> : <Unlock className="w-5 h-5" />}
-                                    {isProcessing ? 'Decrypting...' : 'Unlock Vault'}
+                                    {isProcessing ? 'Decrypting...' : 'Unlock'}
                                 </button>
                             </div>
                         </div>
@@ -158,7 +158,7 @@ export default function SecurityVault() {
 
                     {isLocked ? (
                         <div className="flex-1 flex items-center justify-center text-black/30 font-mono text-sm">
-                            Unlock vault to view accounts
+                            Unlock to view accounts
                         </div>
                     ) : (
                         <div className="space-y-3 overflow-y-auto flex-1">

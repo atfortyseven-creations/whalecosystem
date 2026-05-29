@@ -232,17 +232,87 @@ export default async function RootLayout({
             Catches router-level dynamic import failures (stale deployment)
             that bubble past React Error Boundaries. */}
         <script nonce={nonce} dangerouslySetInnerHTML={{ __html: `(function(){
-  window.addEventListener('unhandledrejection', function(event) {
-    var msg = event.reason ? (event.reason.message || event.reason.name || '') : '';
-    if (msg.includes('ChunkLoadError') || msg.includes('dynamically imported module')) {
-      if (!sessionStorage.getItem('global_chunk_reload')) {
-        sessionStorage.setItem('global_chunk_reload', '1');
-        window.location.reload(true);
+  // ── ChunkLoadError Recovery v2 ──────────────────────────────────────────
+  // After a Railway deploy, old JS chunk URLs (with old content hashes) return
+  // 404. This causes React hydration failures and broken layouts. The fix:
+  // 1. Detect the error  2. Clear ALL SW caches  3. Hard-reload from server
+  var RELOAD_KEY = 'chunk_reload_v2';
+  var RELOAD_TS_KEY = 'chunk_reload_ts';
+
+  function isChunkError(msg) {
+    return msg && (
+      msg.includes('ChunkLoadError') ||
+      msg.includes('dynamically imported module') ||
+      msg.includes('Failed to fetch dynamically') ||
+      msg.includes('Loading chunk') ||
+      msg.includes('Loading CSS chunk')
+    );
+  }
+
+  function clearCachesAndReload() {
+    var now = Date.now();
+    var lastReload = parseInt(sessionStorage.getItem(RELOAD_TS_KEY) || '0', 10);
+    // Prevent reload loops: only allow one auto-reload per 10 seconds
+    if (now - lastReload < 10000) { return; }
+    sessionStorage.setItem(RELOAD_TS_KEY, now.toString());
+    // Tell the Service Worker to clear all its caches before we reload
+    if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+      var mc = new MessageChannel();
+      mc.port1.onmessage = function() { window.location.reload(true); };
+      navigator.serviceWorker.controller.postMessage({ type: 'CLEAR_ALL_CACHES' }, [mc.port2]);
+      // Fallback: reload after 800ms even if SW doesn't respond
+      setTimeout(function() { window.location.reload(true); }, 800);
+    } else {
+      // No SW — also manually delete caches via CacheStorage API
+      if (window.caches) {
+        window.caches.keys().then(function(keys) {
+          return Promise.all(keys.map(function(k) { return window.caches.delete(k); }));
+        }).then(function() { window.location.reload(true); }).catch(function() { window.location.reload(true); });
       } else {
-        sessionStorage.removeItem('global_chunk_reload');
+        window.location.reload(true);
       }
     }
+  }
+
+  window.addEventListener('unhandledrejection', function(event) {
+    var msg = event.reason ? (event.reason.message || event.reason.name || String(event.reason) || '') : '';
+    if (isChunkError(msg)) {
+      event.preventDefault();
+      clearCachesAndReload();
+    }
   });
+
+  window.addEventListener('error', function(event) {
+    var msg = (event.message || '') + (event.filename || '');
+    if (isChunkError(msg)) {
+      clearCachesAndReload();
+    }
+  }, true);
+
+  // ── Nuclear Service Worker Purge ─────────────────────────────────────────
+  // If the user is stuck with a broken SW returning HTML for CSS (un-styled page)
+  // or an old cached HTML, we force an unregister and reload ONCE per session.
+  var NUCLEAR_KEY = 'sw_nuclear_purge_v3';
+  if (!sessionStorage.getItem(NUCLEAR_KEY)) {
+    sessionStorage.setItem(NUCLEAR_KEY, '1');
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(regs) {
+        var unregs = regs.map(function(r) { return r.unregister(); });
+        Promise.all(unregs).then(function() {
+          if (window.caches) {
+            window.caches.keys().then(function(keys) {
+              Promise.all(keys.map(function(k) { return window.caches.delete(k); }))
+                .then(function() { window.location.reload(true); })
+                .catch(function() { window.location.reload(true); });
+            });
+          } else {
+            window.location.reload(true);
+          }
+        });
+      });
+    }
+  }
+
 })();` }} />
         <script
           nonce={nonce}

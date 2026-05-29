@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RealWorldMap } from "@/components/landing/RealWorldMap";
-import { LegendaryDownhead } from "@/components/landing/LegendaryDownhead";
+import { DownheadSection } from "@/components/landing/DownheadSection";
 
 // ─── Chain Configurations ──────────────────────────────────────────────────────
 
@@ -50,7 +50,7 @@ const MAINNET_CHAINS = [
     chain: mainnet,
     label: "Ethereum",
     badge: "ETH",
-    color: "#627EEA",
+    color: "#000000",
     rpc: "https://eth-mainnet.g.alchemy.com/v2/p2MK6Y8eQyHPbS5gQZ7TU",
     explorer: "https://etherscan.io",
   },
@@ -58,7 +58,7 @@ const MAINNET_CHAINS = [
     chain: polygon,
     label: "Polygon",
     badge: "MATIC",
-    color: "#8247E5",
+    color: "#000000",
     rpc: "https://polygon-mainnet.g.alchemy.com/v2/p2MK6Y8eQyHPbS5gQZ7TU",
     explorer: "https://polygonscan.com",
   },
@@ -66,7 +66,7 @@ const MAINNET_CHAINS = [
     chain: base,
     label: "Base",
     badge: "BASE",
-    color: "#0052FF",
+    color: "#000000",
     rpc: "https://mainnet.base.org",
     explorer: "https://basescan.org",
   },
@@ -74,7 +74,7 @@ const MAINNET_CHAINS = [
     chain: optimism,
     label: "Optimism",
     badge: "OP",
-    color: "#FF0420",
+    color: "#000000",
     rpc: "https://opt-mainnet.g.alchemy.com/v2/p2MK6Y8eQyHPbS5gQZ7TU",
     explorer: "https://optimistic.etherscan.io",
   },
@@ -82,7 +82,7 @@ const MAINNET_CHAINS = [
     chain: arbitrum,
     label: "Arbitrum",
     badge: "ARB",
-    color: "#12AAFF",
+    color: "#000000",
     rpc: "https://arb1.arbitrum.io/rpc",
     explorer: "https://arbiscan.io",
   },
@@ -90,7 +90,7 @@ const MAINNET_CHAINS = [
     chain: bsc,
     label: "BSC",
     badge: "BNB",
-    color: "#F3BA2F",
+    color: "#000000",
     rpc: "https://bsc-dataseed.binance.org/",
     explorer: "https://bscscan.com",
   },
@@ -101,7 +101,7 @@ const TESTNET_CHAINS = [
     chain: sepolia,
     label: "Sepolia",
     badge: "SEP",
-    color: "#627EEA",
+    color: "#000000",
     rpc: "https://eth-sepolia.g.alchemy.com/v2/tBBD_tGhqE9AOhsw9RIOZ",
     explorer: "https://sepolia.etherscan.io",
   },
@@ -109,7 +109,7 @@ const TESTNET_CHAINS = [
     chain: baseSepolia,
     label: "Base Sepolia",
     badge: "bSEP",
-    color: "#0052FF",
+    color: "#000000",
     rpc: "https://sepolia.base.org",
     explorer: "https://sepolia.basescan.org",
   },
@@ -117,7 +117,7 @@ const TESTNET_CHAINS = [
     chain: optimismSepolia,
     label: "OP Sepolia",
     badge: "oSEP",
-    color: "#FF0420",
+    color: "#000000",
     rpc: "https://opt-sepolia.g.alchemy.com/v2/tBBD_tGhqE9AOhsw9RIOZ",
     explorer: "https://sepolia-optimism.etherscan.io",
   },
@@ -133,7 +133,7 @@ const ZK_MAINNET_CHAINS = [
     chain: zkSync,
     label: "zkSync Era",
     badge: "ZKS",
-    color: "#1E69FF",
+    color: "#000000",
     rpc: "https://mainnet.era.zksync.io",
     explorer: "https://explorer.zksync.io",
     proofType: "SNARK" as const,
@@ -143,7 +143,7 @@ const ZK_MAINNET_CHAINS = [
     chain: polygonZkEvm,
     label: "Polygon zkEVM",
     badge: "zkEVM",
-    color: "#7B3FE4",
+    color: "#000000",
     rpc: "https://zkevm-rpc.com",
     explorer: "https://zkevm.polygonscan.com",
     proofType: "SNARK" as const,
@@ -156,7 +156,7 @@ const ZK_TESTNET_CHAINS = [
     chain: zkSyncSepoliaTestnet,
     label: "zkSync Sepolia",
     badge: "ZKS-T",
-    color: "#1E69FF",
+    color: "#000000",
     rpc: "https://sepolia.era.zksync.dev",
     explorer: "https://sepolia.explorer.zksync.io",
     proofType: "SNARK" as const,
@@ -166,7 +166,7 @@ const ZK_TESTNET_CHAINS = [
     chain: polygonZkEvmCardona,
     label: "zkEVM Cardona",
     badge: "zkC",
-    color: "#7B3FE4",
+    color: "#000000",
     rpc: "https://rpc.cardona.zkevm-rpc.com",
     explorer: "https://cardona-zkevm.polygonscan.com",
     proofType: "SNARK" as const,
@@ -423,7 +423,7 @@ export default function RegistryPage() {
             chain: "Real Person connected",
             chainId: 1,
             badge: "REAL",
-            color: "#10b981",
+            color: "#000000",
             txCount: 1,
             blockNumber: 0,
             timestamp: u.createdAt,
@@ -555,8 +555,20 @@ export default function RegistryPage() {
 
       setWallets(finalWallets);
       setBlockRoots(roots.sort((a, b) => b.blockNumber - a.blockNumber));
+      
+      let syncedTotal = finalWallets.length + 11530;
+      try {
+        const resMap = await fetch("/api/network/wallet-connections");
+        if (resMap.ok) {
+          const dataMap = await resMap.json();
+          if (dataMap.total) {
+            syncedTotal = dataMap.total;
+          }
+        }
+      } catch (e) {}
+
       setStats({
-        totalWallets: finalWallets.length + 11530,
+        totalWallets: syncedTotal,
         totalChains: chains.length,
         latestBlock: Math.max(...roots.map((r) => r.blockNumber), 0),
         totalTxs: totalTxs + 751350, // 751.35k historic requests from CF
@@ -779,7 +791,7 @@ export default function RegistryPage() {
                           <CheckCircle2
                             size={11}
                             className="ml-auto"
-                            style={{ color: "#10b981" }}
+                            style={{ color: "#000000" }}
                           />
                         )}
                       </button>
@@ -832,7 +844,7 @@ export default function RegistryPage() {
                 color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.55)",
               }}
             >
-              <span className="text-[10px] font-bold uppercase tracking-wider">{isDark ? "Light" : "Dark"}</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider">{isDark ? "DARK" : "LIGHT"}</span>
             </button>
           </div>
         </div>
@@ -1104,7 +1116,7 @@ export default function RegistryPage() {
                                 <div
                                   className="w-6 h-6 rounded-full flex items-center justify-center shrink-0 text-[8px] font-black"
                                   style={{
-                                    backgroundColor: w.color + "20",
+                                    backgroundColor: isDark ? "#fff" : "#000" + "20",
                                     border: `1px solid ${w.color}35`,
                                     color: w.color,
                                   }}
@@ -1138,7 +1150,7 @@ export default function RegistryPage() {
                               <span
                                 className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[9px] font-black uppercase tracking-[0.1em]"
                                 style={{
-                                  backgroundColor: w.color + "18",
+                                  backgroundColor: isDark ? "#fff" : "#000" + "18",
                                   color: w.color,
                                   border: `1px solid ${w.color}30`,
                                 }}
@@ -1223,7 +1235,7 @@ export default function RegistryPage() {
                                 target="_blank"
                                 rel="noopener noreferrer"
                                 className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-[10px] font-bold transition-opacity"
-                                style={{ color: "#627EEA" }}
+                                style={{ color: "#000000" }}
                               >
                                 View 
                               </a>
@@ -1433,7 +1445,7 @@ export default function RegistryPage() {
                                   backgroundColor: isDark
                                     ? "rgba(16,185,129,0.12)"
                                     : "rgba(16,185,129,0.08)",
-                                  color: "#10b981",
+                                  color: "#000000",
                                   border: "1px solid rgba(16,185,129,0.25)",
                                 }}
                               >
@@ -1566,7 +1578,7 @@ export default function RegistryPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="flex items-center gap-1 text-[10px] font-bold hover:underline"
-                            style={{ color: "#627EEA" }}
+                            style={{ color: "#000000" }}
                           >
                             View 
                           </a>
@@ -1606,8 +1618,8 @@ export default function RegistryPage() {
                     style={{ color: isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.45)" }}
                   >
                     Live Network SNARK proofs from{" "}
-                    <strong style={{ color: "#1E69FF" }}>zkSync Era</strong> and{" "}
-                    <strong style={{ color: "#7B3FE4" }}>Polygon zkEVM</strong>.
+                    <strong style={{ color: "#000000" }}>zkSync Era</strong> and{" "}
+                    <strong style={{ color: "#000000" }}>Polygon zkEVM</strong>.
                     The <code className="text-[10px] font-mono">stateRoot</code> in each block is the real
                     ZK-proven cryptographic commitment to all account state. On zkSync Era,{" "}
                     <code className="text-[10px] font-mono">l1BatchNumber</code> links directly to the
@@ -1675,7 +1687,7 @@ export default function RegistryPage() {
                     className="mt-4 px-4 py-2 rounded-xl text-[11px] font-bold transition-all"
                     style={{
                       backgroundColor: "#1E69FF18",
-                      color: "#1E69FF",
+                      color: "#000000",
                       border: "1px solid #1E69FF30",
                     }}
                   >
@@ -1704,7 +1716,7 @@ export default function RegistryPage() {
                         <div className="flex items-center gap-1.5 flex-wrap">
                           <span
                             className="text-[9px] font-black uppercase tracking-[0.12em] px-2 py-0.5 rounded-full flex items-center gap-1"
-                            style={{ backgroundColor: entry.color + "18", color: entry.color, border: `1px solid ${entry.color}30` }}
+                            style={{ backgroundColor: isDark ? "#fff" : "#000" + "18", color: entry.color, border: `1px solid ${entry.color}30` }}
                           >
                             {entry.badge}
                           </span>
@@ -1717,7 +1729,7 @@ export default function RegistryPage() {
                           {entry.isCurrent && (
                             <span
                               className="text-[9px] font-black uppercase tracking-[0.1em] px-2 py-0.5 rounded-full"
-                              style={{ backgroundColor: isDark ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)", color: "#10b981", border: "1px solid rgba(16,185,129,0.25)" }}
+                              style={{ backgroundColor: isDark ? "rgba(16,185,129,0.12)" : "rgba(16,185,129,0.08)", color: "#000000", border: "1px solid rgba(16,185,129,0.25)" }}
                             >
                               Latest
                             </span>
@@ -1866,13 +1878,13 @@ export default function RegistryPage() {
                     label: "Wallets",
                     value: stats.totalWallets.toLocaleString(),
                     
-                    color: "#627EEA",
+                    color: "#000000",
                   },
                   {
                     label: "Chains",
                     value: stats.totalChains.toString(),
                     
-                    color: "#8247E5",
+                    color: "#000000",
                   },
                   {
                     label: "Latest Block",
@@ -1880,25 +1892,25 @@ export default function RegistryPage() {
                       ? `#${stats.latestBlock.toLocaleString()}`
                       : "–",
                     
-                    color: "#10b981",
+                    color: "#000000",
                   },
                   {
                     label: "Txns Scanned",
                     value: stats.totalTxs.toLocaleString(),
                     
-                    color: "#f59e0b",
+                    color: "#000000",
                   },
                   {
                     label: "Senders",
                     value: stats.senders.toLocaleString(),
                     
-                    color: "#06b6d4",
+                    color: "#000000",
                   },
                   {
                     label: "Receivers",
                     value: stats.receivers.toLocaleString(),
                     
-                    color: "#ec4899",
+                    color: "#000000",
                   },
                 ].map((s, i) => (
                   <motion.div
@@ -2195,7 +2207,7 @@ export default function RegistryPage() {
               </div>
             </motion.div>
           )}
-        <LegendaryDownhead />
+        <DownheadSection />
         </AnimatePresence>
       </div>
     </div>

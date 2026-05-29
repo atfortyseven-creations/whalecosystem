@@ -252,7 +252,7 @@ export function InstitutionalPortfolioView() {
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4" onClick={() => setShowAccounts(false)}>
                     <div className="w-full max-w-4xl bg-white border border-black/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
                         <div className="p-4 border-b border-black/10 flex justify-between items-center bg-black/5">
-                            <h2 className="text-lg font-black uppercase tracking-widest text-black">Vault Manager</h2>
+                            <h2 className="text-lg font-black uppercase tracking-widest text-black">Account Manager</h2>
                             <button onClick={() => setShowAccounts(false)} className="text-black/40 hover:text-black font-bold text-xs uppercase">Close</button>
                         </div>
                         <div className="overflow-y-auto p-4">
@@ -412,7 +412,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                                 ))}
                             </div>
                             <div className="flex-1 bg-white flex flex-col">
-                                {activeTab === 'TOKENS' && <QuantumHoldingsEngine address={address} activeNetwork={activeNetwork} scannerBase={scannerBase} />}
+                                {activeTab === 'TOKENS' && <QuantumHoldingsEngine address={address} activeNetwork={activeNetwork} scannerBase={scannerBase} userAssets={assets} />}
                                 {activeTab === 'DEFI' && <QuantumDeFiPositions address={address} activeNetwork={activeNetwork} />}
                                 {activeTab === 'ACTIVITY' && <TransactionHistory address={address} scannerBase={scannerBase} />}
                             </div>
