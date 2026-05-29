@@ -426,8 +426,8 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
 
           {phase === "ENTROPY" && (
             <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full px-2 text-center">
-              <h2 className="text-[13px] md:text-[20px] font-black uppercase tracking-widest text-black mb-2 drop-shadow-sm">Extracting Quantum Entropy</h2>
-              <p className="text-[10px] md:text-[12px] font-mono uppercase tracking-widest text-black/50 mb-8 md:mb-11">Autonomous Hardware Jitter Collection</p>
+              <h2 className="text-[13px] md:text-[20px] font-black uppercase tracking-widest text-black mb-2 drop-shadow-sm">Generating Secure Identity</h2>
+              <p className="text-[10px] md:text-[12px] font-mono uppercase tracking-widest text-black/50 mb-8 md:mb-11">Extracting device entropy</p>
               
               <div className="w-full max-w-xl bg-black/5 h-1.5 mb-5 overflow-hidden rounded-full backdrop-blur-sm">
                 <div className="h-full bg-black transition-all duration-75 ease-linear rounded-full" style={{ width: `${entropyProgress}%` }} />
@@ -438,7 +438,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
               </div>
               
               <div className="mt-4 font-mono text-[10px] md:text-[14px] text-black/40 tracking-widest uppercase">
-                Hardware Hex: {hardwareHex}
+                Entropy Hash: {hardwareHex}
               </div>
               
               <div className="grid grid-cols-10 md:grid-cols-20 gap-2 mt-8 w-full max-w-3xl opacity-30">
