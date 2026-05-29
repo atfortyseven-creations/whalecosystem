@@ -122,14 +122,78 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
     );
 }
 
+const PROTOCOL_LIST = [
+    {
+        id: 'PRIVACY',
+        label: 'Privacy Shield',
+        desc: 'Manage shielded transactions and configure your privacy settings. Control which addresses can see your activity.',
+    },
+    {
+        id: 'ALLOWANCES',
+        label: 'Allowances',
+        desc: 'Review and revoke token spending permissions granted to external protocols. Keep your approvals under control.',
+    },
+    {
+        id: 'SMART_ACCOUNT',
+        label: 'Smart Account',
+        desc: 'Configure account abstraction, session keys, and automated signing rules for this wallet.',
+    },
+    {
+        id: 'DEPLOYER',
+        label: 'Contract Deployer',
+        desc: 'Deploy and manage smart contracts directly from your wallet across all supported networks.',
+    },
+    {
+        id: 'CROSS_CHAIN',
+        label: 'Cross Chain',
+        desc: 'Bridge and transfer assets across all supported networks using native and third-party bridge protocols.',
+    },
+    {
+        id: 'MEMPOOL',
+        label: 'Transaction Monitor',
+        desc: 'Monitor pending transactions, inspect the mempool, and adjust gas settings for speed and cost.',
+    },
+];
+
 function ProtocolsModule() {
+    const [selected, setSelected] = useState<string | null>(null);
+
+    const proto = PROTOCOL_LIST.find(p => p.id === selected);
+
+    if (selected && proto) {
+        return (
+            <div className="space-y-6">
+                <button
+                    onClick={() => setSelected(null)}
+                    className="text-[10px] font-black uppercase tracking-[0.2em] border border-black px-5 py-2.5 hover:bg-black hover:text-white transition-colors"
+                >
+                    Back
+                </button>
+
+                <div className="border border-black p-8">
+                    <h3 className="text-[13px] font-black uppercase tracking-[0.2em] mb-3">{proto.label}</h3>
+                    <p className="text-[11px] tracking-widest leading-relaxed text-black/60 mb-10 uppercase">{proto.desc}</p>
+
+                    <div className="py-14 text-center border border-black/20">
+                        <span className="text-[10px] font-black uppercase tracking-[0.25em] text-black/30">AVAILABLE IN NEXT RELEASE</span>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
         <div className="space-y-6">
             <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">Core Protocols</h3>
             <div className="grid grid-cols-2 gap-4">
-                {['PRIVACY', 'ALLOWANCES', 'SMART ACCOUNT', 'DEPLOYER', 'CROSS-CHAIN', 'MEMPOOL'].map(p => (
-                    <button key={p} className="p-8 border border-black hover:bg-black hover:text-white transition-all text-center">
-                        <span className="text-[11px] font-black uppercase tracking-[0.25em]">{p}</span>
+                {PROTOCOL_LIST.map(p => (
+                    <button
+                        key={p.id}
+                        onClick={() => setSelected(p.id)}
+                        className="p-7 border border-black hover:bg-black hover:text-white transition-all text-left group"
+                    >
+                        <span className="text-[11px] font-black uppercase tracking-[0.25em] block mb-2">{p.label}</span>
+                        <span className="text-[9px] uppercase tracking-widest text-black/40 group-hover:text-white/60 block leading-relaxed">{p.desc}</span>
                     </button>
                 ))}
             </div>
@@ -146,14 +210,14 @@ function QuantumSwapModule({ btcAddress, btcBalance }: any) {
         setSwapping(true);
         setTimeout(() => {
             setSwapping(false);
-            toast.success("QUANTUM SWAP EXECUTED", { description: "BTC securely routed to ETH via zero-knowledge channels." });
+            toast.success("Swap Submitted", { description: "BTC routed to ETH via the cross-chain bridge." });
             setAmount('');
         }, 3000);
     };
 
     return (
         <div className="space-y-6">
-            <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">Quantum On-Chain Swap (BTC {'->'} ETH)</h3>
+            <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">Native Swap (BTC to ETH)</h3>
             
             <div className="border border-black p-6 space-y-4 bg-black/5">
                 <div className="flex justify-between items-center border-b border-black/20 pb-4">

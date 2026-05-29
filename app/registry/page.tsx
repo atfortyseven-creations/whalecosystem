@@ -41,6 +41,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RealWorldMap } from "@/components/landing/RealWorldMap";
+import { LegendaryDownhead } from "@/components/landing/LegendaryDownhead";
 
 // ─── Chain Configurations ──────────────────────────────────────────────────────
 
@@ -123,7 +124,7 @@ const TESTNET_CHAINS = [
 ] as const;
 
 // ─── ZK Chains (real ZK proof data) ───────────────────────────────────────────
-// These chains produce real SNARK/STARK proofs committed on-chain.
+// These chains produce real SNARK/STARK proofs committed Network.
 // zkSync Era: each block carries l1BatchNumber referencing the L1 proof batch.
 // Polygon zkEVM: each block's stateRoot is the ZK-proven state commitment.
 
@@ -212,13 +213,13 @@ interface ZkEntry {
   color: string;
   proofType: "SNARK" | "STARK";
   blockNumber: number;
-  // Real stateRoot from block header — this IS the ZK-proven state commitment
+  // Real stateRoot from block header this IS the ZK-proven state commitment
   stateRoot: string;
   // Real block hash
   blockHash: string;
   // Real parent hash
   parentHash: string;
-  // zkSync Era specific: L1 batch number referencing the on-chain proof
+  // zkSync Era specific: L1 batch number referencing the Network proof
   l1BatchNumber: number | null;
   // Whether we got a non-empty stateRoot (i.e. proof was actually available)
   proofVerified: boolean;
@@ -235,7 +236,7 @@ type TabType = "map" | "wallets" | "block-roots" | "circuit-roots" | "overview";
 type NetworkType = "mainnet" | "testnet";
 
 const PER_PAGE = 30;
-// 10 real blocks per chain — enough data without timing out on slow RPCs
+// 10 real blocks per chain enough data without timing out on slow RPCs
 const SCAN_DEPTH = 10n;
 
 // ─── Helpers ───────────────────────────────────────────────────────────────────
@@ -320,7 +321,7 @@ export default function RegistryPage() {
   // Both chains produce real ZK proofs: each block's stateRoot is the
   // cryptographic commitment proven by a SNARK before L1 finalization.
   // zkSync Era also exposes l1BatchNumber linking each block to the
-  // on-chain Ethereum proof batch.
+  // Network Ethereum proof batch.
 
   const runZkIndexer = useCallback(async (selectedNetwork: NetworkType) => {
     setZkLoading(true);
@@ -391,7 +392,7 @@ export default function RegistryPage() {
     setZkLoading(false);
   }, []);
 
-  // ── On-chain Indexer (Wallets + Block Roots) ──────────────────────────────
+  // ── Network Indexer (Wallets + Block Roots) ──────────────────────────────
 
   const runIndexer = useCallback(async (selectedNetwork: NetworkType) => {
     abortRef.current = true;
@@ -517,7 +518,7 @@ export default function RegistryPage() {
               blockNumber: Number(block.number),
               blockHash: (block.hash as string) || "",
               parentHash: block.parentHash || "",
-              // stateRoot may be empty on some chains — we show "–" in UI
+              // stateRoot may be empty on some chains we show "–" in UI
               stateRoot: (block as any).stateRoot || "",
               timestamp: new Date(Number(block.timestamp) * 1000).toISOString(),
               txCount: txs.length,
@@ -610,19 +611,19 @@ export default function RegistryPage() {
 
   // ── Tab config ────────────────────────────────────────────────────────────
 
-  const TABS: { id: TabType; label: string; icon: React.ReactNode }[] = [
-    { id: "map", label: "Network Map", icon: <Globe size={13} /> },
-    { id: "wallets", label: "Wallets", icon: <Wallet size={13} /> },
-    { id: "block-roots", label: "Block Roots", icon: <Hash size={13} /> },
-    { id: "circuit-roots", label: "Circuit Roots", icon: <Shield size={13} /> },
-    { id: "overview", label: "Overview", icon: <Layers size={13} /> },
+  const TABS: { id: TabType; label: string }[] = [
+    { id: "map", label: "Network Map"},
+    { id: "wallets", label: "Wallets"},
+    { id: "block-roots", label: "Block Roots"},
+    { id: "circuit-roots", label: "Circuit Roots"},
+    { id: "overview", label: "Overview"},
   ];
 
   // ── Render ────────────────────────────────────────────────────────────────
 
   return (
     <div
-      className="min-h-full w-full flex flex-col transition-colors duration-300"
+      className="min-h-full w-full flex flex-col transition-colors duration-300" style={{ zoom: 1.3 }}
       style={{
         backgroundColor: isDark ? "#09090f" : "#ffffff",
         color: isDark ? "#e2e8f0" : "#0f172a",
@@ -646,7 +647,7 @@ export default function RegistryPage() {
           {/* Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
             <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#627EEA] to-[#8247E5] flex items-center justify-center shadow-sm">
-              <Database size={13} className="text-white" />
+              
             </div>
             <div className="hidden sm:block">
               <span
@@ -688,7 +689,7 @@ export default function RegistryPage() {
                       : "rgba(0,0,0,0.55)",
                   }}
                 >
-                  {tab.icon}
+                  
                   <span>{tab.label}</span>
                 </button>
               );
@@ -801,7 +802,7 @@ export default function RegistryPage() {
               <button
                 onClick={() => runAll(network)}
                 disabled={loading || zkLoading}
-                title="Refresh all on-chain data (wallets + ZK proofs)"
+                title="Refresh all Network data (wallets + ZK proofs)"
                 className="p-2 rounded-lg transition-all disabled:opacity-40"
                 style={{
                   border: isDark
@@ -831,7 +832,7 @@ export default function RegistryPage() {
                 color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.55)",
               }}
             >
-              {isDark ? <Sun size={13} /> : <Moon size={13} />}
+              <span className="text-[10px] font-bold uppercase tracking-wider">{isDark ? "Light" : "Dark"}</span>
             </button>
           </div>
         </div>
@@ -934,7 +935,7 @@ export default function RegistryPage() {
                   >
                     {loading
                       ? `Scanning ${network} chains…`
-                      : `${filteredWallets.length.toLocaleString()} wallets indexed across ${stats.totalChains} chains — live on-chain`}
+                      : `${filteredWallets.length.toLocaleString()} wallets indexed across ${stats.totalChains} chains live Network`}
                   </p>
                 </div>
 
@@ -1058,7 +1059,7 @@ export default function RegistryPage() {
                             >
                               {searchQuery
                                 ? "No wallets match your search."
-                                : "No wallets indexed yet — click Refresh."}
+                                : "No wallets indexed yet click Refresh."}
                             </td>
                           </tr>
                         )
@@ -1127,7 +1128,7 @@ export default function RegistryPage() {
                                       : "rgba(0,0,0,0.3)",
                                   }}
                                 >
-                                  <Copy size={10} />
+                                  
                                 </button>
                               </div>
                             </td>
@@ -1224,7 +1225,7 @@ export default function RegistryPage() {
                                 className="opacity-0 group-hover:opacity-100 inline-flex items-center gap-1 text-[10px] font-bold transition-opacity"
                                 style={{ color: "#627EEA" }}
                               >
-                                View <ExternalLink size={9} />
+                                View 
                               </a>
                             </td>
                           </motion.tr>
@@ -1270,7 +1271,7 @@ export default function RegistryPage() {
                             : "rgba(0,0,0,0.6)",
                         }}
                       >
-                        <ChevronLeft size={13} />
+                        
                       </button>
 
                       {Array.from(
@@ -1331,7 +1332,7 @@ export default function RegistryPage() {
                             : "rgba(0,0,0,0.6)",
                         }}
                       >
-                        <ChevronRight size={13} />
+                        
                       </button>
                     </div>
                   </div>
@@ -1499,7 +1500,7 @@ export default function RegistryPage() {
                                     : "rgba(0,0,0,0.25)",
                                 }}
                               >
-                                <Copy size={9} />
+                                
                               </button>
                             </div>
                             <span
@@ -1567,7 +1568,7 @@ export default function RegistryPage() {
                             className="flex items-center gap-1 text-[10px] font-bold hover:underline"
                             style={{ color: "#627EEA" }}
                           >
-                            View <ExternalLink size={9} />
+                            View 
                           </a>
                         </div>
                       </motion.div>
@@ -1577,10 +1578,10 @@ export default function RegistryPage() {
           )}
 
           {/* ══════════════════════════════════════════════════════════════
-              TAB: ZK CIRCUIT ROOTS — REAL DATA
+              TAB: ZK CIRCUIT ROOTS REAL DATA
               Source: zkSync Era (chainId 324) + Polygon zkEVM (chainId 1101)
               stateRoot = ZK-proven state commitment from block header
-              l1BatchNumber = link to the Ethereum on-chain proof batch
+              l1BatchNumber = link to the Ethereum Network proof batch
           ══════════════════════════════════════════════════════════════ */}
           {activeTab === "circuit-roots" && (
             <motion.div
@@ -1597,14 +1598,14 @@ export default function RegistryPage() {
                     className="text-[20px] font-black tracking-tight flex items-center gap-2"
                     style={{ color: isDark ? "#fff" : "#0f172a" }}
                   >
-                    <Zap size={18} style={{ color: "#1E69FF" }} />
+                    
                     ZK State Commitments
                   </h1>
                   <p
                     className="text-[12px] mt-1 max-w-2xl"
                     style={{ color: isDark ? "rgba(255,255,255,0.85)" : "rgba(0,0,0,0.45)" }}
                   >
-                    Live on-chain SNARK proofs from{" "}
+                    Live Network SNARK proofs from{" "}
                     <strong style={{ color: "#1E69FF" }}>zkSync Era</strong> and{" "}
                     <strong style={{ color: "#7B3FE4" }}>Polygon zkEVM</strong>.
                     The <code className="text-[10px] font-mono">stateRoot</code> in each block is the real
@@ -1627,9 +1628,9 @@ export default function RegistryPage() {
                         border: `1px solid ${cfg.color}35`,
                       }}
                     >
-                      <Zap size={8} />
+                      
                       {cfg.label}
-                      <ExternalLink size={7} />
+                      
                     </a>
                   ))}
                 </div>
@@ -1656,7 +1657,7 @@ export default function RegistryPage() {
                 </div>
               )}
 
-              {/* Empty state — RPC unreachable */}
+              {/* Empty state RPC unreachable */}
               {!zkLoading && zkEntries.length === 0 && (
                 <div
                   className="rounded-2xl p-12 text-center"
@@ -1665,10 +1666,9 @@ export default function RegistryPage() {
                     backgroundColor: isDark ? "#0d0d17" : "#fff",
                   }}
                 >
-                  <Zap size={28} className="mx-auto mb-3"
-                    style={{ color: isDark ? "rgba(255,255,255,0.15)" : "rgba(0,0,0,0.15)" }} />
+                  
                   <p className="text-[12px]" style={{ color: isDark ? "rgba(255,255,255,0.75)" : "rgba(0,0,0,0.35)" }}>
-                    ZK RPC nodes are unreachable — check your connection or try refreshing.
+                    ZK RPC nodes are unreachable check your connection or try refreshing.
                   </p>
                   <button
                     onClick={() => runZkIndexer(network)}
@@ -1706,7 +1706,7 @@ export default function RegistryPage() {
                             className="text-[9px] font-black uppercase tracking-[0.12em] px-2 py-0.5 rounded-full flex items-center gap-1"
                             style={{ backgroundColor: entry.color + "18", color: entry.color, border: `1px solid ${entry.color}30` }}
                           >
-                            <Zap size={7} />{entry.badge}
+                            {entry.badge}
                           </span>
                           <span
                             className="text-[9px] font-black uppercase tracking-[0.1em] px-2 py-0.5 rounded-full"
@@ -1748,7 +1748,7 @@ export default function RegistryPage() {
                         )}
                       </div>
 
-                      {/* Cryptographic fields — 100% real on-chain data */}
+                      {/* Cryptographic fields 100% real Network data */}
                       {[
                         { label: "State Root", value: entry.stateRoot, accent: true },
                         { label: "Block Hash", value: entry.blockHash, accent: false },
@@ -1767,7 +1767,7 @@ export default function RegistryPage() {
                               className="opacity-40 hover:opacity-100 transition-opacity"
                               style={{ color: isDark ? "rgba(255,255,255,0.9)" : "rgba(0,0,0,0.5)" }}
                             >
-                              <Copy size={9} />
+                              
                             </button>
                           </div>
                           <span
@@ -1784,7 +1784,7 @@ export default function RegistryPage() {
                         className="flex items-center justify-between mt-4 pt-3 gap-2 flex-wrap"
                         style={{ borderTop: isDark ? "1px solid rgba(255,255,255,0.06)" : "1px solid rgba(0,0,0,0.06)" }}
                       >
-                        {/* Proof status — computed from real stateRoot presence */}
+                        {/* Proof status computed from real stateRoot presence */}
                         <div>
                           <div className="text-[9px] font-black uppercase tracking-[0.1em] mb-0.5"
                             style={{ color: isDark ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.3)" }}>State</div>
@@ -1818,7 +1818,7 @@ export default function RegistryPage() {
                           className="flex items-center gap-1 text-[10px] font-bold hover:underline ml-auto"
                           style={{ color: entry.color }}
                         >
-                          View <ExternalLink size={8} />
+                          View 
                         </a>
                       </div>
                     </motion.div>
@@ -1855,7 +1855,7 @@ export default function RegistryPage() {
                       : "rgba(0,0,0,0.45)",
                   }}
                 >
-                  {network === "mainnet" ? "Mainnet" : "Testnet"} registry — live on-chain statistics
+                  {network === "mainnet" ? "Mainnet" : "Testnet"} registry live Network statistics
                 </p>
               </div>
 
@@ -1865,13 +1865,13 @@ export default function RegistryPage() {
                   {
                     label: "Wallets",
                     value: stats.totalWallets.toLocaleString(),
-                    icon: <Wallet size={15} />,
+                    
                     color: "#627EEA",
                   },
                   {
                     label: "Chains",
                     value: stats.totalChains.toString(),
-                    icon: <Network size={15} />,
+                    
                     color: "#8247E5",
                   },
                   {
@@ -1879,25 +1879,25 @@ export default function RegistryPage() {
                     value: stats.latestBlock
                       ? `#${stats.latestBlock.toLocaleString()}`
                       : "–",
-                    icon: <Activity size={15} />,
+                    
                     color: "#10b981",
                   },
                   {
                     label: "Txns Scanned",
                     value: stats.totalTxs.toLocaleString(),
-                    icon: <Shield size={15} />,
+                    
                     color: "#f59e0b",
                   },
                   {
                     label: "Senders",
                     value: stats.senders.toLocaleString(),
-                    icon: <Globe size={15} />,
+                    
                     color: "#06b6d4",
                   },
                   {
                     label: "Receivers",
                     value: stats.receivers.toLocaleString(),
-                    icon: <CheckCircle2 size={15} />,
+                    
                     color: "#ec4899",
                   },
                 ].map((s, i) => (
@@ -2169,7 +2169,7 @@ export default function RegistryPage() {
                       label: "Deduplication",
                       value: "Address × Chain ID",
                     },
-                    { label: "Data Source", value: "On-chain (Live)" },
+                    { label: "Data Source", value: "Network (Live)" },
                     { label: "Update Mode", value: "On-demand refresh" },
                   ].map(({ label, value }) => (
                     <div key={label}>
@@ -2195,6 +2195,7 @@ export default function RegistryPage() {
               </div>
             </motion.div>
           )}
+        <LegendaryDownhead />
         </AnimatePresence>
       </div>
     </div>

@@ -9,6 +9,7 @@ import { encryptWithPassword, tryDecryptAny } from "@/lib/wallet-security";
 import { useSystemConnect } from "@/hooks/useSystemConnect";
 import { Lock, Hash, Wallet, EyeOff, Eye, UserPlus } from "lucide-react";
 import { OptimizedLocalLottie } from "@/components/landing/OptimizedLocalLottie";
+import { RemoteLottie } from "@/components/ui/RemoteLottie";
 
 type OnboardingPhase = 
   | "INTRO" 
@@ -400,21 +401,21 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
 
           {phase === "ENTROPY" && (
             <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full px-2 text-center">
-              <h2 className="text-[18px] md:text-[28px] font-black uppercase tracking-widest text-black mb-12 md:mb-16 drop-shadow-sm">Move your cursor to generate entropy</h2>
+              <h2 className="text-[13px] md:text-[20px] font-black uppercase tracking-widest text-black mb-8 md:mb-11 drop-shadow-sm">Move your cursor to generate entropy</h2>
               
-              <div className="w-full max-w-3xl bg-black/5 h-2 mb-6 overflow-hidden rounded-full backdrop-blur-sm">
+              <div className="w-full max-w-xl bg-black/5 h-1.5 mb-5 overflow-hidden rounded-full backdrop-blur-sm">
                 <div className="h-full bg-black transition-all duration-100 ease-out rounded-full" style={{ width: `${entropyProgress}%` }} />
               </div>
               
-              <div className="font-mono text-[80px] md:text-[140px] font-black tracking-tighter text-black/10 tabular-nums leading-none">
+              <div className="font-mono text-[56px] md:text-[98px] font-black tracking-tighter text-black/10 tabular-nums leading-none">
                 {entropyProgress.toFixed(1)}%
               </div>
               
-              <div className="grid grid-cols-12 md:grid-cols-24 gap-3 mt-16 w-full max-w-4xl opacity-30">
-                {Array.from({ length: 288 }).map((_, i) => {
+              <div className="grid grid-cols-10 md:grid-cols-20 gap-2 mt-11 w-full max-w-3xl opacity-30">
+                {Array.from({ length: 200 }).map((_, i) => {
                   // Stable fill: cell is "on" if its index falls below the filled proportion
                   // This avoids Math.random() re-evaluating on every mouse move (massive repaint)
-                  const threshold = Math.floor((entropyProgress / 100) * 288);
+                  const threshold = Math.floor((entropyProgress / 100) * 200);
                   const isOn = i < threshold;
                   return (
                     <div
@@ -567,12 +568,13 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
           {phase === "COMPLETE" && (
             <motion.div key="complete" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center text-center w-full h-full">
               <div className="w-64 h-64 md:w-96 md:h-96 mx-auto pointer-events-none mb-8">
-                <OptimizedLocalLottie 
-                  filename="successfully.json"
+                <RemoteLottie
+                  path="/system-shots/Transaction Complete.json"
+                  loop={false}
                   className="w-full h-full"
                 />
               </div>
-              <h2 className="text-[32px] md:text-[48px] font-black uppercase tracking-[0.2em] text-black mb-6 drop-shadow-sm">Success</h2>
+              <h2 className="text-[32px] md:text-[48px] font-black uppercase tracking-[0.2em] text-black mb-6 drop-shadow-sm">Setup Complete</h2>
               <p className="text-[16px] md:text-[20px] font-mono text-black/50 uppercase tracking-widest">Redirecting to portfolio...</p>
             </motion.div>
           )}

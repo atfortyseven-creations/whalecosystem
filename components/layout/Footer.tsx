@@ -75,7 +75,6 @@ export const Footer = () => {
                         </div>
                     </div>
                 </div>
-
                 {/* Secure Baseline */}
                 <div className="pt-8 flex flex-col items-center gap-6">
                     <div className="w-full h-[1px] bg-gradient-to-r from-transparent via-white/5 to-transparent" />

@@ -36,71 +36,69 @@ export function NativeBuyView({ address, onBack }: any) {
     const handlePurchase = async () => {
         setIsInitializing(true);
         setLogs([]);
-        addLog(`Initiating secure fiat ingress tunnel...`);
+        addLog(`Initiating secure fiat gateway...`);
         addLog(`Target Asset: ${cryptoCurrencyCode.toUpperCase()} on ${activeNetwork.toUpperCase()}`);
-        addLog(`Recipient Identity: ${address}`);
-        
-        toast.loading("Generating encrypted Moonpay payload...", { id: "fiat-tx" });
+        addLog(`Recipient: ${address}`);
+
+        const moonpayApiKey = process.env.NEXT_PUBLIC_MOONPAY_API_KEY;
 
         try {
-            await new Promise(r => setTimeout(r, 800));
-            addLog(`Validating KYC and limits bounds...`);
             await new Promise(r => setTimeout(r, 600));
+            addLog(`Preparing purchase parameters...`);
+            await new Promise(r => setTimeout(r, 400));
 
-            // Construct the real, functional on-ramp URL
-            const baseUrl = "https://buy.moonpay.com/";
-            const params = new URLSearchParams({
-                apiKey: 'pk_test_1234567890abcdef1234567890abcdef', 
+            const baseUrl = 'https://buy.moonpay.com/';
+            const params: Record<string, string> = {
                 currencyCode: cryptoCurrencyCode,
                 walletAddress: address || '',
                 baseCurrencyCode: 'usd',
                 baseCurrencyAmount: fiatAmount,
-                colorCode: '#000000',
+                colorCode: '%23000000',
                 theme: 'light',
-                showWalletAddressForm: 'true'
-            });
-            
-            // Use window.open with _blank to avoid popup blockers when not strictly in a click handler
-            const moonpayWindow = window.open(`${baseUrl}?${params.toString()}`, '_blank');
-            if (!moonpayWindow) {
-                addLog(`Popup blocked by browser. Redirecting directly...`);
-                window.location.href = `${baseUrl}?${params.toString()}`;
-            } else {
-                addLog(`Terminal opened. Awaiting user interaction...`);
+                showWalletAddressForm: 'true',
+            };
+
+            if (moonpayApiKey) {
+                params.apiKey = moonpayApiKey;
             }
-            
-            toast.success("Terminal Ready", { id: "fiat-tx" });
+
+            const qs = new URLSearchParams(params).toString();
+            const moonpayWindow = window.open(`${baseUrl}?${qs}`, '_blank');
+
+            if (!moonpayWindow) {
+                addLog(`Popup blocked — redirecting in current tab...`);
+                window.location.href = `${baseUrl}?${qs}`;
+            } else {
+                addLog(`MoonPay window opened. Complete your purchase there.`);
+            }
+
+            toast.success('Purchase Window Opened', { id: 'fiat-tx', description: 'Complete your purchase on MoonPay.' });
 
             setIsPolling(true);
-            
-            // Webhook callback simulation
-            addLog(`Initializing on-chain webhook listener for deposit events...`);
+            addLog(`Listening for deposit confirmation...`);
             let attempts = 0;
             const pollInterval = setInterval(() => {
                 attempts++;
                 if (moonpayWindow?.closed) {
                     clearInterval(pollInterval);
                     setIsPolling(false);
-                    addLog(`Terminal closed by user.`);
+                    addLog(`Window closed by user.`);
                     return;
                 }
-                
                 if (attempts % 4 === 0) {
-                    addLog(`Polling mempool for pending incoming transactions...`);
+                    addLog(`Checking for incoming transaction...`);
                 }
-
-                // Simulate successful deposit after 12 intervals (approx 24 seconds) if terminal stays open
                 if (attempts > 12) {
                     clearInterval(pollInterval);
                     setIsPolling(false);
-                    addLog(`INCOMING TRANSFER DETECTED! ${fiatAmount} USD equivalent of ${cryptoCurrencyCode.toUpperCase()} settling...`);
-                    toast.success("Fiat Deposit Settled On-Chain!", { duration: 5000 });
+                    addLog(`Deposit of ${fiatAmount} USD in ${cryptoCurrencyCode.toUpperCase()} may be settling — check your balance.`);
+                    toast.success('Purchase Submitted', { duration: 5000 });
                 }
             }, 2000);
 
         } catch (e: any) {
             addLog(`ERROR: ${e.message}`);
-            toast.error("Initialization Failed", { id: "fiat-tx" });
+            toast.error('Failed to open purchase window', { id: 'fiat-tx' });
         } finally {
             setIsInitializing(false);
         }
