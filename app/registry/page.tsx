@@ -2207,8 +2207,8 @@ export default function RegistryPage() {
               </div>
             </motion.div>
           )}
-        <DownheadSection />
         </AnimatePresence>
+        <DownheadSection />
       </div>
     </div>
   );

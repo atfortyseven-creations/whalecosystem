@@ -22,8 +22,13 @@ export default function SignUpPage() {
   }, []);
 
   const handleComplete = useCallback(() => {
-    // Wallet sealed, session established, DB indexed — go straight to portfolio
-    router.replace("/portfolio");
+    // Wallet sealed, session established, DB indexed
+    const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+    if (mobile) {
+      router.replace("/dashboard");
+    } else {
+      router.replace("/");
+    }
   }, [router]);
 
   if (!mounted) {

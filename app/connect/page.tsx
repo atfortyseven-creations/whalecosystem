@@ -38,9 +38,14 @@ function RealDeviceRouter() {
       const urlParams = new URLSearchParams(window.location.search);
       const hasUuid = urlParams.has('uuid');
       if (!hasUuid) {
-        const next = urlParams.get('next') || '/';
-        if (next !== window.location.pathname) {
+        const next = urlParams.get('next');
+        if (next && next !== window.location.pathname) {
           window.location.replace(next);
+        } else {
+          // Mobile → Dashboard (scanner), Desktop → Landing Page
+          const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
+            ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.screen.width < 768;
+          window.location.replace(isMobile ? '/dashboard' : '/');
         }
       }
     }
@@ -67,28 +72,30 @@ function RealDeviceRouter() {
     } catch {}
 
     const isAlreadyLinked = hasCookie || hasLocalSession;
-    if (isAlreadyLinked && !hasUuid) {
-      // Authenticated: go to the 'next' param destination, or the dashboard.
-      // NEVER default back to /connect — that creates an infinite redirect loop.
-      const next = urlParams.get('next');
-      const destination = next && !next.startsWith('/connect') && !next.startsWith('/sign-up')
-        ? next
-        : '/dashboard';
-      window.location.replace(destination);
-      return;
-    }
 
-    // Not authenticated — determine device type and show appropriate connect UI.
+    // Detect device type early — needed for both the early redirect and the view setting
     const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());
     const isTouchDevice = (
       'ontouchstart' in window ||
       navigator.maxTouchPoints > 0 ||
-      // @ts-ignore  legacy IE check
+      // @ts-ignore
       navigator.msMaxTouchPoints > 0
     );
     const isNarrowScreen = window.screen.width < 768;
+    const isMobileDevice = isUaMobile || (isTouchDevice && isNarrowScreen);
 
-    setView(isUaMobile || (isTouchDevice && isNarrowScreen) ? 'mobile' : 'desktop');
+    if (isAlreadyLinked && !hasUuid) {
+      const next = urlParams.get('next');
+      const fallback = isMobileDevice ? '/dashboard' : '/';
+      const destination = next && !next.startsWith('/connect') && !next.startsWith('/sign-up')
+        ? next
+        : fallback;
+      window.location.replace(destination);
+      return;
+    }
+
+    // Not authenticated — show appropriate connect UI
+    setView(isMobileDevice ? 'mobile' : 'desktop');
   }, []);
 
   if (view === 'loading') {

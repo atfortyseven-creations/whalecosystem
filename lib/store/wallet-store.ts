@@ -473,34 +473,6 @@ export const useWalletStore = create<WalletState>()(
           }
           
           const displayBalance = numericBalance === 0 ? "0.0" : numericBalance < 0.0001 ? "<0.0001" : numericBalance.toFixed(4);
-          
-          // Fetch ERC20 balances for CORE and Custom Tokens
-          const currentTokens = [...CORE_TOKENS, ...get().customTokens];
-          const updatedTokenBalances: TokenBalance[] = [];
-          
-          // Massive concurrent RPC calls with Promise.allSettled for extreme quantum analytics speed
-          const tokenPromises = currentTokens.map(async (token) => {
-             if (token.address === "0x0000000000000000000000000000000000000000") {
-                return { ...token, balance: "0.0" }; // L2 Native AZTEC placeholder
-             }
-             try {
-                const contract = new ethers.Contract(token.address, [
-                   "function balanceOf(address owner) view returns (uint256)"
-                ], provider);
-                const bal = await contract.balanceOf(address);
-                const formatted = ethers.formatUnits(bal, token.decimals);
-                return { ...token, balance: parseFloat(formatted).toFixed(4) };
-             } catch (e) {
-                return { ...token, balance: "0.0" };
-             }
-          });
-
-          const results = await Promise.allSettled(tokenPromises);
-          for (const result of results) {
-              if (result.status === 'fulfilled') {
-                  updatedTokenBalances.push(result.value);
-              }
-          }
 
           // Fetch Native BTC Balance (On-Chain Blockstream API)
           if (get().btcAddress) {
@@ -516,7 +488,9 @@ export const useWalletStore = create<WalletState>()(
               }
           }
 
-          set({ balance: displayBalance, tokenBalances: updatedTokenBalances });
+          // We no longer spam the RPC for ERC20 tokens here. The portfolio API handles it.
+          set({ balance: displayBalance });
+
 
         } catch (error) {
           console.error("Failed to sync balance:", error);

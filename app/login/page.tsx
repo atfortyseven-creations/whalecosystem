@@ -80,7 +80,12 @@ export default function LoginPage() {
         window.location.replace(returnUrl);
       }
     } else {
-      window.location.replace("/dashboard");
+      const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
+      if (mobile) {
+        window.location.replace("/dashboard");
+      } else {
+        window.location.replace("/");
+      }
     }
   }, []);
 

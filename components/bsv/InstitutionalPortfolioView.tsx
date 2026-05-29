@@ -84,47 +84,11 @@ export function InstitutionalPortfolioView() {
     const [loading, setLoading] = useState(false);
     const [isHydrated, setIsHydrated] = useState(false);
 
-    // Complex Abysmal Entropy & QD Data State
-    const [qdBalance, setQdBalance] = useState<string>("0");
-    const [entropyIndex, setEntropyIndex] = useState<string>("0.000");
-
     const refreshBalance = useCallback(async () => {
         if (!address) return;
         setLoading(true);
         try {
             await updateBalance();
-
-            const onchainRes = await fetch(`/api/portfolio/onchain?address=${address}`, {
-                cache: 'no-store',
-                signal: AbortSignal.timeout(12000),
-            });
-            if (onchainRes.ok) {
-                const onchainData = await onchainRes.json();
-                if (onchainData.ok && Array.isArray(onchainData.tokens)) {
-                    const qdsToken = onchainData.tokens.find(
-                        (t: any) => t.symbol === 'QDs' || t.symbol === 'QDS'
-                    );
-                    if (qdsToken) {
-                        setQdBalance(qdsToken.balance.toFixed(4));
-                    } else {
-                        setQdBalance('0');
-                    }
-                }
-            }
-
-            try {
-                const blockRes = await fetch(
-                    `/api/portfolio/chain-activity?address=${address}&type=txlist`,
-                    { cache: 'no-store', signal: AbortSignal.timeout(6000) }
-                );
-                if (blockRes.ok) {
-                    const blockData = await blockRes.json();
-                    const txList = Array.isArray(blockData?.result) ? blockData.result : [];
-                    const txCount = txList.length;
-                    const entropyVal = Math.min(1, txCount / 50);
-                    setEntropyIndex(entropyVal.toFixed(3));
-                }
-            } catch {}
         } catch (e) {
             console.error('[PORTFOLIO] On-chain sync failure:', e);
         } finally {
@@ -171,8 +135,6 @@ export function InstitutionalPortfolioView() {
                         address={address}
                         balance={balance}
                         balanceFiat={balanceFiat}
-                        qdBalance={qdBalance}
-                        entropyIndex={entropyIndex}
                         loading={loading}
                         activeNetwork={activeNetwork}
                         onRefresh={refreshBalance}

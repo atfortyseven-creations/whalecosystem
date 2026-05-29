@@ -423,10 +423,11 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         if (parsed.conversations) merged = parsed.conversations;
       }
       
-      // Sync from server
+      // Sync from server (contacts + pending offline messages)
       if (address) {
+        const authHeader = { 'x-web3-address': address };
         try {
-          const res = await fetch(`/api/chat/contacts?address=${address}`);
+          const res = await fetch(`/api/chat/contacts?address=${address}`, { headers: authHeader });
           if (res.ok) {
             const data = await res.json();
             if (data.peers && Array.isArray(data.peers)) {
@@ -436,16 +437,43 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                    merged.push({ peerAddress: peer, lastMessage: '', lastAt: new Date() });
                  }
                });
-               if (merged.length > 0) {
-                 localStorage.setItem(`whale_chat_history_${address}`, JSON.stringify({ conversations: merged }));
-               }
             }
           }
+          
+          // FETCH PENDING MESSAGES (OFFLINE ROUTING) — works for both HL and WalletConnect users
+          const pRes = await fetch(`/api/chat/pending?address=${address}`, { headers: authHeader });
+          if (pRes.ok) {
+             const pData = await pRes.json();
+             if (pData.pending && Array.isArray(pData.pending)) {
+                 pData.pending.forEach((p: any) => {
+                     const peer = p.sender.toLowerCase() === address.toLowerCase() ? p.recipient : p.sender;
+                     const existing = merged.find(c => c.peerAddress.toLowerCase() === peer.toLowerCase());
+                     if (!existing) {
+                         merged.push({ peerAddress: peer, lastMessage: p.content.slice(0, 30), lastAt: new Date(p.timestamp) });
+                     } else {
+                         if (!existing.lastAt || new Date(p.timestamp) > new Date(existing.lastAt)) {
+                             existing.lastMessage = p.content.slice(0, 30);
+                             existing.lastAt = new Date(p.timestamp);
+                         }
+                     }
+                 });
+             }
+          }
+
+          if (merged.length > 0) {
+            localStorage.setItem(`whale_chat_history_${address}`, JSON.stringify({ conversations: merged }));
+          }
         } catch (e) {
-          console.error('Failed to sync contacts from server', e);
+          console.error('[WhaleChat] Failed to sync contacts/pending from server', e);
         }
       }
       
+      merged.sort((a, b) => {
+          const tA = a.lastAt ? new Date(a.lastAt).getTime() : 0;
+          const tB = b.lastAt ? new Date(b.lastAt).getTime() : 0;
+          return tB - tA;
+      });
+
       setConversations(merged);
     } catch (e) {}
   }, [address]);
@@ -559,16 +587,16 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
     if (!address) return;
     localStorage.setItem(`whale_chat_history_${address}`, JSON.stringify({ conversations: arr }));
     
-    // Also backup to server
+    // Also backup to server — send x-web3-address so WalletConnect users are accepted
     fetch('/api/chat/contacts', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'x-web3-address': address },
       body: JSON.stringify({
         address,
         peers: arr.map(c => c.peerAddress)
       })
     }).catch(console.error);
-  }, [address]); // ZERO-MOCK: We only store the address book locally, NEVER messages.
+  }, [address]);
 
   const syncToAddressBook = async (peerAddr: string) => {
     try {

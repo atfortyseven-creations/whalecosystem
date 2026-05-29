@@ -1,26 +1,46 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { getSession } from '@/lib/session';
 
-export async function GET(req: Request) {
+/**
+ * Resolve the authenticated address from session OR x-web3-address header fallback.
+ * This allows WalletConnect-only users (no server session cookie) to read their own
+ * pending messages immediately after connecting their wallet.
+ */
+async function resolveUserId(req: NextRequest, queryAddress: string | null): Promise<string | null> {
+  // Priority 1: server session (Humanity Ledger login / SIWE / QR handshake cookie)
+  const session = await getSession();
+  if (session?.userId) return session.userId.toLowerCase();
+
+  // Priority 2: x-web3-address header (sent by WhaleChat for wagmi/WalletConnect users)
+  // We only accept it when it exactly matches the requested address to prevent spoofing.
+  const headerAddr = req.headers.get('x-web3-address')?.toLowerCase();
+  if (
+    headerAddr &&
+    /^0x[a-f0-9]{40}$/.test(headerAddr) &&
+    queryAddress &&
+    headerAddr === queryAddress.toLowerCase()
+  ) {
+    return headerAddr;
+  }
+
+  return null;
+}
+
+export async function GET(req: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session || !session.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
-    const address = searchParams.get('address');
+    const address = searchParams.get('address')?.toLowerCase() ?? null;
 
-    if (!address || address.toLowerCase() !== session.userId.toLowerCase()) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const userId = await resolveUserId(req, address);
+    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!address || address !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     const pending = await prisma.pendingChatMessage.findMany({
       where: {
         OR: [
-          { sender: address.toLowerCase() },
-          { recipient: address.toLowerCase() }
+          { sender: address },
+          { recipient: address }
         ]
       },
       orderBy: { timestamp: 'asc' }
@@ -33,7 +53,7 @@ export async function GET(req: Request) {
   }
 }
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     const session = await getSession();
     if (!session || !session.userId) {
@@ -65,22 +85,17 @@ export async function POST(req: Request) {
   }
 }
 
-export async function DELETE(req: Request) {
+export async function DELETE(req: NextRequest) {
   try {
-    const session = await getSession();
-    if (!session || !session.userId) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
-    }
-
     const { searchParams } = new URL(req.url);
-    const address = searchParams.get('address');
+    const address = searchParams.get('address')?.toLowerCase() ?? null;
 
-    if (!address || address.toLowerCase() !== session.userId.toLowerCase()) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
-    }
+    const userId = await resolveUserId(req, address);
+    if (!userId) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    if (!address || address !== userId) return NextResponse.json({ error: 'Forbidden' }, { status: 403 });
 
     await prisma.pendingChatMessage.deleteMany({
-      where: { recipient: address.toLowerCase() }
+      where: { recipient: address }
     });
 
     return NextResponse.json({ success: true });

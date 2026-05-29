@@ -13,7 +13,7 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
     let isMounted = true;
     async function fetchUniswapTokens() {
         try {
-            const res = await fetch('https://gateway.ipfs.io/ipns/tokens.uniswap.org');
+            const res = await fetch('https://tokens.uniswap.org');
             if (!res.ok) throw new Error("Failed to fetch");
             const data = await res.json();
             if (isMounted && data.tokens) {

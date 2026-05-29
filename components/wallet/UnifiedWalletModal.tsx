@@ -390,9 +390,32 @@ const UNISWAP_V2_ROUTER_ABI = parseAbi([
   "function swapExactTokensForTokensSupportingFeeOnTransferTokens(uint amountIn, uint amountOutMin, address[] calldata path, address to, uint deadline) external"
 ]);
 
-const STARGATE_ROUTER_ABI = parseAbi([
-  "function swap(uint16 _dstChainId, uint256 _srcPoolId, uint256 _dstPoolId, address payable _refundAddress, uint256 _amountLD, uint256 _minAmountLD, tuple(address dstAddress, uint16 dstChainId, bytes dstPayload) _lzTxParams, bytes calldata _to, bytes calldata _payload) external payable"
-]);
+const STARGATE_ROUTER_ABI = [
+  {
+    "inputs": [
+      { "internalType": "uint16", "name": "_dstChainId", "type": "uint16" },
+      { "internalType": "uint256", "name": "_srcPoolId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_dstPoolId", "type": "uint256" },
+      { "internalType": "address payable", "name": "_refundAddress", "type": "address" },
+      { "internalType": "uint256", "name": "_amountLD", "type": "uint256" },
+      { "internalType": "uint256", "name": "_minAmountLD", "type": "uint256" },
+      { 
+        "components": [
+          { "internalType": "address", "name": "dstAddress", "type": "address" },
+          { "internalType": "uint16", "name": "dstChainId", "type": "uint16" },
+          { "internalType": "bytes", "name": "dstPayload", "type": "bytes" }
+        ],
+        "internalType": "struct IStargateRouter.lzTxObj", "name": "_lzTxParams", "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "_to", "type": "bytes" },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
+    ],
+    "name": "swap",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+] as const;
 
 function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatusMessage }: any) {
     const { address, chain: activeChain } = useAccount();
