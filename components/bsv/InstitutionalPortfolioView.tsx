@@ -15,6 +15,7 @@ import QRScannerModal from '@/components/wallet/QRScannerModal';
 import SecurityVault from '@/components/wallet/SecurityVault';
 import SettingsPanel from '@/components/wallet/SettingsPanel';
 import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
+import { useRealWalletData } from '@/hooks/useRealWalletData';
 
 import { QuantumHoldingsEngine } from '@/components/portfolio/QuantumHoldingsEngine';
 
@@ -67,6 +68,7 @@ const truncate = (str: string, len: number) => {
 
 export function InstitutionalPortfolioView() {
     const { address, balance, updateBalance, activeNetwork, restoreFromCloud, isLocked, unlockVault, passwordHash } = useWalletStore();
+    const { assets } = useRealWalletData([], address);
     
     // We keep 'HOME' as the main view, and overlay modals for actions
     const [view, setView] = useState<'HOME'|'NETWORK'|'CREATE'|'SHIELD'|'SECURITY'|'DEPLOY'|'MEMPOOL'|'SMART_ACCOUNT'|'OMNICHAIN'>('HOME');
@@ -209,6 +211,7 @@ export function InstitutionalPortfolioView() {
                 isOpen={!!unifiedActionTab} 
                 initialTab={unifiedActionTab || 'SEND'} 
                 onClose={() => setUnifiedActionTab(null)} 
+                userAssets={assets || []}
             />
             
             {showReceive && (
