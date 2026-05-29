@@ -9,7 +9,6 @@ export function SiteNavigationPill() {
     const pathname = usePathname();
 
     const navLinks = [
-        { href: '/docs',      label: 'Docs',      icon: HelpCircle,    active: pathname.startsWith('/docs') },
         { href: '/ledger',    label: 'Ledger',    icon: Globe,         active: pathname.startsWith('/ledger') },
         { href: '/portfolio', label: 'Portfolio', icon: LayoutDashboard, active: pathname.startsWith('/portfolio') },
         { href: '/qds',       label: 'QDs',       icon: Atom,          active: pathname.startsWith('/qds') },

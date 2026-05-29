@@ -70,7 +70,7 @@ export function WhaleAlertFooter() {
             title: t('footer.learn'),
             links: [
                 { name: t('footer.developers'), href: "/developer" },
-                { name: t('footer.docs'), href: "#" },
+
                 { name: t('footer.dashboard'), href: "/dashboard" },
                 { name: t('footer.sdk'), href: "#" },
                 { name: t('footer.web3_services'), href: "#" }
@@ -82,7 +82,7 @@ export function WhaleAlertFooter() {
                 { name: t('footer.security'), href: "#" },
                 { name: t('footer.support' as any), href: "/support" },
                 { name: t('footer.blog'), href: "#" },
-                { name: t('footer.careers'), href: "#" },
+
                 { name: t('footer.contact'), href: "#" }
             ]
         }
@@ -121,7 +121,7 @@ export function WhaleAlertFooter() {
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-4">Resources</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/docs" className="text-sm text-slate-600 hover:text-slate-900">Docs</Link></li>
+
                             <li><Link href="/privacy" className="text-sm text-slate-600 hover:text-slate-900">Privacy</Link></li>
                             <li><Link href="/status" className="text-sm text-slate-600 hover:text-slate-900">Status</Link></li>
                         </ul>
@@ -129,7 +129,7 @@ export function WhaleAlertFooter() {
                     <div>
                         <h3 className="text-sm font-black uppercase tracking-widest text-slate-900 mb-4">Company</h3>
                         <ul className="space-y-2">
-                            <li><Link href="/careers" className="text-sm text-slate-600 hover:text-slate-900">Careers</Link></li>
+
                             <li><Link href="/academy" className="text-sm text-slate-600 hover:text-slate-900">Academy</Link></li>
                         </ul>
                     </div>

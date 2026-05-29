@@ -12,7 +12,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { path: '/forum', priority: 0.9, frequency: 'always' },
     { path: '/news', priority: 0.9, frequency: 'hourly' },
     { path: '/academy', priority: 0.8, frequency: 'weekly' },
-    { path: '/careers', priority: 0.8, frequency: 'weekly' },
+
     { path: '/status', priority: 0.9, frequency: 'always' },
     { path: '/developers/api-docs', priority: 0.9, frequency: 'weekly' },
     { path: '/roadmap', priority: 0.9, frequency: 'weekly' },

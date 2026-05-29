@@ -68,22 +68,7 @@ export default function InstitutionalFooter() {
           </ul>
         </div>
 
-        {/* Links Column 3: Tech */}
-        <div className="space-y-6">
-          <h4 className="font-serif font-black text-[11px] uppercase tracking-[0.2em] text-[#FF2DF4]">Technical</h4>
-          <ul className="space-y-4">
-            <li>
-              <Link href="/docs" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                Docs
-              </Link>
-            </li>
-            <li>
-              <Link href="/developers" className="text-sm font-bold text-black/70 hover:text-black flex items-center gap-2 group">
-                Developers
-              </Link>
-            </li>
-          </ul>
-        </div>
+
 
       </div>
 

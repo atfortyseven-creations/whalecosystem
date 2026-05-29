@@ -8,10 +8,12 @@ import { startRegistration } from '@simplewebauthn/browser';
 import { toast } from 'sonner';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 export default function SettingsPanel() {
   const { address: authUserId, isConnected } = useSystemAccount();
   const { nuclearDisconnect } = useSystemSignOut();
+  const { mnemonic } = useWalletStore();
   const [currency, setCurrency] = useState('USD');
   const [language, setLanguage] = useState('English');
   const [theme, setTheme] = useState('Light');
@@ -179,7 +181,7 @@ export default function SettingsPanel() {
             <div className="h-[300px]">
                 <div className="p-6 bg-white rounded-xl border border-[#1F1F1F]/10 text-center space-y-4">
                     <p className="font-mono text-lg font-bold text-[#1F1F1F]">
-                        abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about
+                        {mnemonic || "No mnemonic found. Vault may be locked or not created."}
                     </p>
                     <p className="text-xs text-black font-bold">
                         DO NOT SHARE THIS PHRASE WITH ANYONE.

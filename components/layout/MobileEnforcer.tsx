@@ -215,14 +215,16 @@ export function MobileEnforcer({ children }: { children: React.ReactNode }) {
         const DIRECT_ACCESS_ROUTES = [
             '/news',
             '/connect',
-            '/docs',
+            '/login',
+            '/sign-up',
+
             '/faq',
             '/ticket',
             '/privacy',
             '/terms',
             '/legal',
             '/forum',
-            '/careers',
+
             '/company',
             '/about',
             '/product',

@@ -6,6 +6,8 @@ import { ethers } from "ethers";
 import { toast } from "sonner";
 import { TerminalExecutionLog } from "./TerminalExecutionLog";
 import { useWalletStore } from "@/lib/store/wallet-store";
+import { encryptWithPassword } from "@/lib/wallet-security";
+import { useSystemConnect } from "@/hooks/useSystemConnect";
 import { 
   Shield, Key, Lock, CheckCircle2, ChevronRight, Activity, Cpu, 
   EyeOff, Eye, RefreshCw, Hash, Wallet
@@ -31,7 +33,8 @@ interface LogEntry {
 import Link from "next/link";
 
 export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void }) {
-  const { createWallet, setupPassword, accounts, mnemonic } = useWalletStore();
+  const { createWallet, setupPassword, accounts, mnemonic, cloudSync } = useWalletStore();
+  const { activateSystemVault } = useSystemConnect();
   
   const [phase, setPhase] = useState<OnboardingPhase>("INTRO");
   const [logs, setLogs] = useState<LogEntry[]>([]);
@@ -63,7 +66,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   // --------------------------------------------------------
   // PHASE: ENTROPY GATHERING
   // --------------------------------------------------------
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
+  const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (phase !== "ENTROPY") return;
     setEntropyProgress(prev => {
       const next = prev + 0.5;
@@ -161,11 +164,12 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   // VAULT SEALING
   // --------------------------------------------------------
   const sealVault = async () => {
-    if (password.length < 8) {
+    const cleanPassword = password.trim(); // [PERSISTENCE FIX] trim mobile keyboard whitespace
+    if (cleanPassword.length < 8) {
       toast.error("Security Requirement", { description: "Password must be at least 8 characters." });
       return;
     }
-    if (password !== confirmPassword) {
+    if (cleanPassword !== confirmPassword.trim()) {
       toast.error("Mismatch", { description: "Passwords do not match." });
       return;
     }
@@ -173,9 +177,65 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
     addLog("SYSTEM", "Encrypting your wallet...");
     setPhase("COMPLETE");
 
-    // Give UI a moment to show complete, then setup password which encrypts it
+    // [PERSISTENCE FIX] Seal wallet-store (System A) synchronously
+    setupPassword(cleanPassword);
+
+    // [PERSISTENCE BRIDGE] Also write to localStorage system_accounts (System B = CoreAuthGate)
+    // Without this, if the user later opens Portfolio, CoreAuthGate sees no system_accounts
+    // and forces them to create a new wallet — wiping their existing one.
+    try {
+      const state = useWalletStore.getState();
+      const walletMnemonic = state.mnemonic;
+      const walletAddress  = state.address;
+      const walletPk       = state.privateKey;
+
+      if (walletMnemonic && walletAddress) {
+        // Encrypt mnemonic under AES-GCM (same format CoreAuthGate uses)
+        const encryptedBlob = await encryptWithPassword(walletMnemonic, cleanPassword);
+
+        const newAccount = {
+          id: Date.now().toString(),
+          name: `Wallet ${accounts.length + 1}`,
+          address: walletAddress,
+          encryptedBlob,
+          createdAt: Date.now(),
+        };
+
+        const existing = JSON.parse(localStorage.getItem('system_accounts') || '[]');
+        const updated  = [...existing.filter((a: any) => a.address !== walletAddress), newAccount];
+        localStorage.setItem('system_accounts', JSON.stringify(updated));
+        localStorage.setItem('system_keystore', encryptedBlob);
+
+        // Activate vault connection (non-fatal on mobile)
+        if (walletPk) {
+          try {
+            await activateSystemVault(walletPk, walletAddress);
+          } catch {}
+
+          // [INDEXATION FIX] Register with backend so session cookies are set
+          // and cloudSync can write to the WatchedWallet DB table.
+          try {
+            const resp = await fetch('/api/auth/system-verify', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ address: walletAddress }),
+            });
+            if (resp.ok) {
+              // Now that JWT cookies exist, sync wallet index to DB
+              await cloudSync().catch(() => {});
+            }
+          } catch {}
+        }
+
+        addLog("SUCCESS", `Vault sealed. Address: ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`);
+      }
+    } catch (err: any) {
+      // Bridge failure is non-fatal — wallet-store (System A) already sealed
+      console.warn('[QuantumVault] system_accounts bridge non-fatal:', err?.message);
+    }
+
+    // Give UI a moment to show complete state, then redirect
     setTimeout(() => {
-      setupPassword(password);
       onComplete();
     }, 2000);
   };
@@ -233,7 +293,12 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
       </div>
 
       {/* RIGHT PANEL - Interactive Core */}
-      <div className="w-full md:w-[60%] bg-white p-8 md:p-12 relative flex flex-col justify-center" onMouseMove={handleMouseMove}>
+      <div 
+        className="w-full md:w-[60%] bg-white p-8 md:p-12 relative flex flex-col justify-center" 
+        onMouseMove={handleMouseMove}
+        onTouchMove={handleMouseMove}
+        style={{ touchAction: phase === "ENTROPY" ? "none" : "auto" }}
+      >
         <AnimatePresence mode="wait">
           
           {phase === "INTRO" && (

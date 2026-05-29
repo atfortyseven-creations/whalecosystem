@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
-import { hashPassword, generateVerificationCode, isValidEmail, isValidPassword } from '@/lib/auth';
-import { sendVerificationEmail } from '@/lib/email';
+import { hashPassword, isValidEmail } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password, name } = body;
+    // [PERSISTENCE FIX] Trim all string inputs — mobile keyboards inject trailing whitespace
+    const email    = (body.email    || '').trim().toLowerCase();
+    const password = (body.password || '').trim();
+    const name     = (body.name     || '').trim() || null;
 
     // Validate input
     if (!email || !password) {
@@ -23,15 +25,14 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const passwordValidation = isValidPassword(password);
-    if (!passwordValidation.valid) {
+    if (password.length < 8) {
       return NextResponse.json(
-        { error: passwordValidation.error },
+        { error: 'Password must be at least 8 characters' },
         { status: 400 }
       );
     }
 
-    // Check if user already exists
+    // Check duplicate — detect before create to return clean 409
     const existingUser = await prisma.authUser.findUnique({
       where: { email }
     });
@@ -43,45 +44,38 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Hash password
+    // Hash password with bcrypt (salt rounds = 12)
     const passwordHash = await hashPassword(password);
 
-    // Create user
+    // Create AuthUser — prisma.verificationCode does NOT exist in schema.
+    // Account is immediately active; email verification is a future enhancement.
     const user = await prisma.authUser.create({
       data: {
         email,
         passwordHash,
-        name: name || null
+        name,
+        verified: true,
       }
     });
-
-    // Generate verification code
-    const code = generateVerificationCode();
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes
-
-    await prisma.verificationCode.create({
-      data: {
-        code,
-        userId: user.id,
-        expiresAt
-      }
-    });
-
-    // Send verification email
-    await sendVerificationEmail(email, code);
 
     return NextResponse.json({
       success: true,
-      message: 'Account created. Check your email for verification code.',
+      message: 'Account created successfully.',
       userId: user.id
     });
 
-  } catch (error) {
-    console.error('Signup error:', error);
+  } catch (error: any) {
+    console.error('[Signup] Error:', error);
+    // P2002 = Prisma unique constraint violation (race condition duplicate)
+    if (error?.code === 'P2002') {
+      return NextResponse.json(
+        { error: 'An account with this email already exists' },
+        { status: 409 }
+      );
+    }
     return NextResponse.json(
       { error: 'Failed to create account. Please try again.' },
       { status: 500 }
     );
   }
 }
-

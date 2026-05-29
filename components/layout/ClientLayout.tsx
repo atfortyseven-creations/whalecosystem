@@ -39,19 +39,19 @@ const LinkedGate = dynamic(
 // 
 // Routes that don't need the gate (public / landing)
 // 
-const PUBLIC_PREFIXES = ['/docs', '/privacy', '/terms', '/connect', '/sign-up', '/login', '/news', '/careers', '/chat', '/sign-up'];
+const PUBLIC_PREFIXES = ['/privacy', '/terms', '/connect', '/sign-up', '/login', '/news', '/chat'];
 
 // 
 // Routes that must NOT get the legacy black Downhead footer
 // 
 const NO_DOWNHEAD_PREFIXES = [
   '/dashboard', '/portfolio', '/academy', '/support',
-  '/docs', '/privacy', '/terms', '/ticket', '/news', '/connect',
+  '/privacy', '/terms', '/ticket', '/news', '/connect',
   '/voss-supremacy', '/predictions', '/ledger',
   '/gold-registry', '/infrastructure', '/directory', '/company',
   '/vip', '/faq', '/api-marketplace', '/clearance', '/settings',
   '/login', '/sign-up', '/legal', '/admin', '/developer', '/forum',
-  '/careers',
+  // removed careers
 ];
 
 // 
@@ -63,10 +63,10 @@ const BOUNDED_PREFIXES = [
   '/portfolio', '/academy', '/support', '/news',
   '/predictions', '/ledger', '/voss-supremacy',
   '/gold-registry', '/vip', '/developer', '/developers', '/faq',
-  '/ticket', '/settings', '/docs', '/privacy', '/terms', '/legal',
+  '/ticket', '/settings', '/privacy', '/terms', '/legal',
   '/connect', '/sign-up', '/login', '/admin', '/clearance',
   '/api-marketplace', '/directory', '/company', '/infrastructure',
-  '/forum', '/careers', '/chat',
+  '/forum', '/chat',
 ];
 
 export function ClientLayout({ children }: { children: React.ReactNode }) {
@@ -116,7 +116,6 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       const step = pathname === '/' ? 'LANDING'
         : pathname.startsWith('/connect') ? 'WALLET_CONNECT'
         : pathname.startsWith('/dashboard') ? 'DASHBOARD'
-        : pathname.startsWith('/careers') ? 'TEXT_ARTICLE'
         : null;
       if (step) {
         fetch('/api/analytics/funnel', {
@@ -336,7 +335,7 @@ export function ClientLayout({ children }: { children: React.ReactNode }) {
       pathname === '/academy' ||
       pathname === '/vip' ||
       pathname === '/news' ||
-      pathname === '/careers' ||
+      // removed careers
       pathname === '/'
     );
 

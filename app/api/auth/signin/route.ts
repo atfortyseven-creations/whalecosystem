@@ -1,12 +1,14 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { verifyPassword, isValidEmail } from '@/lib/auth';
-import { cookies } from 'next/headers';
 
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, password } = body;
+    // [PERSISTENCE FIX] Trim inputs — mobile keyboards inject trailing whitespace
+    // causing "Invalid credentials" even with correct passwords
+    const email    = (body.email    || '').trim().toLowerCase();
+    const password = (body.password || '').trim();
 
     // Validation
     if (!email || !password) {
@@ -16,20 +18,29 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const isEmailValid = isValidEmail(email);
-    if (!isEmailValid) {
+    if (!isValidEmail(email)) {
       return NextResponse.json(
         { error: 'Invalid email format' },
         { status: 400 }
       );
     }
 
-    // Find user
-    const user = await prisma.authUser.findUnique({
+    // [INDEXATION FIX] Primary lookup by exact normalized email.
+    // Fallback to case-insensitive search to handle accounts created before
+    // the email normalization fix (toLower) was introduced.
+    let user = await prisma.authUser.findUnique({
       where: { email }
     });
 
     if (!user) {
+      // Case-insensitive fallback — catches legacy accounts stored with mixed case
+      user = await prisma.authUser.findFirst({
+        where: { email: { equals: email, mode: 'insensitive' } }
+      });
+    }
+
+    if (!user) {
+      // Generic message — never reveal whether the account exists
       return NextResponse.json(
         { error: 'Invalid credentials' },
         { status: 401 }
@@ -53,28 +64,33 @@ export async function POST(request: NextRequest) {
     const { createAccessToken, createRefreshToken, setSessionCookies, generateFingerprint } = await import('@/lib/session');
     const fingerprint = generateFingerprint(userAgent, ip);
     
-    const accessToken = await createAccessToken(user.id, user.email, fingerprint);
+    const accessToken  = await createAccessToken(user.id, user.email, fingerprint);
     const refreshToken = await createRefreshToken(user.id, user.email, fingerprint);
 
     // Set secure httpOnly cookies
     await setSessionCookies(accessToken, refreshToken);
 
+    // [INDEXATION FIX] Also update lastLoginAt so the DB record shows as active
+    await prisma.authUser.update({
+      where: { id: user.id },
+      data: { lastLoginAt: new Date() }
+    }).catch(() => {}); // Non-fatal
+
     return NextResponse.json({
       success: true,
       token: accessToken,
       user: {
-        id: user.id,
+        id:    user.id,
         email: user.email,
-        name: user.name
+        name:  user.name
       }
     });
 
   } catch (error) {
-    console.error('Signin error:', error);
+    console.error('[Signin] Error:', error);
     return NextResponse.json(
       { error: 'Authentication failed' },
       { status: 500 }
     );
   }
 }
-

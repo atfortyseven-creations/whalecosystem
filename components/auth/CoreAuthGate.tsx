@@ -11,6 +11,10 @@ import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { useSystemConnect } from '@/hooks/useSystemConnect';
 import { encryptWithPassword, tryDecryptAny } from '@/lib/wallet-security';
 
+// [PERSISTENCE BRIDGE] Sanitize password uniformly across mobile/desktop
+// Mobile keyboards silently inject trailing whitespace. Trim ALWAYS.
+const sanitizePassword = (p: string) => p.trim();
+
 export interface SystemAccount {
   id: string;
   name: string;
@@ -268,7 +272,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
   const progressTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const transitionTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { isConnected } = useAccount();
-  const { importWallet } = useWalletStore();
+  const { importWallet, setupPassword: storeSetupPassword, cloudSync } = useWalletStore();
   const { activateSystemVault } = useSystemConnect();
 
   // Cleanup timers on unmount
@@ -411,7 +415,9 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
       //  Enterprise UPGRADE: Use fast AES-256-GCM (PBKDF2-SHA256 × 600k)
       //    instead of the legacy ethers scrypt which crashes on mobile.
       //    We store the mnemonic phrase so it can be restored from any device.
-      const encryptedBlob = await encryptWithPassword(wallet.mnemonic.phrase, password);
+      // [PERSISTENCE FIX] Always sanitize to prevent mobile-keyboard trailing-space bug
+      const cleanPassword = sanitizePassword(password);
+      const encryptedBlob = await encryptWithPassword(wallet.mnemonic.phrase, cleanPassword);
       
       const newAccount: SystemAccount = {
         id: Date.now().toString(),
@@ -430,6 +436,15 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
 
       importWallet(wallet.privateKey, 'System Main');
 
+      // [PERSISTENCE BRIDGE] Synchronize wallet-store so /login page can also unlock
+      // without this, the user creates via CoreAuthGate but wallet-store.encryptedVault
+      // is empty, causing "Account not found" when they use /login next time.
+      try {
+        storeSetupPassword(cleanPassword);
+      } catch (syncErr) {
+        console.warn('[CoreAuthGate] wallet-store sync non-fatal:', syncErr);
+      }
+
       try {
         sessionStorage.setItem('portfolio_unlocked', 'true');
         sessionStorage.setItem('system_wallet_addr', wallet.address.toLowerCase());
@@ -444,11 +459,15 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
       }
 
       try {
-        await fetch('/api/auth/system-verify', {
+        const verifyResp = await fetch('/api/auth/system-verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ address: wallet.address })
         });
+        if (verifyResp.ok) {
+          // Now that cookies are set, index this wallet in the DB
+          await cloudSync().catch(() => {});
+        }
       } catch (e) {}
 
       const elapsed = Date.now() - startTime;
@@ -504,13 +523,16 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
       let pk: string | null = null;
       let addr: string | null = null;
 
+      // [PERSISTENCE FIX] Sanitize password - prevents mobile trailing-space bug
+      const cleanPassword = sanitizePassword(password);
+
       if (!isLegacyVault) {
         //  Enterprise UPGRADE: tryDecryptAny handles ALL formats atomically:
         //    New AES-GCM blobs (system v1/v2)
         //    Legacy ethers scrypt keystores (V3)
         //    Transparently migrates legacy keystores to AES-GCM on first login
         try {
-          const { plaintext, wasLegacy } = await tryDecryptAny(targetBlob, password);
+          const { plaintext, wasLegacy } = await tryDecryptAny(targetBlob, cleanPassword);
 
           let walletObj: any;
           if (wasLegacy) {
@@ -529,7 +551,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
             try {
               const mnemonic = walletObj.mnemonic?.phrase;
               if (mnemonic) {
-                const newBlob = await encryptWithPassword(mnemonic, password);
+                const newBlob = await encryptWithPassword(mnemonic, cleanPassword);
                 if (targetAccount) {
                   const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: newBlob, address: addr! } : a);
                   localStorage.setItem('system_accounts', JSON.stringify(updatedAccounts));
@@ -566,8 +588,8 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
         try {
           const mnemonic = walletObj.mnemonic?.phrase;
           const blob = mnemonic
-            ? await encryptWithPassword(mnemonic, password)
-            : await encryptWithPassword(vaultPk, password);
+            ? await encryptWithPassword(mnemonic, cleanPassword)
+            : await encryptWithPassword(vaultPk, cleanPassword);
           if (targetAccount) {
              const updatedAccounts = accounts.map(a => a.id === targetAccount!.id ? { ...a, encryptedBlob: blob, address: addr! } : a);
              localStorage.setItem('system_accounts', JSON.stringify(updatedAccounts));
@@ -587,6 +609,16 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
         }
 
         importWallet(pk, 'System Main');
+
+        // [PERSISTENCE BRIDGE] Sync wallet-store so /login page resolves correctly.
+        // If user created via CoreAuthGate, wallet-store.encryptedVault was empty.
+        // After successful decryption here we re-seal it so next visit auto-resolves.
+        try {
+          storeSetupPassword(cleanPassword);
+        } catch (syncErr) {
+          console.warn('[CoreAuthGate] Login wallet-store sync non-fatal:', syncErr);
+        }
+
         try {
           sessionStorage.setItem('portfolio_unlocked', 'true');
           sessionStorage.setItem('system_wallet_addr', addr.toLowerCase());
@@ -599,11 +631,14 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
         }
 
         try {
-          await fetch('/api/auth/system-verify', {
+          const verifyResp = await fetch('/api/auth/system-verify', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ address: addr })
           });
+          if (verifyResp.ok) {
+            await cloudSync().catch(() => {});
+          }
         } catch (e) {}
 
         const elapsed = Date.now() - startTime;
@@ -639,9 +674,11 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
     try {
       // Validate phrase by deriving wallet  throws if any word is invalid
       const restoredWallet = ethers.Wallet.fromPhrase(phrase);
+      // [PERSISTENCE FIX] Sanitize password before encryption
+      const cleanPassword = sanitizePassword(password);
 
       //  Enterprise UPGRADE: Encrypt with fast AES-GCM (not ethers scrypt)
-      const encryptedBlob = await encryptWithPassword(phrase, password);
+      const encryptedBlob = await encryptWithPassword(phrase, cleanPassword);
       
       const restoredAccount: SystemAccount = {
         id: Date.now().toString(),
@@ -661,6 +698,14 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
       localStorage.removeItem('system_vault_v1');
 
       importWallet(restoredWallet.privateKey, 'System Restored');
+
+      // [PERSISTENCE BRIDGE] Sync wallet-store with cleanPassword so /login works
+      try {
+        storeSetupPassword(cleanPassword);
+      } catch (syncErr) {
+        console.warn('[CoreAuthGate] Restore wallet-store sync non-fatal:', syncErr);
+      }
+
       try {
         sessionStorage.setItem('portfolio_unlocked', 'true');
         sessionStorage.setItem('system_wallet_addr', restoredWallet.address.toLowerCase());
@@ -670,11 +715,14 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
       } catch {}
 
       try {
-        await fetch('/api/auth/system-verify', {
+        const verifyResp = await fetch('/api/auth/system-verify', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ address: restoredWallet.address })
         });
+        if (verifyResp.ok) {
+          await cloudSync().catch(() => {});
+        }
       } catch (e) {}
       toast.success('Wallet restaurado', { description: `${restoredWallet.address.slice(0, 6)}...${restoredWallet.address.slice(-4)}` });
       onComplete();

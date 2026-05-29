@@ -6,17 +6,24 @@ import { QuantumVaultOnboarding } from "@/components/auth/QuantumVaultOnboarding
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
+/**
+ * /sign-up — Wallet creation entry point.
+ *
+ * [PERSISTENCE NOTE] All persistence work (setupPassword, system_accounts write,
+ * system-verify call, cloudSync) is now handled inside QuantumVaultOnboarding.sealVault().
+ * handleComplete() only handles navigation so there is NO race condition or duplicate indexation.
+ */
 export default function SignUpPage() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-  }, [router]);
+  }, []);
 
   const handleComplete = useCallback(() => {
-    // When complete, the session is sealed and they go straight to portfolio
-    router.replace("/portfolio");
+    // Wallet sealed, session established, DB indexed — go straight to dashboard
+    router.replace("/dashboard");
   }, [router]);
 
   if (!mounted) {

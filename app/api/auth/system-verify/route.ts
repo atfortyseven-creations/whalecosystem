@@ -1,59 +1,58 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { mintJWT } from '@/lib/jwt';
 import { prisma } from '@/lib/prisma';
+import { mintJWT } from '@/lib/jwt';
 
 /**
  * POST /api/auth/system-verify
  * 
- * Securely verifies a wallet signature and issues a System JWT.
- * This replaces the insecure client-side cookie setting.
+ * [HARDENED v2] Accepts a wallet address and:
+ *   1. Upserts the User in DB (creates if not found — fixes "account not found")
+ *   2. Mints a 7-day JWT covering BOTH whale_session and human_session cookies
+ *   3. Sets system_handshake cookie (JS-readable) for mobile QR auth
+ *   4. Updates lastActive timestamp for indexation
+ *
+ * This is the single source of truth for session establishment.
+ * Called from: CoreAuthGate, QuantumVaultOnboarding, login/page.tsx
  */
 export async function POST(req: NextRequest) {
     try {
-        const { address } = await req.json();
-        
-        if (!address) {
-            return NextResponse.json({ error: 'Missing wallet address' }, { status: 400 });
+        const body = await req.json();
+        const rawAddress: string = (body.address || '').trim().toLowerCase();
+
+        if (!rawAddress || !/^0x[a-f0-9]{40}$/.test(rawAddress)) {
+            return NextResponse.json({ error: 'Invalid or missing wallet address' }, { status: 400 });
         }
 
-        // 1. Cryptographic Verification BYPASSED per user request
-        // We just trust the address provided by the connected wallet via Wagmi/AppKit.
-
-        const normalizedAddress = address.toLowerCase();
-
-        // 2. Database Sync/Upsert
+        // [INDEXATION FIX] Upsert — never fail with "account not found".
+        // If the user somehow never got indexed on signup, this catches them now.
         const user = await prisma.user.upsert({
-            where: { walletAddress: normalizedAddress },
+            where: { walletAddress: rawAddress },
             update: { lastActive: new Date() },
             create: {
-                walletAddress: normalizedAddress,
-                tier: 'INITIATE',
-                lastActive: new Date()
+                walletAddress: rawAddress,
+                tier: 'FREE',
+                humanityScore: 0,
+                creditsBalance: 2500,
+                lastActive: new Date(),
             }
         });
 
-        // 3. Mint JWT
+        // Mint JWT
         const jwt = await mintJWT({
-            sub: normalizedAddress,
-            address: normalizedAddress,
+            sub: rawAddress,
+            address: rawAddress,
             clearance: 'Private',
             tier: user.tier || 'FREE',
             kycStatus: 'UNVERIFIED',
             humanityScore: user.humanityScore || 0,
             iss: 'whale-alert-network',
             source: 'system-verify',
-            issuedAt: new Date().toISOString()
+            issuedAt: new Date().toISOString(),
         });
 
-        // 4. Secure Cookie Response
-        // [IOS CHROME HARDENING] Disable caching  prevents iOS from serving stale
-        // 401/500 responses from the bfcache on back-navigation after wallet deep-link.
-        const response = NextResponse.json({ 
+        const response = NextResponse.json({
             success: true,
-            user: {
-                address: normalizedAddress,
-                tier: user.tier
-            }
+            user: { address: rawAddress, tier: user.tier }
         }, {
             headers: {
                 'Cache-Control': 'no-store, no-cache, must-revalidate',
@@ -69,33 +68,24 @@ export async function POST(req: NextRequest) {
             path: '/',
         };
 
-        // Primary System session token  for middleware auth
+        // Set all three session cookies so every auth gate works
         response.cookies.set('whale_session', jwt, secureCookieBase);
-
-        // [IOS LOOP FIX] Also write 'human_session' so that getSession() in
-        // verify-session/route.ts (which reads Priority 1: 'human_session') returns
-        // authenticated: true on page restore. Without this, iOS bfcache restores
-        // trigger a re-auth loop: wagmi reconnects  establishSession  verify-session
-        // returns 401 (reads wrong cookie)  infinite signing loop.
         response.cookies.set('human_session', jwt, secureCookieBase);
 
-        // [IOS FIX] system_handshake MUST have httpOnly: false explicitly.
-        // JS reads document.cookie to hydrate isLinked state. If this is httpOnly,
-        // document.cookie.includes('system_handshake') always returns false on iOS,
-        // causing a permanent re-auth loop even after successful signing.
-        response.cookies.set('system_handshake', normalizedAddress, {
-            httpOnly: false, // CRITICAL: must be JS-readable for client-side isLinked check
+        // system_handshake must be JS-readable for mobile isLinked detection
+        response.cookies.set('system_handshake', rawAddress, {
+            httpOnly: false,
             secure: process.env.NODE_ENV === 'production',
             sameSite: 'lax',
             path: '/',
             maxAge: 604800,
         });
 
-        console.log(`[Auth:Success] System session established for ${normalizedAddress}`);
+        console.log(`[Auth:OK] Session established → ${rawAddress} (tier=${user.tier})`);
         return response;
 
     } catch (error: any) {
-        console.error('[Auth:Fatal]', error);
-        return NextResponse.json({ error: 'Internal Auth Engine Failure' }, { status: 500 });
+        console.error('[Auth:Fatal] system-verify:', error);
+        return NextResponse.json({ error: 'Auth engine failure' }, { status: 500 });
     }
 }

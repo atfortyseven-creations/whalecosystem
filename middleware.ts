@@ -1,4 +1,4 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { runWAF } from './lib/security/waf-engine';
 import type { JWTPayload } from 'jose';
 import { checkRateLimit, resolveTier } from './lib/security/rate-limiter';
@@ -125,15 +125,6 @@ export default async function middleware(request: NextRequest) {
       return NextResponse.rewrite(url);
     }
 
-    // [VIRTUAL ROUTE] Documentation Catch-All Redirect to Dynamic Router
-    if (pathname.startsWith('/docs') && !pathname.startsWith('/docs/dynamic') && pathname !== '/docs' && pathname !== '/docs/') {
-      const remainingPath = pathname.substring('/docs/'.length);
-      if (remainingPath && !remainingPath.includes('.')) {
-        const url = request.nextUrl.clone();
-        url.pathname = `/docs/dynamic/${remainingPath}`;
-        return NextResponse.rewrite(url);
-      }
-    }
 
     // 0. GEOFENCING  Regulatory Firewall (CFTC/OFAC)
     if (!isBypassIP && matchesPattern(pathname, GEO_RESTRICTED_PATTERNS)) {

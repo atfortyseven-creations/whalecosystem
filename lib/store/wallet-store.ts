@@ -138,22 +138,24 @@ export const useWalletStore = create<WalletState>()(
       encryptedVault: null,
 
       setupPassword: (password: string) => {
-          const hash = CryptoJS.SHA256(password).toString();
-          sessionEncryptionKey = password;
+          const cleanPassword = password.trim();
+          const hash = CryptoJS.SHA256(cleanPassword).toString();
+          sessionEncryptionKey = cleanPassword;
           set({ passwordHash: hash, isLocked: false });
           get()._encryptAndSave();
           toast.success("Security Vault Initialized");
       },
 
       unlockVault: (password: string) => {
+          const cleanPassword = password.trim();
           const { passwordHash, encryptedVault } = get();
           if (!passwordHash) return true;
-          const hash = CryptoJS.SHA256(password).toString();
+          const hash = CryptoJS.SHA256(cleanPassword).toString();
           if (hash !== passwordHash) {
               toast.error("Decryption Failed", { description: "Invalid password provided." });
               return false;
           }
-          sessionEncryptionKey = password;
+          sessionEncryptionKey = cleanPassword;
           
           if (encryptedVault) {
               try {
@@ -175,6 +177,29 @@ export const useWalletStore = create<WalletState>()(
               }
           }
           set({ isLocked: false });
+
+          // [BRIDGE] wallet-store has a password hash but no encrypted vault.
+          // This happens when the user created via CoreAuthGate (Portfolio) and
+          // we later called storeSetupPassword() to sync — but _encryptAndSave()
+          // ran before importWallet() populated the accounts array.
+          // Attempt to load from system_accounts localStorage and re-seal.
+          try {
+              const raw = localStorage.getItem('system_accounts');
+              if (raw) {
+                  const accs = JSON.parse(raw);
+                  if (Array.isArray(accs) && accs.length > 0) {
+                      // We cannot decrypt AES-GCM here (async, no await in sync Zustand).
+                      // Signal the login UI to fall through to System B by returning false
+                      // only when no accounts are loaded at all.
+                      const loaded = get().accounts;
+                      if (!loaded || loaded.length === 0) {
+                          console.warn('[vault-store] Vault empty — system_accounts present. Login page will handle via System B.');
+                          return false; // Tell login page to try system_accounts
+                      }
+                  }
+              }
+          } catch {}
+
           return true;
       },
 
@@ -566,12 +591,16 @@ export const useWalletStore = create<WalletState>()(
       },
 
       cloudSync: async () => {
-        const { accounts } = get();
+        const { accounts, address } = get();
         if (accounts.length === 0) return;
 
         try {
           await fetch('/api/wallets/sync', {
             method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'x-web3-address': address || accounts[0].address
+            },
             body: JSON.stringify({
               wallets: accounts.map(a => ({ address: a.address, label: a.label }))
             })
@@ -582,8 +611,12 @@ export const useWalletStore = create<WalletState>()(
       },
 
       restoreFromCloud: async () => {
+        const { address } = get();
+        if (!address) return;
         try {
-          const res = await fetch('/api/wallets/sync');
+          const res = await fetch('/api/wallets/sync', {
+              headers: { 'x-web3-address': address }
+          });
           const { wallets } = await res.json();
           if (wallets && wallets.length > 0) {
               const currentAccounts = get().accounts;
@@ -624,7 +657,8 @@ export const useWalletStore = create<WalletState>()(
                  passwordHash: state.passwordHash,
                  encryptedVault: state.encryptedVault,
                  // We store masked accounts so the UI knows they exist, but without keys
-                 accounts: state.accounts.map(a => ({ ...a, privateKey: null, mnemonic: null }))
+                 accounts: state.accounts.map(a => ({ ...a, privateKey: null, mnemonic: null })),
+                 isLocked: true // Force lock on fresh page load to prevent stuck "unlocked but keyless" UI states
              } as Partial<WalletState>;
         }
         // Legacy fallback if no password is set yet
@@ -639,12 +673,8 @@ export const useWalletStore = create<WalletState>()(
         } as Partial<WalletState>;
       },
       onRehydrateStorage: () => (state) => {
-          if (state && state.passwordHash) {
-              // Lock immediately on rehydration so the app requires unlock
-              state.isLocked = true;
-              state.privateKey = null;
-              state.mnemonic = null;
-          }
+          // No direct mutation here since Zustand state is immutable.
+          // The isLocked: true in partialize ensures correct hydration.
       }
     }
   )

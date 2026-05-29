@@ -86,7 +86,6 @@ export async function GET() {
     probe('News',       `${baseUrl}/news`),
     probe('Academy',    `${baseUrl}/academy`),
     probe('Forum',      `${baseUrl}/forum`),
-    probe('Careers',    `${baseUrl}/careers`),
     probe('QDs',        `${baseUrl}/qds`),
   ]);
 

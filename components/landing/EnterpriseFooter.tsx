@@ -156,7 +156,7 @@ export function EnterpriseFooter() {
                         title="Empresa"
                         links={[
                             { label: 'Nosotros', href: '/about' },
-                            { label: 'Carreras', href: '/careers' },
+
                             { label: 'Blog', href: '/blog' },
                             { label: 'Prensa', href: '/press' }
                         ]}
@@ -164,7 +164,7 @@ export function EnterpriseFooter() {
                     <FooterColumn
                         title="Recursos"
                         links={[
-                            { label: 'Documentación', href: '/docs' },
+
                             { label: 'Support', href: '/support' },
                             { label: 'FAQ', href: '/#faq' },
                             { label: 'Media Kit', href: '/media-kit' }
