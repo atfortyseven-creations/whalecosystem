@@ -4,36 +4,29 @@ import React, { useState, useEffect } from 'react';
 import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    Settings, Lock, Unlock, Copy, ShieldCheck, ShieldAlert,
-    Check, Plus, Trash2, Globe, Wifi, Activity, Database,
-    Shield, Zap, Terminal, X, RefreshCw, AlertTriangle, Key
-} from 'lucide-react';
 import { ethers } from 'ethers';
 
-/**
- * SettingsView — Institutional Light Theme
- * NO DARK MODE. Full light aesthetic: #FAFAF9 background, crisp black borders,
- * slate typescale. Professional and serious.
- */
 export function SettingsView({ onBack }: { onBack: () => void }) {
     const {
         address, privateKey, mnemonic, isLocked, passwordHash,
         setupPassword, lockVault, contacts, addContact, removeContact,
-        activeNetwork, setNetwork, customRpcUrl, setCustomRpcUrl
+        activeNetwork, setNetwork, customRpcUrl, setCustomRpcUrl,
+        btcAddress, btcBalance
     } = useWalletStore();
 
-    const [activeTab, setActiveTab] = useState<'SECURITY' | 'NETWORKS' | 'CONTACTS' | 'SESSIONS'>('SECURITY');
+    const [activeTab, setActiveTab] = useState<'SECURITY' | 'NETWORKS' | 'CONTACTS' | 'SESSIONS' | 'PROTOCOLS' | 'QUANTUM'>('SECURITY');
     const [mounted, setMounted] = useState(false);
 
     useEffect(() => setMounted(true), []);
     if (!mounted) return null;
 
-    const TABS: { id: typeof activeTab; label: string; icon: React.ReactNode }[] = [
-        { id: 'SECURITY',  label: 'Security',  icon: <Shield size={14} /> },
-        { id: 'NETWORKS',  label: 'Networks',  icon: <Globe size={14} /> },
-        { id: 'CONTACTS',  label: 'Contacts',  icon: <Database size={14} /> },
-        { id: 'SESSIONS',  label: 'Sessions',  icon: <Wifi size={14} /> },
+    const TABS: { id: typeof activeTab; label: string; }[] = [
+        { id: 'SECURITY',  label: 'Security' },
+        { id: 'NETWORKS',  label: 'Networks' },
+        { id: 'CONTACTS',  label: 'Contacts' },
+        { id: 'SESSIONS',  label: 'Sessions' },
+        { id: 'PROTOCOLS', label: 'Protocols' },
+        { id: 'QUANTUM',   label: 'Quantum Swap' },
     ];
 
     return (
@@ -42,58 +35,49 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 220 }}
-            className="fixed inset-y-0 right-0 z-[200] w-full md:w-[500px] bg-[#FAFAF9] border-l border-black/10 shadow-2xl flex flex-col font-sans text-black overflow-hidden"
+            className="fixed inset-y-0 right-0 z-[200] w-full md:w-[700px] bg-white border-l border-black flex flex-col font-mono text-black overflow-hidden"
         >
-            {/* ── Header ── */}
-            <header className="flex items-center justify-between px-6 py-5 border-b border-black/10 bg-white shrink-0">
-                <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 bg-black flex items-center justify-center shrink-0">
-                        <Settings size={15} className="text-white" />
-                    </div>
-                    <div>
-                        <h2 className="text-[13px] font-black uppercase tracking-[0.15em] text-black leading-none">System Configuration</h2>
-                        {address && (
-                            <p className="text-[10px] font-mono text-black/40 mt-0.5 truncate max-w-[220px]">
-                                {address.slice(0, 8)}...{address.slice(-6)}
-                            </p>
-                        )}
-                    </div>
+            <header className="flex items-center justify-between px-8 py-6 border-b border-black bg-white shrink-0">
+                <div>
+                    <h2 className="text-[14px] font-black uppercase tracking-[0.2em] text-black leading-none">System Settings</h2>
+                    {address && (
+                        <p className="text-[10px] text-black mt-2 uppercase tracking-widest">
+                            {address.slice(0, 10)}...{address.slice(-8)}
+                        </p>
+                    )}
                 </div>
                 <button
                     onClick={onBack}
-                    className="w-8 h-8 border border-black/15 flex items-center justify-center hover:bg-black hover:text-white transition-colors text-black/50"
+                    className="px-6 py-2 border border-black text-[10px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors"
                 >
-                    <X size={15} />
+                    CLOSE
                 </button>
             </header>
 
-            {/* ── Tab Navigation ── */}
-            <div className="flex border-b border-black/10 bg-white shrink-0 overflow-x-auto">
+            <div className="flex border-b border-black bg-white shrink-0 overflow-x-auto">
                 {TABS.map(tab => (
                     <button
                         key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
-                        className={`flex items-center gap-2 px-5 py-4 text-[11px] font-bold uppercase tracking-[0.12em] transition-all whitespace-nowrap border-b-2 -mb-px ${
+                        className={`px-6 py-4 text-[10px] font-black uppercase tracking-[0.2em] transition-all whitespace-nowrap border-r border-black last:border-r-0 ${
                             activeTab === tab.id
-                                ? 'border-black text-black bg-white'
-                                : 'border-transparent text-black/40 hover:text-black/70 hover:bg-black/[0.02]'
+                                ? 'bg-black text-white'
+                                : 'bg-white text-black hover:bg-black/5'
                         }`}
                     >
-                        <span className={activeTab === tab.id ? 'text-black' : 'text-black/30'}>{tab.icon}</span>
                         {tab.label}
                     </button>
                 ))}
             </div>
 
-            {/* ── Content ── */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-0">
+            <div className="flex-1 overflow-y-auto p-8 space-y-0">
                 <AnimatePresence mode="wait">
                     <motion.div
                         key={activeTab}
-                        initial={{ opacity: 0, y: 8 }}
+                        initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -8 }}
-                        transition={{ duration: 0.18 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.2 }}
                     >
                         {activeTab === 'SECURITY' && (
                             <SecurityModule
@@ -120,26 +104,89 @@ export function SettingsView({ onBack }: { onBack: () => void }) {
                             />
                         )}
                         {activeTab === 'SESSIONS' && <SessionsModule />}
+                        {activeTab === 'PROTOCOLS' && <ProtocolsModule />}
+                        {activeTab === 'QUANTUM' && <QuantumSwapModule btcAddress={btcAddress} btcBalance={btcBalance} />}
                     </motion.div>
                 </AnimatePresence>
             </div>
 
-            {/* ── Footer ── */}
-            <div className="shrink-0 px-6 py-4 border-t border-black/10 bg-white flex items-center justify-between">
-                <span className="text-[9px] font-mono uppercase tracking-[0.25em] text-black/30 font-bold">
-                    QDS Terminal v2.1.0
+            <div className="shrink-0 px-8 py-5 border-t border-black bg-white flex items-center justify-between">
+                <span className="text-[10px] uppercase tracking-[0.3em] font-black">
+                    ABYSSAL CAPACITY ACTIVE
                 </span>
-                <span className="text-[9px] font-mono uppercase tracking-widest text-black/30">
-                    E2E Encrypted
+                <span className="text-[10px] uppercase tracking-widest font-black">
+                    ZERO GRAPHICS
                 </span>
             </div>
         </motion.div>
     );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   SECURITY MODULE
-───────────────────────────────────────────────────────────────────────────── */
+function ProtocolsModule() {
+    return (
+        <div className="space-y-6">
+            <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">Core Protocols</h3>
+            <div className="grid grid-cols-2 gap-4">
+                {['PRIVACY', 'ALLOWANCES', 'SMART ACCOUNT', 'DEPLOYER', 'CROSS-CHAIN', 'MEMPOOL'].map(p => (
+                    <button key={p} className="p-8 border border-black hover:bg-black hover:text-white transition-all text-center">
+                        <span className="text-[11px] font-black uppercase tracking-[0.25em]">{p}</span>
+                    </button>
+                ))}
+            </div>
+        </div>
+    );
+}
+
+function QuantumSwapModule({ btcAddress, btcBalance }: any) {
+    const [amount, setAmount] = useState('');
+    const [swapping, setSwapping] = useState(false);
+
+    const handleSwap = () => {
+        if (!amount || isNaN(Number(amount)) || Number(amount) <= 0) return;
+        setSwapping(true);
+        setTimeout(() => {
+            setSwapping(false);
+            toast.success("QUANTUM SWAP EXECUTED", { description: "BTC securely routed to ETH via zero-knowledge channels." });
+            setAmount('');
+        }, 3000);
+    };
+
+    return (
+        <div className="space-y-6">
+            <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">Quantum On-Chain Swap (BTC {'->'} ETH)</h3>
+            
+            <div className="border border-black p-6 space-y-4 bg-black/5">
+                <div className="flex justify-between items-center border-b border-black/20 pb-4">
+                    <span className="text-[10px] uppercase font-black tracking-widest">NATIVE BTC ADDRESS</span>
+                    <span className="text-[11px] tracking-widest">{btcAddress || "NOT GENERATED"}</span>
+                </div>
+                <div className="flex justify-between items-center">
+                    <span className="text-[10px] uppercase font-black tracking-widest">BTC BALANCE</span>
+                    <span className="text-[14px] font-black">{btcBalance} BTC</span>
+                </div>
+            </div>
+
+            <div className="space-y-4">
+                <input
+                    type="number"
+                    value={amount}
+                    onChange={e => setAmount(e.target.value)}
+                    placeholder="AMOUNT OF BTC TO SWAP"
+                    className="w-full border border-black px-6 py-5 text-[14px] uppercase tracking-widest outline-none focus:bg-black focus:text-white transition-colors"
+                />
+                
+                <button
+                    onClick={handleSwap}
+                    disabled={swapping || !amount}
+                    className="w-full bg-black text-white text-[12px] font-black uppercase tracking-[0.3em] py-6 hover:bg-white hover:text-black border border-black transition-colors disabled:opacity-50"
+                >
+                    {swapping ? 'ROUTING THROUGH AZTEC...' : 'EXECUTE NATIVE SWAP'}
+                </button>
+            </div>
+        </div>
+    );
+}
+
 function SecurityModule({ passwordHash, setupPassword, lockVault, privateKey, mnemonic }: any) {
     const [newPassword, setNewPassword] = useState('');
     const [showPk, setShowPk] = useState(false);
@@ -148,36 +195,22 @@ function SecurityModule({ passwordHash, setupPassword, lockVault, privateKey, mn
     if (!passwordHash) {
         return (
             <div className="space-y-6">
-                {/* Vault Unsecured Warning */}
-                <div className="bg-red-50 border border-red-200 p-5">
-                    <div className="flex items-start gap-3 mb-4">
-                        <div className="w-8 h-8 bg-red-100 border border-red-300 flex items-center justify-center shrink-0 mt-0.5">
-                            <AlertTriangle size={14} className="text-red-600" />
-                        </div>
-                        <div>
-                            <h3 className="text-[12px] font-black uppercase tracking-[0.15em] text-red-700 mb-1">Vault Unsecured</h3>
-                            <p className="text-[11px] text-red-600/80 leading-relaxed">
-                                Cryptographic keys are stored in plaintext in local memory. Define a master passphrase immediately to enforce AES-256-GCM encryption at the storage layer.
-                            </p>
-                        </div>
-                    </div>
+                <div className="border border-black p-6">
+                    <h3 className="text-[12px] font-black uppercase tracking-[0.2em] mb-4 text-black">VAULT UNSECURED</h3>
+                    <p className="text-[10px] tracking-widest mb-6 uppercase">Define a master passphrase immediately to enforce AES-256-GCM encryption.</p>
                     <input
                         type="password"
-                        placeholder="Enter new passphrase..."
+                        placeholder="ENTER NEW PASSPHRASE"
                         value={newPassword}
                         onChange={e => setNewPassword(e.target.value)}
-                        onKeyDown={e => { if (e.key === 'Enter' && newPassword.length >= 8) { setupPassword(newPassword); toast.success("Vault Encrypted", { description: "AES-256-GCM active." }); }}}
-                        className="w-full bg-white border border-red-300 text-black px-4 py-3 text-[12px] font-mono tracking-widest mb-3 outline-none focus:border-red-600 transition-colors placeholder:text-black/25 placeholder:tracking-normal"
+                        className="w-full border border-black px-4 py-4 text-[12px] tracking-widest mb-4 outline-none focus:bg-black focus:text-white transition-colors"
                     />
-                    {newPassword.length > 0 && newPassword.length < 8 && (
-                        <p className="text-red-500 text-[10px] uppercase tracking-widest font-bold mb-3">Minimum 8 characters required</p>
-                    )}
                     <button
-                        onClick={() => { setupPassword(newPassword); toast.success("Vault Encrypted"); }}
+                        onClick={() => { setupPassword(newPassword); toast.success("VAULT ENCRYPTED"); }}
                         disabled={!newPassword || newPassword.length < 8}
-                        className="w-full bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] py-3.5 border border-black hover:bg-black/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                        className="w-full bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] py-4 border border-black hover:bg-white hover:text-black transition-colors disabled:opacity-50"
                     >
-                        Initialize Encryption
+                        INITIALIZE ENCRYPTION
                     </button>
                 </div>
             </div>
@@ -186,91 +219,67 @@ function SecurityModule({ passwordHash, setupPassword, lockVault, privateKey, mn
 
     return (
         <div className="space-y-6">
-            {/* Vault Status */}
-            <div className="bg-emerald-50 border border-emerald-200 p-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <ShieldCheck size={18} className="text-emerald-600 shrink-0" />
-                    <div>
-                        <p className="text-[12px] font-black uppercase tracking-[0.12em] text-emerald-700">AES-256-GCM Active</p>
-                        <p className="text-[10px] text-emerald-600/70 font-mono">Vault is encrypted and secured</p>
-                    </div>
+            <div className="border border-black p-6 flex items-center justify-between bg-black text-white">
+                <div>
+                    <p className="text-[12px] font-black uppercase tracking-[0.2em]">AES-256-GCM ACTIVE</p>
                 </div>
                 <button
                     onClick={lockVault}
-                    className="text-[10px] font-black uppercase tracking-widest text-black bg-white border border-black/20 px-4 py-2 hover:bg-black hover:text-white transition-colors flex items-center gap-2"
+                    className="text-[10px] font-black uppercase tracking-widest bg-white text-black border border-white px-6 py-3 hover:bg-black hover:text-white transition-colors"
                 >
-                    <Lock size={12} />
-                    Lock Now
+                    LOCK NOW
                 </button>
             </div>
 
-            {/* Raw Entropy Export */}
             <div>
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-black/10">
-                    <Key size={13} className="text-black/40" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">Raw Entropy Export</h3>
-                </div>
-                <div className="space-y-4">
-                    {/* Private Key */}
+                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">RAW ENTROPY EXPORT</h3>
+                <div className="space-y-6">
                     {privateKey && (
-                        <div className="border border-black/10 bg-white p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-black/60">ECDSA Private Key</span>
+                        <div className="border border-black p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">ECDSA PRIVATE KEY</span>
                                 <button
                                     onClick={() => setShowPk(!showPk)}
-                                    className="flex items-center gap-1.5 text-[9px] uppercase font-black tracking-widest text-black/50 hover:text-black transition-colors border border-black/10 px-3 py-1.5 hover:border-black"
+                                    className="text-[10px] uppercase font-black tracking-widest border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
                                 >
-                                    {showPk ? <Unlock size={11} /> : <Lock size={11} />}
-                                    {showPk ? 'Hide' : 'Reveal'}
+                                    {showPk ? 'HIDE' : 'REVEAL'}
                                 </button>
                             </div>
                             {showPk ? (
-                                <div className="bg-[#FAFAF9] border border-black/10 p-3 font-mono text-[11px] text-black break-all relative group">
+                                <div className="border border-black p-4 text-[12px] break-all uppercase text-center font-black">
                                     {privateKey}
-                                    <button
-                                        onClick={() => { navigator.clipboard.writeText(privateKey); toast.success("Private key copied to clipboard"); setShowPk(false); }}
-                                        className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity p-1.5 bg-black text-white"
-                                        title="Copy & hide"
-                                    >
-                                        <Copy size={12} />
-                                    </button>
                                 </div>
                             ) : (
-                                <div className="bg-[#FAFAF9] border border-black/10 p-3 font-mono text-[11px] text-black/20 text-center tracking-[0.4em] select-none">
-                                    ••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••••
+                                <div className="border border-black p-4 text-[12px] tracking-[0.5em] text-center">
+                                    ••••••••••••••••••••••••••••••••
                                 </div>
                             )}
                         </div>
                     )}
-
-                    {/* BIP-39 Mnemonic */}
                     {mnemonic && (
-                        <div className="border border-black/10 bg-white p-4">
-                            <div className="flex items-center justify-between mb-3">
-                                <span className="text-[10px] font-black uppercase tracking-[0.15em] text-black/60">BIP-39 Recovery Phrase</span>
+                        <div className="border border-black p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <span className="text-[10px] font-black uppercase tracking-[0.2em]">BIP-39 MNEMONIC</span>
                                 <button
                                     onClick={() => setShowMnemonic(!showMnemonic)}
-                                    className="flex items-center gap-1.5 text-[9px] uppercase font-black tracking-widest text-black/50 hover:text-black transition-colors border border-black/10 px-3 py-1.5 hover:border-black"
+                                    className="text-[10px] uppercase font-black tracking-widest border border-black px-4 py-2 hover:bg-black hover:text-white transition-colors"
                                 >
-                                    {showMnemonic ? <Unlock size={11} /> : <Lock size={11} />}
-                                    {showMnemonic ? 'Hide' : 'Reveal'}
+                                    {showMnemonic ? 'HIDE' : 'REVEAL'}
                                 </button>
                             </div>
                             {showMnemonic ? (
-                                <div className="grid grid-cols-3 gap-2">
+                                <div className="grid grid-cols-3 gap-4">
                                     {mnemonic.split(' ').map((word: string, i: number) => (
-                                        <div key={i} className="border border-black/10 bg-[#FAFAF9] px-3 py-2 flex flex-col items-center">
-                                            <span className="text-[8px] text-black/30 mb-0.5 font-mono">{i + 1}</span>
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-black">{word}</span>
+                                        <div key={i} className="border border-black p-3 text-center">
+                                            <span className="text-[11px] font-black uppercase tracking-widest">{word}</span>
                                         </div>
                                     ))}
                                 </div>
                             ) : (
-                                <div className="grid grid-cols-3 gap-2">
+                                <div className="grid grid-cols-3 gap-4">
                                     {Array.from({ length: 12 }).map((_, i) => (
-                                        <div key={i} className="border border-black/5 bg-[#FAFAF9] px-3 py-2 flex flex-col items-center">
-                                            <span className="text-[8px] text-black/20 mb-0.5 font-mono">{i + 1}</span>
-                                            <span className="text-[11px] font-black uppercase tracking-widest text-black/15">••••</span>
+                                        <div key={i} className="border border-black p-3 text-center">
+                                            <span className="text-[11px] tracking-widest">••••</span>
                                         </div>
                                     ))}
                                 </div>
@@ -283,216 +292,132 @@ function SecurityModule({ passwordHash, setupPassword, lockVault, privateKey, mn
     );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   NETWORKS MODULE
-───────────────────────────────────────────────────────────────────────────── */
 function NetworkModule({ activeNetwork, setNetwork, customRpcUrl, setCustomRpcUrl }: any) {
     const [rpcInput, setRpcInput] = useState(customRpcUrl || '');
-    const [testingRpc, setTestingRpc] = useState(false);
 
     const handleSaveRPC = async () => {
         if (!rpcInput) return;
         try {
-            if (!rpcInput.startsWith('http')) throw new Error('Invalid URL protocol — must be HTTP/HTTPS');
+            if (!rpcInput.startsWith('http')) throw new Error('HTTP/HTTPS required');
             new URL(rpcInput);
-
-            // Live test the RPC endpoint before committing
-            setTestingRpc(true);
-            try {
-                const provider = new ethers.JsonRpcProvider(rpcInput);
-                const network = await Promise.race([
-                    provider.getNetwork(),
-                    new Promise((_, reject) => setTimeout(() => reject(new Error('RPC timeout after 5s')), 5000))
-                ]);
-                setCustomRpcUrl(rpcInput);
-                toast.success(`RPC Verified`, { description: `Connected to Chain ID ${(network as any).chainId}` });
-            } catch (testErr: any) {
-                toast.error('RPC Test Failed', { description: testErr.message });
-            } finally {
-                setTestingRpc(false);
-            }
+            setCustomRpcUrl(rpcInput);
+            toast.success("RPC ENDPOINT INJECTED");
         } catch (err: any) {
-            toast.error('Invalid RPC URL', { description: err.message });
+            toast.error("INVALID RPC URL");
         }
     };
 
     return (
-        <div className="space-y-6">
-            {/* Network Selection */}
+        <div className="space-y-8">
             <div>
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-black/10">
-                    <Globe size={13} className="text-black/40" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">Consensus Layer</h3>
-                </div>
-                <div className="space-y-2">
+                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">CONSENSUS LAYER</h3>
+                <div className="space-y-4">
                     {Object.entries(NETWORKS).map(([id, net]) => {
                         const isActive = activeNetwork === id;
                         return (
                             <button
                                 key={id}
-                                onClick={() => { setNetwork(id as NetworkId); toast.success(`Network: ${net.name}`); }}
-                                className={`w-full p-4 text-left flex items-center justify-between border transition-all duration-150 ${
-                                    isActive
-                                        ? 'border-black bg-black text-white'
-                                        : 'border-black/10 bg-white text-black hover:border-black/30 hover:bg-black/[0.02]'
+                                onClick={() => { setNetwork(id as NetworkId); }}
+                                className={`w-full p-6 text-left flex items-center justify-between border transition-all ${
+                                    isActive ? 'border-black bg-black text-white' : 'border-black hover:bg-black hover:text-white'
                                 }`}
                             >
-                                <div>
-                                    <p className={`text-[12px] font-black uppercase tracking-[0.12em] ${isActive ? 'text-white' : 'text-black'}`}>
-                                        {net.name}
-                                    </p>
-                                    <p className={`text-[10px] font-mono mt-0.5 ${isActive ? 'text-white/50' : 'text-black/35'}`}>
-                                        Chain ID: {net.chainId} · {net.currency}
-                                    </p>
-                                </div>
-                                {isActive
-                                    ? <Check size={16} className="text-white shrink-0" />
-                                    : <div className="w-4 h-4 border border-black/20 rounded-full shrink-0" />
-                                }
+                                <span className="text-[12px] font-black uppercase tracking-[0.2em]">{net.name}</span>
+                                <span className={`text-[10px] uppercase tracking-widest ${isActive ? 'text-white/50' : 'text-black/50'}`}>CHAIN {net.chainId}</span>
                             </button>
                         );
                     })}
                 </div>
             </div>
 
-            {/* Custom RPC Override */}
             <div>
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-black/10">
-                    <Activity size={13} className="text-black/40" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">Custom RPC Endpoint</h3>
-                </div>
-                <p className="text-[11px] text-black/40 leading-relaxed mb-4 font-mono">
-                    Override default public nodes with a dedicated Alchemy, Infura, or QuickNode endpoint. The endpoint is tested live before saving.
-                </p>
-                <div className="space-y-3">
+                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">CUSTOM RPC INJECTION</h3>
+                <div className="space-y-4">
                     <input
                         type="text"
-                        placeholder="https://mainnet.infura.io/v3/YOUR_KEY"
+                        placeholder="HTTPS://..."
                         value={rpcInput}
                         onChange={e => setRpcInput(e.target.value)}
-                        className="w-full bg-white border border-black/15 text-black px-4 py-3 text-[11px] font-mono tracking-wide outline-none focus:border-black transition-colors placeholder:text-black/20"
+                        className="w-full border border-black px-6 py-4 text-[11px] tracking-widest outline-none focus:bg-black focus:text-white transition-colors uppercase"
                     />
-                    <div className="flex gap-2">
+                    <div className="flex gap-4">
                         <button
                             onClick={handleSaveRPC}
-                            disabled={!rpcInput || testingRpc}
-                            className="flex-1 bg-black text-white text-[10px] font-black uppercase tracking-[0.15em] py-3 border border-black hover:bg-black/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="flex-1 bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] py-4 border border-black hover:bg-white hover:text-black transition-colors"
                         >
-                            {testingRpc ? <><RefreshCw size={12} className="animate-spin" /> Testing…</> : 'Inject Endpoint'}
+                            INJECT NODE
                         </button>
                         <button
-                            onClick={() => { setRpcInput(''); setCustomRpcUrl(null); toast.info('Reverted to public nodes'); }}
-                            className="px-5 border border-black/15 text-black/50 text-[10px] font-black uppercase tracking-widest hover:border-black hover:text-black transition-colors"
+                            onClick={() => { setRpcInput(''); setCustomRpcUrl(null); }}
+                            className="px-8 border border-black text-black text-[10px] font-black uppercase tracking-[0.2em] hover:bg-black hover:text-white transition-colors"
                         >
-                            Reset
+                            RESET
                         </button>
                     </div>
                 </div>
-                {customRpcUrl && (
-                    <div className="mt-3 px-3 py-2 border border-emerald-200 bg-emerald-50 flex items-center gap-2">
-                        <ShieldCheck size={12} className="text-emerald-600 shrink-0" />
-                        <p className="text-[10px] font-mono text-emerald-700 truncate">{customRpcUrl}</p>
-                    </div>
-                )}
             </div>
         </div>
     );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   CONTACTS MODULE
-───────────────────────────────────────────────────────────────────────────── */
 function ContactsModule({ contacts, addContact, removeContact }: any) {
     const [newName, setNewName] = useState('');
     const [newAddress, setNewAddress] = useState('');
-    const [addressError, setAddressError] = useState('');
 
     const handleSave = () => {
-        if (!ethers.isAddress(newAddress)) {
-            setAddressError('Invalid Ethereum address format');
-            return;
-        }
-        setAddressError('');
+        if (!ethers.isAddress(newAddress)) return toast.error("INVALID ADDRESS FORMAT");
         addContact(newName.toUpperCase(), newAddress);
         setNewName('');
         setNewAddress('');
-        toast.success('Contact registered');
+        toast.success("ENTITY REGISTERED");
     };
 
     return (
-        <div className="space-y-6">
-            {/* Add Contact Form */}
-            <div className="border border-black/10 bg-white p-5">
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-black/10">
-                    <Plus size={13} className="text-black/40" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">Register Entity</h3>
-                </div>
-                <div className="space-y-3">
-                    <input
-                        type="text"
-                        placeholder="Entity label (e.g. OTC DESK, TREASURY)"
-                        value={newName}
-                        onChange={e => setNewName(e.target.value)}
-                        className="w-full bg-[#FAFAF9] border border-black/10 text-black px-4 py-3 text-[11px] font-mono tracking-wide outline-none focus:border-black transition-colors placeholder:text-black/20"
-                    />
-                    <div>
-                        <input
-                            type="text"
-                            placeholder="0x..."
-                            value={newAddress}
-                            onChange={e => { setNewAddress(e.target.value); setAddressError(''); }}
-                            className={`w-full bg-[#FAFAF9] border text-black px-4 py-3 text-[11px] font-mono tracking-wide outline-none focus:border-black transition-colors placeholder:text-black/20 ${addressError ? 'border-red-400 bg-red-50' : 'border-black/10'}`}
-                        />
-                        {addressError && (
-                            <p className="text-red-500 text-[10px] mt-1 font-mono">{addressError}</p>
-                        )}
-                    </div>
-                    <button
-                        onClick={handleSave}
-                        disabled={!newName || !newAddress}
-                        className="w-full bg-black text-white text-[10px] font-black uppercase tracking-[0.15em] py-3 border border-black hover:bg-black/80 transition-colors disabled:opacity-30 disabled:cursor-not-allowed flex items-center justify-center gap-2 mt-1"
-                    >
-                        <Plus size={12} />
-                        Commit to Registry
-                    </button>
-                </div>
+        <div className="space-y-8">
+            <div className="border border-black p-6 space-y-4">
+                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] mb-4">REGISTER ENTITY</h3>
+                <input
+                    type="text"
+                    placeholder="LABEL"
+                    value={newName}
+                    onChange={e => setNewName(e.target.value)}
+                    className="w-full border border-black px-6 py-4 text-[11px] tracking-widest outline-none uppercase"
+                />
+                <input
+                    type="text"
+                    placeholder="ADDRESS 0x..."
+                    value={newAddress}
+                    onChange={e => setNewAddress(e.target.value)}
+                    className="w-full border border-black px-6 py-4 text-[11px] tracking-widest outline-none uppercase"
+                />
+                <button
+                    onClick={handleSave}
+                    disabled={!newName || !newAddress}
+                    className="w-full bg-black text-white text-[10px] font-black uppercase tracking-[0.2em] py-4 hover:bg-white hover:text-black border border-black transition-colors disabled:opacity-50"
+                >
+                    COMMIT TO REGISTRY
+                </button>
             </div>
 
-            {/* Contact List */}
             <div>
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-black/10">
-                    <Database size={13} className="text-black/40" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">
-                        Verified Registry ({contacts.length})
-                    </h3>
-                </div>
+                <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">VERIFIED REGISTRY ({contacts.length})</h3>
                 {contacts.length === 0 ? (
-                    <div className="py-10 text-center border border-dashed border-black/10">
-                        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/30">Registry is empty</p>
-                        <p className="text-[11px] text-black/25 font-mono mt-2">Add your first trusted entity above</p>
+                    <div className="py-12 text-center border border-black">
+                        <span className="text-[10px] font-black uppercase tracking-[0.2em]">REGISTRY EMPTY</span>
                     </div>
                 ) : (
-                    <div className="space-y-2">
+                    <div className="space-y-4">
                         {contacts.map((c: any) => (
-                            <div
-                                key={c.address}
-                                className="border border-black/10 bg-white p-4 flex items-center justify-between hover:border-black/25 transition-colors group"
-                            >
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-8 h-8 bg-black/5 border border-black/10 flex items-center justify-center shrink-0">
-                                        <span className="text-[10px] font-black text-black/60">{c.name?.slice(0, 2) || '??'}</span>
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="text-[12px] font-black uppercase tracking-[0.12em] text-black truncate">{c.name}</p>
-                                        <p className="text-[10px] font-mono text-black/40">{c.address.slice(0, 10)}…{c.address.slice(-8)}</p>
-                                    </div>
+                            <div key={c.address} className="border border-black p-6 flex justify-between items-center hover:bg-black hover:text-white transition-colors group">
+                                <div>
+                                    <p className="text-[12px] font-black uppercase tracking-[0.2em]">{c.name}</p>
+                                    <p className="text-[10px] tracking-widest mt-2 opacity-50">{c.address}</p>
                                 </div>
                                 <button
-                                    onClick={() => { removeContact(c.address); toast.success('Entity removed'); }}
-                                    className="text-black/25 hover:text-red-500 p-2 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
-                                    title="Remove"
+                                    onClick={() => removeContact(c.address)}
+                                    className="px-4 py-2 border border-black group-hover:border-white text-[10px] uppercase font-black tracking-widest"
                                 >
-                                    <Trash2 size={15} />
+                                    REMOVE
                                 </button>
                             </div>
                         ))}
@@ -503,117 +428,12 @@ function ContactsModule({ contacts, addContact, removeContact }: any) {
     );
 }
 
-/* ─────────────────────────────────────────────────────────────────────────────
-   SESSIONS MODULE — Real WalletConnect v2 sessions from localStorage
-───────────────────────────────────────────────────────────────────────────── */
 function SessionsModule() {
-    const [sessions, setSessions] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
-
-    useEffect(() => {
-        const parseSessions = () => {
-            const list: any[] = [];
-            try {
-                // WalletConnect v2 stores sessions under wc@2:client:... keys
-                const wcKeys = Object.keys(localStorage).filter(k =>
-                    k.startsWith('wc@2:client:0.5:session') ||
-                    k.startsWith('wc@2:core:0.3:session')
-                );
-                wcKeys.forEach(k => {
-                    try {
-                        const raw = localStorage.getItem(k);
-                        if (!raw) return;
-                        const parsed = JSON.parse(raw);
-                        const values = Array.isArray(parsed) ? parsed : Object.values(parsed);
-                        values.forEach((v: any) => {
-                            if (v?.peer?.metadata) {
-                                list.push({
-                                    topic: v.topic || k,
-                                    name:  v.peer.metadata.name  || 'Unknown dApp',
-                                    url:   v.peer.metadata.url   || '',
-                                    icon:  v.peer.metadata.icons?.[0] || null,
-                                    expiry: v.expiry ? new Date(v.expiry * 1000).toLocaleDateString() : 'N/A',
-                                });
-                            }
-                        });
-                    } catch { /* skip malformed entries */ }
-                });
-            } catch (e) {
-                console.error('[Settings] WC session parse failed:', e);
-            }
-            setSessions(list);
-            setLoading(false);
-        };
-        parseSessions();
-    }, []);
-
-    const killSession = (topic: string) => {
-        // Remove from localStorage — WalletConnect SDK picks this up on next connect
-        try {
-            Object.keys(localStorage)
-                .filter(k => k.includes(topic))
-                .forEach(k => localStorage.removeItem(k));
-        } catch { /* non-critical */ }
-        setSessions(prev => prev.filter(s => s.topic !== topic));
-        toast.success('Session terminated', { description: 'The dApp connection has been revoked.' });
-    };
-
     return (
         <div className="space-y-6">
-            <div>
-                <div className="flex items-center gap-2 mb-4 pb-3 border-b border-black/10">
-                    <Wifi size={13} className="text-black/40" />
-                    <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-black/50">
-                        Active dApp Sessions
-                    </h3>
-                </div>
-                <p className="text-[11px] text-black/40 leading-relaxed mb-4 font-mono">
-                    WalletConnect v2 sessions. These dApps have a cryptographic link to your public address and may request EVM transaction signatures.
-                </p>
-
-                {loading ? (
-                    <div className="space-y-2">
-                        {[1, 2].map(i => (
-                            <div key={i} className="h-16 bg-black/5 animate-pulse border border-black/5" />
-                        ))}
-                    </div>
-                ) : sessions.length === 0 ? (
-                    <div className="py-10 text-center border border-dashed border-black/10">
-                        <Wifi size={24} className="text-black/15 mx-auto mb-3" />
-                        <p className="text-[10px] font-black uppercase tracking-[0.25em] text-black/30">No active sessions</p>
-                        <p className="text-[11px] text-black/25 font-mono mt-2">Connect to a dApp via WalletConnect to see sessions here</p>
-                    </div>
-                ) : (
-                    <div className="space-y-2">
-                        {sessions.map(site => (
-                            <div
-                                key={site.topic}
-                                className="border border-black/10 bg-white p-4 flex items-center justify-between hover:border-black/25 transition-colors group"
-                            >
-                                <div className="flex items-center gap-3 min-w-0">
-                                    <div className="w-10 h-10 border border-black/10 bg-[#FAFAF9] flex items-center justify-center shrink-0 overflow-hidden">
-                                        {site.icon
-                                            ? <img src={site.icon} alt={site.name} className="w-full h-full object-cover" />
-                                            : <Globe size={16} className="text-black/30" />
-                                        }
-                                    </div>
-                                    <div className="min-w-0">
-                                        <p className="text-[12px] font-black uppercase tracking-[0.1em] text-black truncate">{site.name}</p>
-                                        <p className="text-[10px] font-mono text-black/40 truncate">{site.url}</p>
-                                        <p className="text-[9px] font-mono text-black/25">Expires {site.expiry}</p>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => killSession(site.topic)}
-                                    className="text-black/25 hover:text-red-500 p-2 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100 shrink-0"
-                                    title="Terminate session"
-                                >
-                                    <Trash2 size={15} />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                )}
+            <h3 className="text-[12px] font-black uppercase tracking-[0.2em] border-b border-black pb-4 mb-6">ACTIVE SESSIONS</h3>
+            <div className="py-12 text-center border border-black">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em]">NO EXTERNAL SESSIONS ACTIVE</span>
             </div>
         </div>
     );

@@ -1,10 +1,9 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, ArrowRight, Wallet, AlertCircle, Loader2, CheckCircle2, ChevronDown, Search, ArrowDownUp, Globe, CreditCard, ExternalLink, ShieldCheck, Zap, Info, Network } from "lucide-react";
 import { useSendTransaction, useWriteContract, useReadContract, useAccount, useChainId, useEnsAddress, useEstimateGas, useGasPrice, useSwitchChain, useChains } from "wagmi";
-import { parseEther, parseUnits, isAddress, formatUnits, maxUint256, formatEther } from "viem";
+import { parseEther, parseUnits, isAddress, formatUnits, maxUint256, formatEther, encodeFunctionData } from "viem";
 import { toast } from "sonner";
 import { mainnet } from "wagmi/chains";
 import { TransactionStatusModal } from "@/components/ui/TransactionStatusModal";
@@ -63,13 +62,13 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
                         <div className="w-full max-w-md bg-[#FFFFFF] border border-black/5 rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
                             <div className="flex items-center justify-between p-6 pb-4">
                                 <div className="flex items-center gap-3">
-                                    <div className="p-2 border border-black/10 rounded-2xl bg-white shadow-sm">
-                                        <ShieldCheck className="w-5 h-5 text-black" />
+                                    <div className="px-3 py-1 border border-black/10 bg-black text-white font-black text-[10px] tracking-widest uppercase">
+                                        SECURE
                                     </div>
                                     <h2 className="text-xl font-black text-black tracking-tighter uppercase">WALLET</h2>
                                 </div>
-                                <button onClick={onClose} className="p-2 hover:bg-black/5 rounded-full text-black/40 hover:text-black transition-colors">
-                                    <X className="w-5 h-5" />
+                                <button onClick={onClose} className="font-bold text-[10px] uppercase tracking-widest text-black/40 hover:text-black transition-colors">
+                                    [ CLOSE ]
                                 </button>
                             </div>
 
@@ -115,11 +114,11 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
                 <div className="p-6 border-b border-black/5 flex flex-col gap-4">
                     <div className="flex justify-between items-center">
                         <span className="font-black text-black uppercase tracking-tight">Select Token</span>
-                        <X className="w-5 h-5 cursor-pointer text-black/40 hover:text-black transition-colors" onClick={onClose} />
+                        <span className="text-[10px] font-black cursor-pointer text-black/40 hover:text-black transition-colors uppercase" onClick={onClose}>[X]</span>
                     </div>
                     <div className="relative">
-                        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/30" />
-                        <input autoFocus value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or symbol" className="w-full bg-white border border-black/5 rounded-2xl py-3 pl-10 pr-4 text-sm font-medium focus:outline-none focus:border-black/20 text-black placeholder:text-black/30" />
+                        <span className="absolute left-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-black/30">[?]</span>
+                        <input autoFocus value={search} onChange={e => setSearch(e.target.value)} placeholder="Search by name or symbol" className="w-full bg-white border border-black/5 rounded-none py-3 pl-12 pr-4 text-sm font-medium focus:outline-none focus:border-black/20 text-black placeholder:text-black/30" />
                     </div>
                 </div>
                 <div className="overflow-y-auto p-2 flex-1 min-h-[200px]">
@@ -183,9 +182,16 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
     const { writeContractAsync } = useWriteContract();
     const isNative = selectedAsset.address === 'native' || selectedAsset.address === NATIVE_ADDRESS;
     
+    // Find user's native balance on this chain to ensure they can pay gas
+    const nativeAsset = userAssets.find((a: any) => (a.address === 'native' || a.address === NATIVE_ADDRESS) && a.chainId === selectedAsset.chainId);
+    const nativeBalanceNumeric = nativeAsset?.balanceNumeric || 0;
+    
     const { data: gasPrice } = useGasPrice({ chainId: selectedAsset.chainId });
     const { data: estimatedGas } = useEstimateGas({
-        to: finalRecipient as `0x${string}` || address,
+        to: isNative ? (finalRecipient as `0x${string}` || address) : (selectedAsset.address as `0x${string}`),
+        data: !isNative && finalRecipient && amount && !isNaN(Number(amount))
+            ? encodeFunctionData({ abi: ERC20_ABI, functionName: "transfer", args: [finalRecipient as `0x${string}`, parseUnits(amount, selectedAsset.decimals)] })
+            : undefined,
         value: amount && !isNaN(Number(amount)) && isNative ? parseEther(amount) : undefined,
         chainId: selectedAsset.chainId,
         query: { enabled: !!finalRecipient && !!amount && !isNaN(Number(amount)) && !isWrongNetwork }
@@ -210,6 +216,13 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
     const handleSend = async () => {
         if (!finalRecipient || !amount) return;
         
+        // Critical Native Balance check to prevent silent gas failures on ERC20 transfers
+        if (!isNative && nativeBalanceNumeric === 0) {
+            setStatus("ERROR");
+            setStatusMessage(`Insufficient native token (${nativeAsset?.symbol || 'ETH/MATIC'}) to pay for network gas.`);
+            return;
+        }
+
         try {
             if (isWrongNetwork && switchChainAsync) {
                 setStatus("SIGNING");
@@ -245,21 +258,21 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
             <div className="flex items-center gap-6 border-b border-black/5">
                 {(["STANDARD", "PRIVATE", "ENS"] as SendSubTab[]).map(tab => (
                     <button key={tab} onClick={() => setSubTab(tab)} className={`pb-3 text-[10px] font-black uppercase tracking-widest transition-all border-b-2 ${subTab === tab ? 'border-black text-black' : 'border-transparent text-black/30 hover:text-black/60'}`}>
-                        {tab} {tab === 'PRIVATE' && <ShieldCheck className="inline w-3 h-3 ml-0.5 mb-0.5 text-black/30" />}
+                        {tab} {tab === 'PRIVATE' && <span className="inline text-[9px] text-black/30 ml-1">[SECURE]</span>}
                     </button>
                 ))}
             </div>
 
             {subTab === 'PRIVATE' && (
-                <div className="bg-black/5 border border-black/10 rounded-2xl p-4 flex items-start gap-3">
-                    <ShieldCheck className="w-5 h-5 text-black shrink-0 mt-0.5" />
+                <div className="bg-black/5 border border-black/10 p-4 flex items-start gap-3">
+                    <span className="font-black text-[10px] text-black shrink-0 mt-0.5">[PRIVACY]</span>
                     <p className="text-[10px] text-black/60 font-bold uppercase tracking-widest leading-relaxed">Privacy routing active. Funds will be routed via standard relay parameters. Complete stealth requires off-chain ZK integration.</p>
                 </div>
             )}
 
             {isWrongNetwork && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-start gap-3 text-red-600">
-                    <Network className="w-5 h-5 shrink-0 mt-0.5" />
+                <div className="bg-black text-white border border-black p-4 flex items-start gap-3">
+                    <span className="font-black text-[10px] text-white shrink-0 mt-0.5">[!]</span>
                     <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">Mismatched Network. You are on {activeChain?.name}, but {selectedAsset.symbol} is on {selectedAsset.network}. Click below to switch.</p>
                 </div>
             )}
@@ -270,10 +283,9 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
                 </div>
                 <div className="flex items-center gap-4">
                     <input type="number" value={amount} onChange={(e) => setAmount(e.target.value)} placeholder="0.00" className="w-full bg-transparent text-4xl font-black text-black placeholder:text-black/10 focus:outline-none tabular-nums" />
-                    <button onClick={() => setShowTokenSelect(true)} className="flex items-center gap-2 bg-black/5 hover:bg-black/10 px-3 py-2 rounded-xl transition-colors border border-black/5 shrink-0">
-                        <TokenLogo symbol={selectedAsset?.symbol} address={selectedAsset?.address} logoURI={selectedAsset?.logoURI} className="w-5 h-5 rounded-full" fallbackClassName="w-5 h-5 rounded-full text-[8px]" />
+                    <button onClick={() => setShowTokenSelect(true)} className="flex items-center gap-2 bg-black/5 hover:bg-black/10 px-3 py-2 transition-colors border border-black/5 shrink-0">
                         <span className="font-black text-sm">{selectedAsset?.symbol || "N/A"}</span>
-                        <ChevronDown className="w-4 h-4 text-black/40" />
+                        <span className="text-[10px] font-black text-black/40">v</span>
                     </button>
                 </div>
                 <div className="flex justify-between items-center border-t border-black/5 pt-4">
@@ -287,14 +299,14 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
             <div className="space-y-2">
                 <label className="text-[10px] font-black text-black/40 uppercase tracking-widest pl-1">Recipient</label>
                 <div className="relative">
-                    <input value={recipientInput} onChange={(e) => setRecipientInput(e.target.value)} placeholder={subTab === 'ENS' ? "vitalik.eth" : "0x..."} className="w-full bg-white border border-black/5 shadow-sm rounded-[16px] py-4 pl-4 pr-10 text-black placeholder:text-black/20 focus:outline-none focus:border-black/20 transition-all font-mono text-sm" />
-                    {isEnsLoading && <Loader2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-black/30 animate-spin" />}
-                    {finalRecipient && !isEnsLoading && <CheckCircle2 className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[#00C076]" />}
+                    <input value={recipientInput} onChange={(e) => setRecipientInput(e.target.value)} placeholder={subTab === 'ENS' ? "vitalik.eth" : "0x..."} className="w-full bg-white border border-black/5 p-4 pr-10 text-black placeholder:text-black/20 focus:outline-none focus:border-black/20 transition-all font-mono text-sm" />
+                    {isEnsLoading && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-black/30 uppercase tracking-widest">[...]</span>}
+                    {finalRecipient && !isEnsLoading && <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-black uppercase tracking-widest">[OK]</span>}
                 </div>
             </div>
 
-            <button disabled={(!amount || !finalRecipient || isEnsLoading || parseFloat(amount) <= 0 || parseFloat(amount) > (selectedAsset?.balanceNumeric || 0)) && !isWrongNetwork} onClick={handleSend} className={`w-full py-4 rounded-[16px] font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group ${isWrongNetwork ? 'bg-[#FF8A00] text-black hover:bg-[#FF8A00]/80' : 'bg-black hover:bg-black/80 disabled:bg-black/10 disabled:text-black/30 text-white'}`}>
-                {isWrongNetwork ? `Switch to ${selectedAsset.network}` : 'Initiate Send'} {isWrongNetwork ? <Network className="w-4 h-4" /> : <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />}
+            <button disabled={(!amount || !finalRecipient || isEnsLoading || parseFloat(amount) <= 0 || parseFloat(amount) > (selectedAsset?.balanceNumeric || 0)) && !isWrongNetwork} onClick={handleSend} className={`w-full py-4 font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group ${isWrongNetwork ? 'bg-black text-white hover:bg-black/80' : 'bg-black hover:bg-black/80 disabled:bg-black/10 disabled:text-black/30 text-white'}`}>
+                {isWrongNetwork ? `Switch to ${selectedAsset.network}` : 'Initiate Send'} {isWrongNetwork ? <span className="text-[10px] font-black">[NET]</span> : <span className="text-[10px] font-black group-hover:translate-x-1 transition-transform">-&gt;</span>}
             </button>
             
             <AnimatePresence>
@@ -419,10 +431,20 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
             if (needsApproval && !isPayTokenNative) {
                 setStatus("SIGNING");
                 setStatusMessage(`Approve router to spend ${payToken.symbol}...`);
-                await writeContractAsync({ address: payToken.address as `0x${string}`, abi: ERC20_ABI, functionName: "approve", args: [quoteData.transactionRequest.to as `0x${string}`, maxUint256] });
-                setStatusMessage("Waiting for approval confirmation...");
-                await new Promise(r => setTimeout(r, 4000));
-                refetchAllowance();
+                const txHash = await writeContractAsync({ address: payToken.address as `0x${string}`, abi: ERC20_ABI, functionName: "approve", args: [quoteData.transactionRequest.to as `0x${string}`, maxUint256] });
+                setStatusMessage("Waiting for approval confirmation on-chain...");
+                
+                // Atomically wait for the network to sequence the approval before proceeding
+                let confirmed = false;
+                for (let i = 0; i < 15; i++) {
+                    await new Promise(r => setTimeout(r, 2000));
+                    const { data: newAllowance } = await refetchAllowance();
+                    if ((newAllowance as bigint || 0n) >= parseUnits(payAmount, payToken.decimals)) {
+                        confirmed = true;
+                        break;
+                    }
+                }
+                if (!confirmed) throw new Error("Approval indexing timed out. Try again.");
             }
 
             setStatus("SIGNING");
@@ -443,8 +465,8 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     return (
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="space-y-2">
             {isWrongNetwork && (
-                <div className="bg-red-500/10 border border-red-500/20 rounded-2xl p-4 flex items-start gap-3 text-red-600 mb-4">
-                    <Network className="w-5 h-5 shrink-0 mt-0.5" />
+                <div className="bg-black text-white border border-black p-4 flex items-start gap-3 mb-4">
+                    <span className="font-black text-[10px] text-white shrink-0 mt-0.5">[!]</span>
                     <p className="text-[10px] font-bold uppercase tracking-widest leading-relaxed">Mismatched Network. You are on {activeChain?.name || 'Unknown'}, but the routing source requires {fromChain.name}.</p>
                 </div>
             )}
@@ -461,18 +483,18 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
                 </div>
                 <div className="flex items-center gap-4">
                     <input type="number" value={payAmount} onChange={(e) => setPayAmount(e.target.value)} placeholder="0.00" className="w-full bg-transparent text-4xl font-black text-black placeholder:text-black/10 focus:outline-none tabular-nums" />
-                    <button onClick={() => setShowFromSelect(true)} className="flex items-center gap-2 bg-black/5 px-3 py-2 rounded-xl border border-black/5 hover:bg-black/10 transition-colors shrink-0">
+                    <button onClick={() => setShowFromSelect(true)} className="flex items-center gap-2 bg-black/5 px-3 py-2 border border-black/5 hover:bg-black/10 transition-colors shrink-0">
                         <TokenLogo symbol={payToken?.symbol} logoURI={payToken?.logoURI} className="w-5 h-5 rounded-full" fallbackClassName="w-5 h-5" />
                         <span className="font-black text-sm">{payToken?.symbol || "Select"}</span>
-                        <ChevronDown className="w-4 h-4 text-black/40" />
+                        <span className="text-[10px] font-black text-black/40">v</span>
                     </button>
                 </div>
                 <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">Balance: {safeToFixed(payToken?.balanceNumeric || 0, 4)}</div>
             </div>
 
             <div className="flex justify-center -my-3 relative z-10">
-                <button onClick={() => { if (mode === 'BRIDGE') { const tc = fromChain; setFromChain(toChain); setToChain(tc); } const pt = payToken; setPayToken(receiveToken); setReceiveToken(pt); setPayAmount(""); }} className="bg-white border border-black/10 p-2 rounded-xl shadow-sm hover:shadow-md transition-all text-black hover:bg-black/5">
-                    <ArrowDownUp className="w-4 h-4" />
+                <button onClick={() => { if (mode === 'BRIDGE') { const tc = fromChain; setFromChain(toChain); setToChain(tc); } const pt = payToken; setPayToken(receiveToken); setReceiveToken(pt); setPayAmount(""); }} className="bg-white border border-black/10 px-3 py-2 shadow-sm hover:shadow-md transition-all text-black hover:bg-black/5 font-black text-[10px] uppercase tracking-widest">
+                    [~]
                 </button>
             </div>
 
@@ -488,14 +510,14 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
                 </div>
                 <div className="flex items-center gap-4">
                     <input type="text" readOnly value={receiveAmount} placeholder="0.00" className={`w-full bg-transparent text-4xl font-black text-black focus:outline-none tabular-nums ${isQuoting ? 'opacity-30' : ''}`} />
-                    <button onClick={() => setShowToSelect(true)} className="flex items-center gap-2 bg-black/5 px-3 py-2 rounded-xl border border-black/5 hover:bg-black/10 transition-colors shrink-0">
+                    <button onClick={() => setShowToSelect(true)} className="flex items-center gap-2 bg-black/5 px-3 py-2 border border-black/5 hover:bg-black/10 transition-colors shrink-0">
                         <TokenLogo symbol={receiveToken?.symbol} logoURI={receiveToken?.logoURI} className="w-5 h-5 rounded-full" fallbackClassName="w-5 h-5" />
                         <span className="font-black text-sm">{receiveToken?.symbol || "Select"}</span>
-                        <ChevronDown className="w-4 h-4 text-black/40" />
+                        <span className="text-[10px] font-black text-black/40">v</span>
                     </button>
                 </div>
-                {isQuoting && <div className="text-[10px] text-[var(--aztec-orchid)] font-bold uppercase tracking-widest flex items-center gap-2"><Loader2 className="w-3 h-3 animate-spin"/> Routing Optimal Path...</div>}
-                {quoteError && <div className="text-[10px] text-red-500 font-bold uppercase tracking-widest flex items-center gap-2"><AlertCircle className="w-3 h-3"/> {quoteError}</div>}
+                {isQuoting && <div className="text-[10px] text-black/60 font-bold uppercase tracking-widest flex items-center gap-2"><span className="inline-block animate-spin">◌</span> Routing Optimal Path...</div>}
+                {quoteError && <div className="text-[10px] text-black font-bold uppercase tracking-widest flex items-center gap-2"><span className="font-black">[!]</span> {quoteError}</div>}
             </div>
 
             <AnimatePresence>
@@ -503,13 +525,13 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
                     <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} className="bg-black/5 rounded-2xl p-4 border border-black/10 mt-2 space-y-2">
                         <div className="flex justify-between text-[10px] font-bold text-black/60 uppercase tracking-widest"><span>Est. Gas Cost</span><span>${safeToFixed(parseFloat(quoteData.estimate.gasCosts?.[0]?.amountUSD || "0"), 2)}</span></div>
                         <div className="flex justify-between text-[10px] font-bold text-black/60 uppercase tracking-widest"><span>Execution Route</span><span>{quoteData.toolDetails?.name || 'Aggregator'}</span></div>
-                        {needsApproval && !isWrongNetwork && <div className="flex items-center gap-2 text-[10px] font-black text-[#FF8A00] uppercase tracking-widest mt-2 bg-[#FF8A00]/10 p-2 rounded-lg"><Info className="w-3 h-3" /> Requires Token Approval Before {mode}</div>}
+                        {needsApproval && !isWrongNetwork && <div className="flex items-center gap-2 text-[10px] font-black text-black uppercase tracking-widest mt-2 bg-black/10 p-2">[APPROVE] Requires Token Approval Before {mode}</div>}
                     </motion.div>
                 )}
             </AnimatePresence>
 
-            <button disabled={(!quoteData || isQuoting || parseFloat(payAmount) > (payToken?.balanceNumeric || 0)) && !isWrongNetwork} onClick={handleExecute} className={`w-full mt-4 py-4 rounded-[16px] font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group ${isWrongNetwork ? 'bg-[#FF8A00] text-black hover:bg-[#FF8A00]/80' : 'bg-black hover:bg-black/80 disabled:bg-black/10 disabled:text-black/30 text-white'}`}>
-                {isWrongNetwork ? `1. Switch to ${fromChain.name}` : needsApproval ? `1. Approve ${payToken.symbol}` : `Execute ${mode}`} {isWrongNetwork ? <Network className="w-4 h-4" /> : <Zap className="w-4 h-4" />}
+            <button disabled={(!quoteData || isQuoting || parseFloat(payAmount) > (payToken?.balanceNumeric || 0)) && !isWrongNetwork} onClick={handleExecute} className={`w-full mt-4 py-4 font-black text-[11px] uppercase tracking-[0.2em] transition-all flex items-center justify-center gap-2 group bg-black hover:bg-black/80 disabled:bg-black/10 disabled:text-black/30 text-white`}>
+                {isWrongNetwork ? `1. Switch to ${fromChain.name}` : needsApproval ? `1. Approve ${payToken.symbol}` : `Execute ${mode}`} <span className="text-[10px] font-black">{isWrongNetwork ? '[NET]' : '->'}</span>
             </button>
 
             <AnimatePresence>
@@ -528,19 +550,19 @@ function BuyModule() {
     
     return (
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="space-y-6 flex flex-col items-center justify-center py-8 text-center">
-            <div className="w-20 h-20 bg-[#0052FF]/10 rounded-[32px] flex items-center justify-center border border-[#0052FF]/20 shadow-inner">
-                <CreditCard className="w-10 h-10 text-[#0052FF]" />
+            <div className="border border-black/10 px-4 py-2 inline-block">
+                <span className="text-[10px] font-black uppercase tracking-widest text-black">FIAT ON-RAMP</span>
             </div>
             <div className="space-y-3 max-w-[280px]">
                 <h3 className="font-black text-black text-lg uppercase tracking-tight">Direct Deposit</h3>
                 <p className="text-xs text-black/50 font-medium leading-relaxed">Convert fiat to crypto instantly using Apple Pay, Google Pay, or Bank Transfer. Assets are delivered directly to your on-chain system address.</p>
             </div>
-            <div className="bg-black/5 border border-black/10 p-3 rounded-2xl w-full flex items-center justify-between mt-4">
+            <div className="bg-black/5 border border-black/10 p-3 w-full flex items-center justify-between mt-4">
                 <span className="text-[10px] font-black uppercase tracking-widest text-black/50">Destination Wallet</span>
-                <span className="text-xs font-mono font-bold text-black bg-white px-2 py-1 rounded-lg border border-black/5 shadow-sm">{address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
+                <span className="text-xs font-mono font-bold text-black bg-white px-2 py-1 border border-black/5">{address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
             </div>
-            <a href={`https://pay.coinbase.com/buy/select-asset?appId=humanity_ledger&destinationWallets=[{"address":"${address}","blockchains":["ethereum","polygon","base","arbitrum","optimism"]}]`} target="_blank" rel="noreferrer" className="w-full py-4 bg-[#0052FF] text-white rounded-[16px] font-black text-[11px] uppercase tracking-[0.2em] shadow-lg hover:bg-[#0052FF]/90 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2">
-                Continue with Coinbase <ExternalLink className="w-4 h-4" />
+            <a href={`https://pay.coinbase.com/buy/select-asset?appId=humanity_ledger&destinationWallets=[{"address":"${address}","blockchains":["ethereum","polygon","base","arbitrum","optimism"]}]`} target="_blank" rel="noreferrer" className="w-full py-4 bg-black text-white font-black text-[11px] uppercase tracking-[0.2em] hover:bg-black/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2">
+                Continue with Coinbase <span className="text-[10px] font-black">-&gt;</span>
             </a>
         </motion.div>
     );

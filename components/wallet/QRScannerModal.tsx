@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { X, Shield, Camera, Upload, Loader2, CheckCircle } from 'lucide-react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { ATOM_PNGTREE } from '@/lib/constants/systemAssets';
 
@@ -151,42 +150,15 @@ function ScannedOverlay() {
         transition={{ type: 'spring', stiffness: 380, damping: 22, delay: 0.05 }}
         className="flex flex-col items-center gap-4"
       >
-        {/* Animated checkmark ring */}
-        <div className="relative flex items-center justify-center">
-          {/* Outer pulse ring */}
-          <motion.div
-            initial={{ scale: 0.6, opacity: 0.6 }}
-            animate={{ scale: 1.35, opacity: 0 }}
-            transition={{ duration: 0.9, repeat: 1, ease: 'easeOut' }}
-            className="absolute w-20 h-20 rounded-full border-2 border-black/15"
-          />
-          {/* Check circle */}
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            transition={{ type: 'spring', stiffness: 500, damping: 25, delay: 0.1 }}
-            className="w-16 h-16 rounded-full bg-white border border-black/15 flex items-center justify-center"
-            style={{ boxShadow: '0 0 0 6px rgba(5,5,5,0.06)' }}
-          >
-            {/* SVG checkmark with draw animation */}
-            <svg
-              viewBox="0 0 24 24"
-              className="w-7 h-7"
-              fill="none"
-              stroke="#050505"
-              strokeWidth={2.5}
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <motion.path
-                d="M5 13l4 4L19 7"
-                initial={{ pathLength: 0 }}
-                animate={{ pathLength: 1 }}
-                transition={{ duration: 0.4, delay: 0.2, ease: 'easeOut' }}
-              />
-            </svg>
-          </motion.div>
-        </div>
+        {/* Minimal check indicator */}
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ type: 'spring', stiffness: 500, damping: 25, delay: 0.1 }}
+          className="border border-black/15 px-8 py-4"
+        >
+          <span className="text-[11px] font-black uppercase tracking-[0.3em] text-[#050505]">[OK]</span>
+        </motion.div>
 
         {/* Label */}
         <motion.div
@@ -418,10 +390,10 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
           {/* Close button */}
           <button
             onClick={onClose}
-            className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 p-3 rounded-full bg-black/5 hover:bg-black/10 text-black/60 transition-all z-50 border border-black/10"
+            className="absolute top-[calc(1.5rem+env(safe-area-inset-top))] right-6 font-black text-[9px] uppercase tracking-[0.2em] text-black/40 hover:text-black transition-colors z-50 border border-black/10 px-3 py-2"
             aria-label="Close scanner"
           >
-            <X size={22} />
+            [CLOSE]
           </button>
 
           <motion.div
@@ -451,23 +423,23 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
             <div className="w-full flex gap-2 mb-4">
               <button
                 onClick={() => setTab('camera')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border ${
                   tab === 'camera'
                     ? 'bg-[#050505] text-white border-[#050505]'
                     : 'bg-white text-black/40 border-black/10 hover:border-black/20'
                 }`}
               >
-                <Camera size={13} /> Camera
+                [CAM] Camera
               </button>
               <button
                 onClick={() => setTab('file')}
-                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all border ${
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 text-[10px] font-black uppercase tracking-widest transition-all border ${
                   tab === 'file'
                     ? 'bg-[#050505] text-white border-[#050505]'
                     : 'bg-white text-black/40 border-black/10 hover:border-black/20'
                 }`}
               >
-                <Upload size={13} /> Gallery
+                [IMG] Gallery
               </button>
             </div>
 
@@ -538,13 +510,13 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   {/* Error overlay */}
                   {status === 'error' && (
                     <div className="absolute inset-0 bg-white z-10 flex flex-col p-8 text-center justify-center gap-4">
-                      <Shield size={30} className="mx-auto text-red-500" />
-                      <p className="text-red-500 text-[11px] font-black uppercase tracking-widest leading-relaxed">
+                      <span className="text-[30px] font-black text-black mx-auto">[!]</span>
+                      <p className="text-black text-[11px] font-black uppercase tracking-widest leading-relaxed">
                         {errMsg}
                       </p>
                       <button
                         onClick={handleRetry}
-                        className="text-[9px] font-black uppercase tracking-[0.2em] px-6 py-3 bg-black text-white rounded-full mx-auto mt-2 hover:bg-black/80 transition-colors shadow-lg"
+                        className="text-[9px] font-black uppercase tracking-[0.2em] px-6 py-3 bg-black text-white mx-auto mt-2 hover:bg-black/80 transition-colors"
                       >
                         Retry
                       </button>
@@ -556,8 +528,8 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
               {/*  GALLERY TAB  */}
               {tab === 'file' && (
                 <div className="flex flex-col items-center justify-center w-full h-full min-h-[280px] gap-5 p-6">
-                  <div className="w-16 h-16 rounded-2xl bg-black/5 flex items-center justify-center">
-                    <Upload size={28} className="text-black/30" />
+                  <div className="w-16 h-16 border border-black/10 flex items-center justify-center">
+                    <span className="text-[20px] font-black text-black/30">[^]</span>
                   </div>
                   <div className="text-center space-y-1">
                     <p className="text-[12px] font-black uppercase tracking-widest text-[#050505]">
@@ -569,11 +541,11 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                   </div>
 
                   <label className="relative cursor-pointer">
-                    <span className="flex items-center gap-2 px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest rounded-xl hover:bg-black/80 transition-colors">
+                    <span className="flex items-center gap-2 px-6 py-3 bg-[#050505] text-white text-[10px] font-black uppercase tracking-widest hover:bg-black/80 transition-colors">
                       {fileLoading ? (
-                        <><Loader2 size={13} className="animate-spin" /> Processing...</>
+                        <><span className="inline-block animate-spin">◌</span> Processing...</>
                       ) : (
-                        <><Upload size={13} /> Select Image</>
+                        <>[^] Select Image</>
                       )}
                     </span>
                     <input
@@ -592,17 +564,14 @@ export default function QRScannerModal({ isOpen, onClose, onScan, address: exter
                         animate={{ opacity: 1, scale: 1 }}
                         className="flex items-center gap-2"
                       >
-                        <CheckCircle size={14} className="text-[#050505]" />
-                        <p className="text-[11px] font-black uppercase tracking-widest text-[#050505]">
-                          ¡ Scanned !
-                        </p>
+                        <span className="text-[11px] font-black uppercase tracking-widest text-[#050505]">[OK] Scanned!</span>
                       </motion.div>
                     )}
                   </AnimatePresence>
 
                   {status === 'error' && (
-                    <p className="text-[11px] font-black uppercase tracking-widest text-red-500 text-center">
-                      {errMsg}
+                    <p className="text-[11px] font-black uppercase tracking-widest text-black text-center">
+                      [!] {errMsg}
                     </p>
                   )}
                 </div>

@@ -1,9 +1,7 @@
 "use client";
 
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-
-import { Copy, ExternalLink, Share2, Check } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { getExplorerAddressUrl } from '@/lib/wallet/chains';
 
 interface ReceiveHubProps {
@@ -11,7 +9,7 @@ interface ReceiveHubProps {
         network: string;
         address: string;
         token: string;
-        chainId?: number; // Optional chainId for explorer links
+        chainId?: number;
         icon?: React.ReactNode;
     }[];
 }
@@ -20,10 +18,10 @@ export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
     const [selectedIdx, setSelectedIdx] = useState(0);
     const [copied, setCopied] = useState(false);
 
-    const current = addresses[selectedIdx] || { 
-        network: 'Ethereum', 
-        address: '0x...', 
-        token: 'ETH' 
+    const current = addresses[selectedIdx] || {
+        network: 'Ethereum',
+        address: '0x...',
+        token: 'ETH'
     };
 
     const handleCopy = (text: string) => {
@@ -34,121 +32,115 @@ export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
 
     return (
         <div className="w-full max-w-4xl mx-auto p-6 grid grid-cols-1 md:grid-cols-12 gap-8">
-            
-            {/* LEFT: ADDRESS LIST (Multi-address view) */}
+
+            {/* LEFT: ADDRESS LIST */}
             <div className="md:col-span-4 space-y-4">
-                <h3 className="text-sm font-bold text-[#1F1F1F]/60 uppercase tracking-widest mb-4">Your Addresses</h3>
-                <div className="space-y-2 max-h-[60vh] overflow-y-auto pr-2 custom-scrollbar">
+                <h3 className="text-[9px] font-black text-black/40 uppercase tracking-[0.3em] mb-4">Your Addresses</h3>
+                <div className="space-y-1 max-h-[60vh] overflow-y-auto pr-2">
                     {addresses.map((addr, idx) => (
                         <button
                             key={`${addr.network}-${idx}`}
                             onClick={() => setSelectedIdx(idx)}
-                            className={`w-full p-4 rounded-2xl flex items-center justify-between transition-all border ${
-                                selectedIdx === idx 
-                                    ? 'bg-white border-purple-500/30 shadow-lg scale-[1.02]' 
-                                    : 'bg-white/40 border-transparent hover:bg-white/60'
+                            className={`w-full p-4 flex items-center justify-between transition-all border-b ${
+                                selectedIdx === idx
+                                    ? 'border-black bg-black text-white'
+                                    : 'border-black/10 bg-transparent text-black hover:bg-black/5'
                             }`}
                         >
                             <div className="flex items-center gap-3">
-                                <div className={`w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-xs ${getNetworkColor(addr.network)}`}>
-                                    {addr.token[0]}
+                                <div className={`w-7 h-7 border flex items-center justify-center font-black text-[9px] uppercase ${
+                                    selectedIdx === idx ? 'border-white text-white' : 'border-black/20 text-black/40'
+                                }`}>
+                                    {addr.token.slice(0, 3)}
                                 </div>
                                 <div className="text-left">
-                                    <div className="text-[#1F1F1F] font-bold text-sm">{addr.network}</div>
-                                    <div className="text-[#1F1F1F]/50 text-xs font-mono">{addr.address.slice(0, 6)}...{addr.address.slice(-4)}</div>
+                                    <div className={`font-black text-[10px] uppercase tracking-widest ${selectedIdx === idx ? 'text-white' : 'text-black'}`}>{addr.network}</div>
+                                    <div className={`text-[9px] font-mono ${selectedIdx === idx ? 'text-white/60' : 'text-black/40'}`}>{addr.address.slice(0, 6)}...{addr.address.slice(-4)}</div>
                                 </div>
                             </div>
+                            {selectedIdx === idx && (
+                                <span className="text-[9px] font-black text-white/60 uppercase tracking-widest">[*]</span>
+                            )}
                         </button>
                     ))}
                 </div>
             </div>
 
-            {/* CENTER: BIG QR & INFO */}
+            {/* RIGHT: QR + ADDRESS */}
             <div className="md:col-span-8">
-                <motion.div 
-                    layoutId={`card-${selectedIdx}`}
-                    className="bg-white rounded-[40px] p-8 shadow-xl border border-[#1F1F1F]/5 flex flex-col items-center text-center relative overflow-hidden"
-                >
-                    {/* Background decoration */}
-                    <div className="absolute top-0 left-0 w-full h-32 bg-gradient-to-b from-purple-500/5 to-transparent pointer-events-none" />
-
-                    <div className="relative z-10 w-full flex flex-col items-center">
-                        <div className={`px-4 py-1.5 rounded-full text-xs font-bold text-white mb-8 ${getNetworkColor(current.network)}`}>
-                            {current.network} Network
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={selectedIdx}
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -8 }}
+                        transition={{ duration: 0.2 }}
+                        className="border border-black/10 bg-white p-8 flex flex-col items-center text-center"
+                    >
+                        {/* Network Label */}
+                        <div className="border border-black px-4 py-1.5 mb-8">
+                            <span className="text-[9px] font-black uppercase tracking-[0.3em] text-black">{current.network} / {current.token}</span>
                         </div>
 
                         {/* QR Display */}
-                        <div className="p-4 bg-white rounded-3xl shadow-lg mb-8 border border-[#1F1F1F]/5">
-                            <img src={`https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=${current.address}&color=000000&bgcolor=ffffff`} alt="Wallet Address QR" className="w-[220px] h-[220px] object-contain rounded-xl" />
+                        <div className="p-3 border border-black/10 mb-8">
+                            <img
+                                src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${current.address}&color=000000&bgcolor=ffffff`}
+                                alt="Wallet Address QR"
+                                className="w-[200px] h-[200px] object-contain"
+                            />
                         </div>
 
-                        {/* Instruction Text */}
-                        <p className="text-[#1F1F1F]/60 text-sm max-w-sm mb-2">
-                             Use this address to receive tokens and collectibles on
+                        {/* Instruction */}
+                        <p className="text-[9px] text-black/40 uppercase tracking-widest font-black mb-1">
+                            Send {current.token} to this address on
                         </p>
-                        <h2 className="text-2xl font-black text-[#1F1F1F] mb-8">
-                            "{current.token}"
-                        </h2>
+                        <p className="text-[13px] font-black uppercase tracking-tight text-black mb-8">
+                            {current.network} Network
+                        </p>
 
                         {/* Address Box */}
-                        <div className="w-full max-w-md bg-[#F5F5F0] rounded-2xl p-4 flex items-center justify-between mb-6 group cursor-pointer hover:bg-[#EAEADF] transition-colors"
-                             onClick={() => handleCopy(current.address)}>
-                            <p className="font-mono text-[#1F1F1F] text-sm md:text-base break-all text-center flex-1">
+                        <button
+                            onClick={() => handleCopy(current.address)}
+                            className="w-full max-w-md bg-black/5 border border-black/10 p-4 flex items-center justify-between mb-4 hover:bg-black/10 transition-colors group"
+                        >
+                            <p className="font-mono text-black text-xs break-all text-left flex-1">
                                 {current.address}
                             </p>
-                            <div className={`${copied ? 'text-green-500' : 'text-[#1F1F1F]/30'} ml-2`}>
-                                {copied ? <Check size={20} /> : <Copy size={20} />}
-                            </div>
-                        </div>
+                            <span className="ml-3 text-[9px] font-black uppercase tracking-widest text-black/40 group-hover:text-black transition-colors shrink-0">
+                                {copied ? '[COPIED]' : '[COPY]'}
+                            </span>
+                        </button>
 
-                        {/* Action Buttons */}
-                        <div className="flex gap-3 w-full max-w-md mb-8">
-                            <button 
+                        {/* Actions */}
+                        <div className="flex gap-2 w-full max-w-md mb-6">
+                            <button
                                 onClick={() => handleCopy(current.address)}
-                                className="flex-1 py-4 bg-purple-600 hover:bg-purple-700 text-white rounded-xl font-bold transition-all shadow-lg shadow-purple-500/20 active:scale-95 flex items-center justify-center gap-2"
+                                className="flex-1 py-3 bg-black text-white font-black text-[9px] uppercase tracking-[0.2em] hover:bg-black/80 transition-colors"
                             >
-                                <Copy size={18} />
-                                Copy Address
+                                {copied ? 'Copied!' : 'Copy Address'}
                             </button>
-                            
-                            <a 
+                            <a
                                 href={current.chainId ? getExplorerAddressUrl(current.chainId, current.address) : `https://etherscan.io/address/${current.address}`}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="px-4 py-4 bg-white border border-[#1F1F1F]/10 text-[#1F1F1F] rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center"
+                                className="px-5 py-3 border border-black/20 text-black font-black text-[9px] uppercase tracking-widest hover:bg-black/5 transition-colors flex items-center justify-center"
                                 title="View on Explorer"
                             >
-                                <ExternalLink size={20} />
+                                [EXP]
                             </a>
-                            
-                            <button className="px-4 py-4 bg-white border border-[#1F1F1F]/10 text-[#1F1F1F] rounded-xl font-bold hover:bg-gray-50 transition-all active:scale-95 flex items-center justify-center">
-                                <Share2 size={20} />
-                            </button>
                         </div>
 
-                        {/* Educational Tip for 404 addresses */}
-                        <div className="w-full max-w-md p-4 bg-blue-50/50 border border-blue-100 rounded-2xl flex gap-3 text-left">
-                           <div className="w-6 h-6 rounded-full bg-blue-100 flex items-center justify-center shrink-0">
-                               <ExternalLink size={12} className="text-blue-600" />
-                           </div>
-                           <p className="text-xs text-blue-800 leading-relaxed font-medium">
-                               <span className="font-bold block mb-1">404 Error in explorer?</span>
-                               New addresses do not appear in public block explorers until they receive their first transaction or balance. This is a standard blockchain network measure.
-                           </p>
+                        {/* Note */}
+                        <div className="w-full max-w-md p-3 border border-black/10 bg-black/3 flex gap-3 text-left">
+                            <span className="text-[9px] font-black text-black/30 shrink-0">[i]</span>
+                            <p className="text-[9px] text-black/40 font-bold leading-relaxed uppercase tracking-wide">
+                                New addresses appear in explorers only after the first transaction. Standard network behavior.
+                            </p>
                         </div>
-                    </div>
-                </motion.div>
+                    </motion.div>
+                </AnimatePresence>
             </div>
-
         </div>
     );
 }
-
-function getNetworkColor(network: string) {
-    if (network.includes('Bitcoin')) return 'bg-orange-500';
-    if (network.includes('Polygon')) return 'bg-purple-500';
-    if (network.includes('Solana')) return 'bg-teal-500';
-    if (network.includes('Base')) return 'bg-blue-500';
-    return 'bg-blue-600'; // Default ETH
-}
-

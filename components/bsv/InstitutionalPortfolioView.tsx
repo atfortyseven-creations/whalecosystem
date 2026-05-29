@@ -9,20 +9,15 @@ import { SettingsView } from '@/components/settings/SettingsView';
 import { ethers } from 'ethers';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { useFeeData } from 'wagmi';
-import { ArrowDownToLine, RefreshCw, ArrowRightLeft, Send, QrCode, ScanLine, Wallet, Hexagon, ShieldAlert, FileCode, Activity, Fingerprint, Globe } from 'lucide-react';
 
-// Universal Modals
-import UniversalSendModal from '@/components/wallet/UniversalSendModal';
-import SwapModal from '@/components/wallet/SwapModal';
 import ReceiveHub from '@/components/wallet/ReceiveHub';
 import QRScannerModal from '@/components/wallet/QRScannerModal';
 import SecurityVault from '@/components/wallet/SecurityVault';
 import SettingsPanel from '@/components/wallet/SettingsPanel';
-import FiatOnRamp from '@/components/wallet/FiatOnRamp';
+import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
 
 import { QuantumHoldingsEngine } from '@/components/portfolio/QuantumHoldingsEngine';
 
-import { NativeBridgeView } from '@/components/portfolio/NativeBridgeView';
 import { AztecPrivacyTerminal } from '@/components/portfolio/AztecPrivacyTerminal';
 import { SecurityAllowances } from '@/components/portfolio/SecurityAllowances';
 import { ContractDeployerView } from '@/components/portfolio/ContractDeployerView';
@@ -74,16 +69,14 @@ export function InstitutionalPortfolioView() {
     const { address, balance, updateBalance, activeNetwork, restoreFromCloud, isLocked, unlockVault, passwordHash } = useWalletStore();
     
     // We keep 'HOME' as the main view, and overlay modals for actions
-    const [view, setView] = useState<'HOME'|'NETWORK'|'CREATE'|'BRIDGE'|'SHIELD'|'SECURITY'|'DEPLOY'|'MEMPOOL'|'SMART_ACCOUNT'|'OMNICHAIN'>('HOME');
+    const [view, setView] = useState<'HOME'|'NETWORK'|'CREATE'|'SHIELD'|'SECURITY'|'DEPLOY'|'MEMPOOL'|'SMART_ACCOUNT'|'OMNICHAIN'>('HOME');
     
     // Modal states for full universal capability
-    const [showSend, setShowSend] = useState(false);
-    const [showSwap, setShowSwap] = useState(false);
+    const [unifiedActionTab, setUnifiedActionTab] = useState<'SEND'|'SWAP'|'BRIDGE'|'BUY'|null>(null);
     const [showReceive, setShowReceive] = useState(false);
     const [showScan, setShowScan] = useState(false);
     const [showAccounts, setShowAccounts] = useState(false);
     const [showSettings, setShowSettings] = useState(false);
-    const [showDeposit, setShowDeposit] = useState(false);
     
     const [prefilledAddress, setPrefilledAddress] = useState('');
     const [loading, setLoading] = useState(false);
@@ -181,13 +174,13 @@ export function InstitutionalPortfolioView() {
                         loading={loading}
                         activeNetwork={activeNetwork}
                         onRefresh={refreshBalance}
-                        onSend={() => setShowSend(true)}
+                        onSend={() => setUnifiedActionTab('SEND')}
                         onReceive={() => setShowReceive(true)}
                         onScan={() => setShowScan(true)}
                         onCreate={() => setView('CREATE')}
-                        onBuy={() => setShowDeposit(true)}
-                        onSwap={() => setShowSwap(true)}
-                        onBridge={() => setView('BRIDGE')}
+                        onBuy={() => setUnifiedActionTab('BUY')}
+                        onSwap={() => setUnifiedActionTab('SWAP')}
+                        onBridge={() => setUnifiedActionTab('BRIDGE')}
                         onNetworkClick={() => setView('NETWORK')}
                         onSettingsClick={() => setShowSettings(true)}
                         onAccountsClick={() => setShowAccounts(true)}
@@ -202,7 +195,7 @@ export function InstitutionalPortfolioView() {
                 )}
                 {/* Embedded older views for deep protocol interactions */}
                 {view === 'NETWORK' && <NetworkView key="network" onBack={() => setView('HOME')} />}
-                {view === 'BRIDGE' && <NativeBridgeView key="bridge" address={address} onBack={() => setView('HOME')} />}
+
                 {view === 'SHIELD' && <AztecPrivacyTerminal key="shield" onBack={() => setView('HOME')} />}
                 {view === 'SECURITY' && <SecurityAllowances key="security" onBack={() => setView('HOME')} />}
                 {view === 'DEPLOY' && <ContractDeployerView key="deploy" onBack={() => setView('HOME')} />}
@@ -212,27 +205,28 @@ export function InstitutionalPortfolioView() {
             </AnimatePresence>
 
             {/* Universal On-Chain Modals for ALL Users */}
-            <UniversalSendModal isOpen={showSend} onClose={() => setShowSend(false)} />
-            <SwapModal isOpen={showSwap} onClose={() => setShowSwap(false)} />
-
-            {showDeposit && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4" onClick={() => setShowDeposit(false)}>
-                    <div className="w-full max-w-4xl bg-white border border-black/10 shadow-2xl p-6 relative overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setShowDeposit(false)} className="absolute top-4 right-4 text-black/40 hover:text-black z-10">X</button>
-                        <h2 className="text-lg font-black uppercase tracking-widest text-black mb-6">Deposit Fiat</h2>
-                        <div className="overflow-y-auto flex-1">
-                            <FiatOnRamp />
-                        </div>
-                    </div>
-                </div>
-            )}
+            <UnifiedWalletModal 
+                isOpen={!!unifiedActionTab} 
+                initialTab={unifiedActionTab || 'SEND'} 
+                onClose={() => setUnifiedActionTab(null)} 
+            />
             
             {showReceive && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4" onClick={() => setShowReceive(false)}>
-                    <div className="w-full max-w-md bg-white border border-black/10 shadow-2xl p-6 relative" onClick={e => e.stopPropagation()}>
-                        <button onClick={() => setShowReceive(false)} className="absolute top-4 right-4 text-black/40 hover:text-black z-10">X</button>
-                        <h2 className="text-lg font-black uppercase tracking-widest text-black mb-6">Receive Assets</h2>
-                        <ReceiveHub addresses={[{ network: 'Polygon', address: address || '', token: 'MATIC', chainId: 137 }]} />
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm" onClick={() => setShowReceive(false)}>
+                    <div className="w-full max-w-5xl max-h-[90vh] bg-white border border-black/10 shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-8 py-5 border-b border-black/10">
+                            <h2 className="text-[11px] font-black uppercase tracking-[0.3em] text-black">Receive Assets</h2>
+                            <button onClick={() => setShowReceive(false)} className="font-black text-[9px] uppercase tracking-widest text-black/40 hover:text-black transition-colors border border-black/10 px-3 py-2">[CLOSE]</button>
+                        </div>
+                        <div className="overflow-y-auto flex-1">
+                            <ReceiveHub addresses={[
+                                { network: 'Ethereum', address: address || '0x...', token: 'ETH', chainId: 1 },
+                                { network: 'Polygon', address: address || '0x...', token: 'MATIC', chainId: 137 },
+                                { network: 'Arbitrum', address: address || '0x...', token: 'ETH', chainId: 42161 },
+                                { network: 'Base', address: address || '0x...', token: 'ETH', chainId: 8453 },
+                                { network: 'Optimism', address: address || '0x...', token: 'ETH', chainId: 10 },
+                            ]} />
+                        </div>
                     </div>
                 </div>
             )}
@@ -244,24 +238,13 @@ export function InstitutionalPortfolioView() {
                     const addr = data.startsWith('ethereum:') ? data.replace('ethereum:', '').split('@')[0].split('?')[0] : data;
                     setShowScan(false);
                     toast.success(`Scanned: ${addr}`);
-                    setTimeout(() => setShowSend(true), 500);
+                    setTimeout(() => setUnifiedActionTab('SEND'), 500);
                 }}
             />
 
-            {showSettings && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4" onClick={() => setShowSettings(false)}>
-                    <div className="w-full max-w-4xl bg-white border border-black/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
-                        <div className="p-4 border-b border-black/10 flex justify-between items-center bg-black/5">
-                            <h2 className="text-lg font-black uppercase tracking-widest text-black">System Settings</h2>
-                            <button onClick={() => setShowSettings(false)} className="text-black/40 hover:text-black font-bold text-xs uppercase">Close</button>
-                        </div>
-                        <div className="overflow-y-auto p-4">
-                            <SettingsPanel />
-                        </div>
-                    </div>
-                </div>
-            )}
-
+            <AnimatePresence>
+                {showSettings && <SettingsView onBack={() => setShowSettings(false)} />}
+            </AnimatePresence>
             {showAccounts && (
                 <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm p-4" onClick={() => setShowAccounts(false)}>
                     <div className="w-full max-w-4xl bg-white border border-black/10 shadow-2xl overflow-hidden flex flex-col max-h-[90vh]" onClick={e => e.stopPropagation()}>
@@ -393,32 +376,16 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     {/* Left sidebar – actions */}
                     <div className="lg:col-span-3 space-y-4">
                         <div className="bg-white border border-black/10 p-5">
-                            <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-3 mb-4 flex items-center gap-2">
-                                <Wallet size={12} className="text-black/30" />
-                                Actions
+                            <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-3 mb-4 block">
+                                ACTIONS
                             </h4>
                             <div className="grid grid-cols-2 gap-2">
-                                <ActionBtn label="Deposit" icon={ArrowDownToLine} onClick={onBuy} />
-                                <ActionBtn label="Swap" icon={RefreshCw} onClick={onSwap} />
-                                <ActionBtn label="Bridge" icon={ArrowRightLeft} onClick={onBridge} />
-                                <ActionBtn label="Send" icon={Send} onClick={onSend} />
-                                <ActionBtn label="Receive" icon={QrCode} onClick={onReceive} />
-                                <ActionBtn label="Scan" icon={ScanLine} onClick={onScan} />
-                            </div>
-                        </div>
-
-                        <div className="bg-white border border-black/10 p-5">
-                            <h4 className="text-[9px] font-black uppercase tracking-[0.3em] text-black/40 border-b border-black/10 pb-3 mb-4 flex items-center gap-2">
-                                <Hexagon size={12} className="text-black/30" />
-                                Tools
-                            </h4>
-                            <div className="grid grid-cols-2 gap-2">
-                                <ActionBtn label="Privacy" icon={Hexagon} onClick={onShield} />
-                                <ActionBtn label="Allowances" icon={ShieldAlert} onClick={onSecurity} />
-                                <ActionBtn label="Smart Account" icon={Fingerprint} onClick={onSmartAccount} />
-                                <ActionBtn label="Deployer" icon={FileCode} onClick={onDeploy} />
-                                <ActionBtn label="Cross-Chain" icon={Globe} onClick={onOmnichain} />
-                                <ActionBtn label="Mempool" icon={Activity} onClick={onMempool} />
+                                <ActionBtn label="Deposit" onClick={onBuy} />
+                                <ActionBtn label="Swap" onClick={onSwap} />
+                                <ActionBtn label="Bridge" onClick={onBridge} />
+                                <ActionBtn label="Send" onClick={onSend} />
+                                <ActionBtn label="Receive" onClick={onReceive} />
+                                <ActionBtn label="Scan" onClick={onScan} />
                             </div>
                         </div>
                     </div>
@@ -468,13 +435,12 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
     );
 }
 
-function ActionBtn({ label, icon: Icon, onClick }: any) {
+function ActionBtn({ label, onClick }: any) {
     return (
         <button
             onClick={onClick}
-            className="flex flex-col items-center justify-center p-6 border border-black/5 hover:border-black hover:bg-black hover:text-white hover:shadow-xl transition-all duration-300 group bg-black/[0.02] gap-3"
+            className="flex flex-col items-center justify-center p-6 border border-black/5 hover:border-black hover:bg-black hover:text-white hover:shadow-xl transition-all duration-300 group bg-black/[0.02]"
         >
-            {Icon && <Icon size={22} strokeWidth={1.5} className="text-black/60 group-hover:text-white transition-colors duration-300" />}
             <span className="text-[10px] font-bold uppercase tracking-widest">{label}</span>
         </button>
     );
