@@ -11,6 +11,7 @@ import { QrScanner } from '@/components/dashboard/QrScanner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import type { Client } from '@xmtp/browser-sdk';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
+import { useWalletStore } from '@/lib/store/wallet-store';
 
 import { toast } from 'sonner';
 
@@ -39,7 +40,7 @@ function Avatar({ address }: { address: string }) {
 }
 
 export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
-  const { address, isConnected, isSystemHandshake, isChecking, connector, isZkVerified } = useSystemAccount();
+  const { address, isConnected, isSystemHandshake, isChecking, connector, isZkVerified, isLocalSystemWallet } = useSystemAccount();
   const { signMessageAsync } = useSignMessage();
   const { reconnect } = useReconnect();
   const { open: openAppKit } = useAppKit();
@@ -502,6 +503,12 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         const wagmiSigner = {
           getAddress: async () => address as string,
           signMessage: async (msg: string | Uint8Array) => {
+            if (isLocalSystemWallet) {
+                const wallet = await useWalletStore.getState().getConnectedWallet();
+                if (wallet) {
+                    return await wallet.signMessage(msg);
+                }
+            }
             try {
               return await signMessageAsync({ message: typeof msg === 'string' ? msg : { raw: msg } as any });
             } catch (sigErr: any) {
@@ -564,23 +571,14 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
         }
       }
     }
-  }, [address, isMobile, signMessageAsync, isSystemHandshake, loadConversations]);
+  }, [address, isMobile, signMessageAsync, isSystemHandshake, loadConversations, isLocalSystemWallet]);
 
   useEffect(() => {
     // Aggressive Auto-Init: Trigger for all connected users.
     if (isConnected && address && !client && !initInFlight.current && !initError) {
-      const hasVault = typeof localStorage !== 'undefined' && !!localStorage.getItem("system_vault_v1");
-      const hasInit = typeof localStorage !== 'undefined' && !!localStorage.getItem("whale_xmtp_initialized");
-      const isTouch = typeof window !== 'undefined' && ('ontouchstart' in window || navigator.maxTouchPoints > 0);
-      
-      // On mobile, auto-init can trigger unwanted wallet app switches if the keys aren't in IndexedDB.
-      // However, if forceAutoInit is true or it's a handshake session, we proceed.
-      // For returning users with IndexedDB keys, the auto-init is completely silent!
-      if (hasVault || hasInit || !isTouch || forceAutoInit || isSystemHandshake) {
-        initClient();
-      }
+      initClient();
     }
-  }, [isConnected, address, client, initError, initClient, forceAutoInit, isSystemHandshake]);
+  }, [isConnected, address, client, initError, initClient]);
 
   // Sync contacts to backend debounced
   const persistToLocal = useCallback((arr: ConversationMeta[]) => {

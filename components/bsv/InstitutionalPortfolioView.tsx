@@ -9,6 +9,7 @@ import { SettingsView } from '@/components/settings/SettingsView';
 import { ethers } from 'ethers';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { useFeeData } from 'wagmi';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 import ReceiveHub from '@/components/wallet/ReceiveHub';
 import QRScannerModal from '@/components/wallet/QRScannerModal';
@@ -67,8 +68,9 @@ const truncate = (str: string, len: number) => {
 };
 
 export function InstitutionalPortfolioView() {
-    const { address, balance, updateBalance, activeNetwork, restoreFromCloud, isLocked, unlockVault, passwordHash } = useWalletStore();
-    const { assets } = useRealWalletData([], address);
+    const { balance, updateBalance, activeNetwork, restoreFromCloud, isLocked, unlockVault, passwordHash } = useWalletStore();
+    const { address } = useSystemAccount();
+    const { assets } = useRealWalletData([], address || undefined);
     
     // We keep 'HOME' as the main view, and overlay modals for actions
     const [view, setView] = useState<'HOME'|'NETWORK'|'CREATE'|'SHIELD'|'SECURITY'|'DEPLOY'|'MEMPOOL'|'SMART_ACCOUNT'|'OMNICHAIN'>('HOME');
