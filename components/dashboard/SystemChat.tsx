@@ -661,6 +661,82 @@ export default function SystemChat({ onReturnToGate }: { onReturnToGate?: () => 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [isConnected, xmtpReady, needsWalletReconnect, iosSignPending]);
 
+  // ── Consume Offline Messages ──
+  useEffect(() => {
+    if (!xmtpReady || !address) return;
+    const consumeOffline = async () => {
+      try {
+        const res = await fetch('/api/chat/queue/consume', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address }),
+        });
+        if (!res.ok) return;
+
+        const { messages: offlineMsgs } = await res.json();
+        if (!offlineMsgs || offlineMsgs.length === 0) return;
+
+        console.log('[XMTP Offline Queue] Consumed', offlineMsgs.length, 'message(s)');
+
+        // BUG FIX: Batch all rendered messages into ONE setState call
+        // instead of calling setMessages N times (N re-renders + layout thrash)
+        const rendered: RenderableMessage[] = offlineMsgs.map((oMsg: any) => ({
+          id: `offline-${oMsg.id}`,
+          senderAddress: oMsg.sender,
+          content: oMsg.content,
+          sentAt: new Date(oMsg.timestamp).getTime(),
+          isMine: false,
+          isPinned: false,
+          isDestructing: false,
+          reactions: [],
+        }));
+
+        // Inject into active message list (deduplicated)
+        setMessages(prev => {
+          const existingIds = new Set(prev.map(m => m.id));
+          const fresh = rendered.filter(r => !existingIds.has(r.id));
+          if (fresh.length === 0) return prev;
+          return [...prev, ...fresh].sort((a, b) => a.sentAt - b.sentAt);
+        });
+
+        // Update conversation list with unread counts (batched)
+        setConversations(prev => {
+          let next = [...prev];
+          for (const oMsg of offlineMsgs) {
+            const senderNorm = (oMsg.sender as string).toLowerCase();
+            // Only treat as a conversation if it looks like an Ethereum address
+            if (!/^0x[a-fA-F0-9]{40}$/.test(senderNorm)) continue;
+
+            const idx = next.findIndex(c => c.peerAddress.toLowerCase() === senderNorm);
+            if (idx !== -1) {
+              next[idx] = {
+                ...next[idx],
+                unread: next[idx].unread + 1,
+                lastMessage: (oMsg.content as string).slice(0, 30),
+              };
+            } else {
+              next.push({
+                peerAddress: oMsg.sender,
+                displayName: resolveZKName(oMsg.sender),
+                folder: 'all',
+                unread: 1,
+                lastMessage: (oMsg.content as string).slice(0, 30),
+              });
+            }
+          }
+          return next;
+        });
+
+        // Play notification sound
+        playMessageSound();
+      } catch (e) {
+        console.error('[XMTP Offline Queue] Error consuming offline queue:', e);
+      }
+    };
+    consumeOffline();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [xmtpReady, address]);
+
   useEffect(() => {
     if (!xmtpReady || !xmtpClient.current) return;
     

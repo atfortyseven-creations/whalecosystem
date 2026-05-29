@@ -22,13 +22,13 @@ export default function SignUpPage() {
   }, []);
 
   const handleComplete = useCallback(() => {
-    // Wallet sealed, session established, DB indexed — go straight to dashboard
-    router.replace("/dashboard");
+    // Wallet sealed, session established, DB indexed — go straight to portfolio
+    router.replace("/portfolio");
   }, [router]);
 
   if (!mounted) {
     return (
-      <div className="min-h-screen bg-[#fafafa] flex items-center justify-center">
+      <div className="min-h-[100dvh] bg-white flex items-center justify-center">
         <div className="w-7 h-7 border-2 border-black/15 border-t-black/50 rounded-full animate-spin" />
       </div>
     );

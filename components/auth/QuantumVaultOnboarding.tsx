@@ -1,20 +1,18 @@
 "use client";
 
-import React, { useState, useEffect, useRef, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ethers } from "ethers";
 import { toast } from "sonner";
-import { TerminalExecutionLog } from "./TerminalExecutionLog";
 import { useWalletStore } from "@/lib/store/wallet-store";
-import { encryptWithPassword } from "@/lib/wallet-security";
+import { encryptWithPassword, tryDecryptAny } from "@/lib/wallet-security";
 import { useSystemConnect } from "@/hooks/useSystemConnect";
-import { 
-  Shield, Key, Lock, CheckCircle2, ChevronRight, Activity, Cpu, 
-  EyeOff, Eye, RefreshCw, Hash, Wallet
-} from "lucide-react";
+import { Lock, Hash, Wallet, EyeOff, Eye, UserPlus } from "lucide-react";
+import { OptimizedLocalLottie } from "@/components/landing/OptimizedLocalLottie";
 
 type OnboardingPhase = 
   | "INTRO" 
+  | "UNLOCK"
   | "ENTROPY" 
   | "PROOFS" 
   | "MNEMONIC_BACKUP" 
@@ -22,24 +20,34 @@ type OnboardingPhase =
   | "VAULT_SEAL" 
   | "COMPLETE";
 
-interface LogEntry {
-  id: string;
-  timestamp: string;
-  level: "INFO" | "WARN" | "ERROR" | "SUCCESS" | "SYSTEM";
-  message: string;
-  hash?: string;
-}
-
-import Link from "next/link";
-
 export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void }) {
-  const { createWallet, setupPassword, accounts, mnemonic, cloudSync } = useWalletStore();
+  const { createWallet, setupPassword, importWallet, accounts, mnemonic, cloudSync } = useWalletStore();
   const { activateSystemVault } = useSystemConnect();
   
   const [phase, setPhase] = useState<OnboardingPhase>("INTRO");
-  const [logs, setLogs] = useState<LogEntry[]>([]);
   const [entropyProgress, setEntropyProgress] = useState(0);
+  // Stable IDs — must NOT use Math.random() or inputs lose focus on every keystroke
+  const unlockPwdId = "unlock-password-field";
+  const newPwdId = "new-password-field";
+  const newPwdConfirmId = "new-password-confirm-field";
   
+  // Storage Check
+  const [hasKeystore, setHasKeystore] = useState(false);
+  const [systemAccounts, setSystemAccounts] = useState<any[]>([]);
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem('system_accounts');
+      const parsed = stored ? JSON.parse(stored) : [];
+      setSystemAccounts(parsed);
+      const ks = localStorage.getItem('system_keystore');
+      const vault = localStorage.getItem('system_vault_v1');
+      if (parsed.length > 0 || ks || vault) {
+        setHasKeystore(true);
+      }
+    } catch {}
+  }, []);
+
   // Verification states
   const [seedWords, setSeedWords] = useState<string[]>([]);
   const [verificationIndices, setVerificationIndices] = useState<number[]>([]);
@@ -49,19 +57,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-
-  // --------------------------------------------------------
-  // LOGGING SYSTEM
-  // --------------------------------------------------------
-  const addLog = useCallback((level: LogEntry["level"], message: string, hash?: string) => {
-    setLogs(prev => [...prev, {
-      id: Math.random().toString(36).substring(7),
-      timestamp: new Date().toISOString().split('T')[1].substring(0, 12),
-      level,
-      message,
-      hash
-    }]);
-  }, []);
+  const [isDecrypting, setIsDecrypting] = useState(false);
 
   // --------------------------------------------------------
   // PHASE: ENTROPY GATHERING
@@ -69,7 +65,8 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   const handleMouseMove = useCallback((e: React.MouseEvent | React.TouchEvent) => {
     if (phase !== "ENTROPY") return;
     setEntropyProgress(prev => {
-      const next = prev + 0.5;
+      // Slower entropy gathering as requested
+      const next = prev + 0.15;
       if (next >= 100) {
         setPhase("PROOFS");
         return 100;
@@ -85,44 +82,19 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
     if (phase === "PROOFS") {
       let isSubscribed = true;
       const runProofs = async () => {
-        addLog("SYSTEM", "Setting up wallet...");
-        await new Promise(r => setTimeout(r, 800));
-        
-        if (!isSubscribed) return;
-        addLog("INFO", "Generating secure keys...");
-        await new Promise(r => setTimeout(r, 1200));
-
-        if (!isSubscribed) return;
-        const fakeHash1 = ethers.keccak256(ethers.toUtf8Bytes(Date.now().toString()));
-        addLog("SUCCESS", "Keys generated successfully.", fakeHash1);
-        await new Promise(r => setTimeout(r, 800));
-
-        if (!isSubscribed) return;
-        addLog("INFO", "Preparing account structures...");
         await new Promise(r => setTimeout(r, 1000));
-
         if (!isSubscribed) return;
-        addLog("INFO", "Creating secure backup phrase...");
         
-        // ACTUAL WALLET GENERATION HAPPENS HERE
         createWallet();
-        
         await new Promise(r => setTimeout(r, 1500));
         if (!isSubscribed) return;
-        
-        addLog("SUCCESS", "Wallet successfully generated.");
-        await new Promise(r => setTimeout(r, 800));
-
-        if (!isSubscribed) return;
-        addLog("SYSTEM", "Generation complete. Awaiting password.");
-        await new Promise(r => setTimeout(r, 1000));
         
         setPhase("MNEMONIC_BACKUP");
       };
       runProofs();
       return () => { isSubscribed = false; };
     }
-  }, [phase, addLog, createWallet]);
+  }, [phase, createWallet]);
 
   // --------------------------------------------------------
   // MNEMONIC SETUP
@@ -133,7 +105,6 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
       setSeedWords(words);
       
       if (verificationIndices.length === 0) {
-        // Pick 3 random distinct indices
         const indices = new Set<number>();
         while(indices.size < 3) {
           indices.add(Math.floor(Math.random() * 12));
@@ -144,16 +115,17 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   }, [phase, mnemonic, verificationIndices.length]);
 
   const verifyMnemonic = () => {
+    // Guard: if seedWords haven't loaded yet, skip
+    if (seedWords.length === 0 || verificationIndices.length === 0) return;
     let isValid = true;
     for (const index of verificationIndices) {
-      if (verificationAnswers[index]?.toLowerCase().trim() !== seedWords[index]) {
+      if ((verificationAnswers[index] ?? '').toLowerCase().trim() !== seedWords[index]) {
         isValid = false;
         break;
       }
     }
     
     if (isValid) {
-      toast.success("Backup Verified", { description: "Seed phrase match confirmed." });
       setPhase("VAULT_SEAL");
     } else {
       toast.error("Verification Failed", { description: "One or more words are incorrect." });
@@ -164,7 +136,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   // VAULT SEALING
   // --------------------------------------------------------
   const sealVault = async () => {
-    const cleanPassword = password.trim(); // [PERSISTENCE FIX] trim mobile keyboard whitespace
+    const cleanPassword = password.trim();
     if (cleanPassword.length < 8) {
       toast.error("Security Requirement", { description: "Password must be at least 8 characters." });
       return;
@@ -174,15 +146,10 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
       return;
     }
 
-    addLog("SYSTEM", "Encrypting your wallet...");
-    setPhase("COMPLETE");
-
-    // [PERSISTENCE FIX] Seal wallet-store (System A) synchronously
+    // BUG FIX: Don't transition to COMPLETE until the async vault sealing succeeds.
+    // Moved setPhase("COMPLETE") below after successful encryption.
     setupPassword(cleanPassword);
 
-    // [PERSISTENCE BRIDGE] Also write to localStorage system_accounts (System B = CoreAuthGate)
-    // Without this, if the user later opens Portfolio, CoreAuthGate sees no system_accounts
-    // and forces them to create a new wallet — wiping their existing one.
     try {
       const state = useWalletStore.getState();
       const walletMnemonic = state.mnemonic;
@@ -190,12 +157,11 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
       const walletPk       = state.privateKey;
 
       if (walletMnemonic && walletAddress) {
-        // Encrypt mnemonic under AES-GCM (same format CoreAuthGate uses)
         const encryptedBlob = await encryptWithPassword(walletMnemonic, cleanPassword);
 
         const newAccount = {
           id: Date.now().toString(),
-          name: `Wallet ${accounts.length + 1}`,
+          name: `Wallet ${systemAccounts.length + 1}`,
           address: walletAddress,
           encryptedBlob,
           createdAt: Date.now(),
@@ -206,14 +172,11 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
         localStorage.setItem('system_accounts', JSON.stringify(updated));
         localStorage.setItem('system_keystore', encryptedBlob);
 
-        // Activate vault connection (non-fatal on mobile)
         if (walletPk) {
           try {
             await activateSystemVault(walletPk, walletAddress);
           } catch {}
 
-          // [INDEXATION FIX] Register with backend so session cookies are set
-          // and cloudSync can write to the WatchedWallet DB table.
           try {
             const resp = await fetch('/api/auth/system-verify', {
               method: 'POST',
@@ -221,160 +184,282 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
               body: JSON.stringify({ address: walletAddress }),
             });
             if (resp.ok) {
-              // Now that JWT cookies exist, sync wallet index to DB
               await cloudSync().catch(() => {});
             }
           } catch {}
         }
-
-        addLog("SUCCESS", `Vault sealed. Address: ${walletAddress.slice(0,6)}...${walletAddress.slice(-4)}`);
       }
     } catch (err: any) {
-      // Bridge failure is non-fatal — wallet-store (System A) already sealed
-      console.warn('[QuantumVault] system_accounts bridge non-fatal:', err?.message);
+      // Vault sealing failed — stay on VAULT_SEAL so user can retry
+      toast.error("Vault Error", { description: "Could not seal vault. Please try again." });
+      return;
     }
 
-    // Give UI a moment to show complete state, then redirect
+    // Only transition to COMPLETE after all crypto work succeeded
+    // Mark session as unlocked so portfolio page gate clears on return/refresh
+    try { sessionStorage.setItem('portfolio_unlocked', 'true'); } catch {}
+    setPhase("COMPLETE");
     setTimeout(() => {
       onComplete();
-    }, 2000);
+    }, 4500); // Wait for the lottie
+  };
+
+  // --------------------------------------------------------
+  // UNLOCK EXISTING VAULT
+  // --------------------------------------------------------
+  const handleUnlock = async () => {
+    const cleanPassword = password.trim();
+    if (!cleanPassword) return;
+
+    let targetBlob = '';
+    let targetAccount = systemAccounts[0];
+    let isLegacyVault = false;
+
+    if (targetAccount) {
+      targetBlob = targetAccount.encryptedBlob;
+      if (targetAccount.id === 'legacy-1' && !localStorage.getItem('system_keystore') && localStorage.getItem('system_vault_v1')) {
+        isLegacyVault = true;
+      }
+    } else {
+      const ks = localStorage.getItem('system_keystore');
+      const vault = localStorage.getItem('system_vault_v1');
+      if (ks) targetBlob = ks;
+      else if (vault) { targetBlob = vault; isLegacyVault = true; }
+    }
+
+    if (!targetBlob) {
+      toast.error('Wallet data missing');
+      return;
+    }
+
+    setIsDecrypting(true);
+    await new Promise(r => setTimeout(r, 60));
+
+    try {
+      let pk: string | null = null;
+      let addr: string | null = null;
+
+      if (!isLegacyVault) {
+        const { plaintext, wasLegacy } = await tryDecryptAny(targetBlob, cleanPassword);
+        let walletObj: any;
+        if (wasLegacy) {
+          walletObj = new ethers.Wallet(plaintext);
+        } else {
+          walletObj = ethers.Wallet.fromPhrase(plaintext);
+        }
+        pk = walletObj.privateKey;
+        addr = walletObj.address;
+      } else {
+        const { readStoredVaultKey } = await import('@/hooks/useSystemConnect');
+        const vaultPk = await readStoredVaultKey();
+        if (!vaultPk) throw new Error('Vault corrupted');
+        const walletObj: any = new ethers.Wallet(vaultPk);
+        pk = walletObj.privateKey;
+        addr = walletObj.address;
+      }
+
+      if (pk && addr) {
+        importWallet(pk, 'System Main');
+        try { setupPassword(cleanPassword); } catch {}
+        try {
+          sessionStorage.setItem('portfolio_unlocked', 'true');
+          sessionStorage.setItem('system_wallet_addr', addr.toLowerCase());
+        } catch {}
+        try { await activateSystemVault(pk, addr); } catch {}
+        try {
+          const verifyResp = await fetch('/api/auth/system-verify', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ address: addr })
+          });
+          if (verifyResp.ok) await cloudSync().catch(() => {});
+        } catch {}
+        
+        setIsDecrypting(false);
+        setPassword("");        // BUG FIX: clear password from state after unlock
+        setConfirmPassword("");
+        setPhase("COMPLETE");
+        setTimeout(() => {
+          onComplete();
+        }, 4500); // Wait for the lottie
+      }
+    } catch (e: any) {
+      setIsDecrypting(false);
+      toast.error('Contraseña incorrecta');
+    }
+  };
+
+  // BUG FIX: Reset all creation state when user starts a fresh wallet from INTRO
+  const startNewWallet = () => {
+    setEntropyProgress(0);
+    setSeedWords([]);
+    setVerificationIndices([]);
+    setVerificationAnswers({});
+    setPassword("");
+    setConfirmPassword("");
+    setPhase("ENTROPY");
   };
 
   // --------------------------------------------------------
   // RENDERERS
   // --------------------------------------------------------
   return (
-    <div className="w-full min-h-[100dvh] flex flex-col md:flex-row bg-white relative overflow-x-hidden">
-      
-      {/* LEFT PANEL - Terminal / Aesthetic Info */}
-      <div className="w-full md:w-[40%] bg-[#fafafa] border-b md:border-b-0 md:border-r border-black/10 p-6 pt-24 md:p-8 flex flex-col justify-between">
-        <div>
-          <div className="flex items-center gap-4 mb-10">
-            <div className="w-12 h-12 bg-black flex items-center justify-center">
-              <Wallet size={24} className="text-white" />
-            </div>
-            <div>
-              <h2 className="text-[20px] font-black uppercase tracking-[0.2em] text-black">Wallet Setup</h2>
-              <p className="text-[13px] text-black/40 uppercase tracking-widest font-mono">Account Creation</p>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            <div className={`p-6 border transition-colors ${phase === "ENTROPY" ? "border-black bg-black/5" : "border-black/10"}`}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[14px] font-bold uppercase tracking-widest text-black/60">Step 1</span>
-              </div>
-              <h3 className="text-[16px] font-black uppercase tracking-wider text-black">System Setup</h3>
-            </div>
-            <div className={`p-6 border transition-colors ${phase === "PROOFS" ? "border-black bg-black/5" : "border-black/10"}`}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[14px] font-bold uppercase tracking-widest text-black/60">Step 2</span>
-              </div>
-              <h3 className="text-[16px] font-black uppercase tracking-wider text-black">Wallet Generation</h3>
-            </div>
-            <div className={`p-6 border transition-colors ${["MNEMONIC_BACKUP", "MNEMONIC_VERIFY"].includes(phase) ? "border-black bg-black/5" : "border-black/10"}`}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[14px] font-bold uppercase tracking-widest text-black/60">Step 3</span>
-              </div>
-              <h3 className="text-[16px] font-black uppercase tracking-wider text-black">Secret Backup</h3>
-            </div>
-            <div className={`p-6 border transition-colors ${phase === "VAULT_SEAL" ? "border-black bg-black/5" : "border-black/10"}`}>
-              <div className="flex items-center justify-between mb-3">
-                <span className="text-[14px] font-bold uppercase tracking-widest text-black/60">Step 4</span>
-              </div>
-              <h3 className="text-[16px] font-black uppercase tracking-wider text-black">Secure Password</h3>
-            </div>
-          </div>
-        </div>
-
-        <div className="mt-8">
-          <TerminalExecutionLog logs={logs} height="h-64" />
-        </div>
-      </div>
-
-      {/* RIGHT PANEL - Interactive Core */}
-      <div 
-        className="w-full md:w-[60%] bg-white p-6 py-12 md:p-12 relative flex flex-col justify-center min-h-[60vh] md:min-h-screen" 
-        onMouseMove={handleMouseMove}
-        onTouchMove={handleMouseMove}
-        style={{ touchAction: phase === "ENTROPY" ? "none" : "auto" }}
-      >
+    <div 
+      className="w-full min-h-[100dvh] bg-transparent flex flex-col items-center justify-center relative overflow-hidden"
+      onMouseMove={handleMouseMove}
+      onTouchMove={handleMouseMove}
+      style={{ touchAction: phase === "ENTROPY" ? "none" : "auto" }}
+    >
+      <div className="w-full max-w-5xl px-6 md:px-12 flex flex-col items-center justify-center relative z-10 py-12">
         <AnimatePresence mode="wait">
           
           {phase === "INTRO" && (
-            <motion.div key="intro" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col items-center text-center">
-              <div className="w-24 h-24 border-2 border-black flex items-center justify-center mb-8">
+            <motion.div key="intro" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }} className="flex flex-col items-center text-center w-full">
+              <div className="w-24 h-24 border-2 border-black flex items-center justify-center mb-8 bg-white/50 backdrop-blur-md">
                 <Wallet size={36} className="text-black" />
               </div>
-              <h1 className="text-[34px] font-black uppercase tracking-widest text-black mb-6">Create Your Account</h1>
-              <Link href="/login" className="mb-8 px-8 py-3 border-2 border-black text-[14px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-colors">
-                Login with Humanity Ledger
-              </Link>
-              <p className="text-[16px] font-medium text-black/60 max-w-lg mb-16 leading-relaxed">
-                You are about to create your secure wallet. The system will gather random data to generate your account securely.
+              <h1 className="text-[34px] md:text-[56px] font-black uppercase tracking-[0.15em] text-black mb-6 drop-shadow-sm">Humanity Ledger</h1>
+              <p className="text-[16px] md:text-[18px] font-medium text-black/60 max-w-lg mb-16 leading-relaxed">
+                Connect your identity to the most secure on-chain wallet system.
               </p>
+              
+              <div className="flex flex-col gap-6 w-full max-w-md">
+                {hasKeystore ? (
+                  <>
+                    <button 
+                      onClick={() => setPhase("UNLOCK")}
+                      className="group relative px-10 py-5 bg-black text-white font-black text-[14px] uppercase tracking-[0.3em] overflow-hidden transition-transform active:scale-95 w-full flex items-center justify-center gap-3 shadow-2xl"
+                    >
+                      <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                      <span className="relative z-10 flex items-center gap-3"><Lock size={18} /> Login / Unlock Wallet</span>
+                    </button>
+                    <button 
+                      onClick={startNewWallet}
+                      className="px-10 py-5 border-2 border-black text-black bg-white/50 backdrop-blur-sm font-black text-[14px] uppercase tracking-[0.3em] hover:bg-black/5 transition-colors w-full shadow-lg"
+                    >
+                      Create New Wallet
+                    </button>
+                  </>
+                ) : (
+                  <button 
+                    onClick={startNewWallet}
+                    className="group relative px-10 py-5 bg-black text-white font-black text-[14px] uppercase tracking-[0.3em] overflow-hidden transition-transform active:scale-95 w-full flex items-center justify-center gap-3 shadow-2xl"
+                  >
+                    <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                    <span className="relative z-10 flex items-center gap-3"><UserPlus size={18} /> Create New Wallet</span>
+                  </button>
+                )}
+              </div>
+            </motion.div>
+          )}
+
+          {phase === "UNLOCK" && (
+            <motion.div key="unlock" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full max-w-md">
+              <div className="w-24 h-24 border-2 border-black bg-white/50 backdrop-blur-sm flex items-center justify-center mb-8 shadow-lg">
+                <Lock size={36} className="text-black" />
+              </div>
+              <h2 className="text-[28px] md:text-[36px] font-black uppercase tracking-widest text-black mb-12 text-center drop-shadow-sm">Unlock Wallet</h2>
+              
+              <form autoComplete="off" onSubmit={(e) => { e.preventDefault(); handleUnlock(); }} className="w-full space-y-8 mb-12">
+                <input type="text" name="fakeusernameremembered" style={{ display: "none" }} />
+                
+                <div className="relative">
+                  <input 
+                    type={showPassword ? "text" : "password"}
+                    id={unlockPwdId}
+                    name={unlockPwdId}
+                    autoComplete="current-password"
+                    spellCheck="false"
+                    className="w-full border-b-2 border-black/20 pb-4 text-[20px] md:text-[28px] text-center font-mono font-bold text-black focus:border-black outline-none transition-colors bg-transparent tracking-widest drop-shadow-sm"
+                    placeholder="ENTER PASSWORD"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-0 bottom-4 text-black/40 hover:text-black">
+                    {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+                  </button>
+                </div>
+              </form>
+
               <button 
-                onClick={() => setPhase("ENTROPY")}
-                className="group relative px-10 py-5 bg-black text-white font-black text-[14px] uppercase tracking-[0.3em] overflow-hidden transition-transform active:scale-95"
+                onClick={handleUnlock}
+                disabled={isDecrypting}
+                className="w-full px-10 py-5 bg-black text-white font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black/90 transition-all flex items-center justify-center gap-3 disabled:opacity-50 shadow-2xl"
               >
-                <div className="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
-                <span className="relative z-10 flex items-center gap-3">Start Setup <ChevronRight size={18} /></span>
+                {isDecrypting ? <span className="animate-pulse">Decrypting...</span> : "Unlock"}
+              </button>
+              
+              <button 
+                onClick={() => setPhase("INTRO")}
+                className="mt-8 text-[12px] font-bold text-black/50 uppercase tracking-widest hover:text-black"
+              >
+                Back
               </button>
             </motion.div>
           )}
 
           {phase === "ENTROPY" && (
             <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full px-2 text-center">
-              <h2 className="text-[16px] md:text-[20px] font-black uppercase tracking-widest text-black mb-12 md:mb-16">Move your cursor to generate random data</h2>
+              <h2 className="text-[18px] md:text-[28px] font-black uppercase tracking-widest text-black mb-12 md:mb-16 drop-shadow-sm">Move your cursor to generate entropy</h2>
               
-              <div className="w-full max-w-xl bg-[#f4f4f4] h-3 mb-6 overflow-hidden">
-                <div className="h-full bg-black transition-all duration-100 ease-out" style={{ width: `${entropyProgress}%` }} />
+              <div className="w-full max-w-3xl bg-black/5 h-2 mb-6 overflow-hidden rounded-full backdrop-blur-sm">
+                <div className="h-full bg-black transition-all duration-100 ease-out rounded-full" style={{ width: `${entropyProgress}%` }} />
               </div>
               
-              <div className="font-mono text-[64px] font-black tracking-tighter text-black/10 tabular-nums">
+              <div className="font-mono text-[80px] md:text-[140px] font-black tracking-tighter text-black/10 tabular-nums leading-none">
                 {entropyProgress.toFixed(1)}%
               </div>
               
-              <div className="grid grid-cols-12 gap-2 mt-16 w-full max-w-xl opacity-20">
-                {Array.from({ length: 144 }).map((_, i) => (
-                  <div key={i} className="aspect-square bg-black transition-opacity duration-500" style={{ opacity: Math.random() < (entropyProgress / 100) ? 1 : 0.1 }} />
-                ))}
+              <div className="grid grid-cols-12 md:grid-cols-24 gap-3 mt-16 w-full max-w-4xl opacity-30">
+                {Array.from({ length: 288 }).map((_, i) => {
+                  // Stable fill: cell is "on" if its index falls below the filled proportion
+                  // This avoids Math.random() re-evaluating on every mouse move (massive repaint)
+                  const threshold = Math.floor((entropyProgress / 100) * 288);
+                  const isOn = i < threshold;
+                  return (
+                    <div
+                      key={i}
+                      className="aspect-square bg-black rounded-sm transition-opacity duration-300"
+                      style={{ opacity: isOn ? 0.8 : 0.05 }}
+                    />
+                  );
+                })}
               </div>
             </motion.div>
           )}
 
           {phase === "PROOFS" && (
             <motion.div key="proofs" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center justify-center w-full h-full">
-              <div className="relative flex items-center justify-center w-48 h-48 mb-12">
-                <div className="absolute inset-0 border-[6px] border-black/10 rounded-full" />
-                <div className="absolute inset-0 border-[6px] border-t-black border-r-black border-b-transparent border-l-transparent rounded-full animate-spin" />
-                <Hash size={48} className="text-black animate-pulse" />
+              <div className="relative flex items-center justify-center w-64 h-64 md:w-80 md:h-80 mb-12">
+                <div className="absolute inset-0 border-[3px] border-black/10 rounded-full" />
+                <div className="absolute inset-0 border-[3px] border-t-black border-r-black border-b-transparent border-l-transparent rounded-full animate-spin" style={{ animationDuration: '3s' }} />
+                <Hash size={80} className="text-black animate-pulse drop-shadow-md" />
               </div>
-              <h2 className="text-[20px] font-black uppercase tracking-widest text-black mb-3">Setting Up</h2>
-              <p className="text-[14px] font-mono text-black/50 uppercase tracking-widest">Generating your unique wallet address...</p>
+              <h2 className="text-[28px] md:text-[40px] font-black uppercase tracking-widest text-black mb-4 drop-shadow-sm">Generating Identity</h2>
+              <p className="text-[16px] font-mono text-black/50 uppercase tracking-widest">Compiling ZK-Proofs...</p>
             </motion.div>
           )}
 
           {phase === "MNEMONIC_BACKUP" && (
-            <motion.div key="backup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
-              <div className="mb-12">
-                <h2 className="text-[24px] font-black uppercase tracking-widest text-black mb-3">Secret Recovery Phrase</h2>
-                <p className="text-[15px] font-bold text-red-500 uppercase tracking-widest">CRITICAL: Write these down. Never share them. If lost, funds are permanently unrecoverable.</p>
+            <motion.div key="backup" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full max-w-4xl bg-white/40 backdrop-blur-xl p-8 md:p-16 rounded-[40px] shadow-2xl border border-white/50">
+              <div className="mb-16 text-center">
+                <h2 className="text-[28px] md:text-[40px] font-black uppercase tracking-[0.1em] text-black mb-4 drop-shadow-sm">Secret Recovery Phrase</h2>
+                <p className="text-[14px] md:text-[18px] font-bold text-red-600 uppercase tracking-widest drop-shadow-sm">CRITICAL: Write these down. Never share them. If lost, funds are permanently unrecoverable.</p>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-12">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 md:gap-8 mb-16">
                 {seedWords.map((word, index) => (
-                  <div key={index} className="flex items-center border border-black/10 p-3 sm:p-4 bg-[#fafafa] overflow-hidden">
-                    <span className="text-[12px] sm:text-[14px] font-bold text-black/30 w-6 sm:w-8 shrink-0">{index + 1}.</span>
-                    <span className="text-[14px] sm:text-[16px] font-mono font-bold text-black truncate">{word}</span>
+                  <div key={index} className="flex items-center border-b-2 border-black/20 pb-4">
+                    <span className="text-[14px] md:text-[16px] font-bold text-black/40 w-10 md:w-12 shrink-0">{index + 1}.</span>
+                    <span className="text-[18px] md:text-[24px] font-mono font-black text-black tracking-widest drop-shadow-sm">{word}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="flex justify-center md:justify-end">
+              <div className="flex justify-center">
                 <button 
                   onClick={() => setPhase("MNEMONIC_VERIFY")}
-                  className="w-full md:w-auto px-6 py-4 bg-black text-white font-black text-[12px] md:text-[14px] uppercase tracking-widest hover:bg-black/80 transition-colors"
+                  className="px-12 py-6 bg-black text-white font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black/80 transition-colors w-full md:w-auto shadow-xl"
                 >
                   I have securely saved these words
                 </button>
@@ -383,21 +468,21 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
           )}
 
           {phase === "MNEMONIC_VERIFY" && (
-            <motion.div key="verify" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full">
-               <div className="mb-12">
-                <h2 className="text-[24px] font-black uppercase tracking-widest text-black mb-3">Verify Backup</h2>
-                <p className="text-[15px] font-bold text-black/60 uppercase tracking-widest">Confirm specific words from your phrase to proceed.</p>
+            <motion.div key="verify" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }} className="w-full max-w-3xl bg-white/40 backdrop-blur-xl p-8 md:p-16 rounded-[40px] shadow-2xl border border-white/50">
+               <div className="mb-16 text-center">
+                <h2 className="text-[28px] md:text-[40px] font-black uppercase tracking-[0.1em] text-black mb-4 drop-shadow-sm">Verify Backup</h2>
+                <p className="text-[14px] md:text-[18px] font-bold text-black/60 uppercase tracking-widest">Confirm specific words from your phrase to proceed.</p>
               </div>
 
-              <div className="space-y-6 mb-12">
+              <div className="space-y-12 mb-16">
                 {verificationIndices.map((index) => (
-                  <div key={index} className="flex flex-col gap-3">
-                    <label className="text-[14px] font-black uppercase tracking-widest text-black">
+                  <div key={index} className="flex flex-col gap-4">
+                    <label className="text-[16px] font-black uppercase tracking-widest text-black text-center md:text-left drop-shadow-sm">
                       Word #{index + 1}
                     </label>
                     <input 
                       type="text"
-                      className="w-full border-b-2 border-black/20 pb-3 text-[18px] font-mono font-bold text-black focus:border-black outline-none transition-colors bg-transparent placeholder:text-black/10"
+                      className="w-full border-b-4 border-black/20 pb-4 text-[24px] md:text-[32px] font-mono font-black text-black text-center md:text-left focus:border-black outline-none transition-colors bg-transparent placeholder:text-black/10"
                       placeholder={`Enter word #${index + 1}`}
                       value={verificationAnswers[index] || ""}
                       onChange={(e) => setVerificationAnswers(prev => ({...prev, [index]: e.target.value}))}
@@ -406,16 +491,16 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 ))}
               </div>
 
-              <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-6 md:gap-4 mt-8">
+              <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-6">
                 <button 
                   onClick={() => setPhase("MNEMONIC_BACKUP")}
-                  className="text-[12px] md:text-[14px] font-bold text-black/40 uppercase tracking-widest hover:text-black"
+                  className="text-[12px] md:text-[14px] font-bold text-black/50 uppercase tracking-widest hover:text-black"
                 >
                   View Phrase Again
                 </button>
                 <button 
                   onClick={verifyMnemonic}
-                  className="w-full md:w-auto px-6 py-4 bg-black text-white font-black text-[12px] md:text-[14px] uppercase tracking-widest hover:bg-black/80 transition-colors text-center"
+                  className="px-10 py-5 bg-black text-white font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black/80 transition-colors w-full md:w-auto text-center shadow-xl"
                 >
                   Verify & Proceed
                 </button>
@@ -424,46 +509,43 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
           )}
 
           {phase === "VAULT_SEAL" && (
-            <motion.div key="seal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="w-full">
-              <div className="mb-12 text-center">
-                <div className="w-24 h-24 mx-auto border-2 border-black flex items-center justify-center mb-8 bg-black">
+            <motion.div key="seal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="w-full max-w-2xl bg-white/40 backdrop-blur-xl p-8 md:p-16 rounded-[40px] shadow-2xl border border-white/50">
+              <div className="mb-16 text-center">
+                <div className="w-24 h-24 mx-auto border-2 border-black flex items-center justify-center mb-8 bg-black shadow-lg">
                   <Lock size={36} className="text-white" />
                 </div>
-                <h2 className="text-[26px] font-black uppercase tracking-widest text-black mb-3">Set a Password</h2>
-                <p className="text-[15px] font-bold text-black/60 uppercase tracking-widest">Create a local password to encrypt and protect your account.</p>
+                <h2 className="text-[28px] md:text-[40px] font-black uppercase tracking-[0.1em] text-black mb-4 drop-shadow-sm">Set Password</h2>
+                <p className="text-[14px] md:text-[18px] font-bold text-black/60 uppercase tracking-widest">Create a local password to encrypt your account on this device.</p>
               </div>
 
-              <form autoComplete="off" onSubmit={(e) => e.preventDefault()} className="space-y-8 max-w-lg mx-auto mb-12">
-                {/* Anti-autocomplete honey pot fields */}
+              <form autoComplete="off" onSubmit={(e) => e.preventDefault()} className="space-y-12 mb-16">
                 <input type="text" name="fakeusernameremembered" style={{ display: "none" }} />
                 <input type="password" name="fakepasswordremembered" style={{ display: "none" }} />
                 
                 <div className="relative">
                   <input 
                     type={showPassword ? "text" : "password"}
-                    name={`new-password-${Math.random()}`}
+                    id={newPwdId}
+                    name={newPwdId}
                     autoComplete="new-password"
-                    data-lpignore="true"
-                    data-1p-ignore="true"
                     spellCheck="false"
-                    className="w-full border-b-2 border-black/20 pb-4 text-[18px] font-mono font-bold text-black focus:border-black outline-none transition-colors bg-transparent tracking-widest"
+                    className="w-full border-b-4 border-black/20 pb-4 text-[24px] md:text-[32px] font-mono font-black text-black text-center focus:border-black outline-none transition-colors bg-transparent tracking-widest drop-shadow-sm"
                     placeholder="ENTER PASSWORD"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                   />
                   <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-0 top-0 bottom-4 text-black/40 hover:text-black">
-                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                    {showPassword ? <EyeOff size={28} /> : <Eye size={28} />}
                   </button>
                 </div>
                 <div className="relative">
                   <input 
                     type={showPassword ? "text" : "password"}
-                    name={`new-password-confirm-${Math.random()}`}
+                    id={newPwdConfirmId}
+                    name={newPwdConfirmId}
                     autoComplete="new-password"
-                    data-lpignore="true"
-                    data-1p-ignore="true"
                     spellCheck="false"
-                    className="w-full border-b-2 border-black/20 pb-4 text-[18px] font-mono font-bold text-black focus:border-black outline-none transition-colors bg-transparent tracking-widest"
+                    className="w-full border-b-4 border-black/20 pb-4 text-[24px] md:text-[32px] font-mono font-black text-black text-center focus:border-black outline-none transition-colors bg-transparent tracking-widest drop-shadow-sm"
                     placeholder="CONFIRM PASSWORD"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -474,9 +556,9 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
               <div className="flex justify-center">
                 <button 
                   onClick={sealVault}
-                  className="px-10 py-5 bg-black text-white font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black/90 transition-all flex items-center gap-3"
+                  className="px-12 py-6 bg-black text-white font-black text-[14px] uppercase tracking-[0.2em] hover:bg-black/90 transition-all flex items-center justify-center gap-3 w-full md:w-auto shadow-2xl"
                 >
-                  <Lock size={16} /> Complete Setup
+                  <Lock size={18} /> Complete Setup
                 </button>
               </div>
             </motion.div>
@@ -484,27 +566,19 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
 
           {phase === "COMPLETE" && (
             <motion.div key="complete" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }} className="flex flex-col items-center justify-center text-center w-full h-full">
-              <motion.div 
-                initial={{ rotate: -90, opacity: 0 }} 
-                animate={{ rotate: 0, opacity: 1 }} 
-                transition={{ type: "spring", bounce: 0.5 }}
-                className="mb-10"
-              >
-                <CheckCircle2 size={84} className="text-black" />
-              </motion.div>
-              <h2 className="text-[32px] font-black uppercase tracking-widest text-black mb-5">Account Created</h2>
-              <p className="text-[16px] font-mono text-black/50 uppercase tracking-widest">Redirecting to your dashboard...</p>
-              <div className="mt-10 flex gap-2">
-                <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: "0ms" }} />
-                <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: "150ms" }} />
-                <div className="w-2 h-2 bg-black rounded-full animate-bounce" style={{ animationDelay: "300ms" }} />
+              <div className="w-64 h-64 md:w-96 md:h-96 mx-auto pointer-events-none mb-8">
+                <OptimizedLocalLottie 
+                  filename="successfully.json"
+                  className="w-full h-full"
+                />
               </div>
+              <h2 className="text-[32px] md:text-[48px] font-black uppercase tracking-[0.2em] text-black mb-6 drop-shadow-sm">Success</h2>
+              <p className="text-[16px] md:text-[20px] font-mono text-black/50 uppercase tracking-widest">Redirecting to portfolio...</p>
             </motion.div>
           )}
 
         </AnimatePresence>
       </div>
-
     </div>
   );
 }

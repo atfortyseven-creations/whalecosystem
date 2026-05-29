@@ -236,6 +236,32 @@ export async function sendMessage(
   toAddress: string,
   content: string,
 ): Promise<void> {
+  const canMsg = await canReceiveMessages(client, toAddress);
+
+  if (!canMsg) {
+    // If recipient has NEVER connected to XMTP, we queue the message offline
+    // with maximum galactic precision so they receive it upon first login.
+    const senderAddr: string =
+      (client as any).accountAddress ??
+      (client as any).address ??
+      (client as any).inboxId ??
+      'unknown';
+
+    const res = await fetch('/api/chat/queue', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sender: senderAddr,
+        recipient: toAddress,
+        content,
+      }),
+    });
+    if (!res.ok) {
+      throw new Error('[XMTP Offline Queue] Failed to queue offline message');
+    }
+    return;
+  }
+
   const identifier: XmtpIdentifier = {
     identifier: toAddress,
     identifierKind: 'Ethereum',

@@ -213,4 +213,10 @@ export const prisma = (globalForPrisma.prisma ?? createPrismaClient()) as unknow
 // Always store the singleton globally, even in production, to prevent Serverless/Edge connection explosions
 (globalForPrisma as unknown as { prisma: SystemPrismaClient }).prisma = prisma;
 
+/** Named accessor — preferred import for new code (avoids default import ambiguity). */
+export function getPrisma(): SystemPrismaClient {
+  return prisma;
+}
+
 export default prisma;
+
