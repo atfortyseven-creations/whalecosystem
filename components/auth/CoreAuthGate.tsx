@@ -749,7 +749,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
         return (
           <div className="space-y-8">
             <div className="text-center space-y-4 mb-10">
-              <div className="w-80 h-80 mx-auto -mt-16 mb-0 pointer-events-none">
+              <div className="w-52 h-52 sm:w-72 sm:h-72 mx-auto mb-0 pointer-events-none">
                  <RemoteLottie path="/system-shots/Lock Loading.json" className="w-full h-full" />
               </div>
               <h1 className="text-4xl font-black text-[#0A0A0A] tracking-tighter uppercase font-sans">{t.home_title}</h1>
@@ -1038,7 +1038,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
                 </div>
               ) : null}
               
-              <div className={`grid grid-cols-3 gap-2 w-full transition-all duration-700 ${revealed ? 'opacity-100 scale-100 filter-none' : 'opacity-0 scale-95 blur-md select-none pointer-events-none'}`}>
+              <div className={`grid grid-cols-2 sm:grid-cols-3 gap-2 w-full transition-all duration-700 ${revealed ? 'opacity-100 scale-100 filter-none' : 'opacity-0 scale-95 blur-md select-none pointer-events-none'}`}>
                 {wallet?.mnemonic?.phrase?.split(' ')?.map((word, i) => (
                   <div key={i} className="flex flex-col bg-white border border-black/5 rounded-xl overflow-hidden shadow-sm">
                     <div className="w-full py-1 bg-black/[0.03] text-[10px] text-[#050505]/40 font-black tracking-widest text-center border-b border-black/5">
@@ -1052,16 +1052,16 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
               </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row justify-between items-center gap-4 pt-2">
-              <button onClick={() => { navigator.clipboard.writeText(wallet?.mnemonic?.phrase || ''); toast.success(t.copy); }} className="text-[#050505]/40 hover:text-[#050505] text-[13px] font-black uppercase tracking-widest flex items-center gap-2 transition-colors">
-                <Copy size={14} /> {t.copy}
-              </button>
+            <div className="flex flex-col gap-3 pt-2">
               <button 
                 onClick={() => setStep('verify')}
                 disabled={!revealed}
-                className="w-full sm:w-auto px-10 py-4 rounded-[18px] bg-[#050505] text-white font-black tracking-widest text-[13px] uppercase disabled:opacity-40 transition-all shadow-md active:scale-[0.98]"
+                className="w-full px-10 py-4 rounded-[18px] bg-[#050505] text-white font-black tracking-widest text-[13px] uppercase disabled:opacity-40 transition-all shadow-md active:scale-[0.98]"
               >
                 {t.proceed}
+              </button>
+              <button onClick={() => { navigator.clipboard.writeText(wallet?.mnemonic?.phrase || ''); toast.success(t.copy); }} className="w-full text-center text-[#050505]/40 hover:text-[#050505] text-[13px] font-black uppercase tracking-widest flex items-center justify-center gap-2 transition-colors py-2">
+                <Copy size={14} /> {t.copy}
               </button>
             </div>
           </div>
@@ -1171,7 +1171,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
   };
 
   return (
-    <div className="flex items-center justify-center px-4 md:px-6 h-full w-full relative overflow-y-auto py-12 md:py-0">
+    <div className="flex items-start sm:items-center justify-center px-4 sm:px-6 min-h-[100dvh] w-full relative overflow-y-auto py-8 sm:py-12">
       <div className="fixed inset-0 z-0 pointer-events-none opacity-50">
          <RemoteLottie path="/system-shots/Airplane Lottie Animation (1).json" className="w-full h-full object-cover" loop={false} />
       </div>
@@ -1181,7 +1181,7 @@ export function CoreAuthGate({ onComplete, startAt }: { onComplete: () => void; 
         animate={{ opacity: 1, scale: 1, y: 0 }}
         exit={{ opacity: 0, scale: 0.98, y: -10 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-        className="w-full max-w-[560px] bg-white/90 backdrop-blur-[40px] rounded-[36px] border border-black/[0.04] shadow-[0_24px_80px_rgba(0,0,0,0.08)] p-8 sm:p-12 relative z-10 will-change-transform"
+        className="w-full max-w-[560px] bg-white/90 backdrop-blur-[40px] rounded-[28px] sm:rounded-[36px] border border-black/[0.04] shadow-[0_24px_80px_rgba(0,0,0,0.08)] p-5 sm:p-10 relative z-10 will-change-transform"
       >
         <LangSelector lang={lang} setLang={setLang} />
         <AnimatePresence mode="wait">
