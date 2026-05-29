@@ -244,10 +244,10 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   // RENDERERS
   // --------------------------------------------------------
   return (
-    <div className="w-full h-full flex flex-col md:flex-row bg-white relative overflow-hidden">
+    <div className="w-full min-h-[100dvh] flex flex-col md:flex-row bg-white relative overflow-x-hidden">
       
       {/* LEFT PANEL - Terminal / Aesthetic Info */}
-      <div className="w-full md:w-[40%] bg-[#fafafa] border-r border-black/10 p-8 flex flex-col justify-between">
+      <div className="w-full md:w-[40%] bg-[#fafafa] border-b md:border-b-0 md:border-r border-black/10 p-6 pt-24 md:p-8 flex flex-col justify-between">
         <div>
           <div className="flex items-center gap-4 mb-10">
             <div className="w-12 h-12 bg-black flex items-center justify-center">
@@ -294,7 +294,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
 
       {/* RIGHT PANEL - Interactive Core */}
       <div 
-        className="w-full md:w-[60%] bg-white p-8 md:p-12 relative flex flex-col justify-center" 
+        className="w-full md:w-[60%] bg-white p-6 py-12 md:p-12 relative flex flex-col justify-center min-h-[60vh] md:min-h-screen" 
         onMouseMove={handleMouseMove}
         onTouchMove={handleMouseMove}
         style={{ touchAction: phase === "ENTROPY" ? "none" : "auto" }}
@@ -324,8 +324,8 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
           )}
 
           {phase === "ENTROPY" && (
-            <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full">
-              <h2 className="text-[20px] font-black uppercase tracking-widest text-black mb-16">Move your cursor to generate random data</h2>
+            <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full px-2 text-center">
+              <h2 className="text-[16px] md:text-[20px] font-black uppercase tracking-widest text-black mb-12 md:mb-16">Move your cursor to generate random data</h2>
               
               <div className="w-full max-w-xl bg-[#f4f4f4] h-3 mb-6 overflow-hidden">
                 <div className="h-full bg-black transition-all duration-100 ease-out" style={{ width: `${entropyProgress}%` }} />
@@ -362,19 +362,19 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 <p className="text-[15px] font-bold text-red-500 uppercase tracking-widest">CRITICAL: Write these down. Never share them. If lost, funds are permanently unrecoverable.</p>
               </div>
 
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 mb-12">
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-4 mb-12">
                 {seedWords.map((word, index) => (
-                  <div key={index} className="flex border border-black/10 p-4 bg-[#fafafa]">
-                    <span className="text-[14px] font-bold text-black/30 w-8">{index + 1}.</span>
-                    <span className="text-[16px] font-mono font-bold text-black">{word}</span>
+                  <div key={index} className="flex items-center border border-black/10 p-3 sm:p-4 bg-[#fafafa] overflow-hidden">
+                    <span className="text-[12px] sm:text-[14px] font-bold text-black/30 w-6 sm:w-8 shrink-0">{index + 1}.</span>
+                    <span className="text-[14px] sm:text-[16px] font-mono font-bold text-black truncate">{word}</span>
                   </div>
                 ))}
               </div>
 
-              <div className="flex justify-end">
+              <div className="flex justify-center md:justify-end">
                 <button 
                   onClick={() => setPhase("MNEMONIC_VERIFY")}
-                  className="px-8 py-4 bg-black text-white font-black text-[14px] uppercase tracking-widest hover:bg-black/80 transition-colors"
+                  className="w-full md:w-auto px-6 py-4 bg-black text-white font-black text-[12px] md:text-[14px] uppercase tracking-widest hover:bg-black/80 transition-colors"
                 >
                   I have securely saved these words
                 </button>
@@ -406,16 +406,16 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
                 ))}
               </div>
 
-              <div className="flex justify-between items-center">
+              <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-6 md:gap-4 mt-8">
                 <button 
                   onClick={() => setPhase("MNEMONIC_BACKUP")}
-                  className="text-[14px] font-bold text-black/40 uppercase tracking-widest hover:text-black"
+                  className="text-[12px] md:text-[14px] font-bold text-black/40 uppercase tracking-widest hover:text-black"
                 >
                   View Phrase Again
                 </button>
                 <button 
                   onClick={verifyMnemonic}
-                  className="px-8 py-4 bg-black text-white font-black text-[14px] uppercase tracking-widest hover:bg-black/80 transition-colors"
+                  className="w-full md:w-auto px-6 py-4 bg-black text-white font-black text-[12px] md:text-[14px] uppercase tracking-widest hover:bg-black/80 transition-colors text-center"
                 >
                   Verify & Proceed
                 </button>

@@ -35,8 +35,8 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="fixed inset-0 w-full h-full flex flex-col bg-white text-[#0A0A0A] overflow-hidden z-[100]">
-      <Link href="/login" className="absolute top-6 left-6 z-50 flex items-center gap-2 text-black/40 hover:text-black transition-colors group px-4 py-2 bg-white/70 backdrop-blur-md rounded-full border border-black/10 shadow-sm">
+    <div className="min-h-[100dvh] w-full flex flex-col bg-white text-[#0A0A0A] relative overflow-x-hidden z-[100]">
+      <Link href="/login" className="absolute top-4 left-4 sm:top-6 sm:left-6 z-50 flex items-center gap-2 text-black/40 hover:text-black transition-colors group px-4 py-2 bg-white/70 backdrop-blur-md rounded-full border border-black/10 shadow-sm">
         <ArrowLeft size={18} className="group-hover:-translate-x-0.5 transition-transform" />
         <span className="font-mono text-[13px] uppercase tracking-[0.2em] font-bold">Go Back</span>
       </Link>
