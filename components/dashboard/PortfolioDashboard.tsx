@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowUpRight, ArrowDownRight, Wallet, ArrowRight, Eye, RefreshCw, Box } from 'lucide-react';
+
 import { useAppKit } from '@reown/appkit/react';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
@@ -77,7 +77,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
         return (
             <div className="flex flex-col items-center justify-center min-h-[600px] text-center space-y-12 bg-white">
                 <div className="relative p-10 rounded-full border border-slate-200">
-                    <Wallet size={80} strokeWidth={1} className="text-black" />
+                    <span className="font-mono text-5xl font-black text-black">[!]</span>
                 </div>
                 <div className="space-y-4 max-w-md relative z-10">
                     <h2 className="text-4xl font-black text-black tracking-tighter uppercase leading-none">
@@ -116,7 +116,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                     <div className="flex items-center justify-between mb-4">
                         <span className="font-mono text-[9px] font-black uppercase tracking-[0.3em] text-slate-400">Total Holdings</span>
                         <button onClick={() => setIsEyesOff(!isEyesOff)} className="text-slate-400 hover:text-black transition-colors active:scale-95">
-                            <Eye size={14} />
+                            <span className="font-mono text-[10px] font-black">[EYE]</span>
                         </button>
                     </div>
                     <div className="flex flex-col md:flex-row md:items-end gap-6">
@@ -124,7 +124,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                             {isEyesOff ? "*****" : <AnimatedCounter value={totalValue} isCurrency={true} />}
                         </div>
                         <div className="flex items-center gap-2 text-sm font-bold tracking-widest font-mono">
-                            {isProfit ? <ArrowUpRight size={16} /> : <ArrowDownRight size={16} />}
+                            {isProfit ? <span className="font-mono font-black">[+]</span> : <span className="font-mono font-black">[-]</span>}
                             {isEyesOff ? "***" : <><AnimatedCounter value={Math.abs(totalChange24h)} isCurrency={false} />%</>}
                         </div>
                     </div>
@@ -180,7 +180,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                                     {asset.logoURI ? (
                                                         <img src={asset.logoURI} alt={asset.symbol} className="w-6 h-6" />
                                                     ) : (
-                                                        <Box size={16} className="text-slate-400" />
+                                                        <span className="font-mono text-[10px] font-black text-slate-400">[TKN]</span>
                                                     )}
                                                 </div>
                                                 <div className="flex flex-col">

@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ChevronDown, Send, CheckCircle, Mail, AlertCircle, Users, MessageSquare, Globe, Twitter, BookOpen, Code2, Zap, Shield, ArrowUpRight } from 'lucide-react';
+
 import { toast } from 'sonner';
 import Link from 'next/link';
 
@@ -29,7 +29,7 @@ const FAQ = [
 
 const COMMUNITY_CHANNELS = [
     {
-        icon: <Globe size={20} />,
+        icon: <span className="font-mono font-black text-[12px]">[WWW]</span>,
         label: 'Token Forum',
         sub: 'Governance · Research · Announcements',
         href: '/forum',
@@ -37,7 +37,7 @@ const COMMUNITY_CHANNELS = [
         badge: 'LIVE',
     },
     {
-        icon: <MessageSquare size={20} />,
+        icon: <span className="font-mono font-black text-[12px]">[MSG]</span>,
         label: 'Discord',
         sub: 'Real-time community discussion',
         href: 'https://discord.gg/aztec',
@@ -45,7 +45,7 @@ const COMMUNITY_CHANNELS = [
         badge: null,
     },
     {
-        icon: <Twitter size={20} />,
+        icon: <span className="font-mono font-black text-[12px]">[X]</span>,
         label: 'Twitter / X',
         sub: 'Updates, announcements, and ecosystem news',
         href: 'https://x.com/aztecnetwork',
@@ -55,17 +55,17 @@ const COMMUNITY_CHANNELS = [
 ];
 
 const DOCS_LINKS = [
-    { icon: <BookOpen size={16} />, label: 'Technical Whitepaper',  href: '/whitepaper',  desc: 'Full cryptographic architecture of Humanity Ledger on Aztec L2.' },
-    { icon: <Shield size={16} />,   label: 'Privacy Manifesto',     href: '/manifesto',   desc: 'Our commitment to zero-knowledge privacy and human Privatety.' },
-    { icon: <Zap size={16} />,      label: 'QDs Tokenomics',        href: '/tokenomics',  desc: 'Supply schedule, distribution model, and governance mechanics.' },
-    { icon: <Globe size={16} />,    label: 'Roadmap',               href: '/roadmap',     desc: 'Quarterly milestones and Aztec Network integration timeline.' },
-    { icon: <Code2 size={16} />,    label: 'Developer Hub',         href: '/developer',   desc: 'API documentation, SDK references, and Noir circuit guides.' },
-    { icon: <Code2 size={16} />,    label: 'API Reference',         href: '/developers/api-docs', desc: 'Full REST and WebSocket API specification with live playground.' },
-    { icon: <Code2 size={16} />,    label: 'API Marketplace',       href: '/developers',  desc: 'Third-party integrations and licensed data endpoint catalogue.' },
-    { icon: <Code2 size={16} />,    label: 'Noir Circuits',         href: 'https://github.com/hvbr1s/noir-circuits', desc: 'Open-source ZK circuit implementations powering private execution.' },
-    { icon: <Shield size={16} />,   label: 'Security Policy',       href: '/security',    desc: 'Responsible disclosure process and security architecture overview.' },
-    { icon: <Shield size={16} />,   label: 'Bug Bounty',            href: '/security',    desc: 'Earn rewards for reporting critical vulnerabilities in the protocol.' },
-    { icon: <Shield size={16} />,   label: 'Audits',                href: '/security',    desc: 'Independent third-party audit reports and formal verification results.' },
+    { icon: <span className="font-mono font-black text-[10px]">[DOC]</span>, label: 'Technical Whitepaper',  href: '/whitepaper',  desc: 'Full cryptographic architecture of Humanity Ledger on Aztec L2.' },
+    { icon: <span className="font-mono font-black text-[10px]">[SEC]</span>,   label: 'Privacy Manifesto',     href: '/manifesto',   desc: 'Our commitment to zero-knowledge privacy and human Privatety.' },
+    { icon: <span className="font-mono font-black text-[10px]">[ZAP]</span>,      label: 'QDs Tokenomics',        href: '/tokenomics',  desc: 'Supply schedule, distribution model, and governance mechanics.' },
+    { icon: <span className="font-mono font-black text-[10px]">[WWW]</span>,    label: 'Roadmap',               href: '/roadmap',     desc: 'Quarterly milestones and Aztec Network integration timeline.' },
+    { icon: <span className="font-mono font-black text-[10px]">[DEV]</span>,    label: 'Developer Hub',         href: '/developer',   desc: 'API documentation, SDK references, and Noir circuit guides.' },
+    { icon: <span className="font-mono font-black text-[10px]">[DEV]</span>,    label: 'API Reference',         href: '/developers/api-docs', desc: 'Full REST and WebSocket API specification with live playground.' },
+    { icon: <span className="font-mono font-black text-[10px]">[DEV]</span>,    label: 'API Marketplace',       href: '/developers',  desc: 'Third-party integrations and licensed data endpoint catalogue.' },
+    { icon: <span className="font-mono font-black text-[10px]">[DEV]</span>,    label: 'Noir Circuits',         href: 'https://github.com/hvbr1s/noir-circuits', desc: 'Open-source ZK circuit implementations powering private execution.' },
+    { icon: <span className="font-mono font-black text-[10px]">[SEC]</span>,   label: 'Security Policy',       href: '/security',    desc: 'Responsible disclosure process and security architecture overview.' },
+    { icon: <span className="font-mono font-black text-[10px]">[SEC]</span>,   label: 'Bug Bounty',            href: '/security',    desc: 'Earn rewards for reporting critical vulnerabilities in the protocol.' },
+    { icon: <span className="font-mono font-black text-[10px]">[SEC]</span>,   label: 'Audits',                href: '/security',    desc: 'Independent third-party audit reports and formal verification results.' },
 ];
 
 export function WhaleSupport() {
@@ -111,9 +111,9 @@ export function WhaleSupport() {
     const priorityLabel: Record<Priority, string> = { LOW: 'LOW', MEDIUM: 'MED', HIGH: 'HIGH' };
 
     const TABS = [
-        { id: 'community', label: 'Community', icon: <Users size={14} /> },
-        { id: 'docs',      label: 'Documentation', icon: <BookOpen size={14} /> },
-        { id: 'support',   label: 'Support Desk', icon: <Mail size={14} /> },
+        { id: 'community', label: 'Community', icon: <span className="font-mono font-black text-[9px]">[PPL]</span> },
+        { id: 'docs',      label: 'Documentation', icon: <span className="font-mono font-black text-[9px]">[DOC]</span> },
+        { id: 'support',   label: 'Support Desk', icon: <span className="font-mono font-black text-[9px]">[EML]</span> },
     ] as const;
 
     return (
@@ -181,7 +181,7 @@ export function WhaleSupport() {
                                     <div className="flex flex-col gap-0.5">
                                         <div className="flex items-center gap-2">
                                             <span className="font-black text-[14px] text-slate-900 tracking-tight">{ch.label}</span>
-                                            {ch.external && <ArrowUpRight size={12} className="text-black/30 group-hover:text-black transition-colors" />}
+                                            {ch.external && <span className="font-mono font-black text-[9px] text-black/30 group-hover:text-black transition-colors">[^&gt;]</span>}
                                         </div>
                                         <span className="font-mono text-[10px] text-black/40 uppercase tracking-wider">{ch.sub}</span>
                                     </div>
@@ -192,7 +192,7 @@ export function WhaleSupport() {
                         {/* FAQ */}
                         <div className="w-full bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
                             <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-black/5/60">
-                                <AlertCircle size={14} className="text-black/40" />
+                                <span className="font-mono text-[10px] font-black text-black/40">[!]</span>
                                 <span className="font-mono text-[10px] font-black uppercase tracking-widest">Frequently Asked Questions</span>
                                 <span className="ml-auto font-mono text-[9px] text-black/30 uppercase tracking-widest">{FAQ.length} entries</span>
                             </div>
@@ -202,7 +202,7 @@ export function WhaleSupport() {
                                         <div className="px-6 py-4 flex items-center justify-between gap-4">
                                             <span className="text-[13px] font-bold text-slate-800 leading-snug">{faq.q}</span>
                                             <motion.div animate={{ rotate: openFaq === i ? 180 : 0 }} transition={{ duration: 0.2 }} className="shrink-0">
-                                                <ChevronDown size={15} className="text-black/30" />
+                                                <span className="font-mono text-[10px] font-black text-black/30">[v]</span>
                                             </motion.div>
                                         </div>
                                         <AnimatePresence>
@@ -224,7 +224,7 @@ export function WhaleSupport() {
                     <motion.div key="docs" initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }} transition={{ duration: 0.25 }} className="flex flex-col gap-4">
                         <div className="w-full bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
                             <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-black/5/60">
-                                <BookOpen size={14} className="text-black/40" />
+                                <span className="font-mono text-[10px] font-black text-black/40">[DOC]</span>
                                 <span className="font-mono text-[10px] font-black uppercase tracking-widest">Protocol Documentation</span>
                                 <span className="ml-auto font-mono text-[9px] text-black/30 uppercase tracking-widest">{DOCS_LINKS.length} resources</span>
                             </div>
@@ -243,7 +243,7 @@ export function WhaleSupport() {
                                         <div className="flex flex-col gap-1 min-w-0">
                                             <div className="flex items-center gap-1.5">
                                                 <span className="font-black text-[13px] text-slate-900 tracking-tight group-hover:text-black">{doc.label}</span>
-                                                {doc.href.startsWith('http') && <ArrowUpRight size={11} className="text-black/25 group-hover:text-black transition-colors shrink-0" />}
+                                                {doc.href.startsWith('http') && <span className="font-mono text-[9px] font-black text-black/25 group-hover:text-black transition-colors shrink-0">[^&gt;]</span>}
                                             </div>
                                             <span className="font-mono text-[10px] text-black/40 leading-relaxed">{doc.desc}</span>
                                         </div>
@@ -261,7 +261,7 @@ export function WhaleSupport() {
                             {/* Form */}
                             <div className="lg:col-span-3 bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
                                 <div className="flex items-center gap-3 px-6 py-5 border-b border-slate-200/60 bg-black/5/60">
-                                    <Mail size={14} className="text-black/40" />
+                                    <span className="font-mono text-[10px] font-black text-black/40">[EML]</span>
                                     <span className="font-mono text-[10px] font-black uppercase tracking-widest">Contact Support</span>
                                 </div>
                                 <div className="p-6 flex flex-col gap-5">
@@ -286,12 +286,12 @@ export function WhaleSupport() {
                                     <AnimatePresence mode="wait">
                                         {submitted ? (
                                             <motion.div key="ok" initial={{ opacity: 0, scale: 0.96 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.96 }} className="flex items-center justify-center gap-3 py-4 rounded-xl bg-black/5/80 border border-slate-200/60 text-slate-700">
-                                                <CheckCircle size={16} />
+                                                <span className="font-mono text-[10px] font-black">[OK]</span>
                                                 <span className="font-mono text-[10px] font-black uppercase tracking-widest">Ticket Submitted</span>
                                             </motion.div>
                                         ) : (
                                             <motion.button key="sub" onClick={handleSubmit} disabled={submitting} className="w-full flex items-center justify-center gap-2.5 py-4 rounded-xl font-black uppercase tracking-widest text-[10px] bg-black text-white hover:bg-black/80 transition-all disabled:opacity-50 active:scale-[0.98]">
-                                                {submitting ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <Send size={15} />}
+                                                {submitting ? <div className="w-4 h-4 border-2 border-current border-t-transparent rounded-full animate-spin" /> : <span className="font-mono text-[10px] font-black">[SND]</span>}
                                                 {submitting ? 'Submitting...' : 'Submit Ticket'}
                                             </motion.button>
                                         )}
@@ -331,7 +331,7 @@ export function WhaleSupport() {
                                 {/* Quick Links */}
                                 <div className="bg-white border border-slate-200/60 rounded-2xl overflow-hidden shadow-sm">
                                     <div className="flex items-center gap-3 px-6 py-4 border-b border-slate-200/60 bg-black/5/60">
-                                        <Globe size={14} className="text-black/40" />
+                                        <span className="font-mono text-[10px] font-black text-black/40">[WWW]</span>
                                         <span className="font-mono text-[10px] font-black uppercase tracking-widest">Quick Resources</span>
                                     </div>
                                     <div className="divide-y divide-slate-100">
@@ -343,7 +343,7 @@ export function WhaleSupport() {
                                         ].map(l => (
                                             <Link key={l.label} href={l.href} target={l.external ? '_blank' : undefined} rel={l.external ? 'noopener noreferrer' : undefined} className="group flex items-center justify-between px-6 py-3.5 hover:bg-black/5/60 transition-colors">
                                                 <span className="text-[12px] font-bold text-slate-700 group-hover:text-black transition-colors">{l.label}</span>
-                                                <ArrowUpRight size={12} className="text-black/25 group-hover:text-black transition-colors" />
+                                                <span className="font-mono text-[9px] font-black text-black/25 group-hover:text-black transition-colors">[^&gt;]</span>
                                             </Link>
                                         ))}
                                     </div>

@@ -1,8 +1,8 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
-import { Search, Download, AlertCircle } from "lucide-react";
+
 import { toast } from "sonner";
 import { motion } from "framer-motion";
 
@@ -90,7 +90,7 @@ export function SessionLogsPanel() {
                         disabled={isExporting} 
                         className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95 flex items-center gap-2 disabled:opacity-50"
                     >
-                        <Download size={12} />
+                        <span className="font-mono text-[10px] font-black">[EXP]</span>
                         {isExporting ? "EXPORTING..." : "EXPORT AUDIT LOG"}
                     </button>
                 </div>
@@ -99,7 +99,7 @@ export function SessionLogsPanel() {
                     {/* Controls */}
                     <div className="flex flex-col md:flex-row md:items-center justify-center gap-4">
                         <div className="relative w-full max-w-lg group">
-                            <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                            <span className="font-mono text-[10px] font-black text-slate-400 absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none">[SCH]</span>
                             <input 
                                 type="text" 
                                 className="block w-full pl-11 pr-4 py-3 bg-black/5/60 border border-slate-200/60 rounded-xl text-[12px] text-slate-800 focus:outline-none focus:ring-1 focus:ring-slate-400 focus:border-slate-400 transition-all font-mono placeholder:text-slate-400 text-center" 
@@ -122,7 +122,7 @@ export function SessionLogsPanel() {
                                 <div className="h-full flex items-center justify-center font-mono text-[11px] text-slate-400 uppercase tracking-widest animate-pulse">Initializing Audit Stream...</div>
                             ) : filteredLogs.length === 0 ? (
                                 <div className="h-full flex flex-col items-center justify-center gap-4 text-slate-400">
-                                    <AlertCircle size={28} strokeWidth={1.5} />
+                                    <span className="font-mono text-3xl font-black">[!]</span>
                                     <span className="font-mono text-[11px] font-black uppercase tracking-widest">No logs found</span>
                                 </div>
                             ) : (

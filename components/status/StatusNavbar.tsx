@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { signIn, signOut, useSession } from 'next-auth/react';
-import { Calendar, ChevronDown } from 'lucide-react';
+
 import Image from 'next/image';
 import Link from 'next/link';
 
@@ -27,7 +27,7 @@ export default function StatusNavbar() {
       {/* Actions */}
       <div className="flex items-center gap-3">
         <button className="flex items-center gap-2 bg-black/5 hover:bg-black/10 border border-black/10 px-4 py-2 rounded-md transition-colors text-sm font-semibold text-black/70">
-          <Calendar size={16} className="text-black/50" />
+          <span className="font-mono text-[10px] font-black text-black/50">[CAL]</span>
           Subscribe to Updates
         </button>
 
@@ -43,7 +43,7 @@ export default function StatusNavbar() {
             className="flex items-center gap-2 bg-black/5 hover:bg-black/10 border border-black/10 px-4 py-2 rounded-md transition-colors text-sm font-semibold text-black/70"
           >
             Account
-            {session && <ChevronDown size={14} className="text-black/50" />}
+            {session && <span className="font-mono text-[10px] font-black text-black/50">[v]</span>}
           </button>
 
           {menuOpen && session && (

@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState } from 'react';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+
 
 export interface UptimeDay {
   date: string;
@@ -28,7 +28,7 @@ export default function UptimeBar({ serviceName, uptimePercentage, days }: Uptim
         onClick={() => setExpanded(!expanded)}
       >
         <div className="flex items-center gap-3">
-          {expanded ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
+          {expanded ? <span className="font-mono text-[10px] font-black text-slate-400">[^]</span> : <span className="font-mono text-[10px] font-black text-slate-400">[v]</span>}
           <span className="font-semibold text-sm text-slate-800">{serviceName}</span>
         </div>
         <span className="text-sm font-medium text-slate-400">{uptimePercentage} uptime</span>

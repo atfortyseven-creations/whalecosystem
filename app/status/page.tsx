@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState, useCallback } from 'react';
-import { RefreshCw, CheckCircle2, AlertTriangle, XCircle, Wifi, Clock, Activity, ShieldAlert, Server, LayoutDashboard, MessageCircle, Briefcase, Newspaper, GraduationCap, Users, Award, LockOpen, Lock, Atom, Globe } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 
 // TYPES
@@ -33,7 +33,7 @@ const STATUS_CONFIG = {
     text: 'text-black',
     bg: 'bg-black/5',
     border: 'border-black/10',
-    icon: LockOpen,
+    icon: ({ className }: { className?: string }) => <span className={`font-mono font-black ${className || ''}`}>[UNLCK]</span>,
   },
   degraded: {
     label: 'Degraded',
@@ -41,7 +41,7 @@ const STATUS_CONFIG = {
     text: 'text-black/60',
     bg: 'bg-black/5',
     border: 'border-black/10',
-    icon: Lock,
+    icon: ({ className }: { className?: string }) => <span className={`font-mono font-black ${className || ''}`}>[LCK]</span>,
   },
   outage: {
     label: 'Outage',
@@ -49,7 +49,7 @@ const STATUS_CONFIG = {
     text: 'text-black/70',
     bg: 'bg-black/5',
     border: 'border-black/10',
-    icon: Lock,
+    icon: ({ className }: { className?: string }) => <span className={`font-mono font-black ${className || ''}`}>[LCK]</span>,
   },
   loading: {
     label: 'Checking...',
@@ -57,7 +57,7 @@ const STATUS_CONFIG = {
     text: 'text-black/40',
     bg: 'bg-black/5',
     border: 'border-black/5',
-    icon: Lock,
+    icon: ({ className }: { className?: string }) => <span className={`font-mono font-black ${className || ''}`}>[LCK]</span>,
   },
 } as const;
 
@@ -81,14 +81,14 @@ import StatusNavbar from '@/components/status/StatusNavbar';
 
 // Component icon + color mapping  all neutral monochrome
 const COMPONENT_META: Record<string, { icon: any; accent: string; gradient: string }> = {
-  'Dashboard':  { icon: LayoutDashboard, accent: 'text-black/70', gradient: 'from-white to-white' },
-  'Whale Chat': { icon: MessageCircle,   accent: 'text-black/70', gradient: 'from-white to-white' },
-  'Portfolio':  { icon: Briefcase,       accent: 'text-black/70', gradient: 'from-white to-white' },
-  'News':       { icon: Newspaper,       accent: 'text-black/70', gradient: 'from-white to-white' },
-  'Academy':    { icon: GraduationCap,   accent: 'text-black/70', gradient: 'from-white to-white' },
-  'Forum':      { icon: Users,           accent: 'text-black/70', gradient: 'from-white to-white' },
-  'Careers':    { icon: Award,           accent: 'text-black/70', gradient: 'from-white to-white' },
-  'QDs':        { icon: Atom,            accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Dashboard':  { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[DASH]</span>, accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Whale Chat': { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[MSG]</span>,   accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Portfolio':  { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[PRTF]</span>,       accent: 'text-black/70', gradient: 'from-white to-white' },
+  'News':       { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[NWS]</span>,       accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Academy':    { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[EDU]</span>,   accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Forum':      { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[PPL]</span>,           accent: 'text-black/70', gradient: 'from-white to-white' },
+  'Careers':    { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[AWD]</span>,           accent: 'text-black/70', gradient: 'from-white to-white' },
+  'QDs':        { icon: ({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[QD]</span>,            accent: 'text-black/70', gradient: 'from-white to-white' },
 };
 
 // MAIN PAGE
@@ -136,7 +136,7 @@ export default function StatusPage() {
         {/* Header Text */}
         <div className="flex flex-col items-center justify-center text-center max-w-lg mx-auto">
             <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="inline-flex items-center justify-center gap-3 px-6 py-2 border border-black/10 rounded-full mb-8">
-                <Server size={14} className="text-black" />
+                <span className="font-mono text-[10px] font-black text-black">[SRV]</span>
                 <span className="text-xs uppercase tracking-widest font-bold text-black/60">System Status</span>
             </motion.div>
             
@@ -153,7 +153,7 @@ export default function StatusPage() {
         <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.5, type: 'spring' }} className="w-full">
           <div className={`w-full bg-white border border-black/10 p-10 flex flex-col items-center text-center gap-6 transition-all duration-700`}>
             <div className={`p-6 rounded-full border border-black/10 flex items-center justify-center mb-2`}>
-              <OverallIcon size={48} className={overallCfg.text} />
+              <OverallIcon className={`${overallCfg.text} text-4xl`} />
             </div>
             
             <div>
@@ -186,7 +186,7 @@ export default function StatusPage() {
                 disabled={loading}
                 className="flex items-center justify-center gap-2 px-8 py-3 bg-black hover:bg-black/80 text-white text-xs font-bold uppercase tracking-widest transition-all active:scale-95 disabled:opacity-50"
               >
-                <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+                <span className={`font-mono text-[10px] font-black ${loading ? 'animate-spin inline-block' : ''}`}>[RST]</span>
                 {loading ? 'Updating' : 'Refresh Now'}
               </button>
             </div>
@@ -201,30 +201,30 @@ export default function StatusPage() {
                 label: 'Online',
                 value: `${health.services.filter(s => s.status === 'operational').length}/${health.services.length}`,
                 good: health.services.every(s => s.status === 'operational'),
-                icon: Activity
+                icon: "[ACT]"
               },
               {
                 label: 'Latency',
                 value: `${health.avgLatencyMs}ms`,
                 good: health.avgLatencyMs < 1000,
-                icon: Wifi
+                icon: "[WIFI]"
               },
               {
                 label: 'Issues',
                 value: String(health.services.filter(s => s.status === 'degraded').length),
                 good: health.services.filter(s => s.status === 'degraded').length === 0,
-                icon: AlertTriangle
+                icon: "[!]"
               },
               {
                 label: 'Outages',
                 value: String(health.services.filter(s => s.status === 'outage').length),
                 good: health.services.filter(s => s.status === 'outage').length === 0,
-                icon: ShieldAlert
+                icon: "[SEC_!]"
               },
             ].map((m, i) => (
               <div key={m.label} className="bg-white border border-black/10 p-6 flex flex-col items-center justify-center text-center gap-3 transition-all hover:bg-black/[0.02]">
                 <div className="flex items-center justify-center gap-2">
-                    <m.icon size={16} className="text-black/50" />
+                    <span className="font-mono text-[10px] font-black text-black/50">{m.icon}</span>
                     <span className="text-xs font-bold uppercase tracking-widest text-black/50">{m.label}</span>
                 </div>
                 <span className="text-3xl font-extrabold tracking-tight text-black">
@@ -256,7 +256,7 @@ export default function StatusPage() {
               const cfg = STATUS_CONFIG[svc.status];
               const StatusIcon = cfg.icon;
               const meta = COMPONENT_META[svc.name];
-              const ComponentIcon = meta?.icon ?? Server;
+              const ComponentIcon = meta?.icon ?? (({ className }: { className?: string }) => <span className={`font-mono text-xs font-black ${className || ''}`}>[SRV]</span>);
               const accentClass = meta?.accent ?? 'text-black';
               const gradientClass = meta?.gradient ?? 'from-white to-white';
               return (
@@ -271,7 +271,7 @@ export default function StatusPage() {
                     {/* Left: icon + name */}
                     <div className="flex items-center gap-4 min-w-0">
                       <div className={`w-12 h-12 border border-black/10 flex items-center justify-center shrink-0 transition-transform`}>
-                        <ComponentIcon size={22} className={accentClass} strokeWidth={1.8} />
+                        <ComponentIcon className={accentClass} />
                       </div>
                       <div className="min-w-0">
                         <p className="font-black text-[16px] tracking-tight text-black leading-tight">{svc.name}</p>
@@ -286,14 +286,14 @@ export default function StatusPage() {
                       </div>
                       {svc.accessible === false && (
                         <span className="inline-flex items-center gap-1 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full border border-black/20 bg-white text-black/60">
-                          <XCircle size={11} />
+                          <span className="font-mono text-[9px] font-black">[X]</span>
                           No access
                         </span>
                       )}
                       <span
                         className={`inline-flex items-center gap-1.5 text-[11px] font-black uppercase tracking-widest px-3.5 py-2 border ${cfg.bg} ${cfg.border} ${cfg.text}`}
                       >
-                        <StatusIcon size={13} />
+                        <StatusIcon className="" />
                         {cfg.label}
                       </span>
                     </div>
@@ -309,7 +309,7 @@ export default function StatusPage() {
         {/* FOOTER */}
         <div className="flex flex-col items-center justify-center pt-10 mt-10 gap-4 w-full border-t border-black/5">
           <div className="flex items-center justify-center gap-3 text-xs font-mono font-medium text-black/50 uppercase tracking-widest">
-            <Clock size={16} className="text-black/50" />
+            <span className="font-mono text-[10px] font-black text-black/50">[TIME]</span>
             <span>UTC Timezone | Real-time connection active</span>
           </div>
           <span className="text-xs font-bold uppercase tracking-widest text-black/30">

@@ -2,7 +2,7 @@
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { getParsedMarkets, RAW_NETWORKS } from '@/lib/data/markets-data';
-import { Search, ChevronDown, RefreshCw, ArrowUpDown } from 'lucide-react';
+
 import { motion, AnimatePresence } from 'framer-motion';
 
 export function InstitutionalMarkets() {
@@ -97,7 +97,7 @@ export function InstitutionalMarkets() {
                 <div className="flex flex-col md:flex-row gap-4 mt-2 relative z-20">
                     <div className="relative flex-1 group">
                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                            <Search className="h-4 w-4 text-[#888888]" />
+                            <span className="font-mono text-[10px] font-black text-[#888888]">[SCH]</span>
                         </div>
                         <input 
                             type="text" 
@@ -115,7 +115,7 @@ export function InstitutionalMarkets() {
                                 className="flex items-center gap-2 px-5 py-3 bg-[#F9F9F9]  border border-[#E5E5E5]  rounded-xl text-[13px] font-bold text-[#050505]  hover:bg-[#E5E5E5]  transition-colors"
                             >
                                 {filterChain ? filterChain : 'Blockchain'}
-                                <ChevronDown className="h-4 w-4 opacity-50" />
+                                <span className="font-mono text-[10px] font-black opacity-50">[v]</span>
                             </button>
 
                             <AnimatePresence>
@@ -145,7 +145,7 @@ export function InstitutionalMarkets() {
                             className="flex items-center justify-center p-3 text-[#888888] hover:text-[#050505]  bg-[#F9F9F9]  border border-[#E5E5E5]  rounded-xl transition-colors group"
                             title="Reset filters"
                         >
-                            <RefreshCw className="h-4 w-4 group-hover:rotate-180 transition-transform duration-500" />
+                            <span className="font-mono text-[10px] font-black group-hover:scale-110 transition-transform duration-500">[RST]</span>
                         </button>
                     </div>
                 </div>
@@ -155,11 +155,11 @@ export function InstitutionalMarkets() {
             <div className="max-w-[1400px] mx-auto w-full flex-1 flex flex-col min-h-0 mt-6 md:mt-8 border border-[#E5E5E5]  rounded-2xl overflow-hidden bg-white  shadow-sm relative z-10">
                 {/* Table Header */}
                 <div className="hidden md:grid grid-cols-[2fr_1fr_1fr_1fr_1fr] px-6 py-4 border-b border-[#E5E5E5]  bg-[#F9F9F9]  text-[11px] font-black text-[#888888] uppercase tracking-widest sticky top-0 z-10">
-                    <div className="cursor-pointer hover:text-[#050505]  flex items-center" onClick={() => handleSort('Token')}>Token <ArrowUpDown className="ml-2 w-3 h-3 opacity-50" /></div>
-                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('Price')}>Price <ArrowUpDown className="ml-2 w-3 h-3 opacity-50" /></div>
-                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('24h change')}>24h change <ArrowUpDown className="ml-2 w-3 h-3 opacity-50" /></div>
-                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('Market cap')}>Market cap <ArrowUpDown className="ml-2 w-3 h-3 opacity-50" /></div>
-                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('Circulation')}>Circulation <ArrowUpDown className="ml-2 w-3 h-3 opacity-50" /></div>
+                    <div className="cursor-pointer hover:text-[#050505]  flex items-center" onClick={() => handleSort('Token')}>Token <span className="font-mono text-[9px] font-black opacity-50 ml-2">[^v]</span></div>
+                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('Price')}>Price <span className="font-mono text-[9px] font-black opacity-50 ml-2">[^v]</span></div>
+                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('24h change')}>24h change <span className="font-mono text-[9px] font-black opacity-50 ml-2">[^v]</span></div>
+                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('Market cap')}>Market cap <span className="font-mono text-[9px] font-black opacity-50 ml-2">[^v]</span></div>
+                    <div className="cursor-pointer hover:text-[#050505]  flex items-center justify-end text-right" onClick={() => handleSort('Circulation')}>Circulation <span className="font-mono text-[9px] font-black opacity-50 ml-2">[^v]</span></div>
                 </div>
 
                 {/* Table Body */}
@@ -188,7 +188,7 @@ export function InstitutionalMarkets() {
                                         <div className="text-right text-[14px] font-bold text-[#050505] ">
                                             {t.price} <span className="text-[10px] text-[#888888] font-normal">{t.currencyPrice}</span>
                                         </div>
-                                        <div className={`text-right text-[12px] font-bold ${isNegative(t.change24h) ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}>
+                                        <div className={`text-right text-[12px] font-bold ${isNegative(t.change24h) ? 'text-black opacity-60' : 'text-black'}`}>
                                             {t.change24h}
                                         </div>
                                     </div>
@@ -200,7 +200,7 @@ export function InstitutionalMarkets() {
                                 </div>
 
                                 {/* Desktop 24h change (Hidden on Mobile) */}
-                                <div className={`hidden md:block text-right text-[14px] font-bold ${isNegative(t.change24h) ? 'text-[#FF3B30]' : 'text-[#00C076]'}`}>
+                                <div className={`hidden md:block text-right text-[14px] font-bold ${isNegative(t.change24h) ? 'text-black opacity-60' : 'text-black'}`}>
                                     {t.change24h}
                                 </div>
 

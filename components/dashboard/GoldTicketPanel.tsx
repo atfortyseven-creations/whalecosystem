@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -11,10 +11,6 @@ import {
 import { parseEther } from 'viem';
 import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { injected } from 'wagmi/connectors';
-import {
-  Zap, Users, Lock, ExternalLink,
-  Clock, CheckCircle2, Flame, PenTool, ShieldCheck, ArrowRight
-} from 'lucide-react';
 import { WhaleLogo } from '@/components/shared/WhaleLogo';
 import { useRouter } from 'next/navigation';
 
@@ -34,7 +30,7 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
   const fill = pct(minted, max);
   const remaining = max - minted;
   const isAlmostFull = remaining <= 20;
-  const urgencyColor = isAlmostFull ? '#FF9500' : '#7C3AED';
+  const urgencyColor = isAlmostFull ? '#050505' : '#050505';
 
   return (
     <div className="w-full space-y-4">
@@ -47,7 +43,7 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
         </div>
         <div className="text-right">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-black/30">Remaining Tickets</p>
-          <p className="text-2xl font-black font-mono tracking-tighter text-[#7C3AED]">
+          <p className="text-2xl font-black font-mono tracking-tighter text-[#050505]">
             {remaining}
           </p>
         </div>
@@ -70,14 +66,14 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
       </div>
 
       <div className="flex items-center justify-between text-[10px] font-black uppercase tracking-[0.2em]">
-        <span className="text-[#7C3AED]">{fill}% PUBLIC MINT SLOTS CLAIMED</span>
+        <span className="text-[#050505]">{fill}% PUBLIC MINT SLOTS CLAIMED</span>
         {isAlmostFull && (
           <motion.span
             animate={{ opacity: [1, 0.4, 1] }}
             transition={{ duration: 1.5, repeat: Infinity }}
-            className="flex items-center gap-2 text-[#FF9500]"
+            className="flex items-center gap-2 text-[#050505]"
           >
-            <Flame size={12} /> FEW TICKETS LEFT
+            <span className="font-mono font-black">[!]</span> FEW TICKETS LEFT
           </motion.span>
         )}
       </div>
@@ -87,9 +83,9 @@ function SupplyBar({ minted, max }: { minted: number; max: number }) {
 
 function StatChip({ label, value, accent }: { label: string; value: string; accent?: boolean }) {
   return (
-    <div className={`flex flex-col gap-2 px-6 py-5 rounded-3xl border ${accent ? 'bg-[#7C3AED]/5 border-[#7C3AED]/20 shadow-[0_10px_30px_rgba(124,58,237,0.05)]' : 'bg-white border-black/[0.06] shadow-xl'}`}>
+    <div className={`flex flex-col gap-2 px-6 py-5 rounded-3xl border ${accent ? 'bg-black/5 border-black/20' : 'bg-white border-black/[0.06] shadow-xl'}`}>
       <p className="text-[10px] font-black text-black/30 uppercase tracking-[0.2em]">{label}</p>
-      <p className={`text-base font-black font-mono tracking-tighter ${accent ? 'text-[#7C3AED]' : 'text-black'}`}>{value}</p>
+      <p className={`text-base font-black font-mono tracking-tighter text-black`}>{value}</p>
     </div>
   );
 }
@@ -190,7 +186,7 @@ function SignaturePad({ onSignature, disabled, onMint, mintLabel }: {
         <canvas ref={canvasRef} className="w-full h-full cursor-crosshair touch-none" onPointerDown={start} onPointerMove={draw} onPointerUp={stop} onPointerLeave={stop} />
         {!hasDrawn && !disabled && (
           <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none opacity-20">
-            <PenTool size={28} className="text-black mb-2" />
+            <span className="text-2xl font-mono font-black text-black mb-2">[SIGN]</span>
             <p className="text-[10px] font-black uppercase tracking-[0.3em]">Draw your signature to unlock</p>
           </div>
         )}
@@ -234,15 +230,15 @@ function GlobalLedger({ feed }: { feed: any[] }) {
                              )}
                         </div>
                         <div className="px-6 py-4 flex flex-col justify-center gap-1">
-                             <span className="text-[10px] font-black uppercase text-[#7C3AED] tracking-[0.1em]">{f.serialCode || 'MEMBER'}</span>
+                             <span className="text-[10px] font-black uppercase text-black tracking-[0.1em]">{f.serialCode || 'MEMBER'}</span>
                              <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.2em]">Optimism L2</span>
                         </div>
                         <div className="px-6 py-4 text-[10px] font-black font-mono text-black/60 uppercase">
                              {new Date(f.claimedAt).toLocaleTimeString()}
                         </div>
                          <div className="px-6 py-2 flex justify-end">
-                              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-purple-50 border border-purple-100 text-[#7C3AED] shadow-sm select-none">
-                                  <ShieldCheck size={11} className="text-[#7C3AED] shrink-0" />
+                              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 border border-black/10 text-black shadow-sm select-none">
+                                  <span className="font-mono text-[10px] font-black text-black shrink-0">[OK]</span>
                                   <span className="text-[9px] font-black font-mono uppercase tracking-wider">SECURE SEAL</span>
                               </div>
                          </div>
@@ -410,7 +406,7 @@ export function GoldTicketPanel() {
         
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-[#7C3AED] bg-[#7C3AED]/10 px-3 py-1 rounded-full">
+            <span className="text-[9px] font-black uppercase tracking-[0.2em] text-black bg-black/5 px-3 py-1 rounded-full">
               ON-CHAIN RECEIPT
             </span>
             <span className="text-[9px] font-black text-black/30 font-mono">
@@ -442,17 +438,17 @@ export function GoldTicketPanel() {
                   href={`https://optimistic.etherscan.io/tx/${txHash}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="font-mono font-black text-[#7C3AED] hover:underline flex items-center gap-1"
+                  className="font-mono font-black text-black hover:underline flex items-center gap-1"
                 >
                   {txHash.slice(0, 8)}...{txHash.slice(-6)}
-                  <ExternalLink size={10} />
+                  <span className="font-mono font-black text-[10px]">[↗]</span>
                 </a>
               </div>
             )}
             <div className="flex justify-between items-center text-xs">
               <span className="text-black/40 font-mono uppercase tracking-wider text-[9px] font-bold">Status</span>
-              <span className="flex items-center gap-1 text-emerald-500 font-mono font-black text-[10px] uppercase tracking-wider">
-                <CheckCircle2 size={11} /> LIVE ON-CHAIN
+              <span className="flex items-center gap-1 text-black font-mono font-black text-[10px] uppercase tracking-wider">
+                <span className="font-mono font-black text-[10px]">[OK]</span> LIVE ON-CHAIN
               </span>
             </div>
           </div>
@@ -465,8 +461,8 @@ export function GoldTicketPanel() {
               {cryptoSignature || "Signed Cryptographically"}
             </span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-emerald-50 border border-emerald-100 text-emerald-600 shadow-sm shrink-0">
-            <ShieldCheck size={12} className="text-emerald-500 shrink-0" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 border border-black/10 text-black shadow-sm shrink-0">
+            <span className="font-mono font-black text-black shrink-0">[OK]</span>
             <span className="text-[9px] font-bold font-mono uppercase tracking-wider">SECURED</span>
           </div>
         </div>

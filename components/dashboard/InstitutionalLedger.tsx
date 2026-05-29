@@ -4,7 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { usePublicClient, useBlockNumber } from 'wagmi';
 import { formatEther } from 'viem';
-import { Search, Loader2, AlertCircle, Zap, ChevronRight, Box, Clock, ShieldCheck, AlignLeft, X } from 'lucide-react';
+
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 
@@ -204,8 +204,8 @@ export default function InstitutionalLedger() {
                 <div className="w-full relative group">
                     <div className="absolute inset-y-0 left-0 flex items-center pl-5 pointer-events-none">
                         {isSearching
-                            ? <Loader2 size={18} className="text-[#050505]  animate-spin" />
-                            : <Search size={18} className="text-[#888888]  group-focus-within:text-[#050505]  transition-colors" />}
+                            ? <span className="font-mono text-[10px] font-black animate-spin inline-block text-[#050505]">[...]</span>
+                            : <span className="font-mono text-[10px] font-black text-[#888888] group-focus-within:text-[#050505] transition-colors">[SCH]</span>}
                     </div>
                     <input
                         type="text"
@@ -227,7 +227,7 @@ export default function InstitutionalLedger() {
                 {/* Search Results / Errors */}
                 {searchError && (
                     <div className="w-full mt-4 border border-[#050505]/20  bg-[#F9F9F9]  p-5 rounded-xl flex items-center gap-4 text-[#050505] ">
-                        <AlertCircle size={16} className="shrink-0" />
+                        <span className="font-mono text-[10px] font-black shrink-0">[!]</span>
                         <span className="text-[10px] font-bold uppercase tracking-[0.1em]">{searchError}</span>
                     </div>
                 )}
@@ -236,7 +236,7 @@ export default function InstitutionalLedger() {
                     <div className="w-full mt-4 border border-[#E5E5E5]  bg-[#F9F9F9]  rounded-xl overflow-hidden shadow-sm animate-in fade-in slide-in-from-top-4 duration-300">
                         <div className="flex items-center justify-between p-5 bg-[#E5E5E5]/50  border-b border-[#E5E5E5] ">
                             <div className="flex items-center gap-3">
-                                <Zap size={14} className="text-[#050505] " />
+                                <span className="font-mono text-[10px] font-black text-[#050505]">[ZAP]</span>
                                 <h2 className="text-[10px] font-bold uppercase tracking-[0.1em]">QUERY RESULTS</h2>
                             </div>
                             <span className="text-[9px] font-bold uppercase tracking-[0.2em] text-[#A0A0A0]">
@@ -263,7 +263,7 @@ export default function InstitutionalLedger() {
                                             </div>
                                             <div className="flex items-center gap-4">
                                                 <span className="px-2.5 py-1 bg-[#E5E5E5]  text-[9px] font-black text-[#050505]  rounded-md uppercase tracking-widest">{label}</span>
-                                                <ChevronRight size={14} className="text-[#888888] group-hover:translate-x-1 transition-all" />
+                                                <span className="font-mono text-[10px] font-black text-[#888888] group-hover:translate-x-1 transition-all">{'[>]'}</span>
                                             </div>
                                         </div>
                                     );
@@ -324,18 +324,18 @@ export default function InstitutionalLedger() {
                                 >
                                     <div className="flex items-center gap-4 relative z-10">
                                         <div className="w-12 h-12 bg-white  rounded-xl flex items-center justify-center border border-[#E5E5E5]  group-hover:bg-[#050505]  group-hover:text-white  transition-all">
-                                            <Box size={16} />
+                                            <span className="font-mono text-[10px] font-black">[BLK]</span>
                                         </div>
                                         <div className="flex flex-col gap-1 text-left">
                                             <span className="text-lg font-mono font-black text-[#050505]  group-hover:text-[#888888]  transition-colors">{block.id}</span>
                                             <span className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center gap-2">
-                                                <Clock size={10} /> {block.age}
+                                                <span className="font-mono text-[9px] font-black">[TIME]</span> {block.age}
                                             </span>
                                         </div>
                                     </div>
                                     <div className="flex flex-col gap-1.5 sm:text-right relative z-10">
                                         <div className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center sm:justify-end gap-2">
-                                            <ShieldCheck size={10} className="text-[#050505] " /> 
+                                            <span className="font-mono text-[9px] font-black text-[#050505]">[OK]</span> 
                                             VALIDATOR: <span className="text-[#050505]  font-bold">{block.miner}</span>
                                         </div>
                                         <div className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center sm:justify-end gap-3">
@@ -371,12 +371,12 @@ export default function InstitutionalLedger() {
                             >
                                 <div className="flex items-center gap-4 min-w-0">
                                     <div className="w-12 h-12 bg-white  rounded-xl flex items-center justify-center border border-[#E5E5E5]  group-hover:border-[#050505]  transition-all shrink-0">
-                                        <AlignLeft size={16} className="text-[#888888]  group-hover:text-[#050505] " />
+                                        <span className="font-mono text-[10px] font-black text-[#888888] group-hover:text-[#050505]">[TX]</span>
                                     </div>
                                     <div className="flex flex-col gap-1 min-w-0">
                                         <span className="text-[11px] font-mono font-bold text-[#050505]  truncate group-hover:text-[#888888]  transition-colors">{tx.hash.substring(0,6) + '...' + tx.hash.substring(60)}</span>
                                         <span className="text-[9px] font-mono text-[#888888]  uppercase tracking-widest flex items-center gap-2">
-                                            <Clock size={10} /> {tx.time}
+                                            <span className="font-mono text-[9px] font-black">[TIME]</span> {tx.time}
                                         </span>
                                     </div>
                                 </div>
@@ -416,7 +416,7 @@ export default function InstitutionalLedger() {
                                 onClick={() => { setSelectedBlock(null); setSelectedTx(null); }}
                                 className="absolute top-6 right-6 w-8 h-8 rounded-lg flex items-center justify-center text-[#888888]  hover:text-[#050505]  hover:bg-white  transition-all"
                             >
-                                <X size={18} />
+                                <span className="font-mono text-[12px] font-black">[X]</span>
                             </button>
                             <div className="p-8 md:p-10">
                                 <div className="flex items-center gap-6 mb-10 pb-6 border-b border-[#E5E5E5] ">

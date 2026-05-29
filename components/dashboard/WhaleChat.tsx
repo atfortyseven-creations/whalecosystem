@@ -11,7 +11,7 @@ import { QrScanner } from '@/components/dashboard/QrScanner';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import type { Client } from '@xmtp/browser-sdk';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
-import { Paperclip, Loader2, MapPin, MoreVertical, Download, Slash, UserPlus, Copy, Trash2, Reply } from 'lucide-react';
+
 import { toast } from 'sonner';
 
 interface ConversationMeta {
@@ -1483,7 +1483,7 @@ export function WhaleChat({ forceAutoInit = false }: WhaleChatProps) {
                   className="w-11 h-11 rounded-xl flex items-center justify-center transition-all active:scale-95 shrink-0 bg-black/[0.05]  text-black/50  hover:bg-black/10 "
                   title="Attach File"
                 >
-                  {isUploading ? <Loader2 size={18} className="animate-spin" /> : <Paperclip size={18} />}
+                  {isUploading ? <span className="font-mono text-[10px] animate-spin inline-block">[...]</span> : <span className="font-mono text-[10px] font-black">[+]</span>}
                 </button>
 
                 <input

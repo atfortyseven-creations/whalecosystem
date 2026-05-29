@@ -2,21 +2,18 @@
 
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import {
-    ChevronLeft, ChevronRight, Search, ChevronDown,
-    ArrowUpRight, Lock
-} from 'lucide-react';
+
 
 // ─── Custom minimal SVG icons (not Lucide) ─────────────────────────────────
 const Icon = {
-  markets:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="8" width="2.5" height="7" rx="0.5"/><rect x="5" y="5" width="2.5" height="10" rx="0.5"/><rect x="9" y="2" width="2.5" height="13" rx="0.5"/><rect x="13" y="6" width="2.5" height="9" rx="0.5"/></svg>,
-  explorer:   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 1.5v13M1.5 8h13"/><path d="M3.5 4a11 11 0 0 1 9 0M3.5 12a11 11 0 0 0 9 0"/></svg>,
-  roadmap:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="4" cy="4" r="1.5"/><circle cx="12" cy="4" r="1.5"/><circle cx="8" cy="12" r="1.5"/><path d="M5.5 4h5M4 5.5v3.8M12 5.5V9a3 3 0 0 1-3 3"/></svg>,
-  sync:       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2 8A6 6 0 0 1 13.5 5"/><path d="M14 8A6 6 0 0 1 2.5 11"/><path d="M2 5.5L2 8l2.5-1M14 8v2.5l-2.5-1"/></svg>,
-  logs:       <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2 4h12M2 8h8M2 12h10"/></svg>,
-  identity:   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><rect x="1.5" y="1.5" width="13" height="13" rx="2"/><circle cx="8" cy="6.5" r="2"/><path d="M4 13.5c0-2.2 1.8-4 4-4s4 1.8 4 4"/></svg>,
-  support:    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><circle cx="8" cy="8" r="6.5"/><path d="M8 10.5v.5M8 5.5a2 2 0 0 1 0 4"/></svg>,
-  forum:      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round"><path d="M2.5 4h11a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1H4.5L2.5 14v-2h-1a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/></svg>,
+  markets:    <span className="font-mono text-[10px] tracking-widest font-black">[MKT]</span>,
+  explorer:   <span className="font-mono text-[10px] tracking-widest font-black">[EXP]</span>,
+  roadmap:    <span className="font-mono text-[10px] tracking-widest font-black">[RDM]</span>,
+  sync:       <span className="font-mono text-[10px] tracking-widest font-black">[SNC]</span>,
+  logs:       <span className="font-mono text-[10px] tracking-widest font-black">[LOG]</span>,
+  identity:   <span className="font-mono text-[10px] tracking-widest font-black">[ID]</span>,
+  support:    <span className="font-mono text-[10px] tracking-widest font-black">[SUP]</span>,
+  forum:      <span className="font-mono text-[10px] tracking-widest font-black">[FRM]</span>,
 };
 import { MODULE_EXPLANATIONS } from './ModuleExplanations';
 import { useSettingsStore } from '@/lib/store/useSettingsStore';
@@ -101,7 +98,7 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
                 )}
 
                 {!isCollapsed && isLocked && (
-                    <Lock size={12} className="ml-2 text-white/30 shrink-0" />
+                    <span className="ml-2 text-[10px] font-mono font-black text-black/30 shrink-0">[LOCKED]</span>
                 )}
 
                 {!isCollapsed && !isLocked && item.badge && (
@@ -116,7 +113,7 @@ function AztecSidebarItem({ item, isActive, isCollapsed, onClick, isLocked }: { 
                     </span>
                 )}
                 {!isCollapsed && item.externalUrl && (
-                    <ArrowUpRight size={12} className={`ml-2 transition-colors ${isActive ? 'text-[#FFFFFF]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`} />
+                    <span className={`ml-2 text-[10px] font-mono font-black transition-colors ${isActive ? 'text-[#FFFFFF]' : 'text-[#A0A0A0] group-hover:text-[#050505]'}`}>[↗]</span>
                 )}
             </div>
         </button>
@@ -382,7 +379,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                     <button 
                         onClick={() => setIsCollapsed(!isCollapsed)}
                         className="w-full flex items-center justify-center p-2 rounded-xl border border-black/10  text-[#888888] hover:text-black  hover:bg-black/5  transition-all"                    >
-                        {isCollapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
+                        {isCollapsed ? <span className="font-mono text-[10px] font-black">[&gt;]</span> : <span className="font-mono text-[10px] font-black">[&lt;]</span>}
                     </button>
                 </div>
             </motion.aside>
@@ -396,8 +393,8 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                         onClick={() => setIsPaletteOpen(true)}
                         className="group flex items-center gap-2.5 h-8 px-3 rounded-full border border-black/[0.08]  bg-white  hover:bg-black/[0.02]  hover:border-black/20  hover:shadow-sm transition-all duration-200 cursor-pointer shrink-0"
                     >
-                        <Search size={12} className="text-[#AAAAAA] group-hover:text-[#555] transition-colors shrink-0" />
-                        <span className="text-[10px] text-[#AAAAAA] group-hover:text-[#555] font-medium transition-colors hidden sm:block pr-1">Search</span>
+                        <span className="text-[10px] font-mono font-black text-[#AAAAAA] group-hover:text-[#555] transition-colors shrink-0">[SCH]</span>
+                        <span className="text-[10px] text-[#AAAAAA] group-hover:text-[#555] font-medium transition-colors hidden sm:block pr-1 ml-1">Search</span>
                         <span className="hidden sm:flex items-center gap-1 ml-0.5">
                             <kbd className="text-[9px] font-black font-mono text-[#AAAAAA] bg-black/[0.04] border border-black/[0.08] rounded px-1.5 py-0.5 leading-none">K</kbd>
                         </span>
@@ -425,7 +422,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                 className="flex items-center gap-2 px-4 py-2 bg-black/5  rounded-full text-[13px] font-semibold text-[#050505]  active:scale-95 transition-transform"
                             >
                                 {SIDEBAR_ITEMS.find(i => i.id === activeTab)?.label || 'Menu'}
-                                <ChevronDown size={12} className={`transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} />
+                                <span className={`transition-transform duration-300 font-mono text-[10px] font-black ml-1 ${isDropdownOpen ? 'rotate-180' : ''}`}>[v]</span>
                             </button>
 
                             <AnimatePresence>
@@ -517,7 +514,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                             { id: 'gold',        icon: Icon.identity, label: 'Identity' },
                             { id: 'markets',     icon: Icon.markets,  label: 'Markets' },
                             { id: 'inst-ledger', icon: Icon.explorer, label: 'Explorer' },
-                            { id: 'menu',        icon: <svg width="18" height="18" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round"><path d="M2 4h12M2 8h12M2 12h12"/></svg>, label: 'Menu' },
+                            { id: 'menu',        icon: <span className="font-mono text-[10px] tracking-widest font-black">[MNU]</span>, label: 'Menu' },
                         ].map(tab => {
                             const isActive = activeTab === tab.id;
                             return (
@@ -701,7 +698,7 @@ export function WhaleProShell({ activeTab, onTabChange, children, isExternalEmbe
                                             </span>
                                         )}
                                         {!isActive && !isZkRestricted && !isLocked && (
-                                            <ChevronRight size={14} className="opacity-30" />
+                                            <span className="font-mono text-[10px] font-black opacity-30">[&gt;]</span>
                                         )}
                                     </div>
                                 </button>

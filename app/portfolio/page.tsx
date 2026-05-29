@@ -7,7 +7,7 @@ import { InstitutionalPortfolioView } from '@/components/bsv/InstitutionalPortfo
 import { UnlockVaultScreen } from '@/components/security/UnlockVaultScreen';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import Link from 'next/link';
-import { ArrowLeft } from 'lucide-react';
+
 
 export default function PortfolioPage() {
   const [sessionUnlocked, setSessionUnlocked] = useState(false);
@@ -36,7 +36,7 @@ export default function PortfolioPage() {
     return (
       <div className="w-full flex-1 flex flex-col bg-[#FFFFFF] text-[#0A0A0A] h-full min-h-0 overflow-hidden relative">
         <Link href="/" className="absolute top-6 left-6 z-50 w-10 h-10 rounded-full bg-white/50 backdrop-blur-md border border-black/10 flex items-center justify-center text-black/40 hover:text-black hover:bg-white transition-all shadow-sm" title="Return to Landing Page">
-          <ArrowLeft size={20} />
+          <span className="font-mono text-[11px] font-black text-black/40">[&lt;]</span>
         </Link>
         <CoreAuthGate onComplete={() => {
           sessionStorage.setItem('portfolio_unlocked', 'true');

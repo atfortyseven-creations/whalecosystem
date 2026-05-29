@@ -1,7 +1,7 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useMemo, useRef, useEffect, useCallback } from "react";
-import { Loader2, RefreshCw } from "lucide-react";
+
 import { AnimatedCounter } from "@/components/ui/animated-counter";
 import { toast } from "sonner";
 import { useQueryClient } from "@tanstack/react-query";
@@ -344,7 +344,7 @@ export function MassTransferIntel() {
             disabled={syncing}
             className="px-6 py-3 bg-white border border-slate-200 text-black rounded-xl font-black uppercase tracking-[0.15em] text-[10px] transition-all shadow-sm hover:shadow-md hover:bg-black/5 active:scale-95 disabled:opacity-50 flex items-center gap-2"
           >
-            <RefreshCw size={12} className={syncing ? "animate-spin" : ""} />
+            <span className={`font-mono text-[10px] font-black ${syncing ? "animate-spin inline-block" : ""}`}>[SYNC]</span>
             {syncing ? "SYNCING LEDGER" : "SYNC LEDGER"}
           </button>
         </div>
@@ -410,7 +410,7 @@ export function MassTransferIntel() {
       <div className="flex-1 min-h-0 overflow-y-auto px-8 py-8">
         {isLoading ? (
           <div className="flex flex-col items-center justify-center h-full text-[#888888] gap-4">
-            <Loader2 className="animate-spin" size={32} />
+            <span className="font-mono text-3xl font-black animate-spin inline-block">[...]</span>
             <p className="text-[11px] font-bold uppercase tracking-[0.2em] text-[#050505] ">INITIALIZING LEDGER</p>
             <p className="text-[9px] font-mono uppercase tracking-[0.1em]">ESTABLISHING RPC LINK</p>
           </div>
