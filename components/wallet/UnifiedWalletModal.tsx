@@ -11,6 +11,8 @@ import { safeToFixed } from '@/lib/utils/number-format';
 import { ERC20_ABI } from "@/lib/wallet/erc20";
 import { TokenLogo } from '@/components/ui/TokenLogo';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
+
 // --- Constants & Types ---
 type MainTab = "SEND" | "SWAP" | "BRIDGE" | "BUY";
 type SendSubTab = "STANDARD" | "PRIVATE" | "ENS";
@@ -22,9 +24,11 @@ interface UnifiedWalletModalProps {
     onClose: () => void;
     initialTab?: MainTab;
     userAssets?: any[];
+    forceToken?: string;
+    asEmbedded?: boolean;
 }
 
-export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND", userAssets = [] }: UnifiedWalletModalProps) {
+export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND", userAssets = [], forceToken, asEmbedded }: UnifiedWalletModalProps) {
     const { address } = useAccount();
     const chainId = useChainId();
     const [activeTab, setActiveTab] = useState<MainTab>(initialTab);
@@ -33,38 +37,21 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
         if (isOpen) setActiveTab(initialTab);
     }, [isOpen, initialTab]);
 
-    const [uniswapTokens, setUniswapTokens] = useState<any[]>([]);
-    useEffect(() => {
-        let isMounted = true;
-        async function fetchTokens() {
-            try {
-                const res = await fetch('https://gateway.ipfs.io/ipns/tokens.uniswap.org');
-                if (!res.ok) return;
-                const data = await res.json();
-                if (isMounted && data.tokens) {
-                    const mapped = data.tokens.map((t: any) => ({
-                        ...t,
-                        balanceNumeric: 0,
-                        balance: '0',
-                        price: 0,
-                        valueUSD: 0,
-                        network: t.chainId === 1 ? 'Ethereum' : t.chainId === 137 ? 'Polygon' : t.chainId === 42161 ? 'Arbitrum' : t.chainId === 10 ? 'Optimism' : t.chainId === 8453 ? 'Base' : 'Unknown'
-                    }));
-                    setUniswapTokens(mapped);
-                }
-            } catch(e) {}
-        }
-        fetchTokens();
-        return () => { isMounted = false; };
-    }, []);
-
     const allMergedAssets = useMemo(() => {
         const userMap = new Map();
         userAssets.forEach(a => userMap.set(`${a.chainId}-${a.address.toLowerCase()}`, a));
         
-        const additional = uniswapTokens.filter(t => !userMap.has(`${t.chainId}-${t.address.toLowerCase()}`));
+        const additional = UNIVERSAL_TOKENS.filter(t => !userMap.has(`1-${t.address.toLowerCase()}`)).map(t => ({
+            ...t,
+            balanceNumeric: 0,
+            balance: '0',
+            price: 0,
+            valueUSD: 0,
+            chainId: 1, // Defaulting to mainnet for universal tokens
+            network: 'Ethereum'
+        }));
         return [...userAssets, ...additional];
-    }, [userAssets, uniswapTokens]);
+    }, [userAssets]);
 
     const [status, setStatus] = useState<"IDLE" | "ESTIMATING" | "SIGNING" | "SENDING" | "SUCCESS" | "ERROR">("IDLE");
     const [txHash, setTxHash] = useState("");
@@ -76,6 +63,58 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
         if (status === 'ERROR') return 'ERROR';
         return 'IDLE'; 
     }, [status]);
+
+    const modalContent = (
+        <div className={`w-full ${asEmbedded ? 'h-full bg-white flex flex-col' : 'max-w-md bg-[#FFFFFF] border border-black/5 rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]'}`}>
+            {!asEmbedded && (
+                <div className="flex items-center justify-between p-6 pb-4">
+                    <div className="flex items-center gap-3">
+                        <div className="px-3 py-1 border border-black/10 bg-black text-white font-black text-[10px] tracking-widest uppercase">
+                            SECURE
+                        </div>
+                        <h2 className="text-xl font-black text-black tracking-tighter uppercase">WALLET</h2>
+                    </div>
+                    <button onClick={onClose} className="font-bold text-[10px] uppercase tracking-widest text-black/40 hover:text-black transition-colors">
+                        [ CLOSE ]
+                    </button>
+                </div>
+            )}
+
+            <div className={`px-6 ${asEmbedded ? 'pt-6' : ''} pb-6`}>
+                <div className="flex items-center bg-black/5 p-1 rounded-[20px] w-full">
+                    {(["SEND", "SWAP", "BRIDGE", "BUY"] as MainTab[]).map(tab => (
+                        <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-[16px] transition-all duration-300 ${activeTab === tab ? 'bg-black text-white shadow-md' : 'text-black/40 hover:text-black hover:bg-black/5'}`}>
+                            {tab}
+                        </button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="px-6 pb-8 flex-1 overflow-y-auto scrollbar-hide">
+                <AnimatePresence mode="wait">
+                    {activeTab === "SEND" && <SendModule key="send" userAssets={allMergedAssets} forceToken={forceToken} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
+                    {activeTab === "SWAP" && <AdvancedRouterModule key="swap" mode="SWAP" userAssets={allMergedAssets} forceToken={forceToken} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
+                    {activeTab === "BRIDGE" && <AdvancedRouterModule key="bridge" mode="BRIDGE" userAssets={allMergedAssets} forceToken={forceToken} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
+                    {activeTab === "BUY" && <BuyModule key="buy" />}
+                </AnimatePresence>
+            </div>
+        </div>
+    );
+
+    if (asEmbedded) {
+        return (
+            <>
+                <TransactionStatusModal 
+                    isOpen={modalStatus !== 'IDLE'}
+                    status={modalStatus}
+                    message={statusMessage}
+                    txHash={txHash}
+                    onClose={() => setStatus('IDLE')}
+                />
+                {modalContent}
+            </>
+        );
+    }
 
     return (
         <AnimatePresence>
@@ -103,38 +142,7 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
                     )}
 
                     <motion.div initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }} className="fixed inset-0 z-[70] flex items-center justify-center pointer-events-none p-4">
-                        <div className="w-full max-w-md bg-[#FFFFFF] border border-black/5 rounded-[32px] shadow-2xl pointer-events-auto overflow-hidden flex flex-col max-h-[90vh]">
-                            <div className="flex items-center justify-between p-6 pb-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="px-3 py-1 border border-black/10 bg-black text-white font-black text-[10px] tracking-widest uppercase">
-                                        SECURE
-                                    </div>
-                                    <h2 className="text-xl font-black text-black tracking-tighter uppercase">WALLET</h2>
-                                </div>
-                                <button onClick={onClose} className="font-bold text-[10px] uppercase tracking-widest text-black/40 hover:text-black transition-colors">
-                                    [ CLOSE ]
-                                </button>
-                            </div>
-
-                            <div className="px-6 pb-6">
-                                <div className="flex items-center bg-black/5 p-1 rounded-[20px] w-full">
-                                    {(["SEND", "SWAP", "BRIDGE", "BUY"] as MainTab[]).map(tab => (
-                                        <button key={tab} onClick={() => setActiveTab(tab)} className={`flex-1 py-3 text-[10px] sm:text-xs font-black uppercase tracking-widest rounded-[16px] transition-all duration-300 ${activeTab === tab ? 'bg-black text-white shadow-md' : 'text-black/40 hover:text-black hover:bg-black/5'}`}>
-                                            {tab}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div className="px-6 pb-8 flex-1 overflow-y-auto scrollbar-hide">
-                                <AnimatePresence mode="wait">
-                                    {activeTab === "SEND" && <SendModule key="send" userAssets={allMergedAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
-                                    {activeTab === "SWAP" && <AdvancedRouterModule key="swap" mode="SWAP" userAssets={allMergedAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
-                                    {activeTab === "BRIDGE" && <AdvancedRouterModule key="bridge" mode="BRIDGE" userAssets={allMergedAssets} setStatus={setStatus} setTxHash={setTxHash} setStatusMessage={setStatusMessage} />}
-                                    {activeTab === "BUY" && <BuyModule key="buy" />}
-                                </AnimatePresence>
-                            </div>
-                        </div>
+                        {modalContent}
                     </motion.div>
                 </>
             )}
@@ -205,7 +213,10 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
 // -----------------------------------------------------------------------------
 // SEND MODULE WITH NETWORK SWITCHING
 // -----------------------------------------------------------------------------
-function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any) {
+// -----------------------------------------------------------------------------
+// SEND MODULE WITH NETWORK SWITCHING
+// -----------------------------------------------------------------------------
+function SendModule({ userAssets, forceToken, setStatus, setTxHash, setStatusMessage }: any) {
     const { address, chain: activeChain } = useAccount();
     const chainId = useChainId();
     const { switchChainAsync } = useSwitchChain();
@@ -213,7 +224,14 @@ function SendModule({ userAssets, setStatus, setTxHash, setStatusMessage }: any)
     const [subTab, setSubTab] = useState<SendSubTab>("STANDARD");
     
     const validAssets = userAssets.filter((a: any) => a.symbol !== 'QDs');
-    const defaultToken = validAssets.find((a: any) => a.address === 'native' && a.chainId === chainId) || validAssets[0] || { symbol: "ETH", address: "native", decimals: 18, balanceNumeric: 0, logoURI: "", chainId: 1 };
+    
+    const defaultToken = useMemo(() => {
+        if (forceToken) {
+            const forced = validAssets.find((a: any) => a.symbol.toUpperCase() === forceToken.toUpperCase());
+            if (forced) return forced;
+        }
+        return validAssets.find((a: any) => a.address === 'native' && a.chainId === chainId) || validAssets[0] || { symbol: "ETH", address: "native", decimals: 18, balanceNumeric: 0, logoURI: "", chainId: 1 };
+    }, [forceToken, validAssets, chainId]);
     
     const [selectedAsset, setSelectedAsset] = useState<any>(defaultToken);
     const [showTokenSelect, setShowTokenSelect] = useState(false);
@@ -417,7 +435,7 @@ const STARGATE_ROUTER_ABI = [
   }
 ] as const;
 
-function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatusMessage }: any) {
+function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHash, setStatusMessage }: any) {
     const { address, chain: activeChain } = useAccount();
     const { switchChainAsync } = useSwitchChain();
     const allWagmiChains = useChains();
@@ -454,7 +472,14 @@ function AdvancedRouterModule({ mode, userAssets, setStatus, setTxHash, setStatu
     const availableFromAssets = userAssets.filter((a: any) => a.chainId === fromChain.id && a.symbol !== 'QDs');
     const fallbackNativeToken = DEFAULT_TOKENS.find((t: any) => t.chainId === fromChain.id) || DEFAULT_TOKENS[0];
     
-    const initialPayToken = availableFromAssets.find((a:any) => a.balanceNumeric > 0) || fallbackNativeToken;
+    const initialPayToken = useMemo(() => {
+        if (forceToken) {
+            const forced = userAssets.find((a: any) => a.symbol.toUpperCase() === forceToken.toUpperCase() && a.chainId === fromChain.id);
+            if (forced) return forced;
+        }
+        return availableFromAssets.find((a:any) => a.balanceNumeric > 0) || fallbackNativeToken;
+    }, [forceToken, fromChain.id, userAssets, availableFromAssets, fallbackNativeToken]);
+    
     const [payToken, setPayToken] = useState<any>(initialPayToken);
     const [receiveToken, setReceiveToken] = useState<any>(fallbackNativeToken);
     

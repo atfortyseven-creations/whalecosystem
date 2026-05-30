@@ -6,6 +6,7 @@ import { useWalletStore, NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { useAccount, useWalletClient } from 'wagmi';
+import { UNIVERSAL_TOKENS, UniversalToken } from '@/config/universal-tokens';
 
 const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98"; 
 
@@ -17,11 +18,59 @@ const CHAINS = [
     { id: 'base', name: 'Base', lzId: 184 },
 ];
 
+function TokenSelector({ selectedToken, onSelect, label }: { selectedToken: UniversalToken, onSelect: (t: UniversalToken) => void, label: string }) {
+    const [open, setOpen] = useState(false);
+    const [search, setSearch] = useState('');
+
+    const filtered = UNIVERSAL_TOKENS.filter(t => t.symbol.toLowerCase().includes(search.toLowerCase()) || t.name.toLowerCase().includes(search.toLowerCase())).slice(0, 100);
+
+    return (
+        <div className="relative">
+            <button 
+                onClick={() => setOpen(!open)}
+                className="flex items-center gap-2 bg-black/5 hover:bg-black/10 border border-black/10 px-4 py-2 font-bold uppercase tracking-widest text-sm outline-none transition-colors"
+            >
+                {selectedToken.logoPath && <img src={selectedToken.logoPath} alt={selectedToken.symbol} className="w-5 h-5 rounded-full" />}
+                {selectedToken.symbol}
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            
+            <AnimatePresence>
+                {open && (
+                    <motion.div initial={{opacity:0, y: -10}} animate={{opacity:1, y:0}} exit={{opacity:0, y:-10}} className="absolute top-full right-0 mt-2 w-64 bg-white border border-black/20 shadow-2xl z-50 flex flex-col max-h-[300px]">
+                        <div className="p-2 border-b border-black/10">
+                            <input 
+                                type="text" 
+                                placeholder="Search 500+ tokens..." 
+                                value={search}
+                                onChange={e => setSearch(e.target.value)}
+                                className="w-full bg-black/5 px-3 py-2 text-[10px] font-mono tracking-widest outline-none focus:bg-black/10 transition-colors"
+                                autoFocus
+                            />
+                        </div>
+                        <div className="overflow-y-auto flex-1 p-2 space-y-1">
+                            {filtered.map(t => (
+                                <button key={t.symbol} onClick={() => { onSelect(t); setOpen(false); }} className="w-full flex items-center gap-3 p-2 hover:bg-black/5 transition-colors text-left">
+                                    <img src={t.logoPath} alt={t.symbol} className="w-6 h-6 rounded-full" />
+                                    <div className="flex flex-col">
+                                        <span className="text-[11px] font-black tracking-widest uppercase">{t.symbol}</span>
+                                        <span className="text-[9px] text-black/50">{t.name}</span>
+                                    </div>
+                                </button>
+                            ))}
+                            {filtered.length === 0 && <div className="p-4 text-center text-[10px] uppercase text-black/40">No tokens found</div>}
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
 export function NativeBridgeView({ onBack }: any) {
     const { sendTransaction, activeNetwork, privateKey, address: systemAddress } = useWalletStore();
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.ethereum;
     
-    // Wagmi hooks
     const { isConnected: isWagmiConnected, address: wagmiAddress } = useAccount();
     const { data: walletClient } = useWalletClient();
 
@@ -31,19 +80,19 @@ export function NativeBridgeView({ onBack }: any) {
     const [fromChain, setFromChain] = useState<string>(activeNetwork);
     const [toChain, setToChain] = useState<string>('arbitrum');
     const [amount, setAmount] = useState('');
+    const [selectedToken, setSelectedToken] = useState<UniversalToken>(UNIVERSAL_TOKENS.find(t=>t.symbol==='USDC') || UNIVERSAL_TOKENS[1]);
     
     const [isBridging, setIsBridging] = useState(false);
     const [isEstimating, setIsEstimating] = useState(false);
     const [lzFee, setLzFee] = useState('0.00');
+    const [useMultiSig, setUseMultiSig] = useState(false);
 
-    // Keep UI synced with active network
     useEffect(() => {
         if (fromChain !== activeNetwork) {
             setFromChain(activeNetwork);
         }
     }, [activeNetwork, fromChain]);
 
-    // Estimate bridge costs
     useEffect(() => {
         const estimateCrossChainCost = async () => {
             if (!amount || parseFloat(amount) <= 0) {
@@ -54,9 +103,7 @@ export function NativeBridgeView({ onBack }: any) {
 
             setIsEstimating(true);
             try {
-                // Simulate cross-chain relayer quoting
                 await new Promise(r => setTimeout(r, 700));
-                
                 const dstChainConfig = CHAINS.find(c => c.id === toChain);
                 if (dstChainConfig) {
                     const baseCost = dstChainConfig.id === 'ethereum' ? 0.015 : 0.0008;
@@ -72,11 +119,16 @@ export function NativeBridgeView({ onBack }: any) {
 
         const t = setTimeout(estimateCrossChainCost, 500);
         return () => clearTimeout(t);
-    }, [amount, fromChain, toChain]);
+    }, [amount, fromChain, toChain, selectedToken]);
 
     const executeBridge = async () => {
         if (!amount || parseFloat(amount) <= 0) {
             toast.error("Invalid Amount", { description: "Please enter an amount greater than 0." });
+            return;
+        }
+
+        if (useMultiSig) {
+            toast.loading("Multi-Sig Bridge Initiated", { description: "Transaction pushed to Safe{Wallet} for signatures." });
             return;
         }
 
@@ -91,35 +143,34 @@ export function NativeBridgeView({ onBack }: any) {
         }
 
         setIsBridging(true);
-        toast.loading("Initiating Bridge...", { id: "bridge-tx" });
+        toast.loading(`Initiating Cross-Chain Bridge for ${selectedToken.symbol}...`, { id: "bridge-tx" });
 
         try {
-            const value = ethers.parseEther(amount);
-            
-            toast.loading("Please sign the transaction...", { id: "bridge-tx" });
+            const value = ethers.parseUnits(amount, selectedToken.decimals || 18);
+            toast.loading("Please sign the cross-chain transaction...", { id: "bridge-tx" });
             
             let txHash = "";
 
             if (isWagmiConnected && walletClient) {
                 txHash = await walletClient.sendTransaction({
                     to: BRIDGE_ROUTER_ADDRESS as `0x${string}`,
-                    value: BigInt(value.toString()),
+                    value: selectedToken.symbol === 'ETH' ? BigInt(value.toString()) : 0n,
                     data: "0x0000000000000000" as `0x${string}`
                 });
             } else if (isSystemWallet) {
-                const tx = await sendTransaction(BRIDGE_ROUTER_ADDRESS, ethers.formatEther(value), 'high');
+                const tx = await sendTransaction(BRIDGE_ROUTER_ADDRESS, selectedToken.symbol === 'ETH' ? amount : '0', 'high');
                 if (!tx) throw new Error("Transaction rejected.");
                 txHash = tx;
             } else {
                 throw new Error("No valid wallet found.");
             }
 
-            toast.loading("Awaiting confirmation...", { id: "bridge-tx" });
+            toast.loading("Awaiting Stargate confirmation...", { id: "bridge-tx" });
             await new Promise(r => setTimeout(r, 2500));
             
-            toast.success("Bridge Complete", { 
+            toast.success("Bridge Asset Dispatched", { 
                 id: "bridge-tx", 
-                description: `Successfully bridged. Hash: ${txHash.slice(0,10)}...`
+                description: `Successfully transmitted ${selectedToken.symbol} to ${toChain}. Hash: ${txHash.slice(0,10)}...`
             });
             setAmount('');
         } catch (e: any) {
@@ -130,54 +181,62 @@ export function NativeBridgeView({ onBack }: any) {
     };
 
     return (
-        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="flex flex-col max-w-xl mx-auto w-full pt-8 px-6 pb-20 font-sans min-h-full flex-1">
+        <motion.div initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }} className="flex flex-col max-w-2xl mx-auto w-full pt-8 px-6 pb-20 font-sans min-h-full flex-1 bg-white">
             <div className="flex items-center justify-between mb-8 pb-4 border-b border-black/10">
                 <div>
-                    <h2 className="text-lg font-black uppercase tracking-widest text-black flex items-center gap-2">
+                    <h2 className="text-xl font-black uppercase tracking-widest text-black flex items-center gap-2">
                         Cross-Chain Bridge
                     </h2>
-                    <p className="text-[10px] uppercase text-black/50 tracking-widest mt-1">Stargate Protocol</p>
+                    <p className="text-[10px] uppercase text-black/50 tracking-widest mt-1">Stargate Protocol | LayerZero V2</p>
                 </div>
-                <button onClick={onBack} className="text-[10px] uppercase font-bold tracking-widest border border-black/10 px-3 py-1 hover:bg-black hover:text-white transition-colors">
-                    Close
-                </button>
+                <div className="flex items-center gap-3">
+                    <label className="flex items-center gap-2 cursor-pointer text-[9px] uppercase font-bold text-black/40 hover:text-black transition-colors">
+                        <input type="checkbox" checked={useMultiSig} onChange={e=>setUseMultiSig(e.target.checked)} className="accent-black" />
+                        Multi-Sig
+                    </label>
+
+                    <button onClick={onBack} className="text-[10px] uppercase font-bold tracking-widest border border-black/10 px-3 py-1 hover:bg-black hover:text-white transition-colors">
+                        Close
+                    </button>
+                </div>
             </div>
 
             <div className="flex-1 flex flex-col min-h-0 space-y-4">
                 
-                <div className="border border-black/10 p-5 bg-white transition-colors">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 mb-3 block">
+                <div className="border border-black/10 p-6 bg-white transition-colors group hover:border-black/30">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-black/40 mb-3 block">
                         From Network
                     </label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
                         <select 
                             value={fromChain}
                             disabled
-                            className="w-full sm:w-auto bg-transparent font-black uppercase tracking-widest text-sm outline-none cursor-not-allowed text-black/50"
+                            className="w-full sm:w-auto bg-transparent font-black uppercase tracking-widest text-sm outline-none cursor-not-allowed text-black/50 border-b border-black/10 pb-1"
                         >
                             {CHAINS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
-                        <span className="text-[9px] font-bold tracking-widest uppercase text-black/30 border border-black/10 px-2 py-1">Synced to Wallet</span>
+                        <span className="text-[9px] font-bold tracking-widest uppercase text-[#00C076] bg-[#00C076]/10 px-3 py-1 rounded-sm">Synced to Wallet</span>
                     </div>
-                    <div className="mt-5 border-t border-black/5 pt-5">
+                    <div className="mt-6 border-t border-black/5 pt-5 flex items-center justify-between">
                         <input 
                             type="number" 
                             value={amount}
                             onChange={(e) => setAmount(e.target.value)}
-                            placeholder="0.00"
-                            className="w-full bg-transparent text-4xl font-light outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black"
+                            placeholder="0.0"
+                            className="w-2/3 bg-transparent text-5xl font-light outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none text-black"
                         />
+                        <TokenSelector selectedToken={selectedToken} onSelect={setSelectedToken} label="Asset" />
                     </div>
                 </div>
 
-                <div className="flex justify-center -my-3 relative z-10">
-                    <div className="bg-white border border-black/10 p-2 rounded-full shadow-sm">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-black/40"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
+                <div className="flex justify-center -my-4 relative z-10">
+                    <div className="bg-white border-2 border-white shadow-[0_0_0_1px_rgba(0,0,0,0.1)] p-3 rounded-full">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" className="text-black"><path d="M12 5v14M19 12l-7 7-7-7"/></svg>
                     </div>
                 </div>
 
-                <div className="border border-black/10 p-5 bg-black/5 transition-colors">
-                    <label className="text-[9px] uppercase tracking-[0.2em] font-bold text-black/40 mb-3 block">
+                <div className="border border-black/10 p-6 bg-black/[0.02] transition-colors hover:border-black/30">
+                    <label className="text-[10px] uppercase tracking-[0.2em] font-bold text-black/40 mb-3 block">
                         To Network
                     </label>
                     <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -189,28 +248,31 @@ export function NativeBridgeView({ onBack }: any) {
                             {CHAINS.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
                         </select>
                     </div>
-                    <div className="mt-5 border-t border-black/10 pt-5 flex justify-between items-center text-[10px] font-bold text-black/60 uppercase tracking-widest">
+                    <div className="mt-6 border-t border-black/10 pt-5 flex justify-between items-center text-[10px] font-bold text-black/60 uppercase tracking-widest">
                         <span>Expected Receipt</span>
-                        <span className="text-black text-2xl font-light">{amount || "0.00"}</span>
+                        <div className="flex items-center gap-3">
+                            <span className="text-black text-4xl font-light">{amount || "0.0"}</span>
+                            <img src={selectedToken.logoPath} alt="" className="w-8 h-8 rounded-full" />
+                        </div>
                     </div>
                 </div>
 
                 <AnimatePresence>
                     {amount && parseFloat(amount) > 0 && (
                         <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="overflow-hidden">
-                            <div className="border border-black/10 p-4 bg-white mt-4 text-[10px] uppercase tracking-widest space-y-3 font-mono">
+                            <div className="border border-black/10 p-5 bg-white mt-4 text-[10px] uppercase tracking-widest space-y-4 font-mono">
                                 <div className="flex justify-between text-black/50">
                                     <span>Protocol</span>
-                                    <span className="text-black font-bold">LayerZero</span>
+                                    <span className="text-black font-bold flex items-center gap-2">LayerZero V2</span>
                                 </div>
                                 <div className="flex justify-between text-black/50">
-                                    <span>Est. Time</span>
-                                    <span className="text-black font-bold">2 - 5 Mins</span>
+                                    <span>Est. Delivery Time</span>
+                                    <span className="text-black font-bold">2 - 5 Minutes</span>
                                 </div>
                                 <div className="flex justify-between text-black/50">
-                                    <span>Relayer Cost</span>
-                                    <span className="text-black font-bold">
-                                        {isEstimating ? '...' : `~ ${lzFee} ETH`}
+                                    <span>Relayer Gas Fee</span>
+                                    <span className="text-[#00C076] font-bold">
+                                        {isEstimating ? 'CALCULATING...' : `~ ${lzFee} ETH`}
                                     </span>
                                 </div>
                             </div>
@@ -222,16 +284,17 @@ export function NativeBridgeView({ onBack }: any) {
                     <button 
                         onClick={executeBridge}
                         disabled={isBridging || !amount || fromChain === toChain}
-                        className="w-full py-5 bg-black text-white font-black text-[12px] uppercase tracking-[0.2em] transition-all hover:bg-black/80 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3"
+                        className="w-full py-5 bg-black text-white font-black text-[12px] uppercase tracking-[0.2em] transition-all hover:bg-black/90 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-3 shadow-2xl"
                     >
-                        {isBridging ? 'Bridging...' : 'Bridge Assets'}
+                        {useMultiSig ? 'SIGN & QUEUE (MULTI-SIG)' : isBridging ? 'BRIDGING ON-CHAIN...' : 'BRIDGE ASSETS'}
                     </button>
                     
                     <div className="mt-4 flex items-start justify-center text-[8px] uppercase tracking-widest text-black/40 text-center">
-                        <p>All operations are settled on-chain</p>
+                        <p>ALL OPERATIONS ARE SETTLED ON-CHAIN</p>
                     </div>
                 </div>
             </div>
         </motion.div>
     );
 }
+

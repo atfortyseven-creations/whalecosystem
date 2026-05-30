@@ -1,163 +1,198 @@
 "use client";
 
-import React, { useMemo, useState, useEffect } from 'react';
-import { Database, RefreshCw, ExternalLink, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { TokenLogo } from '@/components/ui/TokenLogo';
+import React, { useMemo, useState } from 'react';
+import { Database, ExternalLink, ArrowUpRight, ArrowDownRight, Send, Download, ArrowRightLeft, Route, Activity } from 'lucide-react';
 import { safeToFixed } from '@/lib/utils/number-format';
+import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
+import { TOKEN_STATS_20260530, TOKEN_STATS_DATE } from '@/config/token-stats-snapshot';
+import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
 
 export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, userAssets = [] }: { address: string, activeNetwork: string, scannerBase: string, userAssets?: any[] }) {
-  const [uniswapTokens, setUniswapTokens] = useState<any[]>([]);
-  const [isLoadingUniswap, setIsLoadingUniswap] = useState(true);
+    
+    const [actionState, setActionState] = useState<{ isOpen: boolean, type: 'SEND'|'RECEIVE'|'SWAP'|'BRIDGE', token?: any }>({ isOpen: false, type: 'SEND' });
 
-  useEffect(() => {
-    let isMounted = true;
-    async function fetchUniswapTokens() {
-        try {
-            const res = await fetch('https://tokens.uniswap.org');
-            if (!res.ok) throw new Error("Failed to fetch");
-            const data = await res.json();
-            if (isMounted && data.tokens) {
-                // Filter mainnet tokens and limit to top 150 to prevent DOM lag
-                const tokens = data.tokens.filter((t: any) => t.chainId === 1).slice(0, 150);
-                setUniswapTokens(tokens);
-            }
-        } catch (e) {
-            console.error("Failed to load Uniswap tokens", e);
-        } finally {
-            if (isMounted) setIsLoadingUniswap(false);
-        }
-    }
-    fetchUniswapTokens();
-    return () => { isMounted = false; };
-  }, []);
+    const combinedAssets = useMemo(() => {
+        // Map user balances into our universal list, or keep 0
+        const assetMap = new Map(userAssets.map(a => [a.symbol.toUpperCase(), a]));
 
-  const combinedAssets = useMemo(() => {
-      // 1. Process user's actual assets
-      const validUserAssets = userAssets.filter(a => a.symbol !== 'QDs' && a.balanceNumeric > 0).map(a => {
-          const hashSeed = a.address === 'native' ? 100 : a.address.charCodeAt(a.address.length - 1);
-          const volatility = ((hashSeed % 100) / 100) * 15;
-          const change24h = a.change24h || ((hashSeed % 20) - 10);
-          return {
-              symbol: a.symbol,
-              name: a.name || a.symbol,
-              balance: a.balanceNumeric,
-              price: a.price,
-              value: a.valueUSD,
-              address: a.address,
-              logoURI: a.logoURI,
-              change24h,
-              volatility,
-              isOwned: true
-          };
-      }).sort((a, b) => b.value - a.value);
+        return UNIVERSAL_TOKENS.map(t => {
+            const userOwned = assetMap.get(t.symbol.toUpperCase());
+            // Prefer user's real-time price, then fall back to our snapshot
+            const snapshot = TOKEN_STATS_20260530[t.symbol.toUpperCase()];
+            const price = userOwned?.price ?? snapshot?.price ?? 0;
+            const change24h = userOwned?.change24h ?? snapshot?.change24h ?? 0;
+            const balance = userOwned?.balanceNumeric || 0;
+            const value = balance > 0 ? balance * price : 0;
+            
+            return {
+                ...t,
+                balance,
+                price,
+                value,
+                change24h,
+                isOwned: !!userOwned && balance > 0,
+                hasSnapshot: !!snapshot
+            };
+        }).sort((a, b) => {
+            if (a.isOwned && !b.isOwned) return -1;
+            if (!a.isOwned && b.isOwned) return 1;
+            if (a.balance > 0 && b.balance > 0) return b.value - a.value;
+            // Major assets first in unowned section
+            const aMajor = ['ETH','BTC','USDC','USDT','BNB','SOL','XRP'].includes(a.symbol) ? 1 : 0;
+            const bMajor = ['ETH','BTC','USDC','USDT','BNB','SOL','XRP'].includes(b.symbol) ? 1 : 0;
+            if (aMajor !== bMajor) return bMajor - aMajor;
+            // Tokens with live stats before unknown ones
+            if (a.hasSnapshot && !b.hasSnapshot) return -1;
+            if (!a.hasSnapshot && b.hasSnapshot) return 1;
+            return a.symbol.localeCompare(b.symbol);
+        });
+    }, [userAssets]);
 
-      // 2. Add Uniswap tokens that the user doesn't already have
-      const existingSymbols = new Set(validUserAssets.map(a => a.symbol.toUpperCase()));
-      const additionalTokens = uniswapTokens.filter(t => !existingSymbols.has(t.symbol.toUpperCase())).map(t => {
-          const hashSeed = t.address.charCodeAt(t.address.length - 1) || 0;
-          const volatility = ((hashSeed % 100) / 100) * 15;
-          const change24h = ((hashSeed % 20) - 10);
-          return {
-              symbol: t.symbol,
-              name: t.name,
-              balance: 0,
-              price: 0,
-              value: 0,
-              address: t.address,
-              logoURI: t.logoURI,
-              change24h,
-              volatility,
-              isOwned: false
-          };
-      });
+    if (activeNetwork !== 'ethereum' && activeNetwork !== 'polygon' && activeNetwork !== 'arbitrum' && activeNetwork !== 'optimism' && activeNetwork !== 'base') return null;
 
-      return [...validUserAssets, ...additionalTokens];
-  }, [userAssets, uniswapTokens]);
+    const handleAction = (type: 'SEND'|'RECEIVE'|'SWAP'|'BRIDGE', token: any) => {
+        setActionState({ isOpen: true, type, token });
+    };
 
-  if (activeNetwork !== 'ethereum' && activeNetwork !== 'polygon' && activeNetwork !== 'arbitrum' && activeNetwork !== 'optimism' && activeNetwork !== 'base') return null;
+    return (
+        <div className="border border-black/10 bg-white flex flex-col min-h-[500px] overflow-hidden relative">
+            
+            {/* Modal Gateway for Action Execution */}
+            {actionState.isOpen && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center bg-white/90 backdrop-blur-sm" onClick={() => setActionState({ ...actionState, isOpen: false })}>
+                    <div className="w-full max-w-5xl h-[90vh] bg-white border border-black/10 shadow-2xl flex flex-col" onClick={e => e.stopPropagation()}>
+                        <div className="flex items-center justify-between px-8 py-5 border-b border-black/10 bg-black/5">
+                            <h2 className="text-[12px] font-black uppercase tracking-[0.3em] text-black flex items-center gap-2">
+                                <img src={actionState.token?.logoPath} alt="" className="w-5 h-5 rounded-full" />
+                                {actionState.type} {actionState.token?.symbol}
+                            </h2>
+                            <button onClick={() => setActionState({ ...actionState, isOpen: false })} className="font-black text-[10px] uppercase tracking-widest text-black/50 hover:text-black hover:bg-black/5 transition-colors border border-black/10 px-4 py-2">[CLOSE]</button>
+                        </div>
+                        <div className="flex-1 overflow-y-auto">
+                            <UnifiedWalletModal 
+                                isOpen={actionState.isOpen} 
+                                initialTab={actionState.type === 'RECEIVE' ? 'SEND' : actionState.type} // We handle receive differently or fallback
+                                onClose={() => setActionState({ ...actionState, isOpen: false })} 
+                                userAssets={userAssets}
+                                forceToken={actionState.token?.symbol}
+                                asEmbedded={true}
+                            />
+                        </div>
+                    </div>
+                </div>
+            )}
 
-  return (
-    <div className="border border-black/10 bg-white flex flex-col min-h-[400px] overflow-hidden relative">
-        <div className="p-0 flex-1 flex flex-col overflow-y-auto">
-            <table className="w-full text-left text-[11px] font-mono">
-                <thead className="bg-black/5 border-b border-black/10 text-[9px] uppercase tracking-widest text-black/50 sticky top-0 z-10">
-                    <tr>
-                        <th className="py-3 px-4 font-black">Asset</th>
-                        <th className="py-3 px-4 font-black text-right">Balance</th>
-                        <th className="py-3 px-4 font-black text-right">24h Change</th>
-                        <th className="py-3 px-4 font-black text-right">Contract</th>
-                    </tr>
-                </thead>
-                <tbody className="divide-y divide-black/5">
-                    {combinedAssets.length > 0 ? (
-                        combinedAssets.map((token, idx) => (
-                            <tr key={`${token.address}-${idx}`} className="hover:bg-black/5 transition-colors group/row">
-                                <td className="py-3 px-4">
-                                    <div className="flex items-center gap-3">
-                                        <TokenLogo symbol={token.symbol} address={token.address} logoURI={token.logoURI} className="w-6 h-6 rounded-sm shadow-inner border border-black/10" fallbackClassName="w-6 h-6 rounded-sm shadow-inner border border-black/10 flex items-center justify-center bg-black/5 text-[8px] font-black" />
-                                        <div className="flex flex-col">
-                                            <span className="font-black text-[12px] text-black">{token.symbol}</span>
-                                            <span className="text-[9px] text-black/40 font-bold tracking-widest">{token.name}</span>
+            {/* Live Stats Bar */}
+            <div className="flex items-center justify-between px-6 py-2 border-b border-black/5 bg-black/[0.02]">
+                <div className="flex items-center gap-2">
+                    <Activity size={10} className="text-[#00C076]" />
+                    <span className="text-[9px] font-black uppercase tracking-[0.25em] text-black/50">Live Market Snapshot</span>
+                    <span className="text-[9px] font-bold text-[#00C076] tracking-widest">{TOKEN_STATS_DATE}</span>
+                </div>
+                <span className="text-[9px] font-bold text-black/30 tracking-widest uppercase">{UNIVERSAL_TOKENS.length} Assets · CoinGecko</span>
+            </div>
+
+            <div className="p-0 flex-1 flex flex-col overflow-y-auto custom-scrollbar">
+                <table className="w-full text-left text-[11px] font-mono">
+                    <thead className="bg-black/5 border-b border-black/10 text-[9px] uppercase tracking-widest text-black/50 sticky top-0 z-10 backdrop-blur-md">
+                        <tr>
+                            <th className="py-4 px-6 font-black w-1/4">Asset ({UNIVERSAL_TOKENS.length})</th>
+                            <th className="py-4 px-6 font-black text-right w-1/5">Balance / Price</th>
+                            <th className="py-4 px-6 font-black text-right w-1/6">24h Δ</th>
+                            <th className="py-4 px-6 font-black text-right">Actions</th>
+                            <th className="py-4 px-6 font-black text-right w-1/6">Contract</th>
+                        </tr>
+                    </thead>
+                    <tbody className="divide-y divide-black/5">
+                        {combinedAssets.length > 0 ? (
+                            combinedAssets.map((token, idx) => (
+                                <tr key={`${token.symbol}-${idx}`} className="hover:bg-black/[0.03] transition-colors group/row">
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center gap-4">
+                                            <div className="w-8 h-8 rounded-full bg-black/5 p-0.5 border border-black/10 flex items-center justify-center shrink-0 shadow-sm">
+                                                {token.logoPath ? (
+                                                    <img src={token.logoPath} alt={token.symbol} className="w-full h-full rounded-full object-cover" />
+                                                ) : (
+                                                    <span className="text-[8px] font-black">{token.symbol.slice(0,3)}</span>
+                                                )}
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <span className="font-black text-[13px] text-black tracking-wider flex items-center gap-2">
+                                                    {token.symbol}
+                                                    {token.isOwned && <span className="text-[7px] bg-[#00C076]/10 text-[#00C076] px-1.5 py-0.5 font-black uppercase tracking-widest rounded-sm">Owned</span>}
+                                                </span>
+                                                <span className="text-[10px] text-black/40 font-bold tracking-widest">{token.name}</span>
+                                            </div>
                                         </div>
-                                        {token.isOwned && <span className="ml-2 text-[8px] bg-black text-white px-1.5 py-0.5 font-bold uppercase tracking-widest rounded-sm">Owned</span>}
+                                    </td>
+                                    <td className="py-4 px-6 text-right">
+                                        <div className="flex flex-col items-end">
+                                            <span className={`font-black text-sm ${token.isOwned ? 'text-black' : 'text-black/30'}`}>
+                                                {token.balance > 0 ? safeToFixed(token.balance, 4) : "—"}
+                                            </span>
+                                            {token.value > 0 && <span className="text-[10px] text-black/50 font-bold">${safeToFixed(token.value, 2)}</span>}
+                                            {token.price > 0 && !token.isOwned && (
+                                                <span className="text-[9px] text-black/30 font-bold font-mono">
+                                                    ${token.price >= 1 ? safeToFixed(token.price, 2) : token.price >= 0.0001 ? token.price.toFixed(6) : token.price.toExponential(2)}
+                                                </span>
+                                            )}
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6 text-right">
+                                        <div className={`flex items-center justify-end gap-1.5 ${token.change24h >= 0 ? 'text-[#00C076]' : 'text-red-500'} ${!token.isOwned && 'opacity-60'}`}>
+                                            {token.change24h >= 0 ? <ArrowUpRight size={12} strokeWidth={3} /> : <ArrowDownRight size={12} strokeWidth={3} />}
+                                            <span className="font-black text-[11px]">{Math.abs(token.change24h).toFixed(2)}%</span>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6">
+                                        <div className="flex items-center justify-end gap-2 opacity-30 group-hover/row:opacity-100 transition-opacity">
+                                            <button onClick={() => handleAction('SEND', token)} className="p-1.5 border border-black/10 hover:bg-black hover:text-white transition-colors" title="Send">
+                                                <Send size={12} />
+                                            </button>
+                                            <button onClick={() => handleAction('RECEIVE', token)} className="p-1.5 border border-black/10 hover:bg-black hover:text-white transition-colors" title="Receive">
+                                                <Download size={12} />
+                                            </button>
+                                            <button onClick={() => handleAction('SWAP', token)} className="p-1.5 border border-black/10 hover:bg-black hover:text-white transition-colors" title="Swap">
+                                                <ArrowRightLeft size={12} />
+                                            </button>
+                                            <button onClick={() => handleAction('BRIDGE', token)} className="p-1.5 border border-black/10 hover:bg-black hover:text-white transition-colors" title="Bridge">
+                                                <Route size={12} />
+                                            </button>
+                                        </div>
+                                    </td>
+                                    <td className="py-4 px-6 text-right">
+                                        {token.address !== 'native' && token.address.length > 20 ? (
+                                            <a 
+                                                href={`${scannerBase}/token/${token.address}`} 
+                                                target="_blank" 
+                                                rel="noopener noreferrer"
+                                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/5 border border-black/10 rounded-sm text-[10px] text-black/50 hover:text-black hover:border-black/30 hover:bg-white transition-all font-bold tracking-widest"
+                                            >
+                                                {token.address.slice(0,6)}...{token.address.slice(-4)}
+                                                <ExternalLink size={10} />
+                                            </a>
+                                        ) : (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.02] border border-black/5 rounded-sm text-[9px] text-black/30 uppercase tracking-[0.2em] font-black">
+                                                Native Asset
+                                            </span>
+                                        )}
+                                    </td>
+                                </tr>
+                            ))
+                        ) : (
+                            <tr>
+                                <td colSpan={5} className="py-20">
+                                    <div className="flex flex-col items-center justify-center text-center">
+                                        <Database size={32} className="text-black/20 mb-4" />
+                                        <p className="text-[12px] text-black/40 uppercase tracking-[0.2em] font-black mb-1">No Assets Found</p>
                                     </div>
-                                </td>
-                                <td className="py-3 px-4 text-right">
-                                    <div className="flex flex-col items-end">
-                                        <span className={`font-black ${token.isOwned ? 'text-black' : 'text-black/30'}`}>
-                                            {token.balance > 0 ? safeToFixed(token.balance, 4) : "0.00"}
-                                        </span>
-                                        {token.value > 0 && <span className="text-[9px] text-black/40 font-bold">${safeToFixed(token.value, 2)}</span>}
-                                    </div>
-                                </td>
-                                <td className="py-3 px-4 text-right flex justify-end">
-                                    <div className={`flex items-center gap-1 ${token.change24h >= 0 ? 'text-green-600' : 'text-red-600'} ${!token.isOwned && 'opacity-50'}`}>
-                                        {token.change24h >= 0 ? <ArrowUpRight size={10} /> : <ArrowDownRight size={10} />}
-                                        <span className="font-black">{Math.abs(token.change24h).toFixed(2)}%</span>
-                                    </div>
-                                </td>
-                                <td className="py-3 px-4 text-right">
-                                    {token.address !== 'native' ? (
-                                        <a 
-                                            href={`${scannerBase}/token/${token.address}`} 
-                                            target="_blank" 
-                                            rel="noopener noreferrer"
-                                            className="inline-flex items-center gap-1.5 px-2 py-1 bg-white border border-black/10 rounded-sm text-[9px] text-black/40 hover:text-black hover:border-black/30 transition-all"
-                                        >
-                                            {token.address.slice(0,6)}...{token.address.slice(-4)}
-                                            <ExternalLink size={9} />
-                                        </a>
-                                    ) : (
-                                        <span className="inline-flex items-center gap-1.5 px-2 py-1 bg-black/5 border border-black/5 rounded-sm text-[9px] text-black/40 uppercase tracking-widest font-black">
-                                            Native
-                                        </span>
-                                    )}
                                 </td>
                             </tr>
-                        ))
-                    ) : isLoadingUniswap ? (
-                        <tr>
-                            <td colSpan={4} className="py-12">
-                                <div className="flex flex-col items-center justify-center text-center">
-                                    <RefreshCw size={24} className="animate-spin text-black/20 mb-3" />
-                                    <p className="text-[10px] text-black/40 uppercase tracking-widest font-black mb-1">Loading On-Chain Assets...</p>
-                                </div>
-                            </td>
-                        </tr>
-                    ) : (
-                        <tr>
-                            <td colSpan={4} className="py-12">
-                                <div className="flex flex-col items-center justify-center text-center">
-                                    <Database size={24} className="text-black/20 mb-3" />
-                                    <p className="text-[10px] text-black/40 uppercase tracking-widest font-black mb-1">No Assets Found</p>
-                                </div>
-                            </td>
-                        </tr>
-                    )}
-                </tbody>
-            </table>
+                        )}
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
-  );
+    );
 }
 
