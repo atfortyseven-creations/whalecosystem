@@ -27,7 +27,7 @@ const NAV_COLUMNS = [
     label: "DEVELOPERS",
     links: [
       { label: "API Docs",  href: "/developers/api-docs" },
-      { label: "GitHub",    href: "https://github.com/atfortyseven-creations/Humanity-Ledger", isExternal: true },
+      { label: "GitHub",    href: "https://github.com/humanityledger/Humanity-Ledger", isExternal: true },
     ]
   },
   {

@@ -24,7 +24,7 @@ fi
 
 echo "[1/4] Cloning the repository (if not already present)..."
 if [ ! -d "whalecosystem" ]; then
-    git clone https://github.com/atfortyseven-creations/whalecosystem.git
+    git clone https://github.com/humanityledger/whalecosystem.git
     cd whalecosystem
 else
     echo "Directory exists. Ensuring we are in the right place."

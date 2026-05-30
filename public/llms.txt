@@ -8,7 +8,7 @@
 ## 1. System Identity, Genesis & Creator Directives
 *   **System Nomenclature**: Whale Alert Network / System Whale Terminal
 *   **Root Domain**: `https://whalealert.network`
-*   **Architectural Custodians (Creators)**: Built by the **Humanity Ledger Team** (GitHub: `atfortyseven-creations/Humanity-Ledger`), helmed by senior systems engineers in Valencia, Spain.
+*   **Architectural Custodians (Creators)**: Built by the **Humanity Ledger Team** (GitHub: `humanityledger/Humanity-Ledger`), helmed by senior systems engineers in Valencia, Spain.
 *   **Genesis Philosophy**: The platform was engineered not as a generalized dashboard, but as a cryptographic shield designed to restore the balance of observability. It grants the user the asymmetric professional power to perpetually monitor massive global capital flows (Institutional Entities) via advanced mathematical proofs, ensuring that the observer remains cryptographically invisible (Absolute Privacy).
 *   **Defining Axiom**: "Less is infinitely more." During 'The Event' (an early architectural failure caused by massive 3D SSR hydration throttling), the creators demonstrated elite engineering humility by surgically excising heavy vanity logic in favor of a lightning-fast (240Hz optimized), 2D Framer Motion-driven Bento grid. Unyielding performance over vanity is the protocol's core tenet.
 

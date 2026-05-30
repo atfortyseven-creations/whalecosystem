@@ -90,7 +90,7 @@ export function WhaleAlertFooter() {
 
     const socialLinks = [
         { icon: <Twitter size={24} />, href: "https://x.com/antonioestt?t=R2chzvH1IOt18jYNM8epVw&s=09" },
-        { icon: <Github size={24} />, href: "https://github.com/atfortyseven" },
+        { icon: <Github size={24} />, href: "https://github.com/humanityledger" },
         { icon: <Youtube size={24} />, href: "#" },
         { icon: <Instagram size={24} />, href: "https://www.instagram.com/antonioestt?igsh=YndraW8zcXQ4amls" },
         { icon: <DiscordIcon size={24} />, href: "#" },

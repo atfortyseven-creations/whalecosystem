@@ -60,8 +60,8 @@ export default function PrivacyPolicyPage() {
               {[
                 ['Legal Entity', 'Whale Alert Network, S.L.'],
                 ['Registered Office', 'Paseo de la Castellana, Madrid, 28046, Spain'],
-                ['General Email', 'atfortyseven2@humanidfi.es'],
-                ['Data Protection Officer (DPO)', 'atfortyseven2@humanidfi.es'],
+                ['General Email', 'humanityledger@humanidfi.es'],
+                ['Data Protection Officer (DPO)', 'humanityledger@humanidfi.es'],
               ].map(([label, value]) => (
                 <div key={label}>
                   <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-0.5">{label}</p>
@@ -389,14 +389,14 @@ export default function PrivacyPolicyPage() {
             <div className="border border-black/10 rounded-xl p-5 sm:p-6 space-y-4 mt-2">
               <div>
                 <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Email</p>
-                <a href="mailto:atfortyseven2@gmail.com" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors break-all">
-                  atfortyseven2@gmail.com
+                <a href="mailto:humanityledger@gmail.com" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors break-all">
+                  humanityledger@gmail.com
                 </a>
               </div>
               <div>
                 <p className="text-[11px] font-mono font-bold uppercase tracking-widest text-black/40 mb-1">Telegram</p>
-                <a href="https://t.me/atfortyseven2" target="_blank" rel="noopener noreferrer" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors">
-                  @atfortyseven2
+                <a href="https://t.me/humanityledger" target="_blank" rel="noopener noreferrer" className="text-black text-[15px] underline underline-offset-2 hover:text-black/60 transition-colors">
+                  @humanityledger
                 </a>
               </div>
               <div>

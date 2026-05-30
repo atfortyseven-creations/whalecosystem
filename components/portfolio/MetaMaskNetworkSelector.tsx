@@ -47,8 +47,8 @@ export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { 
     }, []);
 
     const handleSelect = (id: number) => {
+        if (switchChain) switchChain({ chainId: id });
         if (onNetworkChange) onNetworkChange(id);
-        else if (switchChain) switchChain({ chainId: id });
         setIsOpen(false);
     };
 
@@ -73,13 +73,24 @@ export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { 
             {/* Dropdown Modal */}
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div 
-                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                        transition={{ duration: 0.15 }}
-                        className="absolute top-full mt-2 left-0 sm:right-0 sm:left-auto w-[320px] bg-white rounded-[16px] shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-black/5 z-50 overflow-hidden font-sans"
-                    >
+                    <>
+                        {/* Mobile Backdrop */}
+                        <motion.div 
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            className="fixed inset-0 bg-black/20 z-[90] sm:hidden"
+                            onClick={() => setIsOpen(false)}
+                        />
+
+                        {/* Modal Content */}
+                        <motion.div 
+                            initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                            exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                            transition={{ duration: 0.15 }}
+                            className="fixed bottom-0 left-0 right-0 w-full sm:w-[320px] sm:absolute sm:bottom-auto sm:left-0 sm:right-auto sm:top-full sm:mt-2 bg-white rounded-t-[24px] sm:rounded-b-[16px] sm:rounded-t-[16px] shadow-[0_-8px_30px_rgb(0,0,0,0.12)] sm:shadow-[0_8px_30px_rgb(0,0,0,0.12)] border border-black/5 z-[100] overflow-hidden font-sans pb-6 sm:pb-0 max-h-[85vh] flex flex-col"
+                        >
                         {/* Header */}
                         <div className="flex items-center justify-between px-4 py-4 border-b border-black/5">
                             <span className="font-bold text-sm text-black flex-1 text-center pl-6">Select network</span>
@@ -173,6 +184,7 @@ export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { 
                             )}
                         </div>
                     </motion.div>
+                    </>
                 )}
             </AnimatePresence>
         </div>

@@ -232,10 +232,10 @@ export default function LegalDocLayout({
           <p className="text-[11px] font-mono text-black/35 uppercase tracking-[0.2em]">
             Questions?{' '}
             <a
-              href="mailto:atfortyseven2@gmail.com"
+              href="mailto:humanityledger@gmail.com"
               className="text-black/55 hover:text-black transition-colors underline underline-offset-2 break-all"
             >
-              atfortyseven2@gmail.com
+              humanityledger@gmail.com
             </a>
           </p>
         </div>

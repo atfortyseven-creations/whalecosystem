@@ -1,5 +1,5 @@
 # CODEOWNERS  Whale Alert Network
-# © 20242026 atfortyseven-creations. All Rights Reserved.
+# © 20242026 humanityledger. All Rights Reserved.
 # Proprietary & Confidential.
 #
 # This file defines the code ownership structure of this repository.
@@ -9,35 +9,35 @@
 # Reference: https://docs.github.com/en/repositories/managing-your-repositorys-settings-and-features/customizing-your-repository/about-code-owners
 
 #  GLOBAL OWNER 
-# atfortyseven-creations is the sole owner of ALL files in this repository.
+# humanityledger is the sole owner of ALL files in this repository.
 # All pull requests require approval from this account.
-* @atfortyseven-creations
+* @humanityledger
 
 #  CRITICAL PATHS 
 # These paths are particularly sensitive and require explicit review.
 
 # Authentication & Security Layer
-/app/api/                     @atfortyseven-creations
-/components/providers/        @atfortyseven-creations
-/components/security/         @atfortyseven-creations
-/components/shared/LinkedGate.tsx  @atfortyseven-creations
-/components/layout/TitaniumGate.tsx @atfortyseven-creations
-/hooks/useSystemAccount.ts @atfortyseven-creations
-/hooks/useSystemSessionLock.ts @atfortyseven-creations
+/app/api/                     @humanityledger
+/components/providers/        @humanityledger
+/components/security/         @humanityledger
+/components/shared/LinkedGate.tsx  @humanityledger
+/components/layout/TitaniumGate.tsx @humanityledger
+/hooks/useSystemAccount.ts @humanityledger
+/hooks/useSystemSessionLock.ts @humanityledger
 
 # Data Layer
-/prisma/                      @atfortyseven-creations
-/lib/                         @atfortyseven-creations
+/prisma/                      @humanityledger
+/lib/                         @humanityledger
 
 # Configuration & Infrastructure
-/.env*                        @atfortyseven-creations
-/next.config.*                @atfortyseven-creations
-/package.json                 @atfortyseven-creations
-/Dockerfile*                  @atfortyseven-creations
-/docker-compose*              @atfortyseven-creations
+/.env*                        @humanityledger
+/next.config.*                @humanityledger
+/package.json                 @humanityledger
+/Dockerfile*                  @humanityledger
+/docker-compose*              @humanityledger
 
 # Legal Documents  Never modify without Owner consent
-/LICENSE                      @atfortyseven-creations
-/NOTICE                       @atfortyseven-creations
-/SECURITY.md                  @atfortyseven-creations
-/CODEOWNERS                   @atfortyseven-creations
+/LICENSE                      @humanityledger
+/NOTICE                       @humanityledger
+/SECURITY.md                  @humanityledger
+/CODEOWNERS                   @humanityledger

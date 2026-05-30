@@ -37,7 +37,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://eth.llamarpc.com',
     ],
     blockExplorerUrl: 'https://etherscan.io',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_ethereum',
     color: '#627EEA',
   },
   polygon: {
@@ -53,7 +53,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://polygon-rpc.com',
     ],
     blockExplorerUrl: 'https://polygonscan.com',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_polygon',
     color: '#8247E5',
   },
   base: {
@@ -69,7 +69,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://base.llamarpc.com',
     ],
     blockExplorerUrl: 'https://basescan.org',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_base',
     color: '#0052FF',
   },
   arbitrum: {
@@ -85,7 +85,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://arb1.arbitrum.io/rpc',
     ],
     blockExplorerUrl: 'https://arbiscan.io',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_arbitrum',
     color: '#28A0F0',
   },
   optimism: {
@@ -101,7 +101,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://mainnet.optimism.io',
     ],
     blockExplorerUrl: 'https://optimistic.etherscan.io',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
     color: '#FF0420',
   },
   avalanche: {
@@ -116,7 +116,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://api.avax.network/ext/bc/C/rpc',
     ],
     blockExplorerUrl: 'https://snowtrace.io',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_avalanche',
     color: '#E84142',
   },
   bsc: {
@@ -131,7 +131,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
       'https://bsc-dataseed1.binance.org',
     ],
     blockExplorerUrl: 'https://bscscan.com',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_binance',
     color: '#F3BA2F',
   },
   bitcoin: {
@@ -144,7 +144,7 @@ export const SUPPORTED_CHAINS: Record<string, ChainConfig> = {
     },
     rpcUrls: [],
     blockExplorerUrl: 'https://mempool.space',
-    logo: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png',
+    logo: 'https://icons.llamao.fi/icons/chains/rsz_bitcoin',
     color: '#F7931A',
   },
 };
@@ -182,35 +182,35 @@ export function getChainName(chainId: number): string {
 }
 
 export const CHAIN_LOGOS: Record<number, string> = {
-  1: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png',
-  137: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png',
-  10: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/optimism/info/logo.png',
-  42161: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/arbitrum/info/logo.png',
-  8453: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png',
-  84532: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png',
-  43114: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/avalanchec/info/logo.png',
-  56: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/smartchain/info/logo.png',
-  42220: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/celo/info/logo.png',
-  250: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/fantom/info/logo.png',
-  324: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/zksync/info/logo.png',
-  300: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/zksync/info/logo.png',
-  100: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/xdai/info/logo.png',
-  1101: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/polygon/info/logo.png',
+  1: 'https://icons.llamao.fi/icons/chains/rsz_ethereum',
+  137: 'https://icons.llamao.fi/icons/chains/rsz_polygon',
+  10: 'https://icons.llamao.fi/icons/chains/rsz_optimism',
+  42161: 'https://icons.llamao.fi/icons/chains/rsz_arbitrum',
+  8453: 'https://icons.llamao.fi/icons/chains/rsz_base',
+  84532: 'https://icons.llamao.fi/icons/chains/rsz_base',
+  43114: 'https://icons.llamao.fi/icons/chains/rsz_avalanche',
+  56: 'https://icons.llamao.fi/icons/chains/rsz_binance',
+  42220: 'https://icons.llamao.fi/icons/chains/rsz_celo',
+  250: 'https://icons.llamao.fi/icons/chains/rsz_fantom',
+  324: 'https://icons.llamao.fi/icons/chains/rsz_zksync',
+  300: 'https://icons.llamao.fi/icons/chains/rsz_zksync',
+  100: 'https://icons.llamao.fi/icons/chains/rsz_xdai',
+  1101: 'https://icons.llamao.fi/icons/chains/rsz_polygon',
   5000: 'https://icons.llamao.fi/icons/chains/rsz_mantle',
   81457: 'https://icons.llamao.fi/icons/chains/rsz_blast',
   34443: 'https://icons.llamao.fi/icons/chains/rsz_mode',
   169: 'https://icons.llamao.fi/icons/chains/rsz_manta',
   167000: 'https://icons.llamao.fi/icons/chains/rsz_taiko',
-  2020: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ronin/info/logo.png',
-  2222: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/kava/info/logo.png',
-  1313161554: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/aurora/info/logo.png',
-  1088: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/metis/info/logo.png',
+  2020: 'https://icons.llamao.fi/icons/chains/rsz_ronin',
+  2222: 'https://icons.llamao.fi/icons/chains/rsz_kava',
+  1313161554: 'https://icons.llamao.fi/icons/chains/rsz_aurora',
+  1088: 'https://icons.llamao.fi/icons/chains/rsz_metis',
   7777777: 'https://icons.llamao.fi/icons/chains/rsz_zora',
   1329: 'https://icons.llamao.fi/icons/chains/rsz_sei',
   30: 'https://icons.llamao.fi/icons/chains/rsz_rsk',
   59144: 'https://icons.llamao.fi/icons/chains/rsz_linea',
   534352: 'https://icons.llamao.fi/icons/chains/rsz_scroll',
-  0: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/bitcoin/info/logo.png'
+  0: 'https://icons.llamao.fi/icons/chains/rsz_bitcoin'
 };
 
 /**
@@ -219,7 +219,7 @@ export const CHAIN_LOGOS: Record<number, string> = {
 export function getChainLogo(chainId: number): string {
   if (CHAIN_LOGOS[chainId]) return CHAIN_LOGOS[chainId];
   const chain = getChainById(chainId);
-  return chain?.logo || 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
+  return chain?.logo || 'https://icons.llamao.fi/icons/chains/rsz_ethereum';
 }
 
 /**

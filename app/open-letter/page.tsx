@@ -84,11 +84,11 @@ export default function OpenLetterPage() {
                 <img src="/system-shots/photo_2026-05-16_19-57-16.jpg" alt="Founder" className="w-full h-full object-cover grayscale opacity-90" />
               </div>
               <div>
-                <strong className="block text-slate-900 font-bold text-lg">atfortyseven</strong>
+                <strong className="block text-slate-900 font-bold text-lg">humanityledger</strong>
                 <span className="text-slate-500 text-sm">Founder, Humanity Ledger</span>
                 <div className="mt-2 flex gap-3">
-                  <a href="https://twitter.com/atfortyseven" target="_blank" rel="noreferrer" className="text-sm text-[#0088cc] font-medium hover:underline">@atfortyseven</a>
-                  <a href="https://github.com/atfortyseven-creations" target="_blank" rel="noreferrer" className="text-sm text-[#0088cc] font-medium hover:underline">GitHub</a>
+                  <a href="https://twitter.com/humanityledger" target="_blank" rel="noreferrer" className="text-sm text-[#0088cc] font-medium hover:underline">@humanityledger</a>
+                  <a href="https://github.com/humanityledger" target="_blank" rel="noreferrer" className="text-sm text-[#0088cc] font-medium hover:underline">GitHub</a>
                 </div>
               </div>
             </div>

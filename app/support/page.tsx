@@ -82,7 +82,7 @@ const CHANNELS = [
     icon: BookOpen,
     label: "Documentation",
     desc: "The technical architecture, API reference, integration guides, and operational procedures are documented in the system README. Consult the documentation before submitting a support request for technical integration questions.",
-    link: "https://github.com/atfortyseven-creations/whalecosystem",
+    link: "https://github.com/humanityledger/whalecosystem",
     cta: "View Documentation",
   },
 ];

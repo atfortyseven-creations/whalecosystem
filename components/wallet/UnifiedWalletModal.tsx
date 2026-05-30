@@ -201,7 +201,7 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
                                     </div>
                                 </div>
                                 <div className="text-right">
-                                    <div className="font-mono text-sm font-bold text-black">{safeToFixed(t.balanceNumeric, 4)}</div>
+                                    <div className="font-mono text-sm font-bold text-black">{t.balanceNumeric > 0 ? Number(t.balanceNumeric).toFixed(6) : '0.00'}</div>
                                     <div className="text-[10px] text-black/40 font-bold tracking-widest">${safeToFixed(t.valueUSD, 2)}</div>
                                 </div>
                             </button>
@@ -368,7 +368,7 @@ function SendModule({ userAssets, forceToken, setStatus, setTxHash, setStatusMes
                 <div className="flex justify-between items-center border-t border-black/5 pt-4">
                     <span className="text-[10px] text-black/40 font-bold uppercase tracking-widest">{amount && selectedAsset.price ? ` $${safeToFixed(parseFloat(amount) * selectedAsset.price, 2)}` : ' $0.00'}</span>
                     <button onClick={handleMax} className="text-[10px] text-black/40 font-black uppercase tracking-widest hover:text-black transition-colors flex items-center gap-1">
-                        Balance: {safeToFixed(selectedAsset?.balanceNumeric || 0, 4)}
+                        Balance: {selectedAsset?.balanceNumeric > 0 ? Number(selectedAsset.balanceNumeric).toFixed(6) : '0.00'}
                     </button>
                 </div>
             </div>
@@ -694,7 +694,7 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
                     </button>
                 </div>
                 <div className="flex justify-between items-center">
-                    <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">Balance: {safeToFixed(payToken?.balanceNumeric || 0, 4)}</div>
+                    <div className="text-[10px] text-black/40 font-bold uppercase tracking-widest">Balance: {payToken?.balanceNumeric > 0 ? Number(payToken.balanceNumeric).toFixed(6) : '0.00'}</div>
                     <button onClick={() => setPayAmount(payToken?.balanceNumeric?.toString() || "0")} className="text-[9px] font-black tracking-widest text-black/40 hover:text-black uppercase">MAX</button>
                 </div>
             </div>

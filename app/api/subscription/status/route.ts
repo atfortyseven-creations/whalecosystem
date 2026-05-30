@@ -3,7 +3,7 @@ import { getSession } from '@/lib/session';
 import { prisma } from '@/lib/prisma';
 
 const OWNER_EMAILS = [
-  'atfortyseven2@gmail.com',
+  'humanityledger@gmail.com',
   'josemanx2000@gmail.com'
 ];
 

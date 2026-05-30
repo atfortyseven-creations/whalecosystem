@@ -224,7 +224,7 @@ function LandingNav() {
         {/* Right: GitHub + Docs + Sign In */}
         <div className="hidden md:flex items-center gap-4">
           <a
-            href="https://github.com/atfortyseven-creations/Humanity-Ledger"
+            href="https://github.com/humanityledger/Humanity-Ledger"
             target="_blank"
             rel="noreferrer"
             className="flex items-center gap-1.5 text-[13.5px] font-medium text-black/70 hover:text-black transition-colors"

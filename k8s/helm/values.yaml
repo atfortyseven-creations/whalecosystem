@@ -3,7 +3,7 @@
 
 #  Image 
 image:
-  repository: ghcr.io/atfortyseven-creations/whale-alert
+  repository: ghcr.io/humanityledger/whale-alert
   tag:        "3.0.0"
   pullPolicy: Always
 

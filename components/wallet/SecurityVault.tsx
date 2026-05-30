@@ -64,29 +64,6 @@ export default function SecurityVault() {
 
     return (
         <div className="space-y-6 text-black">
-            <motion.div 
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="rounded-3xl bg-black text-white p-8 shadow-2xl relative overflow-hidden"
-            >
-                <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg viewBox=%220 0 200 200%22 xmlns=%22http://www.w3.org/2000/svg%22%3E%3Cfilter id=%22noiseFilter%22%3E%3CfeTurbulence type=%22fractalNoise%22 baseFrequency=%220.65%22 numOctaves=%223%22 stitchTiles=%22stitch%22/%3E%3C/filter%3E%3Crect width=%22100%25%22 height=%22100%25%22 filter=%22url(%23noiseFilter)%22/%3E%3C/svg%3E')] opacity-10" />
-                <div className="relative z-10 flex flex-col md:flex-row justify-between items-start gap-8">
-                    <div>
-                        <h2 className="text-3xl font-black uppercase tracking-widest mb-2 flex items-center gap-3">
-                            <Shield className="w-8 h-8" /> Accounts
-                        </h2>
-                        <p className="text-white/60 text-sm max-w-md font-mono">
-                            Fully client-side BIP-39 mnemonic generation & AES-GCM encryption. Keys never leave your browser.
-                        </p>
-                    </div>
-                    <div className="bg-white/10 rounded-2xl p-4 border border-white/20 min-w-[250px]">
-                        <StatusRow label="Status" value={!isLocked ? 'UNLOCKED' : 'LOCKED'} />
-                        <StatusRow label="Encryption" value="AES-GCM-256" />
-                        <StatusRow label="Accounts" value={accounts.length.toString()} />
-                    </div>
-                </div>
-            </motion.div>
-
             <div className="grid md:grid-cols-2 gap-6">
                 {/* Auth Panel */}
                 <div className="bg-white rounded-[32px] p-8 border border-black/10 shadow-sm">
@@ -145,15 +122,7 @@ export default function SecurityVault() {
                 {/* HD Accounts Panel */}
                 <div className="bg-white rounded-[32px] p-8 border border-black/10 shadow-sm flex flex-col">
                     <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-xl font-black uppercase tracking-widest">HD Accounts</h3>
-                        {!isLocked && mnemonic && (
-                            <button 
-                                onClick={deriveNewAccount}
-                                className="flex items-center gap-1 text-xs font-black uppercase tracking-widest bg-black text-white px-3 py-1.5 rounded-full hover:bg-black/80"
-                            >
-                                <Plus size={14} /> Derive
-                            </button>
-                        )}
+                        <h3 className="text-xl font-black uppercase tracking-widest">Accounts</h3>
                     </div>
 
                     {isLocked ? (

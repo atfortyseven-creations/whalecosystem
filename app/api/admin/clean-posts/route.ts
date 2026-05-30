@@ -25,7 +25,7 @@ export async function GET(req: Request) {
     // Partition: keep topics whose title contains "welcome" or "bienvenid"
     const keepIds = allTopics
       .filter((t: any) =>
-        /welcome|bienvenid|atfortyseven|announcement|inaugural/i.test(t.title)
+        /welcome|bienvenid|humanityledger|announcement|inaugural/i.test(t.title)
       )
       .map((t: any) => t.id);
 

@@ -7,14 +7,22 @@ import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
 import { TOKEN_STATS_20260530, TOKEN_STATS_DATE } from '@/config/token-stats-snapshot';
 import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
 import { TokenLogo } from '@/components/ui/TokenLogo';
+import { NETWORKS, NetworkId } from '@/lib/store/wallet-store';
 
 export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, userAssets = [] }: { address: string, activeNetwork: string, scannerBase: string, userAssets?: any[] }) {
     
     const [actionState, setActionState] = useState<{ isOpen: boolean, type: 'SEND'|'RECEIVE'|'SWAP'|'BRIDGE', token?: any }>({ isOpen: false, type: 'SEND' });
 
     const combinedAssets = useMemo(() => {
-        // Map user balances into our universal list, or keep 0
-        const assetMap = new Map(userAssets.map(a => [a.symbol.toUpperCase(), a]));
+        const activeChainId = NETWORKS[activeNetwork as NetworkId]?.chainId;
+
+        // Map user balances into our universal list, filtering by active network
+        const assetMap = new Map();
+        userAssets.forEach(a => {
+            if (!activeChainId || a.chainId === activeChainId) {
+                assetMap.set(a.symbol.toUpperCase(), a);
+            }
+        });
 
         return UNIVERSAL_TOKENS.map(t => {
             const userOwned = assetMap.get(t.symbol.toUpperCase());
@@ -47,7 +55,7 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
             if (!a.hasSnapshot && b.hasSnapshot) return 1;
             return a.symbol.localeCompare(b.symbol);
         });
-    }, [userAssets]);
+    }, [userAssets, activeNetwork]);
 
     const handleAction = (type: 'SEND'|'RECEIVE'|'SWAP'|'BRIDGE', token: any) => {
         setActionState({ isOpen: true, type, token });
@@ -125,7 +133,7 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                                     <td className="py-4 px-6 text-right">
                                         <div className="flex flex-col items-end">
                                             <span className={`font-black text-sm ${token.isOwned ? 'text-black' : 'text-black/30'}`}>
-                                                {token.balance > 0 ? safeToFixed(token.balance, 4) : "—"}
+                                                {token.balance > 0 ? Number(token.balance).toFixed(6) : "0.00"}
                                             </span>
                                             {token.value > 0 && <span className="text-[10px] text-black/50 font-bold">${safeToFixed(token.value, 2)}</span>}
                                             {token.price > 0 && !token.isOwned && (

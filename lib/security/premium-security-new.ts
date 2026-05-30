@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import crypto from 'crypto';
 
-const OWNER_EMAIL = 'atfortyseven2@gmail.com';
+const OWNER_EMAIL = 'humanityledger@gmail.com';
 
 // ============================================
 // SECURITY LAYER 1: Rate Limiting

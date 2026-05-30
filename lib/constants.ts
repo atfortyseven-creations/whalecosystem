@@ -25,7 +25,7 @@ export const SYSTEM_THEME = {
 };
 
 export const OWNER_EMAILS = [
-    'atfortyseven2@gmail.com',
+    'humanityledger@gmail.com',
     'josemanx2000@gmail.com',
     'admin@polymarketwallet.com'
 ];

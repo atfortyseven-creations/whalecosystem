@@ -273,8 +273,11 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/30">Network</span>
                     <MetaMaskNetworkSelector 
                         onNetworkChange={(id) => {
-                            // If we need to map id to string for useWalletStore:
-                            // We rely on Wagmi's switchChain inside the selector, but if we need to sync:
+                            const networkEntries = Object.entries(NETWORKS);
+                            const found = networkEntries.find(([_, config]) => config.chainId === id);
+                            if (found) {
+                                useWalletStore.getState().setNetwork(found[0] as NetworkId);
+                            }
                         }} 
                     />
                 </div>

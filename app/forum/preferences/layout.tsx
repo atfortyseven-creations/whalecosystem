@@ -30,12 +30,12 @@ export default function PreferencesLayout({ children }: { children: React.ReactN
           <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Whale" alt="Avatar" className="w-full h-full object-cover" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-black dark:text-white mb-1">atfortyseven</h1>
-          <p className="text-black/50 dark:text-white/50 text-sm font-semibold mb-3">People can mention you as @atfortyseven</p>
+          <h1 className="text-2xl font-black text-black dark:text-white mb-1">humanityledger</h1>
+          <p className="text-black/50 dark:text-white/50 text-sm font-semibold mb-3">People can mention you as @humanityledger</p>
           <div className="flex items-center gap-4 text-sm font-semibold">
-            <Link href="/forum/u/atfortyseven/summary" className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white flex items-center gap-2"><User size={14} /> Summary</Link>
-            <Link href="/forum/u/atfortyseven/activity" className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white flex items-center gap-2"><Activity size={14} /> Activity</Link>
-            <Link href="/forum/u/atfortyseven/notifications" className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white flex items-center gap-2"><Bell size={14} /> Notifications</Link>
+            <Link href="/forum/u/humanityledger/summary" className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white flex items-center gap-2"><User size={14} /> Summary</Link>
+            <Link href="/forum/u/humanityledger/activity" className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white flex items-center gap-2"><Activity size={14} /> Activity</Link>
+            <Link href="/forum/u/humanityledger/notifications" className="text-black/60 hover:text-black dark:text-white/60 dark:hover:text-white flex items-center gap-2"><Bell size={14} /> Notifications</Link>
           </div>
         </div>
         <div className="ml-auto">

@@ -46,7 +46,7 @@ export default function UserProfilePage() {
   const user = profile.user || profile;
   const addrStr = typeof address === 'string' ? address : address[0];
   const shortAddr = `${addrStr.slice(0, 6)}...${addrStr.slice(-4)}`;
-  const displayName = user.displayName || 'atfortyseven'; // Fallback to match screenshot feeling
+  const displayName = user.displayName || 'humanityledger'; // Fallback to match screenshot feeling
   const username = displayName.toLowerCase().replace(/\s+/g, '');
 
   const setTab = (tab: string) => router.push(`/forum/u/${address}?tab=${tab}`);

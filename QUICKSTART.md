@@ -14,7 +14,7 @@ Get the Whale Alert Network up and running locally in under 5 minutes.
 
 1. **Clone the Repository**
    ```bash
-   git clone https://github.com/atfortyseven-creations/whalecosystem.git
+   git clone https://github.com/humanityledger/whalecosystem.git
    cd whalecosystem
    ```
 

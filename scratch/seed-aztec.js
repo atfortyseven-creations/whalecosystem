@@ -65,7 +65,7 @@ Engage in governance, share your alpha, and help us build the next generation of
             tags: {
                 create: [
                     { name: 'announcement' },
-                    { name: 'atfortyseven' },
+                    { name: 'humanityledger' },
                     { name: 'aztec' }
                 ]
             }

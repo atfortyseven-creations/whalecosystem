@@ -264,7 +264,7 @@ export default function WhaleTracker({
                 'Content-Type': 'application/json',
                 'x-web3-address': currentUserAddress,
                 'x-csrf-token': csrfToken,
-                'x-is-architect': (web3Address?.toLowerCase() === '0xatfortyseven' ? 'true' : 'false') // Placeholder  use OWNER_ADDRESSES
+                'x-is-architect': (web3Address?.toLowerCase() === '0xhumanityledger' ? 'true' : 'false') // Placeholder  use OWNER_ADDRESSES
             },
             body: JSON.stringify({
                 address: finalAddress,

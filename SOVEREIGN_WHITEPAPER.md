@@ -1,7 +1,7 @@
 # Private WHITEPAPER: HUMANITY LEDGER & WHALE ALERT NETWORK
 **Version:** 4.0.0 — The Definitive Technical Reference  
 **Date:** May 2026  
-**Repository:** [github.com/atfortyseven-creations/whalecosystem](https://github.com/atfortyseven-creations/whalecosystem) — **Public & Open Source**  
+**Repository:** [github.com/humanityledger/whalecosystem](https://github.com/humanityledger/whalecosystem) — **Public & Open Source**  
 **arXiv Submission:** cs.CR + q-fin.TR cross-list
 
 ---
@@ -426,7 +426,7 @@ Critical vulnerabilities (fund loss or user deanonymization) are eligible for up
 
 The `Whale Alert Network` and `Humanity Ledger` are public good infrastructure. The entire repository is public.
 
-**GitHub:** [github.com/atfortyseven-creations/whalecosystem](https://github.com/atfortyseven-creations/whalecosystem)
+**GitHub:** [github.com/humanityledger/whalecosystem](https://github.com/humanityledger/whalecosystem)
 
 We invite cryptographers, security researchers, and developers to audit our Noir circuits, Solidity contracts, and EVM Thermodynamics heuristics. Submit Pull Requests following `CONTRIBUTING.md` using the `docs:` commit convention.
 
@@ -457,5 +457,5 @@ Verification supersedes trust.
 
 *End of Manuscript — Version 4.0.0 — May 2026*  
 *arXiv Submission: cs.CR + q-fin.TR cross-list*  
-*GitHub: github.com/atfortyseven-creations/whalecosystem*  
+*GitHub: github.com/humanityledger/whalecosystem*  
 *This document is generated from, and verified against, the deployed source code.*

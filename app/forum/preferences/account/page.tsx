@@ -5,9 +5,9 @@ import { Github, Edit2, Download, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function AccountPreferencesPage() {
-  const [username, setUsername] = useState('atfortyseven');
-  const [name, setName] = useState('atfortyseven');
-  const [email, setEmail] = useState('atfortyseven2@gmail.com');
+  const [username, setUsername] = useState('humanityledger');
+  const [name, setName] = useState('humanityledger');
+  const [email, setEmail] = useState('humanityledger@gmail.com');
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {

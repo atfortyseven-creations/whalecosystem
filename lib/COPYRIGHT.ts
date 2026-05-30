@@ -1,7 +1,7 @@
 /**
  * 
  *   WHALE ALERT NETWORK  INSTITUTIONAL ON-CHAIN INTELLIGENCE TERMINAL     
- *   © 20242026 atfortyseven-creations. All Rights Reserved.               
+ *   © 20242026 humanityledger. All Rights Reserved.               
  *   PROPRIETARY & CONFIDENTIAL  TRADE SECRET                              
  *   Unauthorized copying, modification, distribution, or deployment of     
  *   this file, via any medium, is strictly prohibited.                     
@@ -10,18 +10,18 @@
  *
  * @file      COPYRIGHT.ts
  * @purpose   Machine-readable copyright declaration for automated IP systems
- * @owner     atfortyseven-creations
- * @repo      https://github.com/atfortyseven-creations/whalecosystem
+ * @owner     humanityledger
+ * @repo      https://github.com/humanityledger/whalecosystem
  * @platform  https://www.humanidfi.com
  */
 
 export const COPYRIGHT = {
-  owner:       'atfortyseven-creations',
+  owner:       'humanityledger',
   product:     'Whale Alert Network',
   description: 'Institutional On-Chain Analytics Terminal',
   years:       '20242026',
   contact:     'legal@humanidfi.com',
-  repo:        'https://github.com/atfortyseven-creations/whalecosystem',
+  repo:        'https://github.com/humanityledger/whalecosystem',
   platform:    'https://www.humanidfi.com',
   license:     'Proprietary  All Rights Reserved',
   trademarks:  [

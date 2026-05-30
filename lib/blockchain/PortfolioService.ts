@@ -204,7 +204,7 @@ export class PortfolioService {
             contractAddress: t.token_address,
             balance: t.balance,
             balanceNumeric: balance,
-            balanceFormatted: safeToLocaleString(balance, { maximumFractionDigits: 4 }),
+            balanceFormatted: safeToLocaleString(balance, { maximumFractionDigits: 6 }),
             name: t.name || 'Unknown Token',
             symbol: t.symbol || 'UNK',
             decimals,

@@ -89,7 +89,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: app
-          image: ghcr.io/atfortyseven-creations/whale-alert:3.0.0
+          image: ghcr.io/humanityledger/whale-alert:3.0.0
           imagePullPolicy: Always
           ports:
             - containerPort: 3000
@@ -165,7 +165,7 @@ spec:
         runAsUser: 1001
       containers:
         - name: scanner
-          image: ghcr.io/atfortyseven-creations/whale-alert:3.0.0
+          image: ghcr.io/humanityledger/whale-alert:3.0.0
           imagePullPolicy: Always
           command: ["node", "--max-old-space-size=4096", "-e", "require('./scripts/whale-worker')"]
           envFrom:
@@ -214,7 +214,7 @@ spec:
         runAsUser: 1001
       containers:
         - name: telegram
-          image: ghcr.io/atfortyseven-creations/whale-alert:3.0.0
+          image: ghcr.io/humanityledger/whale-alert:3.0.0
           imagePullPolicy: Always
           command: ["npx", "tsx", "scripts/telegram-worker.ts"]
           envFrom:
