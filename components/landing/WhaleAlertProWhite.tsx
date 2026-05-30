@@ -151,7 +151,7 @@ export default function WhaleAlertProWhite() {
   }, []);
 
   const handleEnterTerminal = () => {
-    if (isConnected) router.push('/dashboard/portfolio');
+    if (isConnected) router.push('/portfolio');
     else router.push('/connect');
   };
 

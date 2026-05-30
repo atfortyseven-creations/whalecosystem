@@ -25,9 +25,9 @@ export default function SignUpPage() {
     // Wallet sealed, session established, DB indexed
     const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
     if (mobile) {
-      router.replace("/dashboard/portfolio");
+      router.replace("/portfolio");
     } else {
-      router.replace("/dashboard/portfolio");
+      router.replace("/portfolio");
     }
   }, [router]);
 

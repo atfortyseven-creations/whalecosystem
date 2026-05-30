@@ -82,9 +82,9 @@ export default function LoginPage() {
     } else {
       const mobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini|Mobile/i.test(navigator.userAgent);
       if (mobile) {
-        window.location.replace("/dashboard/portfolio");
+        window.location.replace("/portfolio");
       } else {
-        window.location.replace("/dashboard/portfolio");
+        window.location.replace("/portfolio");
       }
     }
   }, []);
