@@ -284,6 +284,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                 <div className="flex flex-col gap-1 items-start">
                     <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/30">Network</span>
                     <MetaMaskNetworkSelector 
+                        activeNetworkId={activeChainId}
                         onNetworkChange={(id) => {
                             const networkEntries = Object.entries(NETWORKS);
                             const found = networkEntries.find(([_, config]) => config.chainId === id);
@@ -322,7 +323,10 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                     <h1 className="font-light tracking-tighter text-black" style={{ fontSize: 'clamp(3.5rem, 11vw, 7rem)' }}>
                         {balance || '0.0000'}
                     </h1>
-                    <span className="absolute left-full ml-3 md:ml-5 font-black uppercase tracking-[0.2em] text-black/25" style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.75rem)', bottom: '1rem' }}>{networkInfo.currency}</span>
+                    <span className="absolute left-full ml-3 md:ml-5 font-black uppercase tracking-[0.2em] text-black/25 flex flex-col items-start" style={{ bottom: '0.8rem' }}>
+                        <span style={{ fontSize: 'clamp(1.1rem, 2.5vw, 1.75rem)' }}>{networkInfo.currency}</span>
+                        <span className="text-[10px] text-black/40 tracking-[0.3em] mt-1 bg-black/5 px-2 py-0.5 rounded-sm">{networkInfo.name}</span>
+                    </span>
                 </div>
                 <div className="flex flex-wrap items-center justify-center gap-3 mb-10">
                     <p className="text-[12px] tracking-[0.18em] font-mono text-black/50 border border-black/10 px-5 py-2">{balanceFiat} USD</p>
