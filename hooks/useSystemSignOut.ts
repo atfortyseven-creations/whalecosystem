@@ -74,6 +74,8 @@ export function useSystemSignOut() {
                 if (
                     lower.includes('wagmi') || 
                     lower.includes('walletconnect') || 
+                    lower.includes('wc@2') ||
+                    lower.includes('walletlink') ||
                     lower.includes('appkit') || 
                     lower.includes('w3m') || 
                     lower.includes('reown') ||
@@ -94,10 +96,15 @@ export function useSystemSignOut() {
             sessionStorage.setItem('__disconnected__', '1'); // Flag to prevent immediate auto-relink
         } catch (e) {}
 
-        // 5. NextAuth SignOut (if applicable) - Fire and forget to prevent blocking
+        // 5. NextAuth SignOut (if applicable) - MUST AWAIT to ensure HttpOnly cookies are cleared
         try {
-            signOut({ redirect: false }).catch(() => {});
-        } catch (e) {}
+            await Promise.race([
+                signOut({ redirect: false }),
+                new Promise(resolve => setTimeout(resolve, 2000))
+            ]);
+        } catch (e) {
+            console.warn('[System:Logout] NextAuth signout failed:', e);
+        }
 
         // 6. Hard Redirect - Instant
         console.log('%c[System] Session Locked. Redirecting...', 'color:#00A36C');
