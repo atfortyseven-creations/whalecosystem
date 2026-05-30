@@ -22,17 +22,24 @@ export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { 
         icon: getChainLogo(currentId)
     };
     
-    const popularNetworks = chains.slice(0, 4).map(c => ({
-        id: c.id,
-        name: c.name,
-        icon: getChainLogo(c.id)
-    }));
+    const popularNetworkIds = [1, 56, 137, 8453]; // Ethereum, BNB, Polygon, Base
+    const additionalNetworkIds = [42161, 10, 480]; // Arbitrum, Optimism, World Chain
+
+    const getNetworkInfo = (id: number) => {
+        const wagmiChain = chains.find(c => c.id === id);
+        const fallbackNames: Record<number, string> = {
+            1: 'Ethereum', 56: 'BNB Smart Chain', 137: 'Polygon', 8453: 'Base',
+            42161: 'Arbitrum One', 10: 'OP Mainnet', 480: 'World Chain'
+        };
+        return { 
+            id, 
+            name: wagmiChain?.name || fallbackNames[id] || 'Unknown', 
+            icon: getChainLogo(id) 
+        };
+    };
     
-    const customNetworks = chains.slice(4).map(c => ({
-        id: c.id,
-        name: c.name,
-        icon: getChainLogo(c.id)
-    }));
+    const popularNetworks = popularNetworkIds.map(getNetworkInfo);
+    const customNetworks = additionalNetworkIds.map(getNetworkInfo);
     
     const popoverRef = useRef<HTMLDivElement>(null);
 
@@ -163,7 +170,7 @@ export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { 
                                         <span className="text-[13px] text-black/50 font-medium">Redes adicionales</span>
                                         <Info size={12} className="text-black/40" />
                                     </div>
-                                    {customNetworks.slice(0,3).map(net => (
+                                    {customNetworks.map(net => (
                                         <button 
                                             key={net.id}
                                             onClick={() => handleSelect(net.id)}
@@ -171,13 +178,17 @@ export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { 
                                         >
                                             <div className="w-8 h-8 rounded-full flex items-center justify-center mr-3 shrink-0 overflow-hidden bg-black/5">
                                                 {net.icon ? (
-                                                    <img src={net.icon} alt={net.name} className="w-6 h-6 object-contain" />
+                                                    <img src={net.icon} alt={net.name} className="w-full h-full object-contain" />
                                                 ) : (
                                                     <div className="w-full h-full bg-black/10" />
                                                 )}
                                             </div>
                                             <span className="text-[14px] font-medium text-black flex-1 text-left">{net.name}</span>
-                                            <span className="text-xl font-light text-black/30 group-hover:text-black/60">+</span>
+                                            {currentId === net.id ? (
+                                                <Check size={16} className="text-blue-600" />
+                                            ) : (
+                                                <span className="text-xl font-light text-black/30 group-hover:text-black/60">+</span>
+                                            )}
                                         </button>
                                     ))}
                                 </div>

@@ -210,6 +210,7 @@ export const CHAIN_LOGOS: Record<number, string> = {
   30: 'https://icons.llamao.fi/icons/chains/rsz_rsk',
   59144: 'https://icons.llamao.fi/icons/chains/rsz_linea',
   534352: 'https://icons.llamao.fi/icons/chains/rsz_scroll',
+  480: 'https://icons.llamao.fi/icons/chains/rsz_worldchain',
   0: 'https://icons.llamao.fi/icons/chains/rsz_bitcoin'
 };
 
