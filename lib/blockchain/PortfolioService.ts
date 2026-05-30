@@ -58,7 +58,7 @@ export class PortfolioService {
 
     switch (chainId) {
         case ChainId.WORLDCHAIN:
-            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // AUTH
+            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // WLD
             break;
         case ChainId.OPTIMISM:
             tokens.push('0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1'); // AUTH
@@ -365,7 +365,7 @@ export class PortfolioService {
               // Use PriceService for valuation
               const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
               const isQd = qdsContractAddress && t.address.toLowerCase() === qdsContractAddress.toLowerCase();
-              const symbol = isQd ? 'QDs' : (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'AUTH' : 'UNK';
+              const symbol = isQd ? 'QDs' : (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'WLD' : 'UNK';
               
               let price = 0;
               if (isQd) {

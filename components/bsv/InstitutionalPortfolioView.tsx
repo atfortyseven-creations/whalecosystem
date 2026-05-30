@@ -129,7 +129,18 @@ export function InstitutionalPortfolioView() {
         return <VaultUnlockScreen unlockVault={unlockVault} />;
     }
 
-    const scannerBase = activeNetwork === 'polygon' ? 'https://polygonscan.com' : 'https://etherscan.io';
+    const getScannerBase = (netId: string) => {
+        switch(netId) {
+            case 'polygon': return 'https://polygonscan.com';
+            case 'arbitrum': return 'https://arbiscan.io';
+            case 'optimism': return 'https://optimistic.etherscan.io';
+            case 'base': return 'https://basescan.org';
+            case 'bsc': return 'https://bscscan.com';
+            case 'worldchain': return 'https://worldscan.org';
+            default: return 'https://etherscan.io';
+        }
+    };
+    const scannerBase = getScannerBase(activeNetwork);
     const priceOracle = ethPrice > 0 ? ethPrice : 3100;
     const balanceFiat = `${(parseFloat(balance || "0") * priceOracle).toFixed(2)}`;
 
@@ -384,7 +395,7 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
                             <div className="flex-1 bg-white flex flex-col">
                                 {activeTab === 'TOKENS' && <QuantumHoldingsEngine address={address} activeNetwork={activeNetwork} scannerBase={scannerBase} userAssets={assets} />}
                                 {activeTab === 'DEFI' && <QuantumDeFiPositions address={address} activeNetwork={activeNetwork} />}
-                                {activeTab === 'ACTIVITY' && <TransactionHistory address={address} scannerBase={scannerBase} />}
+                                {activeTab === 'ACTIVITY' && <TransactionHistory address={address} scannerBase={scannerBase} activeNetwork={activeNetwork} />}
                             </div>
                         </div>
                     </div>

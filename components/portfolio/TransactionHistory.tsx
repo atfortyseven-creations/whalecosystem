@@ -42,7 +42,7 @@ function parseTxList(raw: any[], walletAddress: string): ParsedTx[] {
     });
 }
 
-export function TransactionHistory({ address, scannerBase }: { address: string, scannerBase: string }) {
+export function TransactionHistory({ address, scannerBase, activeNetwork }: { address: string, scannerBase: string, activeNetwork: string }) {
     const [transactions, setTransactions] = useState<ParsedTx[]>([]);
     const [loading, setLoading] = useState(true);
 
@@ -50,7 +50,19 @@ export function TransactionHistory({ address, scannerBase }: { address: string, 
         if (!address) { setLoading(false); return; }
         setLoading(true);
         try {
-            const url = `https://api.etherscan.io/api?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=25&sort=desc&apikey=YourApiKeyToken`;
+            const getApiEndpoint = (net: string) => {
+                switch(net) {
+                    case 'polygon': return 'https://api.polygonscan.com/api';
+                    case 'arbitrum': return 'https://api.arbiscan.io/api';
+                    case 'optimism': return 'https://api-optimistic.etherscan.io/api';
+                    case 'base': return 'https://api.basescan.org/api';
+                    case 'bsc': return 'https://api.bscscan.com/api';
+                    case 'worldchain': return 'https://api.worldscan.org/api';
+                    default: return 'https://api.etherscan.io/api';
+                }
+            };
+            const baseUrl = getApiEndpoint(activeNetwork);
+            const url = `${baseUrl}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=25&sort=desc&apikey=YourApiKeyToken`;
             const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const json = await res.json();
@@ -65,7 +77,7 @@ export function TransactionHistory({ address, scannerBase }: { address: string, 
         } finally {
             setLoading(false);
         }
-    }, [address]);
+    }, [address, activeNetwork]);
 
     useEffect(() => {
         fetchHistory();

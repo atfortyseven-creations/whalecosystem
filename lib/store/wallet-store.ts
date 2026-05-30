@@ -7,7 +7,7 @@ import CryptoJS from 'crypto-js';
 import { TransactionManager } from '@/lib/tx-manager';
 
 // 100M-User Scalability & Enterprise Grid Configuration
-export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche' | 'bitcoin' | 'bsc' | 'zksync' | 'celo' | 'fantom' | 'linea' | 'scroll' | 'blast' | 'gnosis' | 'ronin' | 'kava' | 'mantle';
+export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche' | 'bitcoin' | 'bsc' | 'zksync' | 'celo' | 'fantom' | 'linea' | 'scroll' | 'blast' | 'gnosis' | 'ronin' | 'kava' | 'mantle' | 'worldchain';
 export type ProtocolType = 'RPC' | 'WSS';
 
 export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: string; wss: string; color: string; chainId: number }> = {
@@ -99,6 +99,11 @@ export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: 
   mantle: {
     name: 'Mantle', currency: 'MNT', color: '#65b3ae', chainId: 5000,
     rpc: 'https://rpc.mantle.xyz',
+    wss: '',
+  },
+  worldchain: {
+    name: 'World Chain', currency: 'ETH', color: '#000000', chainId: 480,
+    rpc: 'https://worldchain-mainnet.g.alchemy.com/public',
     wss: '',
   }
 };
