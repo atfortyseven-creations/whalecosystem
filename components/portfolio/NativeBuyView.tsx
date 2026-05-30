@@ -63,14 +63,15 @@ export function NativeBuyView({ address, onBack }: any) {
             }
 
             const qs = new URLSearchParams(params).toString();
-            const moonpayWindow = window.open(`${baseUrl}?${qs}`, '_blank');
-
-            if (!moonpayWindow) {
-                addLog(`Popup blocked — redirecting in current tab...`);
-                window.location.href = `${baseUrl}?${qs}`;
-            } else {
-                addLog(`MoonPay window opened. Complete your purchase there.`);
-            }
+            const link = document.createElement('a');
+            link.href = `${baseUrl}?${qs}`;
+            link.target = '_blank';
+            link.rel = 'noopener noreferrer';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            addLog(`MoonPay secure gateway initialized. Complete your purchase in the new window.`);
 
             toast.success('Purchase Window Opened', { id: 'fiat-tx', description: 'Complete your purchase on MoonPay.' });
 
@@ -79,12 +80,6 @@ export function NativeBuyView({ address, onBack }: any) {
             let attempts = 0;
             const pollInterval = setInterval(() => {
                 attempts++;
-                if (moonpayWindow?.closed) {
-                    clearInterval(pollInterval);
-                    setIsPolling(false);
-                    addLog(`Window closed by user.`);
-                    return;
-                }
                 if (attempts % 4 === 0) {
                     addLog(`Checking for incoming transaction...`);
                 }

@@ -84,8 +84,6 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
             {/* Live Stats Bar */}
             <div className="flex items-center justify-between px-6 py-2 border-b border-black/5 bg-black/[0.02]">
                 <div className="flex items-center gap-2">
-                    <Activity size={10} className="text-[#00C076]" />
-                    <span className="text-[9px] font-black uppercase tracking-[0.25em] text-black/50">Live Market Snapshot</span>
                     <span className="text-[9px] font-bold text-[#00C076] tracking-widest">{TOKEN_STATS_DATE}</span>
                 </div>
                 <span className="text-[9px] font-bold text-black/30 tracking-widest uppercase">{UNIVERSAL_TOKENS.length} Assets · CoinGecko</span>

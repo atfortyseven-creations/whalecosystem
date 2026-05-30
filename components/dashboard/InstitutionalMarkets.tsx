@@ -4,6 +4,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import { getParsedMarkets, RAW_NETWORKS } from '@/lib/data/markets-data';
 
 import { motion, AnimatePresence } from 'framer-motion';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 export function InstitutionalMarkets() {
     const [tokens, setTokens] = useState<any[]>([]);
@@ -174,9 +175,11 @@ export function InstitutionalMarkets() {
                                 {/* Mobile Top Row / Desktop Col 1 */}
                                 <div className="flex items-center justify-between md:justify-start gap-4 min-w-0">
                                     <div className="flex items-center gap-3 md:gap-4 min-w-0">
-                                        <div className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#E5E5E5]  flex items-center justify-center text-[12px] md:text-[14px] font-black shrink-0 text-[#050505]  shadow-inner">
-                                            {t.ticker.charAt(0)}
-                                        </div>
+                                        <TokenLogo 
+                                            symbol={t.ticker} 
+                                            className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow-inner shrink-0" 
+                                            fallbackClassName="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#E5E5E5] flex items-center justify-center text-[12px] md:text-[14px] font-black shrink-0 text-[#050505] shadow-inner"
+                                        />
                                         <div className="flex flex-col min-w-0">
                                             <span className="text-[14px] md:text-[15px] font-bold truncate text-[#050505] ">{t.name}</span>
                                             <span className="text-[11px] text-[#888888]  uppercase tracking-wide">{t.ticker}</span>

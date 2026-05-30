@@ -4,44 +4,35 @@ import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Info, ChevronDown, Check } from 'lucide-react';
 import { useAccount, useSwitchChain } from 'wagmi';
-
-export interface NetworkGroup {
-    id: number;
-    name: string;
-    icon: string;
-    isPopular?: boolean;
-}
-
-const NETWORKS: NetworkGroup[] = [
-    { id: 1, name: 'Ethereum', icon: '/system-shots/logostoken/ethereum-eth-logo-colored.svg', isPopular: true },
-    { id: 59144, name: 'Linea', icon: 'https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/linea.svg', isPopular: true },
-    { id: 8453, name: 'Base', icon: 'https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/base.svg', isPopular: true },
-    { id: 42161, name: 'Arbitrum', icon: 'https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/arbitrum.svg', isPopular: true },
-    { id: 56, name: 'BNB Chain', icon: '/system-shots/logostoken/bnb-bnb-logo.png', isPopular: true },
-    { id: 10, name: 'OP', icon: '/system-shots/logostoken/optimism-ethereum-op-logo.png', isPopular: true },
-    { id: 137, name: 'Polygon', icon: '/system-shots/logostoken/polygon-matic-logo.png', isPopular: true },
-    { id: 43114, name: 'Avalanche', icon: '/system-shots/logostoken/avalanche-avax-logo.png', isPopular: true },
-    
-    // Additional networks
-    { id: 250, name: 'Fantom', icon: '/system-shots/logostoken/fantom-ftm-logo.png' },
-    { id: 42220, name: 'Celo', icon: '/system-shots/logostoken/celo-celo-logo.png' },
-    { id: 534352, name: 'Scroll', icon: 'https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/scroll.svg' },
-    { id: 81457, name: 'Blast', icon: 'https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/blast.svg' },
-    { id: 324, name: 'ZkSync', icon: 'https://raw.githubusercontent.com/lifinance/types/main/src/assets/icons/chains/zksync.svg' },
-    { id: 1329, name: 'Sei', icon: '/system-shots/logostoken/sei-sei-logo.png' }
-];
+import { getChainLogo } from '@/lib/wallet/chains';
 
 export function MetaMaskNetworkSelector({ activeNetworkId, onNetworkChange }: { activeNetworkId?: number, onNetworkChange?: (id: number) => void }) {
     const [isOpen, setIsOpen] = useState(false);
     const [tab, setTab] = useState<'popular' | 'custom'>('popular');
     
     const { chainId } = useAccount();
-    const { switchChain } = useSwitchChain();
+    const { chains, switchChain } = useSwitchChain();
     
-    const currentId = activeNetworkId || chainId || 1;
-    const currentNetwork = NETWORKS.find(n => n.id === currentId) || NETWORKS[0];
-    const popularNetworks = NETWORKS.filter(n => n.isPopular);
-    const customNetworks = NETWORKS.filter(n => !n.isPopular);
+    const currentId = activeNetworkId || chainId || (chains.length > 0 ? chains[0].id : 1);
+    const currentWagmiChain = chains.find(c => c.id === currentId);
+    
+    const currentNetwork = {
+        id: currentId,
+        name: currentWagmiChain?.name || 'Unknown Network',
+        icon: getChainLogo(currentId)
+    };
+    
+    const popularNetworks = chains.slice(0, 4).map(c => ({
+        id: c.id,
+        name: c.name,
+        icon: getChainLogo(c.id)
+    }));
+    
+    const customNetworks = chains.slice(4).map(c => ({
+        id: c.id,
+        name: c.name,
+        icon: getChainLogo(c.id)
+    }));
     
     const popoverRef = useRef<HTMLDivElement>(null);
 
