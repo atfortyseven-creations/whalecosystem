@@ -303,6 +303,14 @@ export default function LoginPage() {
 
         <div className="mt-8 flex flex-col items-center gap-2 w-full">
           <Link
+            href="/connect"
+            className="w-full bg-white text-black font-black text-center text-[10px] uppercase tracking-[0.2em] hover:bg-black/5 transition-colors mx-auto mb-4"
+            style={{ padding: "16px 32px", border: "2px solid black" }}
+          >
+            Acceder a portfolio con cuenta de WalletConnect
+          </Link>
+
+          <Link
             href="/sign-up"
             className="text-[11px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
           >

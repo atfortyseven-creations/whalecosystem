@@ -16,13 +16,7 @@ export function useSystemSignOut() {
     const nuclearDisconnect = useCallback(async () => {
         console.log('%c[System] Initiating System Logout...', 'color:#FF3B30;font-weight:bold');
 
-        // 0. LOCK local custom wallet Zustand state instead of purging
-        // This ensures the user can log back in with their password!
-        try {
-            useWalletStore.getState().lockVault();
-        } catch (e) {
-            console.warn('[System:Logout] Zustand wallet lock failed:', e);
-        }
+        // 0. (Moved to end) Lock local custom wallet Zustand state after clearing cookies to prevent UI glitches
 
         // 1. Clear Cookies FIRST (Nuclear approach)
         // Must happen before wagmi disconnect to prevent race where React re-renders
@@ -135,7 +129,12 @@ export function useSystemSignOut() {
 
         // 6. Do NOT clear the wallet state here!
         // Calling clearWallet() wipes the encrypted vault and passwordHash, destroying the ability to log in.
-        // Step 0 already called lockVault() which safely hides the keys in memory.
+        // Instead, we call lockVault() which safely hides the keys in memory.
+        try {
+            useWalletStore.getState().lockVault();
+        } catch (e) {
+            console.warn('[System:Logout] Zustand wallet lock failed:', e);
+        }
 
         // 7. Hard Redirect - Instant
         console.log('%c[System] Session Locked. Redirecting...', 'color:#00A36C');
