@@ -155,8 +155,6 @@ export function EnterpriseFooter() {
                     <FooterColumn
                         title="Empresa"
                         links={[
-                            { label: 'Nosotros', href: '/about' },
-
                             { label: 'Blog', href: '/blog' },
                             { label: 'Prensa', href: '/press' }
                         ]}

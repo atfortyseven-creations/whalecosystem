@@ -19,13 +19,13 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
         // Map user balances into our universal list, filtering by active network
         const assetMap = new Map();
         userAssets.forEach(a => {
-            if (!activeChainId || a.chainId === activeChainId) {
+            if (!activeChainId || Number(a.chainId) === Number(activeChainId)) {
                 assetMap.set(a.symbol.toUpperCase(), a);
             }
         });
-
-        return UNIVERSAL_TOKENS.map(t => {
+        const combined = UNIVERSAL_TOKENS.map(t => {
             const userOwned = assetMap.get(t.symbol.toUpperCase());
+            assetMap.delete(t.symbol.toUpperCase());
             // Prefer user's real-time price, then fall back to our snapshot
             const snapshot = TOKEN_STATS_20260530[t.symbol.toUpperCase()];
             const price = userOwned?.price ?? snapshot?.price ?? 0;
@@ -44,7 +44,28 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                 isOwned: !!userOwned && balance > 0,
                 hasSnapshot: !!snapshot
             };
-        }).sort((a, b) => {
+        });
+
+        // Add any remaining assets the user owns that aren't in UNIVERSAL_TOKENS
+        assetMap.forEach((userOwned, symbol) => {
+            if (userOwned.balanceNumeric > 0) {
+                combined.push({
+                    symbol: userOwned.symbol,
+                    name: userOwned.name || userOwned.symbol,
+                    address: userOwned.address,
+                    chainId: userOwned.chainId || activeChainId,
+                    balance: userOwned.balanceNumeric,
+                    price: userOwned.price || 0,
+                    value: userOwned.balanceNumeric * (userOwned.price || 0),
+                    change24h: userOwned.change24h || 0,
+                    isOwned: true,
+                    hasSnapshot: false,
+                    logoPath: userOwned.logoURI || userOwned.logo || ''
+                } as any);
+            }
+        });
+
+        return combined.sort((a, b) => {
             if (a.isOwned && !b.isOwned) return -1;
             if (!a.isOwned && b.isOwned) return 1;
             if (a.balance > 0 && b.balance > 0) return b.value - a.value;

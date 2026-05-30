@@ -33,7 +33,6 @@ const NAV_COLUMNS = [
   {
     label: "COMPANY",
     links: [
-      { label: "About Us", href: "/about-us" },
       { label: "Vision",   href: "/vision" },
     ]
   }
