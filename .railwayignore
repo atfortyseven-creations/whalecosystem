@@ -26,25 +26,11 @@ tmp_diff.txt
 /.clerk/
 /out/
 /scratch/
-public/system-shots/
-
 # Backup & helper scripts
 **/*.bat
 **/*.exe
-**/*.js
 **/*.py
-**/*.html
-**/*.mjs
-**/*.cjs
 **/*.patch
-**/*.png
-**/*.jpg
-**/*.jpeg
-**/*.gif
-**/*.mp4
-**/*.mov
-**/*.MOV
-**/*.webm
 
 # Do NOT ignore important configuration scripts that PM2/Docker needs
 !server.js
