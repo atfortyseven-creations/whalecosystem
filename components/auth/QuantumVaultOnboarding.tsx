@@ -71,8 +71,9 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   const illuminationOrder = useIlluminationOrder(1681);
 
   // Address to encode: use the store address once available.
-  // Pass null when no address yet — WalletQRMatrix will show a skeleton.
-  const scanAddress = useWalletStore(s => s.address) ?? null;
+  // BUG FIX: For first-time users, the address is not generated until the PROOFS phase,
+  // causing the QR matrix to remain a skeleton. Provide a dummy address for the visual animation.
+  const scanAddress = useWalletStore(s => s.address) || "0x0000000000000000000000000000000000000000";
 
   // SSR-safe screen size: initialise as 320 (desktop default), update after mount
   const [qrSize, setQrSize] = useState(320);
