@@ -1,5 +1,11 @@
 import { http, createConfig } from 'wagmi'
-import { mainnet, base, bsc, optimism } from 'wagmi/chains'
+import { 
+    mainnet, polygon, optimism, arbitrum, base, baseSepolia, 
+    avalanche, bsc, celo, fantom, zksync, zkSyncSepolia, 
+    gnosis, polygonZkEvm, mantle, blast, mode, manta, 
+    taiko, ronin, kava, aurora, metis, zora, sei, 
+    rootstock, linea, scroll 
+} from "wagmi/chains";
 import { injected, walletConnect, coinbaseWallet } from 'wagmi/connectors'
 
 // Project ID for WalletConnect
@@ -13,7 +19,13 @@ export const AUTH_TOKEN_ADDRESS = (process.env.NEXT_PUBLIC_AUTH_TOKEN_ADDRESS ||
 // Using testnets here would cause SystemVault to lock funds on testnets
 // while the analytics layer watches Mainnet  a catastrophic mismatch.
 export const config = createConfig({
-    chains: [mainnet, base, bsc, optimism],
+    chains: [
+        mainnet, polygon, optimism, arbitrum, base, baseSepolia,
+        avalanche, bsc, celo, fantom, zksync, zkSyncSepolia,
+        gnosis, polygonZkEvm, mantle, blast, mode, manta,
+        taiko, ronin, kava, aurora, metis, zora, sei,
+        rootstock, linea, scroll
+    ],
     multiInjectedProviderDiscovery: true,   //  EIP-6963: auto-discovers Rabby, Frame, etc.
     connectors: [
         // CRITICAL: injected must be listed FIRST so MetaMask/Rabby are
@@ -41,6 +53,30 @@ export const config = createConfig({
         [base.id]:     http(process.env.NEXT_PUBLIC_BASE_RPC       || 'https://mainnet.base.org'),
         [bsc.id]:      http(process.env.NEXT_PUBLIC_BSC_RPC        || 'https://bsc-dataseed.binance.org'),
         [optimism.id]: http(process.env.NEXT_PUBLIC_OPTIMISM_RPC   || 'https://mainnet.optimism.io'),
+        [polygon.id]: http(),
+        [arbitrum.id]: http(),
+        [baseSepolia.id]: http(),
+        [avalanche.id]: http(),
+        [celo.id]: http(),
+        [fantom.id]: http(),
+        [zksync.id]: http(),
+        [zkSyncSepolia.id]: http(),
+        [gnosis.id]: http(),
+        [polygonZkEvm.id]: http(),
+        [mantle.id]: http(),
+        [blast.id]: http(),
+        [mode.id]: http(),
+        [manta.id]: http(),
+        [taiko.id]: http(),
+        [ronin.id]: http(),
+        [kava.id]: http(),
+        [aurora.id]: http(),
+        [metis.id]: http(),
+        [zora.id]: http(),
+        [sei.id]: http(),
+        [rootstock.id]: http(),
+        [linea.id]: http(),
+        [scroll.id]: http(),
     },
 })
 

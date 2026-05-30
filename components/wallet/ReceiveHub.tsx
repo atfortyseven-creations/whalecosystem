@@ -3,6 +3,9 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { getExplorerAddressUrl } from '@/lib/wallet/chains';
+import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
+import { TokenLogo } from '@/components/ui/TokenLogo';
+import { useAccount } from 'wagmi';
 
 interface ReceiveHubProps {
     addresses: {
@@ -10,15 +13,29 @@ interface ReceiveHubProps {
         address: string;
         token: string;
         chainId?: number;
-        icon?: React.ReactNode;
+        iconPath?: string;
     }[];
 }
 
 export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
     const [selectedIdx, setSelectedIdx] = useState(0);
     const [copied, setCopied] = useState(false);
+    const { address: wagmiAddress } = useAccount();
 
-    const current = addresses[selectedIdx] || {
+    const baseAddress = wagmiAddress || addresses[0]?.address || '0x...';
+
+    // Merge explicitly provided addresses with universal tokens
+    const allAddresses = [
+        ...addresses,
+        ...UNIVERSAL_TOKENS.map(t => ({
+            network: 'Ethereum', // Defaulting to Ethereum for tokens
+            address: baseAddress,
+            token: t.symbol,
+            iconPath: t.logoPath
+        }))
+    ];
+
+    const current = allAddresses[selectedIdx] || {
         network: 'Ethereum',
         address: '0x...',
         token: 'ETH'
@@ -37,7 +54,7 @@ export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
             <div className="md:col-span-4 space-y-4">
                 <h3 className="text-[9px] font-black text-black/40 uppercase tracking-[0.3em] mb-4">Your Addresses</h3>
                 <div className="space-y-1 max-h-[60vh] overflow-y-auto pr-2">
-                    {addresses.map((addr, idx) => (
+                    {allAddresses.map((addr, idx) => (
                         <button
                             key={`${addr.network}-${idx}`}
                             onClick={() => setSelectedIdx(idx)}
@@ -48,11 +65,12 @@ export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
                             }`}
                         >
                             <div className="flex items-center gap-3">
-                                <div className={`w-7 h-7 border flex items-center justify-center font-black text-[9px] uppercase ${
-                                    selectedIdx === idx ? 'border-white text-white' : 'border-black/20 text-black/40'
-                                }`}>
-                                    {addr.token.slice(0, 3)}
-                                </div>
+                                <TokenLogo 
+                                    symbol={addr.token} 
+                                    logoURI={addr.iconPath} 
+                                    className="w-7 h-7 rounded-full" 
+                                    fallbackClassName={`w-7 h-7 border flex items-center justify-center font-black text-[9px] uppercase ${selectedIdx === idx ? 'border-white text-white' : 'border-black/20 text-black/40'}`} 
+                                />
                                 <div className="text-left">
                                     <div className={`font-black text-[10px] uppercase tracking-widest ${selectedIdx === idx ? 'text-white' : 'text-black'}`}>{addr.network}</div>
                                     <div className={`text-[9px] font-mono ${selectedIdx === idx ? 'text-white/60' : 'text-black/40'}`}>{addr.address.slice(0, 6)}...{addr.address.slice(-4)}</div>

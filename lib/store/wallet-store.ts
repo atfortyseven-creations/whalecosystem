@@ -7,7 +7,7 @@ import CryptoJS from 'crypto-js';
 import { TransactionManager } from '@/lib/tx-manager';
 
 // 100M-User Scalability & Enterprise Grid Configuration
-export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche' | 'bitcoin';
+export type NetworkId = 'ethereum' | 'polygon' | 'arbitrum' | 'optimism' | 'base' | 'avalanche' | 'bitcoin' | 'bsc' | 'zksync' | 'celo' | 'fantom' | 'linea' | 'scroll' | 'blast' | 'gnosis' | 'ronin' | 'kava' | 'mantle';
 export type ProtocolType = 'RPC' | 'WSS';
 
 export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: string; wss: string; color: string; chainId: number }> = {
@@ -44,6 +44,61 @@ export const NETWORKS: Record<NetworkId, { name: string; currency: string; rpc: 
   bitcoin: {
     name: 'Bitcoin', currency: 'BTC', color: '#F7931A', chainId: 0,
     rpc: 'https://blockstream.info/api/', // Rest API for native on-chain lookups
+    wss: '',
+  },
+  bsc: {
+    name: 'BNB Smart Chain', currency: 'BNB', color: '#F3BA2F', chainId: 56,
+    rpc: 'https://bsc-dataseed.binance.org',
+    wss: 'wss://bsc-ws-node.noko.network',
+  },
+  zksync: {
+    name: 'zkSync Era', currency: 'ETH', color: '#8C8DFC', chainId: 324,
+    rpc: 'https://mainnet.era.zksync.io',
+    wss: 'wss://mainnet.era.zksync.io/ws',
+  },
+  celo: {
+    name: 'Celo', currency: 'CELO', color: '#35D07F', chainId: 42220,
+    rpc: 'https://forno.celo.org',
+    wss: '',
+  },
+  fantom: {
+    name: 'Fantom', currency: 'FTM', color: '#1969FF', chainId: 250,
+    rpc: 'https://rpc.ftm.tools',
+    wss: '',
+  },
+  linea: {
+    name: 'Linea', currency: 'ETH', color: '#121212', chainId: 59144,
+    rpc: 'https://rpc.linea.build',
+    wss: '',
+  },
+  scroll: {
+    name: 'Scroll', currency: 'ETH', color: '#FFE0AA', chainId: 534352,
+    rpc: 'https://rpc.scroll.io',
+    wss: '',
+  },
+  blast: {
+    name: 'Blast', currency: 'ETH', color: '#FCFC03', chainId: 81457,
+    rpc: 'https://rpc.blast.io',
+    wss: '',
+  },
+  gnosis: {
+    name: 'Gnosis', currency: 'XDAI', color: '#04795B', chainId: 100,
+    rpc: 'https://rpc.gnosischain.com',
+    wss: '',
+  },
+  ronin: {
+    name: 'Ronin', currency: 'RON', color: '#1273EA', chainId: 2020,
+    rpc: 'https://api.roninchain.com/rpc',
+    wss: '',
+  },
+  kava: {
+    name: 'Kava', currency: 'KAVA', color: '#FF433E', chainId: 2222,
+    rpc: 'https://evm.kava.io',
+    wss: '',
+  },
+  mantle: {
+    name: 'Mantle', currency: 'MNT', color: '#65b3ae', chainId: 5000,
+    rpc: 'https://rpc.mantle.xyz',
     wss: '',
   }
 };

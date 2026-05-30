@@ -7,7 +7,7 @@ const LOGOS_FILE = path.join(__dirname, '../lib/data/allowed-tokens.ts');
 function run() {
     // Read the ALLOWED_TOKEN_LOGOS mapping
     const logosContent = fs.readFileSync(LOGOS_FILE, 'utf8');
-    const logosMatch = logosContent.match(/export const ALLOWED_TOKEN_LOGOS: Record<string, string> = ({[\s\S]*?});/);
+    const logosMatch = logosContent.match(/export const ALLOWED_TOKEN_LOGOS: Record<string, { path: string; name: string }> = ({[\s\S]*?});/);
     if (!logosMatch) return console.error('Could not find ALLOWED_TOKEN_LOGOS');
     
     const logoMap = JSON.parse(logosMatch[1]);
@@ -22,11 +22,13 @@ function run() {
     // Filter
     const filteredTokens = allTokens.filter(t => !!logoMap[t.symbol.toUpperCase()]);
     
-    // Update logoPaths for existing ones to the verified paths
+    // Update logoPaths for existing ones to the verified paths, and names!
     const finalTokens = filteredTokens.map(t => {
+        const logoData = logoMap[t.symbol.toUpperCase()];
         return {
             ...t,
-            logoPath: logoMap[t.symbol.toUpperCase()]
+            name: logoData.name || t.name,
+            logoPath: logoData.path
         };
     });
 

@@ -10,7 +10,9 @@ export interface TokenLogoProps {
 }
 
 export function resolveTokenLogo(asset: { symbol?: string; address?: string; logoURI?: string | null }) {
-    if (asset.logoURI && asset.logoURI.startsWith('http')) return asset.logoURI;
+    if (asset.logoURI && (asset.logoURI.startsWith('http') || asset.logoURI.startsWith('/'))) {
+        return asset.logoURI;
+    }
     
     // Construct the URL to our new internal proprietary API
     const params = new URLSearchParams();

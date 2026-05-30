@@ -446,12 +446,8 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
     const CHAINS = allWagmiChains.map((c: any) => ({
         id: c.id,
         name: c.name,
-        icon: c.id === 1 ? 'https://cryptologos.cc/logos/ethereum-eth-logo.png' : 
-              c.id === 42161 ? 'https://cryptologos.cc/logos/arbitrum-arb-logo.png' : 
-              c.id === 10 ? 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.png' : 
-              c.id === 8453 ? 'https://base.org/document/favicon-32x32.png' : 
-              c.id === 137 ? 'https://cryptologos.cc/logos/polygon-matic-logo.png' : 
-              'https://cryptologos.cc/logos/ethereum-eth-logo.png' 
+        // Provide a default icon fallback using their lowercase name or a default.
+        icon: `https://cryptologos.cc/logos/${c.name.toLowerCase().replace(' ', '-')}-${c.name.toLowerCase().replace(' ', '-')}-logo.png`
     }));
 
     const [fromChain, setFromChain] = useState(CHAINS.find((c: any) => c.id === activeChain?.id) || CHAINS[0]);
@@ -762,8 +758,8 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
             </button>
 
             <AnimatePresence>
-                {showFromSelect && <TokenSelector assets={availableFromAssets} currentChainId={fromChain.id} onClose={() => setShowFromSelect(false)} onSelect={setPayToken} />}
-                {showToSelect && <TokenSelector assets={[...DEFAULT_TOKENS, ...userAssets]} currentChainId={mode === 'BRIDGE' ? toChain.id : fromChain.id} onClose={() => setShowToSelect(false)} onSelect={setReceiveToken} />}
+                {showFromSelect && <TokenSelector assets={[...availableFromAssets, ...UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 }))]} currentChainId={fromChain.id} onClose={() => setShowFromSelect(false)} onSelect={setPayToken} />}
+                {showToSelect && <TokenSelector assets={[...DEFAULT_TOKENS, ...userAssets, ...UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: mode === 'BRIDGE' ? toChain.id : fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 }))]} currentChainId={mode === 'BRIDGE' ? toChain.id : fromChain.id} onClose={() => setShowToSelect(false)} onSelect={setReceiveToken} />}
             </AnimatePresence>
         </motion.div>
     );

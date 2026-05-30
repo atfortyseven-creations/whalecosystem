@@ -486,7 +486,7 @@ export const UNIVERSAL_TOKENS: UniversalToken[] = [
     },
     {
         "symbol": "BEAM",
-        "name": "Beam",
+        "name": "Onbeam",
         "address": "0x0000000000000000000000000000000000000000",
         "decimals": 18,
         "logoPath": "/system-shots/logostoken/onbeam-beam-logo.png"
