@@ -3,50 +3,63 @@ import { cn } from '@/lib/utils';
 
 export interface TokenLogoProps {
     symbol: string;
+    name?: string;
     address?: string;
     logoURI?: string | null;
     className?: string;
     fallbackClassName?: string;
 }
 
-export function resolveTokenLogo(asset: { symbol?: string; address?: string; logoURI?: string | null }) {
-    if (asset.logoURI && (asset.logoURI.startsWith('http') || asset.logoURI.startsWith('/'))) {
-        return asset.logoURI;
+export const TokenLogo: React.FC<TokenLogoProps> = ({ symbol, name, logoURI, className, fallbackClassName }) => {
+    const s = symbol?.toLowerCase() || '';
+    const n = name?.toLowerCase().replace(/[^a-z0-9]/g, '-') || '';
+
+    // Build fallback chain
+    const sources: string[] = [];
+    if (logoURI && (logoURI.startsWith('http') || logoURI.startsWith('/'))) {
+        sources.push(logoURI);
     }
     
-    // Fallbacks
-    if (asset.address && asset.address !== 'native' && asset.address.length === 42) {
-        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${asset.address}/logo.png`;
+    // 1. High priority: the exact local quantum folder file naming convention
+    if (n && s) {
+        sources.push(`/system-shots/logostoken/${n}-${s}-logo.png`);
     }
 
-    if (asset.symbol === 'ETH') return 'https://assets.coingecko.com/coins/images/279/small/ethereum.png?1595348880';
-    if (asset.symbol === 'POL') return 'https://assets.coingecko.com/coins/images/4713/small/matic-token-icon.png';
-    if (asset.symbol === 'USDC') return 'https://assets.coingecko.com/coins/images/6319/small/USD_Coin_icon.png';
-    if (asset.symbol === 'USDT') return 'https://assets.coingecko.com/coins/images/325/small/Tether.png';
-    if (asset.symbol === 'AAVE') return 'https://assets.coingecko.com/coins/images/12645/small/AAVE.png';
-    if (asset.symbol === 'LINK') return 'https://assets.coingecko.com/coins/images/877/small/chainlink-new-logo.png';
-    if (asset.symbol === 'DAI') return 'https://assets.coingecko.com/coins/images/9956/small/Badge_Dai.png';
-    if (asset.symbol === 'CRV') return 'https://assets.coingecko.com/coins/images/12124/small/Curve.png';
-    if (asset.symbol === 'MKR') return 'https://assets.coingecko.com/coins/images/1364/small/Mark_Maker.png';
-    if (asset.symbol === 'ARB') return 'https://assets.coingecko.com/coins/images/16547/small/arbitrum.png';
-
-    if (asset.symbol) {
-        return `https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/${asset.symbol.toLowerCase()}.png`;
+    // 2. Specific Overrides
+    const overrides: Record<string, string> = {
+        'eth': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/eth.png',
+        'usdc': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdc.png',
+        'usdt': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/usdt.png',
+        'dai': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/dai.png',
+        'link': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/link.png',
+        'aave': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/aave.png',
+        'crv': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/crv.png',
+        'mkr': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/mkr.png',
+        'arb': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/arb.png',
+        'pol': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/matic.png',
+        'matic': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/matic.png',
+        'op': 'https://assets.coincap.io/assets/icons/op@2x.png',
+        'pepe': 'https://assets.coincap.io/assets/icons/pepe@2x.png',
+        'shib': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/shib.png',
+        'btc': 'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/128/color/btc.png',
+        'usde': 'https://assets.coincap.io/assets/icons/usde@2x.png',
+    };
+    if (s && overrides[s]) {
+        sources.push(overrides[s]);
     }
 
-    return null;
-}
+    // 3. Fallback: coincap by ticker
+    if (s) {
+        sources.push(`https://assets.coincap.io/assets/icons/${s}@2x.png`);
+    }
 
-export const TokenLogo: React.FC<TokenLogoProps> = ({ symbol, address, logoURI, className, fallbackClassName }) => {
-    const [imgSrc, setImgSrc] = useState<string | null>(null);
-    const [hasError, setHasError] = useState(false);
+    const [srcIndex, setSrcIndex] = useState(0);
 
     useEffect(() => {
-        setHasError(false);
-        setImgSrc(resolveTokenLogo({ symbol, address, logoURI }));
-    }, [symbol, address, logoURI]);
+        setSrcIndex(0);
+    }, [symbol, name, logoURI]);
 
-    if (!imgSrc || hasError) {
+    if (srcIndex >= sources.length || sources.length === 0) {
         return (
             <div className={cn("flex items-center justify-center font-black uppercase tracking-tight bg-black text-white", className, fallbackClassName)}>
                 {typeof symbol === 'string' ? symbol.slice(0, 2) : '?'}
@@ -56,10 +69,10 @@ export const TokenLogo: React.FC<TokenLogoProps> = ({ symbol, address, logoURI, 
 
     return (
         <img 
-            src={imgSrc} 
+            src={sources[srcIndex]} 
             alt={symbol || 'Token'} 
             className={cn("object-contain", className)} 
-            onError={() => setHasError(true)} 
+            onError={() => setSrcIndex(i => i + 1)} 
         />
     );
 };

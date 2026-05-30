@@ -177,6 +177,7 @@ export function InstitutionalMarkets() {
                                     <div className="flex items-center gap-3 md:gap-4 min-w-0">
                                         <TokenLogo 
                                             symbol={t.ticker} 
+                                            name={t.name}
                                             className="w-8 h-8 md:w-10 md:h-10 rounded-full shadow-inner shrink-0" 
                                             fallbackClassName="w-8 h-8 md:w-10 md:h-10 rounded-full bg-[#E5E5E5] flex items-center justify-center text-[12px] md:text-[14px] font-black shrink-0 text-[#050505] shadow-inner"
                                         />

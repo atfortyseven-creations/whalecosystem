@@ -177,12 +177,8 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                     {uniqueAssets.map((asset, idx) => (
                                         <motion.div variants={itemVariants} key={asset.symbol} className="py-6 flex items-center justify-between group">
                                             <div className="flex items-center gap-4">
-                                                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105">
-                                                    {asset.logoURI ? (
-                                                        <TokenLogo symbol={asset.symbol} address={asset.address} logoURI={asset.logoURI} className="w-6 h-6 rounded-full" fallbackClassName="w-6 h-6 rounded-full text-[8px]" />
-                                                    ) : (
-                                                        <span className="font-mono text-[10px] font-black text-slate-400">[TKN]</span>
-                                                    )}
+                                                <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105 overflow-hidden">
+                                                    <TokenLogo symbol={asset.symbol} name={asset.name} address={asset.address} logoURI={asset.logoURI} className="w-full h-full object-cover" fallbackClassName="w-full h-full flex items-center justify-center text-[10px]" />
                                                 </div>
                                                 <div className="flex flex-col">
                                                     <span className="font-black text-sm text-black tracking-tight">{asset.symbol}</span>
