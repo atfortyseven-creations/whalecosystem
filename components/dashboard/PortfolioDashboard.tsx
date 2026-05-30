@@ -8,6 +8,7 @@ import { useSystemAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
 import { cn } from '@/lib/utils';
 import { PortfolioSkeleton } from '@/components/ui/skeleton-loader';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 import { useRealWalletData } from '@/hooks/useRealWalletData';
 import TransactionHistory from '@/components/wallet/TransactionHistory';
 import { useChainId, useChains, useSwitchChain } from 'wagmi';
@@ -178,7 +179,7 @@ export default function PortfolioDashboard({ walletAddress }: { walletAddress?: 
                                             <div className="flex items-center gap-4">
                                                 <div className="w-10 h-10 bg-slate-100 border border-slate-200 rounded-lg flex items-center justify-center grayscale group-hover:grayscale-0 transition-all duration-500 group-hover:scale-105">
                                                     {asset.logoURI ? (
-                                                        <img src={asset.logoURI} alt={asset.symbol} className="w-6 h-6" />
+                                                        <TokenLogo symbol={asset.symbol} address={asset.address} logoURI={asset.logoURI} className="w-6 h-6 rounded-full" fallbackClassName="w-6 h-6 rounded-full text-[8px]" />
                                                     ) : (
                                                         <span className="font-mono text-[10px] font-black text-slate-400">[TKN]</span>
                                                     )}

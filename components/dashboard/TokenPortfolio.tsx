@@ -14,6 +14,8 @@ import { toast } from 'sonner';
 import { useSettings } from '@/src/context/SettingsContext';
 
 import { safeToFixed, safeToLocaleString } from '@/lib/utils/number-format';
+import { TokenLogo } from '@/components/ui/TokenLogo';
+
 export function TokenPortfolio() {
     const { address, chainId } = useAccount();
     const { strictMode, contacts } = useSettings();
@@ -133,7 +135,7 @@ export function TokenPortfolio() {
                         >
                             <div className="flex items-center gap-4">
                                 <div className="w-10 h-10 rounded-full bg-white/5 flex items-center justify-center text-xl shadow-inner border border-white/5 group-hover:border-[#00f2ea]/30 transition-colors">
-                                    {token.icon}
+                                    <TokenLogo symbol={token.symbol} address={token.address} className="w-full h-full rounded-full" fallbackClassName="w-full h-full rounded-full text-[10px]" />
                                 </div>
                                 <div>
                                     <h4 className="text-white font-bold text-sm">{token.name}</h4>
@@ -180,7 +182,7 @@ export function TokenPortfolio() {
                             {view === 'details' && (
                                 <div className="flex flex-col items-center">
                                     <div className="w-16 h-16 rounded-full bg-gradient-to-tr from-white/5 to-white/0 border border-white/10 flex items-center justify-center text-4xl mb-4 shadow-[0_0_30px_rgba(0,242,234,0.1)]">
-                                        {selectedToken.icon}
+                                        <TokenLogo symbol={selectedToken.symbol} address={selectedToken.address} className="w-full h-full rounded-full" fallbackClassName="w-full h-full rounded-full text-[14px]" />
                                     </div>
                                     <h2 className="text-3xl font-bold text-white mb-1">{safeToFixed(selectedToken.balance, 4)} <span className="text-lg text-gray-500">{selectedToken.symbol}</span></h2>
                                     <p className="text-gray-400 font-mono mb-8"> {formatUSD(selectedToken.balance * selectedToken.price)}</p>
