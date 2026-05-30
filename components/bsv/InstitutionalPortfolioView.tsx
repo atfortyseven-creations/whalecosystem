@@ -252,7 +252,8 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
     const { nuclearDisconnect } = useSystemSignOut();
     const networkInfo = NETWORKS[activeNetwork as NetworkId] || NETWORKS.polygon;
 
-    const { data: feeData } = useFeeData({ chainId: activeNetwork === 'ethereum' ? 1 : 137 });
+    const activeChainId = NETWORKS[activeNetwork as NetworkId]?.chainId || 1;
+    const { data: feeData } = useFeeData({ chainId: activeChainId });
     
     const handleDisconnect = async () => {
         setIsDisconnecting(true);

@@ -80,7 +80,7 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                         <div className="flex-1 overflow-y-auto">
                             <UnifiedWalletModal 
                                 isOpen={actionState.isOpen} 
-                                initialTab={actionState.type === 'RECEIVE' ? 'SEND' : actionState.type} // We handle receive differently or fallback
+                                initialTab={actionState.type === 'RECEIVE' ? 'SEND' : actionState.type as any}
                                 onClose={() => setActionState({ ...actionState, isOpen: false })} 
                                 userAssets={userAssets}
                                 forceToken={actionState.token?.symbol}

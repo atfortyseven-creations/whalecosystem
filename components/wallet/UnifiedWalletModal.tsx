@@ -38,20 +38,23 @@ export default function UnifiedWalletModal({ isOpen, onClose, initialTab = "SEND
     }, [isOpen, initialTab]);
 
     const allMergedAssets = useMemo(() => {
-        const userMap = new Map();
-        userAssets.forEach(a => userMap.set(`${a.chainId}-${a.address.toLowerCase()}`, a));
+        // Build a set of symbols the user already owns on any chain
+        const ownedSymbols = new Set(userAssets.map(a => a.symbol.toUpperCase()));
         
-        const additional = UNIVERSAL_TOKENS.filter(t => !userMap.has(`1-${t.address.toLowerCase()}`)).map(t => ({
-            ...t,
-            balanceNumeric: 0,
-            balance: '0',
-            price: 0,
-            valueUSD: 0,
-            chainId: 1, // Defaulting to mainnet for universal tokens
-            network: 'Ethereum'
-        }));
+        // Add universal tokens not already owned (show as 0-balance) — don't pin them to mainnet
+        const additional = UNIVERSAL_TOKENS
+            .filter(t => !ownedSymbols.has(t.symbol.toUpperCase()))
+            .map(t => ({
+                ...t,
+                balanceNumeric: 0,
+                balance: '0',
+                price: 0,
+                valueUSD: 0,
+                chainId: chainId || 1, // Use current wallet chain, not hardcoded mainnet
+                network: 'Multi-Chain'
+            }));
         return [...userAssets, ...additional];
-    }, [userAssets]);
+    }, [userAssets, chainId]);
 
     const [status, setStatus] = useState<"IDLE" | "ESTIMATING" | "SIGNING" | "SENDING" | "SUCCESS" | "ERROR">("IDLE");
     const [txHash, setTxHash] = useState("");
@@ -399,7 +402,27 @@ function SendModule({ userAssets, forceToken, setStatus, setTxHash, setStatusMes
 // -----------------------------------------------------------------------------
 import { parseAbi } from "viem";
 
-const ROUTER_ADDRESS = "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D"; 
+const SWAP_ROUTER_MAP: Record<number, string> = {
+    1: "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", // Uniswap V2 Mainnet
+    137: "0xa5E0829CaCEd8fFDD4De3c43696c57F7D7A678ff", // Quickswap Polygon
+    42161: "0x1b02dA8Cb0d097eB8D57A175b88c7D8b47997506", // SushiSwap Arbitrum
+    10: "0x4A7b5Da61326A6379179b40d00F57E5bbDC962c2", // SushiSwap Optimism
+    8453: "0x327Df1E6de05895d2ab08513aaDD9313Fe505d86", // Base Swap
+    56: "0x10ED43C718714eb63d5aA57B78B54704E256024E", // PancakeSwap BSC
+    43114: "0x60aE616a2155Ee3d9A68541Ba4544862310933d4", // TraderJoe Avalanche
+    480: "0x0000000000000000000000000000000000000000", // Fallback WorldChain
+};
+
+const WRAPPED_NATIVE_MAP: Record<number, string> = {
+    1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH Mainnet
+    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC Polygon
+    42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH Arbitrum
+    10: "0x4200000000000000000000000000000000000006", // WETH Optimism
+    8453: "0x4200000000000000000000000000000000000006", // WETH Base
+    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", // WBNB BSC
+    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7", // WAVAX Avalanche
+};
+
 const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98"; // Stargate Router Mainnet
 
 const UNISWAP_V2_ROUTER_ABI = parseAbi([
@@ -495,7 +518,7 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
     const isPayTokenNative = payToken.address === 'native' || payToken.address === NATIVE_ADDRESS;
     const isReceiveTokenNative = receiveToken.address === 'native' || receiveToken.address === NATIVE_ADDRESS;
     
-    const spenderAddress = mode === 'SWAP' ? ROUTER_ADDRESS : BRIDGE_ROUTER_ADDRESS;
+    const spenderAddress = mode === 'SWAP' ? (SWAP_ROUTER_MAP[fromChain.id] || SWAP_ROUTER_MAP[1]) : BRIDGE_ROUTER_ADDRESS;
 
     const { data: allowanceData, refetch: refetchAllowance } = useReadContract({
         address: isPayTokenNative ? undefined : (payToken.address as `0x${string}`),
@@ -618,17 +641,19 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
                 const minOut = parsedOut * BigInt(Math.floor((100 - parseFloat(slippage)) * 100)) / 10000n;
                 const parsedIn = parseUnits(payAmount, payToken.decimals);
                 
-                const wethFallback = "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2"; // Mainnet WETH for mock
+                const wethFallback = WRAPPED_NATIVE_MAP[fromChain.id] || WRAPPED_NATIVE_MAP[1];
                 const pathFrom = isPayTokenNative ? wethFallback : payToken.address;
                 const pathTo = isReceiveTokenNative ? wethFallback : receiveToken.address;
                 const path = [pathFrom as `0x${string}`, pathTo as `0x${string}`];
 
+                const routerAddress = SWAP_ROUTER_MAP[fromChain.id] || SWAP_ROUTER_MAP[1];
+
                 if (isPayTokenNative) {
-                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactETHForTokensSupportingFeeOnTransferTokens", args: [minOut, path, address as `0x${string}`, deadline], value: parsedIn });
+                    txHashStr = await writeContractAsync({ address: routerAddress as `0x${string}`, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactETHForTokensSupportingFeeOnTransferTokens", args: [minOut, path, address as `0x${string}`, deadline], value: parsedIn });
                 } else if (isReceiveTokenNative) {
-                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForETHSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
+                    txHashStr = await writeContractAsync({ address: routerAddress as `0x${string}`, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForETHSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
                 } else {
-                    txHashStr = await writeContractAsync({ address: ROUTER_ADDRESS, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForTokensSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
+                    txHashStr = await writeContractAsync({ address: routerAddress as `0x${string}`, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForTokensSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
                 }
             } else if (mode === "BRIDGE") {
                 const value = parseEther(payAmount);

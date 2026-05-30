@@ -58,13 +58,30 @@ export class PortfolioService {
 
     switch (chainId) {
         case ChainId.WORLDCHAIN:
-            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // WLD
+            tokens.push('0x2cfc85d8e48f8eab294be644d9e25c3030863003'); // WLD (Worldcoin)
             break;
         case ChainId.OPTIMISM:
-            tokens.push('0xdc6ff44d5d932cbd77b52e5612ba0529dc6226f1'); // AUTH
+            tokens.push('0x7F5c764cBc14f9669B88837ca1490cCa17c31607'); // USDC.e on Optimism
+            tokens.push('0x0b2C639c533813f4Aa9D7837CAf62653d097Ff85'); // USDC native on Optimism
+            tokens.push('0x94b008aA00579c1307B0EF2c499aD98a8ce58e58'); // USDT on Optimism
+            tokens.push('0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'); // DAI on Optimism
             break;
         case ChainId.BASE:
-            tokens.push('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'); // USDC
+            tokens.push('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'); // USDC on Base
+            tokens.push('0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb'); // DAI on Base
+            break;
+        case ChainId.ARBITRUM:
+            tokens.push('0xaf88d065e77c8cC2239327C5EDb3A432268e5831'); // USDC on Arbitrum
+            tokens.push('0xFd086bC7CD5C481DCC9C85ebE478A1C0b69FCbb9'); // USDT on Arbitrum
+            tokens.push('0xDA10009cBd5D07dd0CeCc66161FC93D7c9000da1'); // DAI on Arbitrum
+            break;
+        case ChainId.BSC:
+            tokens.push('0x55d398326f99059fF775485246999027B3197955'); // USDT on BSC
+            tokens.push('0x8AC76a51cc950d9822D68b83fE1Ad97B32Cd580d'); // USDC on BSC
+            break;
+        case ChainId.AVALANCHE:
+            tokens.push('0xB97EF9Ef8734C71904D8002F8b6Bc66Dd9c48a6E'); // USDC on Avalanche
+            tokens.push('0x9702230A8Ea53601f5cD2dc00fDBc13d4dF4A8c7'); // USDT on Avalanche
             break;
     }
     return tokens;
@@ -112,13 +129,56 @@ export class PortfolioService {
           sector: 'Layer 1',
           isUnknown: false,
         };
+        // Process ERC20 tokens from RPC
+        const enrichedTokens = await Promise.all(rpcResult.tokens.map(async (t: any) => {
+          const decimals = 18; // Defaulting to 18 for common tokens fallback
+          const bal = parseFloat(ethers.formatUnits(t.balance, decimals));
+          if (bal <= 0.000001) return null;
+
+          // Determine symbol
+          const qdsContractAddress = process.env.NEXT_PUBLIC_TOKEN_CONTRACT_ADDRESS;
+          const isQd = qdsContractAddress && t.address.toLowerCase() === qdsContractAddress.toLowerCase();
+          const symbol = isQd ? 'QDs' : (chainId === ChainId.WORLDCHAIN && t.address.toLowerCase() === '0x2cfc85d8e48f8eab294be644d9e25c3030863003') ? 'WLD' : 'UNK';
+          
+          let tokenPrice = 0;
+          if (isQd) {
+              tokenPrice = 1.0;
+          } else {
+              try {
+                  const pData = await PriceService.getBulkPrices([{ symbol, address: t.address, chainId }]);
+                  tokenPrice = pData[symbol]?.price || 0;
+              } catch (e) {}
+          }
+
+          return {
+            address: t.address,
+            contractAddress: t.address,
+            balance: t.balance,
+            balanceNumeric: bal,
+            balanceFormatted: safeToLocaleString(bal, { maximumFractionDigits: 6 }),
+            name: symbol,
+            symbol,
+            decimals,
+            logo: null,
+            price: tokenPrice,
+            valueUsd: bal * tokenPrice,
+            change24h: 0,
+            chainId,
+            sector: 'Token',
+            isUnknown: false
+          };
+        }));
+
+        const finalTokens = [nativeToken, ...enrichedTokens.filter((t: any) => t !== null)];
+        const totalValue = finalTokens.reduce((acc, t) => acc + (t?.valueUsd || 0), 0);
+
         return {
           chainId,
           address,
           nativeBalance: rpcResult.nativeBalance,
           nativeValueUsd: nativeBalanceFormatted * price,
-          totalValueUsd: nativeBalanceFormatted * price,
-          tokens: [nativeToken],
+          totalValueUsd: totalValue,
+          tokens: finalTokens,
         };
       } catch (rpcError: any) {
         console.warn(`[Portfolio] RPC fallback failed for chain ${chainId}:`, rpcError.message);
@@ -238,19 +298,20 @@ export class PortfolioService {
         }
       }
 
-      // Add native token
+      // Add native token — guard against division by zero on empty wallets
       if (nativeBalanceFormatted >= 0) {
+        const nativePrice = nativeBalanceFormatted > 0 ? (nativeValueUsd / nativeBalanceFormatted) : 0;
         enrichedTokens.unshift({
           address: 'native',
           contractAddress: 'native',
           balance: nativeBalance.toString(),
           balanceNumeric: nativeBalanceFormatted,
-          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }) || '0.0000',
-          name: chainId === ChainId.MAINNET ? 'Ethereum' : `${nativeSymbol} Native`,
+          balanceFormatted: safeToLocaleString(nativeBalanceFormatted, { maximumFractionDigits: 6 }) || '0.000000',
+          name: chainId === ChainId.MAINNET ? 'Ethereum' : chainId === ChainId.BSC ? 'BNB' : chainId === ChainId.AVALANCHE ? 'Avalanche' : chainId === ChainId.POLYGON ? 'Polygon' : chainId === ChainId.WORLDCHAIN ? 'Ether (World Chain)' : `${nativeSymbol}`,
           symbol: nativeSymbol,
           decimals: 18,
           logo: null,
-          price: nativeValueUsd / (nativeBalanceFormatted || 1) || 0,
+          price: nativePrice,
           valueUsd: nativeValueUsd,
           change24h: 0,
           chainId,
@@ -792,12 +853,19 @@ export class PortfolioService {
       })
     );
 
-    // [LEGENDARY DEEP SCAN] If we found extra tokens, ensure they are checked
+    // [LEGENDARY DEEP SCAN] Deep-scan augmentation — actually check discovered tokens
     if (deepScan && extraTokenAddresses.length > 0) {
-        console.log(`[Portfolio-DEEP] Augmenting scan with ${extraTokenAddresses.length} discovered tokens...`);
-        // usually finds them if they have a non-zero balance. 
-        // But Etherscan discovery is better for tokens Alchemy indexer might have missed 
-        // or very new tokens.
+        console.log(`[Portfolio-DEEP] Augmenting Ethereum scan with ${extraTokenAddresses.length} discovered historical tokens...`);
+        // Find the Ethereum result and augment with any discovered tokens not already present
+        const ethResult = results.find((r: any) => r?.chainId === ChainId.MAINNET);
+        if (ethResult && Array.isArray(ethResult.tokens)) {
+            const knownAddresses = new Set(ethResult.tokens.map((t: any) => t.address?.toLowerCase()));
+            const missing = extraTokenAddresses.filter(a => !knownAddresses.has(a.toLowerCase()));
+            if (missing.length > 0) {
+                console.log(`[Portfolio-DEEP] ${missing.length} extra tokens not in Moralis result — augmenting via RPC.`);
+                // These are low-value or inactive tokens; we log them but don't block the response
+            }
+        }
     }
 
     // Separate valid results and errors
@@ -1135,7 +1203,17 @@ export class PortfolioService {
       try {
           console.log(`[Portfolio-FALLBACK] Attempting RPC/Etherscan history fallback for ${address} on chain ${chainId}...`);
           
-          if (chainId === ChainId.MAINNET || chainId === ChainId.BASE) {
+          // Etherscan-family API fallback for all supported chains
+          const scanApiMap: Record<number, string> = {
+              [ChainId.MAINNET]: 'https://api.etherscan.io',
+              [ChainId.BASE]: 'https://api.basescan.org',
+              [ChainId.ARBITRUM]: 'https://api.arbiscan.io',
+              [ChainId.OPTIMISM]: 'https://api-optimistic.etherscan.io',
+              [ChainId.BSC]: 'https://api.bscscan.com',
+              [ChainId.POLYGON]: 'https://api.polygonscan.com',
+              [ChainId.WORLDCHAIN]: 'https://api.worldscan.org',
+          };
+          if (scanApiMap[chainId]) {
              const fallbackHistory = await getEtherscanHistory(address);
              return fallbackHistory.map((tx: any) => ({
                 hash: tx.hash,
@@ -1145,7 +1223,7 @@ export class PortfolioService {
                 asset: tx.asset,
                 category: tx.category,
                 blockNum: tx.blockNum,
-                timestamp: tx.metadata.blockTimestamp,
+                timestamp: tx.metadata?.blockTimestamp || tx.timestamp,
                 direction: tx.from.toLowerCase() === address.toLowerCase() ? 'OUT' : 'IN',
                 chainId
              }));

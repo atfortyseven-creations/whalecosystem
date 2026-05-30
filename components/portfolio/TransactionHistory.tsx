@@ -45,6 +45,30 @@ function parseTxList(raw: any[], walletAddress: string): ParsedTx[] {
 export function TransactionHistory({ address, scannerBase, activeNetwork }: { address: string, scannerBase: string, activeNetwork: string }) {
     const [transactions, setTransactions] = useState<ParsedTx[]>([]);
     const [loading, setLoading] = useState(true);
+    const [nativePrice, setNativePrice] = useState(0);
+
+    const getNativeSymbolForNetwork = (net: string) => {
+        switch(net) {
+            case 'bsc': return 'BNB';
+            case 'polygon': return 'POL';
+            case 'avalanche': return 'AVAX';
+            default: return 'ETH';
+        }
+    };
+    const nativeSymbol = getNativeSymbolForNetwork(activeNetwork);
+
+    // Fetch live native token price for fiat display
+    useEffect(() => {
+        const fetchPrice = async () => {
+            try {
+                const res = await fetch(`/api/prices?symbols=${nativeSymbol}`);
+                const data = await res.json();
+                const p = data?.[nativeSymbol]?.price || data?.[nativeSymbol] || 0;
+                if (p > 0) setNativePrice(p);
+            } catch {}
+        };
+        fetchPrice();
+    }, [nativeSymbol]);
 
     const fetchHistory = useCallback(async () => {
         if (!address) { setLoading(false); return; }
@@ -62,7 +86,9 @@ export function TransactionHistory({ address, scannerBase, activeNetwork }: { ad
                 }
             };
             const baseUrl = getApiEndpoint(activeNetwork);
-            const url = `${baseUrl}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=25&sort=desc&apikey=YourApiKeyToken`;
+            // Use apikey from env; fall back gracefully to unauthenticated (rate-limited) mode
+            const apiKey = process.env.NEXT_PUBLIC_ETHERSCAN_API_KEY || '';
+            const url = `${baseUrl}?module=account&action=txlist&address=${address}&startblock=0&endblock=99999999&page=1&offset=25&sort=desc${apiKey ? `&apikey=${apiKey}` : ''}`;
             const res = await fetch(url, { headers: { 'Accept': 'application/json' } });
             if (!res.ok) throw new Error(`HTTP ${res.status}`);
             const json = await res.json();
@@ -146,11 +172,10 @@ export function TransactionHistory({ address, scannerBase, activeNetwork }: { ad
 
                                     <div className="text-right">
                                         <span className="text-[15px] font-bold text-black block mb-0.5">
-                                            {tx.direction === 'SEND' ? '-' : ''}{tx.value} {tx.fromToken}
+                                            {tx.direction === 'SEND' ? '-' : '+'}{tx.value} {nativeSymbol}
                                         </span>
                                         <span className="text-[13px] text-black/50">
-                                            {/* In MetaMask this shows fiat value, we'll mock or leave empty. Showing fiat mockup here: */}
-                                            ${(Number(tx.value) * 3100).toFixed(2)} USD
+                                            {nativePrice > 0 ? `$${(Number(tx.value) * nativePrice).toFixed(2)} USD` : `${nativeSymbol}`}
                                         </span>
                                     </div>
                                 </a>
