@@ -10,7 +10,7 @@
     "db:sync": "npx prisma db push --accept-data-loss",
     "build": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "build:ipfs": "cross-env IPFS_BUILD=true next build",
-    "build:railway": "echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
+    "build:railway": "npx tailwindcss -i ./app/globals.css -o ./app/globals.css && echo 'LEGENDARY_BUILD_777' && prisma generate && prisma db push --accept-data-loss && cross-env NODE_OPTIONS=\"--max-old-space-size=4096\" next build",
     "build:contracts": "npx hardhat compile",
     "deploy:deadman": "npx hardhat run scripts/deploy-deadman-switch.js --network polygonAmoy",
     "deploy:deadman:mainnet": "npx hardhat run scripts/deploy-deadman-switch.js --network polygon",
