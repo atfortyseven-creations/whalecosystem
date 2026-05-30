@@ -141,8 +141,8 @@ function FullReportContent() {
     <article className="min-h-screen bg-white text-black pb-32">
 
       {/*  TOP NAV BAR  perfectly centered, full width  */}
-      <nav className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-[60px] border-b border-black/8 py-0 flex items-center justify-between" style={{ height: '56px' }}>
-        <div className="w-full max-w-[900px] mx-auto px-6 md:px-12 flex items-center justify-between h-full">
+      <nav className="sticky top-0 z-30 w-full bg-white/95 backdrop-blur-[60px] border-b border-black/8 pt-[env(safe-area-inset-top,0px)]">
+        <div className="w-full max-w-[900px] mx-auto px-6 md:px-12 flex items-center justify-between h-[56px]">
           <Link href="/news" className="flex items-center gap-3 group shrink-0">
             <div className="w-8 h-8 rounded-full border border-black/10 flex items-center justify-center group-hover:bg-black/5 transition-colors">
               <ArrowLeft size={14} className="text-black/50 group-hover:text-black transition-colors" />

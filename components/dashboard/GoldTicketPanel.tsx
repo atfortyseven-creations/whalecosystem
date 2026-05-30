@@ -200,14 +200,15 @@ function GlobalLedger({ feed }: { feed: any[] }) {
       <div className="w-full h-full bg-white flex flex-col">
          <div className="px-6 py-4 border-b border-black/[0.04] bg-[#FFFFFF] shrink-0 flex items-center justify-between">
              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-[#050505]">PUBLIC SIGNATURE LEDGER</span>
-             <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.3em]">Public Ledger</span>
+             <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.3em]">{feed?.length || 0} ENTRIES</span>
          </div>
          <div className="grid text-[9px] font-black text-black/30 uppercase tracking-[0.2em] bg-white border-b border-black/[0.04] shrink-0"
-              style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
-              <div className="px-6 py-3">User / Wallet</div>
-              <div className="px-6 py-3">Ticket Number</div>
-              <div className="px-6 py-3">Date & Time</div>
-              <div className="px-6 py-3 text-right">Signature Status</div>
+              style={{ gridTemplateColumns: '1.4fr 0.9fr 0.9fr 1.2fr 0.8fr' }}>
+              <div className="px-4 py-3">User / Wallet</div>
+              <div className="px-4 py-3">Ticket</div>
+              <div className="px-4 py-3">Date</div>
+              <div className="px-4 py-3">TX Hash</div>
+              <div className="px-4 py-3 text-right">Status</div>
          </div>
          <div className="flex-1 overflow-y-auto custom-scrollbar divide-y divide-black/[0.04]">
             {feed?.length === 0 && (
@@ -219,28 +220,84 @@ function GlobalLedger({ feed }: { feed: any[] }) {
                 </div>
             )}
             {feed?.map((f: any, i: number) => {
+                // Parse txHash and cryptoSignature from stored signatureData JSON
+                let txHash = "";
+                let cryptoSignature = "";
+                let visualSig = "";
+                let isPaid = false;
+                if (f.signatureData) {
+                    try {
+                        const parsed = JSON.parse(f.signatureData);
+                        txHash = parsed.txHash || "";
+                        cryptoSignature = parsed.cryptoSignature || "";
+                        visualSig = parsed.signature || "";
+                        isPaid = !!txHash;
+                    } catch {
+                        visualSig = f.signatureData;
+                    }
+                }
+
                 return (
-                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.5fr 1fr 1fr 1fr' }}>
-                        <div className="px-6 py-4 flex flex-col justify-center">
-                             <div className="flex items-center gap-2 mb-1">
+                    <div key={i} className="grid items-center hover:bg-black/[0.02] transition-colors" style={{ gridTemplateColumns: '1.4fr 0.9fr 0.9fr 1.2fr 0.8fr' }}>
+                        <div className="px-4 py-4 flex flex-col justify-center">
+                             <div className="flex items-center gap-3 mb-1">
                                   <span className="text-xs font-black font-mono text-black">{f.userAddress.slice(0,8)}...{f.userAddress.slice(-6)}</span>
+                                  {visualSig && visualSig.startsWith('data:image') && (
+                                      <img src={visualSig} alt="sig" className="h-6 w-auto opacity-70 mix-blend-darken" />
+                                  )}
                              </div>
                              {f.twitterHandle && (
                                 <span className="text-[9px] font-black text-black/40 uppercase tracking-[0.1em]">@{f.twitterHandle}</span>
                              )}
                         </div>
-                        <div className="px-6 py-4 flex flex-col justify-center gap-1">
+                        <div className="px-4 py-4 flex flex-col justify-center gap-1">
                              <span className="text-[10px] font-black uppercase text-black tracking-[0.1em]">{f.serialCode || 'MEMBER'}</span>
                              <span className="text-[8px] font-black text-black/40 uppercase tracking-[0.2em]">Optimism L2</span>
                         </div>
-                        <div className="px-6 py-4 text-[10px] font-black font-mono text-black/60 uppercase">
-                             {new Date(f.claimedAt).toLocaleTimeString()}
+                        <div className="px-4 py-4 text-[10px] font-black font-mono text-black/60 uppercase">
+                             {new Date(f.claimedAt).toLocaleDateString()}<br/>
+                             <span className="text-[9px] text-black/40">{new Date(f.claimedAt).toLocaleTimeString()}</span>
                         </div>
-                         <div className="px-6 py-2 flex justify-end">
-                              <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 border border-black/10 text-black shadow-sm select-none">
-                                  <span className="font-mono text-[10px] font-black text-black shrink-0">[OK]</span>
-                                  <span className="text-[9px] font-black font-mono uppercase tracking-wider">SECURE SEAL</span>
-                              </div>
+                        <div className="px-4 py-4 flex flex-col justify-center gap-1">
+                             {txHash ? (
+                                 <a
+                                   href={`https://optimistic.etherscan.io/tx/${txHash}`}
+                                   target="_blank"
+                                   rel="noopener noreferrer"
+                                   className="text-[10px] font-black font-mono text-emerald-600 hover:underline flex items-center gap-1"
+                                 >
+                                   {txHash.slice(0,8)}...{txHash.slice(-6)}
+                                   <span className="text-[9px]">[↗]</span>
+                                 </a>
+                             ) : (
+                                 <span className="text-[9px] font-black text-black/20 font-mono uppercase tracking-wider">—</span>
+                             )}
+                             {cryptoSignature && (
+                                 <span className="text-[8px] font-black text-black/30 font-mono truncate max-w-[140px]" title={cryptoSignature}>
+                                     ECDSA: {cryptoSignature.slice(0,10)}...
+                                 </span>
+                             )}
+                        </div>
+                         <div className="px-4 py-2 flex justify-end">
+                              {isPaid ? (
+                                  <div className="flex flex-col items-end gap-1">
+                                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-600 shadow-sm select-none">
+                                          <span className="font-mono text-[10px] font-black shrink-0">[✓]</span>
+                                          <span className="text-[9px] font-black font-mono uppercase tracking-wider">PAID & SIGNED</span>
+                                      </div>
+                                      <span className="text-[8px] font-black text-emerald-600/70 uppercase tracking-widest">+0.00111 ETH</span>
+                                  </div>
+                              ) : visualSig ? (
+                                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 border border-black/10 text-black shadow-sm select-none">
+                                      <span className="font-mono text-[10px] font-black text-black shrink-0">[@]</span>
+                                      <span className="text-[9px] font-black font-mono uppercase tracking-wider">SIGNED ONLY</span>
+                                  </div>
+                              ) : (
+                                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-black/5 border border-black/[0.06] text-black/40 select-none">
+                                      <span className="font-mono text-[10px] font-black shrink-0">[OK]</span>
+                                      <span className="text-[9px] font-black font-mono uppercase tracking-wider">SEALED</span>
+                                  </div>
+                              )}
                          </div>
                     </div>
                 );

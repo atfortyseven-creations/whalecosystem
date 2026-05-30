@@ -13,6 +13,7 @@ interface CryptoPanicArticle {
   id: number; domain: string; title: string; published_at: string;
   slug: string; url: string;
   source: { title: string; region: string; domain: string };
+  metadata?: { description?: string };
 }
 
 /**

@@ -14,7 +14,7 @@ export function MobileNavBar() {
         { href: '/news',      label: 'Analytics',  icon: Globe },
         { href: '/',          label: 'Home',          icon: Home },
         { href: '/portfolio', label: 'Portfolio',     icon: LineChart },
-        { href: '/support',   label: 'Support',       icon: Target },
+        { href: '/registry',  label: 'Registry',      icon: Target },
     ];
 
     return (

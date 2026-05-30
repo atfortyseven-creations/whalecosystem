@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect } from 'react';
+import { useSignMessage, useReconnect, useDisconnect } from 'wagmi';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ethers } from 'ethers';
 import { 
@@ -58,7 +59,8 @@ const GenericModal = ({ title, onClose, children }: { title: string, onClose: ()
 );
 
 export function GalacticDashboard() {
-  const { address, disconnect } = useSystemAccount();
+  const { address } = useSystemAccount();
+  const { disconnect } = useDisconnect();
   const [activeTab, setActiveTab] = useState<'TOKENS' | 'DEFI' | 'ACTIVITY'>('TOKENS');
   const [maticBalance, setMaticBalance] = useState<string>("0.0");
   const [maticValueUsd, setMaticValueUsd] = useState<string>("0.00");
@@ -203,7 +205,7 @@ export function GalacticDashboard() {
             <Key size={16} className="text-white/70" />
             <span className="text-[9px] font-black uppercase tracking-widest text-white/70">Vault Manager</span>
           </button>
-          <button onClick={disconnect} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20 group">
+          <button onClick={() => disconnect()} className="flex flex-col items-center justify-center gap-2 p-3 rounded-xl bg-red-500/10 hover:bg-red-500/20 transition-colors border border-red-500/20 group">
             <LogOut size={16} className="text-red-500/70 group-hover:text-red-400" />
             <span className="text-[9px] font-black uppercase tracking-widest text-red-500/70 group-hover:text-red-400">Disconnect</span>
           </button>

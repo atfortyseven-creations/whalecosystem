@@ -178,7 +178,7 @@ export class HumanityLedgerProvider implements EIP1193Provider {
       default: {
         const wallet = await state.getConnectedWallet();
         if (!wallet || !wallet.provider) throw { code: 4100, message: "Provider unavailable" };
-        return await wallet.provider.send(method, argsArray);
+        return await (wallet.provider as any).send(method, argsArray);
       }
     }
   }

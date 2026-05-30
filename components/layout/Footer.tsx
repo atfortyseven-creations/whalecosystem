@@ -55,6 +55,7 @@ export const Footer = () => {
                             <h4 className="text-[10px] font-mono font-black uppercase tracking-[0.3em] text-white/50 flex items-center gap-3">
                                 <span className="w-4 h-[1px] bg-white/30" /> Connect
                             </h4>
+                            <div className="flex flex-col gap-5">
                                 <FooterLink href="/privacy" icon={<Lock size={15} />}>Privacy</FooterLink>
                                 <FooterLink href="/terms" icon={<Lock size={15} />}>Terms</FooterLink>
                             </div>

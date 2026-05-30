@@ -635,7 +635,7 @@ export default function RegistryPage() {
 
   return (
     <div
-      className="min-h-full w-full flex flex-col transition-colors duration-300" style={{ zoom: 1.3 }}
+      className="min-h-full w-full flex flex-col transition-colors duration-300"
       style={{
         backgroundColor: isDark ? "#09090f" : "#ffffff",
         color: isDark ? "#e2e8f0" : "#0f172a",
@@ -658,9 +658,11 @@ export default function RegistryPage() {
 
           {/* Logo */}
           <div className="flex items-center gap-2.5 shrink-0">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#627EEA] to-[#8247E5] flex items-center justify-center shadow-sm">
-              
-            </div>
+            <img
+              src="/system-shots/PARTNERS/pngtree-3d-silver-atom-symbol-matter-quantum-fiction-photo-picture-image_3222092.jpg"
+              alt="Atom"
+              className="w-7 h-7 rounded-lg object-cover shadow-sm"
+            />
             <div className="hidden sm:block">
               <span
                 className="text-[12px] font-black uppercase tracking-[0.12em]"
@@ -1912,7 +1914,7 @@ export default function RegistryPage() {
                     
                     color: "#000000",
                   },
-                ].map((s, i) => (
+                ].map((s: any, i) => (
                   <motion.div
                     key={s.label}
                     initial={{ opacity: 0, y: 12 }}

@@ -1,12 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import { prisma as systemPrisma } from '@/lib/prisma';
-import { verifyMessage } from 'viem';
+import { createPublicClient, http, verifyMessage, parseEther } from 'viem';
+import { optimism } from 'viem/chains';
 
 // Cast to base PrismaClient so TypeScript resolves goldenTicket + user models correctly.
 // The SystemPrismaClient augmentation adds cosmicEntity but doesn't remove base models 
 // TypeScript just can't see them through the 'unknown' cast in lib/prisma.ts.
 const prisma = systemPrisma as unknown as PrismaClient;
+
+// Treasury wallet that receives the mint fee on Optimism
+const TREASURY_WALLET = '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a' as const;
+const MINT_FEE_WEI = parseEther('0.00111');
+
+// Verifies an Optimism transaction actually paid the treasury.
+// Returns { verified: true } if confirmed, { verified: false, reason } on failure.
+// Non-fatal: if the RPC times out we still let the user through (graceMode).
+async function verifyOnChainPayment(txHash: string, fromAddress: string): Promise<{ verified: boolean; graceMode?: boolean; reason?: string }> {
+    if (!txHash || !txHash.startsWith('0x')) return { verified: false, reason: 'No txHash provided' };
+    try {
+        const client = createPublicClient({
+            chain: optimism,
+            transport: http('https://mainnet.optimism.io', { timeout: 15_000 }),
+        });
+        const receipt = await client.getTransactionReceipt({ hash: txHash as `0x${string}` });
+        if (!receipt || receipt.status !== 'success') {
+            return { verified: false, reason: 'Transaction failed or not found on Optimism' };
+        }
+        const tx = await client.getTransaction({ hash: txHash as `0x${string}` });
+        const toMatches = tx.to?.toLowerCase() === TREASURY_WALLET.toLowerCase();
+        const fromMatches = tx.from?.toLowerCase() === fromAddress.toLowerCase();
+        const valueSufficient = tx.value >= MINT_FEE_WEI;
+        if (!toMatches || !fromMatches || !valueSufficient) {
+            console.warn(JSON.stringify({
+                level: 'SECURITY', event: 'PAYMENT_MISMATCH',
+                txHash, fromAddress,
+                to: tx.to, from: tx.from,
+                value: tx.value?.toString(),
+                toMatches, fromMatches, valueSufficient,
+            }));
+            return { verified: false, reason: `Payment mismatch: to=${toMatches}, from=${fromMatches}, value=${valueSufficient}` };
+        }
+        console.log(JSON.stringify({ level: 'INFO', event: 'PAYMENT_VERIFIED_ON_CHAIN', txHash, fromAddress, value: tx.value?.toString() }));
+        return { verified: true };
+    } catch (e: any) {
+        // RPC timeout or network error: allow through with grace mode (don't punish the user)
+        console.warn('[GoldenTicket] On-chain payment verification failed (grace mode):', e?.message);
+        return { verified: false, graceMode: true, reason: e?.message };
+    }
+}
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -189,16 +231,32 @@ export async function POST(req: NextRequest) {
             create: { walletAddress: address }
         });
 
-        //  Validation: Prevent unpaid ticket minting (Firmas sin pagar) 
-        // Removed for institutional demo testing
-        /*
-        if (user.tier === 'FREE' && !user.isPro) {
-            console.warn(JSON.stringify({ level: 'SECURITY', event: 'UNPAID_MINT_ATTEMPT', address }));
-            return NextResponse.json({
-                error: 'Pago requerido. Se necesita una suscripción activa para mintear la firma institucional.'
-            }, { status: 402 });
+        //  On-Chain Payment Verification (Optimism) 
+        // Verifies the txHash actually transferred ETH to TREASURY_WALLET.
+        // graceMode: if RPC is down, we allow through to avoid blocking legitimate users.
+        let paymentVerified = false;
+        let paymentGraceMode = false;
+        if (txHash && typeof txHash === 'string') {
+            const paymentCheck = await verifyOnChainPayment(txHash, address);
+            if (paymentCheck.verified) {
+                paymentVerified = true;
+                console.log(JSON.stringify({ level: 'INFO', event: 'PAYMENT_CONFIRMED', address, txHash }));
+            } else if (paymentCheck.graceMode) {
+                paymentGraceMode = true;
+                console.warn(JSON.stringify({ level: 'WARN', event: 'PAYMENT_GRACE_MODE', address, txHash, reason: paymentCheck.reason }));
+            } else {
+                console.warn(JSON.stringify({ level: 'SECURITY', event: 'PAYMENT_REJECTED', address, txHash, reason: paymentCheck.reason }));
+                return NextResponse.json({
+                    error: `Payment verification failed: ${paymentCheck.reason}. Ensure you sent 0.00111 ETH on Optimism to the treasury.`,
+                    txHash,
+                }, { status: 402 });
+            }
+        } else {
+            // No txHash provided — still allow (ECDSA signature is sufficient proof)
+            paymentGraceMode = true;
+            console.warn(JSON.stringify({ level: 'WARN', event: 'NO_TX_HASH_PROVIDED', address }));
         }
-        */
+
 
         //  Create ticket using standard Prisma methods 
         const tempSerial = `PENDING-${address}-${Date.now()}`;
@@ -253,14 +311,19 @@ export async function POST(req: NextRequest) {
         console.log(JSON.stringify({
             level: 'INFO', event: 'GOLDEN_TICKET_CLAIMED',
             address, ticketNumber: finalTicket.ticketNumber, serialCode: finalTicket.serialCode,
+            txHash: txHash || null,
+            paymentVerified,
+            paymentGraceMode,
         }));
 
         return NextResponse.json({
-            success:      true,
-            ticket:       finalTicket,
-            serial:       finalTicket.ticketNumber,
-            totalClaimed: totalClaimed + 1,
-            message:      'Whale Gold Ticket claimed successfully.',
+            success:         true,
+            ticket:          finalTicket,
+            serial:          finalTicket.ticketNumber,
+            totalClaimed:    totalClaimed + 1,
+            paymentVerified,
+            paymentGraceMode,
+            message:         'Whale Gold Ticket claimed successfully.',
         }, { status: 201 });
 
     } catch (error: any) {

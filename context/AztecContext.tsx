@@ -85,10 +85,10 @@ export const AztecProvider: React.FC<{ children: React.ReactNode }> = ({ childre
         console.log('🟡 [Aztec] Loading SDK via dynamic import...');
 
         // ─ Dynamic import: only executes in the browser at runtime ─
-        const { createPXEClient, waitForPXE } = await import(
+        const { createPXEClient, waitForPXE } = (await import(
           /* webpackChunkName: "aztec-sdk" */
           '@aztec/aztec.js'
-        );
+        )) as any;
 
         const PXE_URL = process.env.NEXT_PUBLIC_AZTEC_PXE_URL || 'http://localhost:8080';
         console.log(`🟡 [Aztec] Connecting to PXE at ${PXE_URL}...`);

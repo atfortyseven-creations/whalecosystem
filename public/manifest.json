@@ -5,7 +5,7 @@
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "any",
   "background_color": "#FAFAF8",
   "theme_color": "#0A0A0A",
   "lang": "en",
@@ -97,6 +97,13 @@
       "short_name": "Connect",
       "description": "Authenticate with your wallet",
       "url": "/connect",
+      "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Registry",
+      "short_name": "Registry",
+      "description": "Network Registry Explorer",
+      "url": "/registry",
       "icons": [{ "src": "/icons/icon-96x96.png", "sizes": "96x96" }]
     }
   ],

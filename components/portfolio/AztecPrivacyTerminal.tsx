@@ -160,7 +160,7 @@ export function AztecPrivacyTerminal({ onBack }: { onBack: () => void }) {
               className="p-6 md:p-10"
             >
               {step === 'OVERVIEW' && <OverviewPanel address={address} balance={balance} pendingDeposit={pendingDeposit} viewingKey={viewingKey} onDeposit={() => setStep('DEPOSIT')} />}
-              {step === 'DEPOSIT' && <DepositPanel log={log} privateKey={privateKey} onSuccess={(hash) => { setLastTx(hash); refreshPendingDeposit(); setStep('PENDING'); }} />}
+              {step === 'DEPOSIT' && <DepositPanel log={log} privateKey={privateKey} onSuccess={(hash: string) => { setLastTx(hash); refreshPendingDeposit(); setStep('PENDING'); }} />}
               {step === 'REGISTER' && <RegisterPanel log={log} privateKey={privateKey} />}
               {step === 'TRANSFER' && <PrivateTransferPanel log={log} privateKey={privateKey} />}
               {step === 'PENDING' && <PendingPanel pendingDeposit={pendingDeposit} lastTx={lastTx} onRefresh={refreshPendingDeposit} />}

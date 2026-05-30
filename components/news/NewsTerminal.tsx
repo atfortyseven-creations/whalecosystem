@@ -195,7 +195,7 @@ export function NewsTerminal() {
           <div
             className={`flex-col shrink-0 w-full md:w-[32%] md:min-w-[340px] lg:min-w-[380px] ${selected ? 'hidden md:flex' : 'flex'} border-r border-slate-200/60 bg-white backdrop-blur-xl overflow-y-auto`}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 py-5 border-b border-slate-200/60 bg-white/90 backdrop-blur-xl">
+            <div className="sticky top-0 z-10 flex items-center justify-between px-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] pb-5 border-b border-slate-200/60 bg-white/90 backdrop-blur-xl">
               <div className="flex items-center gap-4 flex-wrap">
                 {marketTimes.map(t => (
                   <div key={t.name} className="flex items-center gap-1.5 shrink-0">
@@ -288,7 +288,7 @@ export function NewsTerminal() {
                 <motion.article key={selected.id} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }}>
                   
                   {/* Top Bar */}
-                  <div className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-12 py-5 border-b border-slate-200/60 bg-white/90 backdrop-blur-md">
+                  <div className="sticky top-0 z-20 flex items-center justify-between px-6 md:px-12 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] pb-5 border-b border-slate-200/60 bg-white/90 backdrop-blur-md">
                     <div className="flex items-center gap-4">
                       <button onClick={() => setSelected(null)} className="md:hidden px-3 py-1 font-mono text-[10px] uppercase tracking-widest font-bold text-slate-500 hover:text-slate-900 transition-colors">
                         Back
@@ -378,7 +378,7 @@ export function NewsTerminal() {
                     </div>
 
                     {/* Call to Action */}
-                    <div className="px-6 md:px-12 pb-24 max-w-4xl mx-auto text-center relative z-10">
+                    <div className="px-6 md:px-12 pb-[calc(8rem+env(safe-area-inset-bottom))] md:pb-24 max-w-4xl mx-auto text-center relative z-10">
                       <button onClick={openFullReport} className="inline-flex items-center justify-center px-8 py-4 bg-slate-900 text-white hover:bg-slate-800 transition-colors rounded-xl shadow-lg hover:shadow-xl">
                         <span className="font-sans text-[12px] font-black uppercase tracking-[0.2em]">{tFullAnalysis}</span>
                       </button>

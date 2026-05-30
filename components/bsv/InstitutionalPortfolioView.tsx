@@ -157,6 +157,7 @@ export function InstitutionalPortfolioView() {
                         onDeploy={() => setView('DEPLOY')}
                         onOmnichain={() => setView('OMNICHAIN')}
                         onMempool={() => setView('MEMPOOL')}
+                        assets={assets || []}
                     />
                 )}
                 {/* Embedded older views for deep protocol interactions */}
@@ -229,7 +230,7 @@ export function InstitutionalPortfolioView() {
     );
 }
 
-function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onSwap, onBridge, onNetworkClick, onSettingsClick, onAccountsClick, scannerBase, onShield, onSecurity, onSmartAccount, onDeploy, onOmnichain, onMempool }: any) {
+function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRefresh, onSend, onReceive, onScan, onCreate, onBuy, onSwap, onBridge, onNetworkClick, onSettingsClick, onAccountsClick, scannerBase, onShield, onSecurity, onSmartAccount, onDeploy, onOmnichain, onMempool, assets }: any) {
     const [copied, setCopied] = useState(false);
     const [isDisconnecting, setIsDisconnecting] = useState(false);
     const [activeTab, setActiveTab] = useState<'TOKENS'|'DEFI'|'ACTIVITY'>('TOKENS');
