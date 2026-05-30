@@ -3,7 +3,7 @@
   "version": "3.0.2",
   "private": true,
   "license": "UNLICENSED",
-  "author": "Stefan Antonio Cirisanu <legal@humanidfi.com> (https://github.com/humanityledger)",
+  "author": "Stefan Antonio Cirisanu <atfortyseven2@humanidfi.es> (https://github.com/humanityledger)",
   "scripts": {
     "dev": "concurrently \"next dev\" \"npm run worker:scanner\"",
     "push:railway": "git add . && git commit -m \"perf: institutional forum hardening, wave removal, profile fix\" && git push origin main",

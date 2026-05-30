@@ -45,6 +45,7 @@ async function fetchEthEur(): Promise<number | null> {
   }
 }
 
+
 export function NewsTerminal() {
   const { isNewsSubscribed, lastBackupDate, setLastBackupDate, archive, upsertDayArticles, getArchiveDates } = useNewsStore();
   const { address } = useAccount();
@@ -67,6 +68,25 @@ export function NewsTerminal() {
   const [showLangMenu, setShowLangMenu] = useState(false);
   const [currentLang,  setCurrentLang]  = useState('ES');
   const [isTranslating,setIsTranslating]= useState(false);
+  const [sentimentFilter, setSentimentFilter] = useState<string>('all');
+
+  const SENTIMENT_FILTERS = [
+    { id: 'all',      label: 'All' },
+    { id: 'bullish',  label: 'Bullish' },
+    { id: 'bearish',  label: 'Bearish' },
+    { id: 'protocol', label: 'Protocol' },
+    { id: 'security', label: 'Security' },
+  ];
+
+  // Derive a sentiment tag from article title keywords (client-side heuristic)
+  function getSentimentTag(title: string): string {
+    const t = title.toLowerCase();
+    if (/hack|exploit|vuln|attack|breach|rug|scam|drain/.test(t)) return 'security';
+    if (/upgrade|deploy|launch|mainnet|testnet|audit|circuit|noir|aztec/.test(t)) return 'protocol';
+    if (/surge|rally|ath|bull|gain|pump|recover|rise/.test(t)) return 'bullish';
+    if (/crash|bear|drop|dump|sell|fall|loss|correction/.test(t)) return 'bearish';
+    return 'all';
+  }
 
   const LANGUAGES = [
     { code: 'EN', name: 'English' },
@@ -120,7 +140,10 @@ export function NewsTerminal() {
 
   //  Load data 
   useEffect(() => {
+    // Initial fetch
     fetchEthEur().then(setEthEur);
+    // FIX: Refresh ETH/EUR price every 60 seconds
+    const priceInterval = setInterval(() => fetchEthEur().then(setEthEur), 60_000);
 
     fetch('/api/auth/session', { cache: 'no-store' })
       .then(r => r.ok ? r.json() : null)
@@ -141,7 +164,10 @@ export function NewsTerminal() {
       })
       .catch(console.error)
       .finally(() => setLoading(false));
+
+    return () => clearInterval(priceInterval);
   }, [upsertDayArticles]);
+
 
   useEffect(() => {
     rightRef.current?.scrollTo({ top: 0, behavior: 'instant' });
@@ -195,27 +221,58 @@ export function NewsTerminal() {
           <div
             className={`flex-col shrink-0 w-full md:w-[32%] md:min-w-[340px] lg:min-w-[380px] ${selected ? 'hidden md:flex' : 'flex'} border-r border-slate-200/60 bg-white backdrop-blur-xl overflow-y-auto`}
           >
-            <div className="sticky top-0 z-10 flex items-center justify-between px-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] pb-5 border-b border-slate-200/60 bg-white/90 backdrop-blur-xl">
-              <div className="flex items-center gap-4 flex-wrap">
-                {marketTimes.map(t => (
-                  <div key={t.name} className="flex items-center gap-1.5 shrink-0">
-                    <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-slate-700">
-                      {t.name} <span className="font-normal text-slate-400 ml-0.5">{t.time}</span>
-                    </span>
-                  </div>
-                ))}
-              </div>
-              <div className="flex items-center gap-4">
-                {hasAccess && (
-                  <button onClick={handleDownload} title="Save Archives" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
-                    Save
+            <div className="sticky top-0 z-10 flex flex-col border-b border-slate-200/60 bg-white/90 backdrop-blur-xl">
+              {/* Top row: markets + actions */}
+              <div className="flex items-center justify-between px-6 pt-[calc(1.25rem+env(safe-area-inset-top,0px))] pb-3">
+                <div className="flex items-center gap-4 flex-wrap">
+                  {marketTimes.map(t => (
+                    <div key={t.name} className="flex items-center gap-1.5 shrink-0">
+                      <span
+                        className={`w-1.5 h-1.5 rounded-full shrink-0 ${t.isOpen ? 'bg-emerald-400' : 'bg-slate-300'}`}
+                      />
+                      <span className="font-mono text-[9px] font-bold uppercase tracking-widest text-slate-700">
+                        {t.name} <span className="font-normal text-slate-400 ml-0.5">{t.time}</span>
+                      </span>
+                    </div>
+                  ))}
+                </div>
+                <div className="flex items-center gap-4">
+                  {hasAccess && (
+                    <button onClick={handleDownload} title="Save Archives" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
+                      Save
+                    </button>
+                  )}
+                  <button onClick={() => setShowArchive(v => !v)} title="Archive" className="relative text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
+                    Archive
+                    {archiveDates.length > 0 && (
+                      <span className="absolute -top-1.5 -right-3 min-w-[16px] h-[16px] rounded-full bg-slate-900 text-white text-[8px] font-black flex items-center justify-center px-1">
+                        {archiveDates.length}
+                      </span>
+                    )}
                   </button>
-                )}
-                <button onClick={() => setShowArchive(v => !v)} title="Archive" className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-colors">
-                  Archive
-                </button>
+                </div>
+              </div>
+              {/* Sentiment filter strip */}
+              <div className="flex items-center gap-1 px-6 pb-3 overflow-x-auto no-scrollbar">
+                {SENTIMENT_FILTERS.map(f => (
+                  <button
+                    key={f.id}
+                    onClick={() => setSentimentFilter(f.id)}
+                    className={`shrink-0 px-3 py-1 rounded-full text-[10px] font-bold font-mono uppercase tracking-wider transition-colors ${
+                      sentimentFilter === f.id
+                        ? 'bg-slate-900 text-white'
+                        : 'bg-slate-100 text-slate-500 hover:bg-slate-200'
+                    }`}
+                  >
+                    {f.label}
+                  </button>
+                ))}
+                <span className="ml-auto shrink-0 font-mono text-[9px] text-slate-300 uppercase tracking-widest">
+                  {articles.filter(a => sentimentFilter === 'all' || getSentimentTag(a.title) === sentimentFilter).length} reports
+                </span>
               </div>
             </div>
+
 
             {showArchive && archiveDates.length > 0 && (
               <div className="border-b border-slate-200 bg-black/5">
@@ -242,8 +299,15 @@ export function NewsTerminal() {
 
             {/* Article list */}
             <div className="flex flex-col py-2">
-              {articles.slice(0, 50).map((art, idx) => {
+              {articles
+                .filter(a => sentimentFilter === 'all' || getSentimentTag(a.title) === sentimentFilter)
+                .slice(0, 50).map((art, idx) => {
                 const isActive = selected?.id === art.id;
+                const tag = getSentimentTag(art.title);
+                const tagColor = tag === 'bullish' ? 'text-emerald-600 bg-emerald-50' :
+                                 tag === 'bearish' ? 'text-red-500 bg-red-50' :
+                                 tag === 'security' ? 'text-amber-600 bg-amber-50' :
+                                 tag === 'protocol' ? 'text-indigo-600 bg-indigo-50' : '';
                 return (
                   <button key={art.id} onClick={() => setSelected(art)}
                     className={`text-left w-full px-6 py-6 relative group transition-colors ${isActive ? 'bg-black/5' : 'bg-transparent hover:bg-black/5'}`}>
@@ -260,6 +324,11 @@ export function NewsTerminal() {
                           <span className="font-mono text-[9px] uppercase tracking-widest truncate max-w-[120px] text-slate-400">{art.source}</span>
                         </>
                       )}
+                      {tag !== 'all' && (
+                        <span className={`ml-auto font-mono text-[8px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded ${tagColor}`}>
+                          {tag}
+                        </span>
+                      )}
                     </div>
                     
                     <h3 className={`font-sans text-[16px] leading-[1.4] font-bold tracking-tight ${isActive ? 'text-slate-900' : 'text-slate-600'}`}>
@@ -268,6 +337,7 @@ export function NewsTerminal() {
                   </button>
                 );
               })}
+
               {!loading && articles.length === 0 && (
                 <div className="px-6 py-10 flex flex-col items-center text-center opacity-50 text-slate-900">
                   <p className="font-mono text-[10px] uppercase tracking-widest">No reports available.</p>

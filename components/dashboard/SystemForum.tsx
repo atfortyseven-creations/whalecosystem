@@ -7,7 +7,6 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { SystemFooter } from '@/components/landing/SystemFooter';
 import { FooterPageIntro } from '@/components/landing/FooterPageIntro';
 import { COMMUNITY_FORUM_INTRO } from '@/lib/content/footerPagesAztec';
-import { WhaleChatLink } from '@/components/shared/WhaleChatLink';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Plus, Hash, ChevronRight, MessageSquare, Eye, ThumbsUp,
@@ -16,7 +15,6 @@ import {
   X, ArrowRight, Bookmark, Share2, MoreHorizontal, Layers
 } from 'lucide-react';
 import Image from 'next/image';
-import { SystemsUtilityHeader } from '@/components/shared/SystemsUtilityHeader';
 
 // ─── Category Metadata ────────────────────────────────────────────────────────
 const CATEGORY_META: Record<string, { icon: React.ReactNode; color: string; bg: string; ring: string }> = {
@@ -517,6 +515,32 @@ function ForumHomeContent() {
                 </p>
               </div>
             </div>
+            {/* Stats bar */}
+            {!loading && (
+              <div className="flex items-center gap-6 mt-3 flex-wrap">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[22px] font-black text-slate-900 tabular-nums leading-none">{topics.length}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">Topics</span>
+                </div>
+                <div className="w-px h-5 bg-slate-200" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[22px] font-black text-slate-900 tabular-nums leading-none">
+                    {topics.reduce((sum, t) => sum + (t._count?.posts || 0), 0)}
+                  </span>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">Replies</span>
+                </div>
+                <div className="w-px h-5 bg-slate-200" />
+                <div className="flex items-center gap-1.5">
+                  <span className="text-[22px] font-black text-slate-900 tabular-nums leading-none">{categories.length}</span>
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-slate-400">Categories</span>
+                </div>
+                <div className="w-px h-5 bg-slate-200" />
+                <div className="flex items-center gap-1.5">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="text-[10px] font-mono uppercase tracking-widest text-emerald-600">Live</span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Inline filter tab bar */}
