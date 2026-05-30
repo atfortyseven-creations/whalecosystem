@@ -11,7 +11,7 @@ import { useWalletStore } from '@/lib/store/wallet-store';
  * blob so the user can log in again with their Humanity Ledger password.
  */
 export function useSystemSignOut() {
-    const { disconnectAsync } = useDisconnect();
+    const { disconnect, disconnectAsync } = useDisconnect();
 
     const nuclearDisconnect = useCallback(async () => {
         console.log('%c[System] Initiating System Logout...', 'color:#FF3B30;font-weight:bold');
@@ -95,32 +95,54 @@ export function useSystemSignOut() {
             }
         } catch (e) {}
 
+        // 3.5 Nuke IndexedDB (WalletConnect stores its persistent session here)
+        try {
+            if (window.indexedDB && typeof window.indexedDB.databases === 'function') {
+                const dbs = await window.indexedDB.databases();
+                dbs.forEach(db => {
+                    if (db.name && (db.name.includes('walletconnect') || db.name.includes('wc@2') || db.name.includes('wagmi') || db.name.includes('w3m'))) {
+                        window.indexedDB.deleteDatabase(db.name);
+                    }
+                });
+            }
+        } catch (e) {
+            console.warn('[System:Logout] IndexedDB purge failed:', e);
+        }
+
         // 4. Disconnect Wagmi AFTER clearing all storage.
-        // Now any React re-renders triggered by the wagmi state change will see
-        // no valid cookies/localStorage and the __disconnected__ flag already set.
+        // We MUST wait for disconnectAsync because WalletConnect needs to clear its IndexedDB asynchronously.
+        // If we reload immediately, the disconnect is aborted and WalletConnect reconnects on reload!
         try {
             if (disconnectAsync) {
-                await disconnectAsync();
+                await Promise.race([
+                    disconnectAsync(),
+                    new Promise(resolve => setTimeout(resolve, 1500))
+                ]);
+            } else if (disconnect) {
+                disconnect();
             }
         } catch (e) {
             console.warn('[System:Logout] Wagmi disconnect failed:', e);
         }
 
-        // 5. NextAuth SignOut (if applicable) - MUST AWAIT to ensure HttpOnly cookies are cleared
+        // 5. NextAuth SignOut (if applicable) - Fire and forget
         try {
-            await Promise.race([
-                signOut({ redirect: false }),
-                new Promise(resolve => setTimeout(resolve, 2000))
-            ]);
+            signOut({ redirect: false }).catch(() => {});
         } catch (e) {
             console.warn('[System:Logout] NextAuth signout failed:', e);
         }
 
-        // 6. Hard Redirect - Instant
-        console.log('%c[System] Session Locked. Redirecting...', 'color:#00A36C');
-        window.location.replace('/');
+        // 6. Force immediate state reset for Zustand wallet store
+        try {
+            useWalletStore.getState().clearWallet();
+        } catch (e) {}
 
-    }, [disconnectAsync]);
+        // 7. Hard Redirect - Instant
+        console.log('%c[System] Session Locked. Redirecting...', 'color:#00A36C');
+        
+        // Force the window to reload to completely wipe memory state
+        window.location.href = '/';
+    }, [disconnect]);
 
     return { nuclearDisconnect };
 }
