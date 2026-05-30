@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
 
 export async function GET(req: Request) {
     const { searchParams } = new URL(req.url);
@@ -7,26 +8,26 @@ export async function GET(req: Request) {
     // though Ethereum addresses are case-insensitive, Trustwallet assets are checksum-cased.
     const address = searchParams.get('address');
     
-    // 1. High-quality explicit map for major tokens (2027 standards)
-    const exactMap: Record<string, string> = {
-        'ETH': 'https://cryptologos.cc/logos/ethereum-eth-logo.png',
-        'USDC': 'https://cryptologos.cc/logos/usd-coin-usdc-logo.png',
-        'USDT': 'https://cryptologos.cc/logos/tether-usdt-logo.png',
-        'WBTC': 'https://cryptologos.cc/logos/wrapped-bitcoin-wbtc-logo.png',
-        'DAI': 'https://cryptologos.cc/logos/multi-collateral-dai-dai-logo.png',
-        'MATIC': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-        'POL': 'https://cryptologos.cc/logos/polygon-matic-logo.png',
-        'OP': 'https://cryptologos.cc/logos/optimism-ethereum-op-logo.png',
-        'ARB': 'https://cryptologos.cc/logos/arbitrum-arb-logo.png',
-        'BASE': 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/base/info/logo.png',
-    };
+    // 1. Check UNIVERSAL_TOKENS local catalog first (Maximum strictness)
+    if (symbol) {
+        const localToken = UNIVERSAL_TOKENS.find(t => t.symbol.toUpperCase() === symbol);
+        if (localToken && localToken.logoPath) {
+            return NextResponse.redirect(new URL(localToken.logoPath, req.url).toString(), 302);
+        }
+    }
 
-    if (symbol && exactMap[symbol]) {
-        return NextResponse.redirect(exactMap[symbol], 302);
+    if (address && address !== 'native') {
+        const localToken = UNIVERSAL_TOKENS.find(t => t.address.toLowerCase() === address.toLowerCase());
+        if (localToken && localToken.logoPath) {
+            return NextResponse.redirect(new URL(localToken.logoPath, req.url).toString(), 302);
+        }
     }
 
     if (address === 'native') {
-        return NextResponse.redirect(exactMap['ETH'], 302);
+        const nativeEth = UNIVERSAL_TOKENS.find(t => t.symbol === 'ETH');
+        if (nativeEth && nativeEth.logoPath) {
+            return NextResponse.redirect(new URL(nativeEth.logoPath, req.url).toString(), 302);
+        }
     }
 
     // 2. Fallback to extensive lists (Trustwallet / 1inch / etc)

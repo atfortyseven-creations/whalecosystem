@@ -6,6 +6,7 @@ import { safeToFixed } from '@/lib/utils/number-format';
 import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
 import { TOKEN_STATS_20260530, TOKEN_STATS_DATE } from '@/config/token-stats-snapshot';
 import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, userAssets = [] }: { address: string, activeNetwork: string, scannerBase: string, userAssets?: any[] }) {
     
@@ -47,8 +48,6 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
             return a.symbol.localeCompare(b.symbol);
         });
     }, [userAssets]);
-
-    if (activeNetwork !== 'ethereum' && activeNetwork !== 'polygon' && activeNetwork !== 'arbitrum' && activeNetwork !== 'optimism' && activeNetwork !== 'base') return null;
 
     const handleAction = (type: 'SEND'|'RECEIVE'|'SWAP'|'BRIDGE', token: any) => {
         setActionState({ isOpen: true, type, token });
@@ -109,13 +108,12 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                                 <tr key={`${token.symbol}-${idx}`} className="hover:bg-black/[0.03] transition-colors group/row">
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-4">
-                                            <div className="w-8 h-8 rounded-full bg-black/5 p-0.5 border border-black/10 flex items-center justify-center shrink-0 shadow-sm">
-                                                {token.logoPath ? (
-                                                    <img src={token.logoPath} alt={token.symbol} className="w-full h-full rounded-full object-cover" />
-                                                ) : (
-                                                    <span className="text-[8px] font-black">{token.symbol.slice(0,3)}</span>
-                                                )}
-                                            </div>
+                                            <TokenLogo 
+                                                symbol={token.symbol} 
+                                                logoURI={token.logoPath} 
+                                                className="w-8 h-8 rounded-full shadow-sm" 
+                                                fallbackClassName="w-8 h-8 rounded-full bg-black/5 p-0.5 border border-black/10 flex items-center justify-center shrink-0 shadow-sm text-[8px] font-black" 
+                                            />
                                             <div className="flex flex-col">
                                                 <span className="font-black text-[13px] text-black tracking-wider flex items-center gap-2">
                                                     {token.symbol}

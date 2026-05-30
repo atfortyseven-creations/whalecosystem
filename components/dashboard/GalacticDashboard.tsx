@@ -21,6 +21,7 @@ import SwapModal from '@/components/wallet/SwapModal';
 import FiatOnRamp from '@/components/wallet/FiatOnRamp';
 import SecurityVault from '@/components/wallet/SecurityVault';
 import SettingsPanel from '@/components/wallet/SettingsPanel';
+import { MetaMaskNetworkSelector } from '@/components/portfolio/MetaMaskNetworkSelector';
 
 // Custom Polygon RPC for direct on-chain reads
 const POLYGON_RPC = "https://polygon-rpc.com";
@@ -178,8 +179,10 @@ export function GalacticDashboard() {
               <div className="w-2.5 h-2.5 bg-purple-500 rounded-full shadow-[0_0_10px_rgba(168,85,247,0.8)]" />
             </div>
             <div>
-              <div className="text-[10px] font-black uppercase tracking-widest text-white/50">Network</div>
-              <div className="text-sm font-bold tracking-wide">Polygon Mainnet</div>
+              <div className="text-[10px] font-black uppercase tracking-widest text-white/50 mb-1">Network</div>
+              <div className="bg-white rounded-full">
+                <MetaMaskNetworkSelector />
+              </div>
             </div>
           </div>
           <h1 className="text-xl font-black tracking-widest uppercase bg-gradient-to-r from-white to-white/40 bg-clip-text text-transparent">

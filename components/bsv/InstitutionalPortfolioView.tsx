@@ -18,6 +18,10 @@ import SettingsPanel from '@/components/wallet/SettingsPanel';
 import UnifiedWalletModal from '@/components/wallet/UnifiedWalletModal';
 import { useRealWalletData } from '@/hooks/useRealWalletData';
 
+import { QRCodeSVG } from 'qrcode.react';
+import { OmniLayerTerminal } from '@/components/dashboard/OmniLayerTerminal';
+import { MetaMaskNetworkSelector } from '@/components/portfolio/MetaMaskNetworkSelector';
+
 import { QuantumHoldingsEngine } from '@/components/portfolio/QuantumHoldingsEngine';
 
 import { AztecPrivacyTerminal } from '@/components/portfolio/AztecPrivacyTerminal';
@@ -265,16 +269,14 @@ function HomeView({ address, balance, balanceFiat, activeNetwork, loading, onRef
 
             {/* ── Top Navigation Bar ── */}
             <header className="flex flex-col md:flex-row md:items-center justify-between px-6 md:px-10 py-5 border-b border-black/10 bg-white">
-                <div className="flex flex-col gap-0.5">
+                <div className="flex flex-col gap-1 items-start">
                     <span className="text-[9px] uppercase tracking-[0.3em] font-black text-black/30">Network</span>
-                    <button onClick={onNetworkClick} className="flex items-center gap-2 hover:opacity-60 transition-opacity">
-                        <span className="text-[13px] uppercase tracking-widest font-black text-black">{address ? networkInfo.name : 'Offline'}</span>
-                        {feeData?.formatted?.gasPrice && (
-                            <span className="text-[9px] font-mono text-black/40 px-1.5 py-0.5 border border-black/10 rounded">
-                                {parseFloat(feeData.formatted.gasPrice).toFixed(1)} gwei
-                            </span>
-                        )}
-                    </button>
+                    <MetaMaskNetworkSelector 
+                        onNetworkChange={(id) => {
+                            // If we need to map id to string for useWalletStore:
+                            // We rely on Wagmi's switchChain inside the selector, but if we need to sync:
+                        }} 
+                    />
                 </div>
 
                 <div className="hidden md:flex flex-col items-center">
