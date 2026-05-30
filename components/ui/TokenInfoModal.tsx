@@ -8,6 +8,7 @@ import {
   ArrowUpRight, ArrowDownRight, ShieldCheck, Database,
   TrendingUp, TrendingDown, Zap, BarChart2
 } from 'lucide-react';
+import { TokenLogo } from '@/components/ui/TokenLogo';
 
 export interface TokenInfoPayload {
   symbol: string;
@@ -140,13 +141,12 @@ export function TokenInfoModal({ token, currency, eurRate, onClose }: Props) {
           >
             {/*  HEADER  */}
             <div className="flex items-center justify-between px-7 py-5 border-b border-black/6">
-              <div className="flex items-center gap-4">
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-black text-white shadow"
-                  style={{ backgroundColor: token.netColor || '#1a1a1a' }}
-                >
-                  {token.symbol[0]}
-                </div>
+                <div className="flex items-center gap-4">
+                <TokenLogo
+                    symbol={token.symbol}
+                    className="w-12 h-12 rounded-xl shadow"
+                    fallbackClassName="w-12 h-12 rounded-xl flex items-center justify-center text-[16px] font-black text-white shadow"
+                />
                 <div>
                   <div className="flex items-center gap-2.5 mb-0.5">
                     <span className="text-[20px] font-black tracking-tight text-black">{token.symbol}</span>

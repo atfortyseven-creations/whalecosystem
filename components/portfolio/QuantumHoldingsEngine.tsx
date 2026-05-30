@@ -106,12 +106,13 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                                 <tr key={`${token.symbol}-${idx}`} className="hover:bg-black/[0.03] transition-colors group/row">
                                     <td className="py-4 px-6">
                                         <div className="flex items-center gap-4">
-                                            <TokenLogo 
-                                                symbol={token.symbol} 
-                                                logoURI={token.logoPath} 
-                                                className="w-8 h-8 rounded-full shadow-sm" 
-                                                fallbackClassName="w-8 h-8 rounded-full bg-black/5 p-0.5 border border-black/10 flex items-center justify-center shrink-0 shadow-sm text-[8px] font-black" 
-                                            />
+                                        <TokenLogo 
+                                            symbol={token.symbol} 
+                                            name={token.name}
+                                            logoURI={token.logoPath} 
+                                            className="w-8 h-8 rounded-full shadow-sm" 
+                                            fallbackClassName="w-8 h-8 rounded-full bg-black/5 p-0.5 border border-black/10 flex items-center justify-center shrink-0 shadow-sm text-[8px] font-black" 
+                                        />
                                             <div className="flex flex-col">
                                                 <span className="font-black text-[13px] text-black tracking-wider flex items-center gap-2">
                                                     {token.symbol}
@@ -157,7 +158,11 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                                         </div>
                                     </td>
                                     <td className="py-4 px-6 text-right">
-                                        {token.address !== 'native' && token.address.length > 20 ? (
+                                        {token.address === 'native' ? (
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.02] border border-black/5 rounded-sm text-[9px] text-black/30 uppercase tracking-[0.2em] font-black">
+                                                Native Asset
+                                            </span>
+                                        ) : token.address && token.address !== '0x0000000000000000000000000000000000000000' && token.address.length > 20 ? (
                                             <a 
                                                 href={`${scannerBase}/token/${token.address}`} 
                                                 target="_blank" 
@@ -168,8 +173,8 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
                                                 <ExternalLink size={10} />
                                             </a>
                                         ) : (
-                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black/[0.02] border border-black/5 rounded-sm text-[9px] text-black/30 uppercase tracking-[0.2em] font-black">
-                                                Native Asset
+                                            <span className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 border border-blue-100 rounded-sm text-[9px] text-blue-400 uppercase tracking-[0.2em] font-black">
+                                                Multi-Chain
                                             </span>
                                         )}
                                     </td>

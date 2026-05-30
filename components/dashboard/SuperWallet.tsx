@@ -48,7 +48,6 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const [showWatchInput, setShowWatchInput] = useState(false);
     const [accounts, setAccounts] = useState<WalletAccount[]>([]);
     const [currentAddress, setCurrentAddress] = useState<string>('');
-    const [accountBalances, setAccountBalances] = useState<Record<string, string>>({});
 
     const [liveNews, setActiveNews] = useState<NewsItem[]>([]);
 
@@ -188,35 +187,6 @@ function SuperWalletContent({ recentNews = [] }: { recentNews?: NewsItem[] }) {
     const [showReceive, setShowReceive] = useState(false);
     const [showScanner, setShowScanner] = useState(false);
 
-    // Background balance fetching for all accounts to support filtering
-    useEffect(() => {
-        if (accounts.length === 0) return;
-
-        const fetchAllBalances = async () => {
-            const balances: Record<string, string> = {};
-            await Promise.all(accounts.map(async (acc) => {
-                try {
-                    // [LEGENDRY PRE-WARM] Fire and forget background portfolio fetch
-                    // This populates the server-side PortfolioService cache (60s TTL)
-                    fetch(`/api/wallet/portfolio?address=${acc.address}`).catch(() => {});
-
-                    const res = await fetch(`/api/wallet/portfolio?address=${acc.address}`);
-                    if (res.ok) {
-                        const data = await res.json();
-                        // We use totalValueUsd as a proxy for 'balance' if specific native balance isn't returned
-                        balances[acc.address.toLowerCase()] = safeToFixed(data.totalValueUsd, 2) || "0.00";
-                    }
-                } catch (e) {
-                    console.error("Failed to fetch balance for", acc.address);
-                }
-            }));
-            setAccountBalances(prev => ({ ...prev, ...balances }));
-        };
-
-        fetchAllBalances();
-        // Auto-sync disabled per user request
-        return () => {};
-    }, [accounts.length]); // Only re-warm if account list changes length
 
     const handleAddAccount = async () => {        
         // [INSTITUTIONAL GRADE] Erradicación de Mocking. Ya no generamos strings falsos.

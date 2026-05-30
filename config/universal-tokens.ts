@@ -9,6 +9,13 @@ export interface UniversalToken {
 
 export const UNIVERSAL_TOKENS: UniversalToken[] = [
     {
+        "symbol": "ETH",
+        "name": "Ethereum",
+        "address": "native",
+        "decimals": 18,
+        "logoPath": "/system-shots/logostoken/ethereum-eth-logo-colored.svg"
+    },
+    {
         "symbol": "AAVE",
         "name": "Aave",
         "address": "0x7Fc66500c84A76Ad7e9c93437bFc5Ac33E2DDaE9",
@@ -113,27 +120,7 @@ export const UNIVERSAL_TOKENS: UniversalToken[] = [
         "decimals": 18,
         "logoPath": "/system-shots/logostoken/1inch-1inch-logo.png"
     },
-    {
-        "symbol": "32X32",
-        "name": "Favicon",
-        "address": "0x0000000000000000000000000000000000000000",
-        "decimals": 18,
-        "logoPath": "/system-shots/logostoken/favicon-32x32.png"
-    },
-    {
-        "symbol": "32X32 (1)",
-        "name": "Favicon",
-        "address": "0x0000000000000000000000000000000000000000",
-        "decimals": 18,
-        "logoPath": "/system-shots/logostoken/favicon-32x32 (1).png"
-    },
-    {
-        "symbol": "32X32 (2)",
-        "name": "Favicon",
-        "address": "0x0000000000000000000000000000000000000000",
-        "decimals": 18,
-        "logoPath": "/system-shots/logostoken/favicon-32x32 (2).png"
-    },
+
     {
         "symbol": "ABBC",
         "name": "Abbc Coin",

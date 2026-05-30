@@ -1,13 +1,24 @@
 "use client";
 
 import React, { useState, useMemo, useEffect, useCallback } from 'react';
-import { RefreshCw, Search, Clock, Wifi, WifiOff, Loader2, AlertTriangle } from 'lucide-react';
+import { Search, Loader2, AlertTriangle } from 'lucide-react';
 import { ModuleHeader } from './ModuleHeader';
-import { useMarketData } from '@/lib/api-client';
 import { TokenInfoModal, TokenInfoPayload } from '@/components/ui/TokenInfoModal';
 import { useIsMobile } from '@/hooks/useIsMobile';
+import { TokenLogo } from '@/components/ui/TokenLogo';
+import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
 
-//  Formatters 
+// ─── Build lookup maps from our 568 verified tokens ─────────────────────────
+// Only tokens in this set will be shown in Markets
+const VERIFIED_SYMBOL_SET = new Set(UNIVERSAL_TOKENS.map(t => t.symbol.toUpperCase()));
+const VERIFIED_LOGO_MAP: Record<string, string> = {};
+UNIVERSAL_TOKENS.forEach(t => {
+    if (t.symbol && t.logoPath) {
+        VERIFIED_LOGO_MAP[t.symbol.toUpperCase()] = t.logoPath;
+    }
+});
+
+// ─── Formatters ──────────────────────────────────────────────────────────────
 const fmt = (n: number) => {
     if (!n || isNaN(n)) return '';
     if (Math.abs(n) >= 1e12) return `$${(n / 1e12).toFixed(2)}T`;
@@ -26,15 +37,14 @@ const fmtPrice = (n: number) => {
 const pctColor = (v: number) => (v >= 0 ? '#050505' : '#64748b');
 const pctFmt   = (v: number) => `${v >= 0 ? '+' : ''}${v.toFixed(2)}%`;
 
-
 const NETWORK_COLORS: Record<string, string> = {
-    bitcoin: '#050505', ethereum: '#050505', bsc: '#050505',
-    solana: '#050505', avalanche: '#050505', arbitrum: '#050505',
-    polygon: '#050505', optimism: '#050505', near: '#050505',
-    cardano: '#050505', polkadot: '#050505', aptos: '#050505',
-    injective: '#050505', starknet: '#050505', celestia: '#050505',
-    sui: '#050505', sei: '#050505', ton: '#050505',
-    xrp: '#050505', default: '#64748b',
+    bitcoin: '#F7931A', ethereum: '#627EEA', bsc: '#F3BA2F',
+    solana: '#9945FF', avalanche: '#E84142', arbitrum: '#12AAFF',
+    polygon: '#8247E5', optimism: '#FF0420', near: '#000000',
+    cardano: '#0033AD', polkadot: '#E6007A', aptos: '#000000',
+    injective: '#00F2FE', starknet: '#EC796B', celestia: '#7B2BF9',
+    sui: '#6FBCF0', sei: '#D44E4E', ton: '#0098EA',
+    xrp: '#00AAE4', default: '#64748b',
 };
 
 const ALL_NETWORKS = ['all', 'ethereum', 'solana', 'bsc', 'avalanche', 'arbitrum', 'polygon'] as const;
@@ -42,12 +52,12 @@ type FilterNetwork = typeof ALL_NETWORKS[number];
 type TimeWindow = '1h' | '24h' | '7d';
 type ViewMode = 'all' | 'gainers' | 'losers';
 
-//  Helper: strip USDT suffix to get ticker symbol 
+// Helper: strip USDT/BUSD suffix to get base ticker
 function stripUSDT(binanceSymbol: string): string {
     return binanceSymbol.replace('USDT', '').replace('BUSD', '');
 }
 
-//  Row Component 
+// ─── Row Component ────────────────────────────────────────────────────────────
 function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, onClick }: {
     rank: number;
     symbol: string;
@@ -65,7 +75,10 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
     const ticker = stripUSDT(symbol);
     const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
     const rate  = currency === 'EUR' ? eurRate : 1;
-    const sym   = currency === 'EUR' ? '' : '$';
+    const sym   = currency === 'EUR' ? '€' : '$';
+
+    // Get the verified logo path for this token
+    const logoPath = VERIFIED_LOGO_MAP[ticker.toUpperCase()] || null;
 
     const fmtCurrency = (n: number) => {
         const v = n * rate;
@@ -94,14 +107,14 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
             {/* Rank */}
             <div className="px-3 text-[10px] font-black text-slate-400 text-center">{rank}</div>
 
-            {/* Asset */}
+            {/* Asset - now with real logo */}
             <div className="px-3 flex items-center gap-3 py-3.5">
-                <div
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-[11px] font-black text-white shrink-0 shadow-sm"
-                    style={{ background: netColor }}
-                >
-                    {ticker[0]}
-                </div>
+                <TokenLogo
+                    symbol={ticker}
+                    logoURI={logoPath}
+                    className="w-9 h-9 rounded-full shadow-sm shrink-0"
+                    fallbackClassName="w-9 h-9 rounded-full text-[11px] font-black text-white shrink-0 shadow-sm"
+                />
                 <div>
                     <div className="flex items-center gap-1.5">
                         <span className="text-[13px] font-black text-slate-900 tracking-tight">{ticker}</span>
@@ -113,11 +126,11 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
                         </span>
                         {(data as any).getblockVerified && (
                             <span className="text-[7px] px-1.5 py-0.5 rounded font-black uppercase bg-slate-100 text-slate-700 border border-slate-200">
-                                 VERIFIED
+                                ✓ VERIFIED
                             </span>
                         )}
                     </div>
-                    <div className="text-[10px] text-slate-400 font-medium mt-0.5 tracking-wide">{meta.name}</div>
+                    <div className="text-[10px] text-slate-400 font-medium mt-0.5 tracking-wide">{meta.name !== symbol ? meta.name : ticker}</div>
                 </div>
             </div>
 
@@ -141,7 +154,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
             {/* Volume */}
             <div className="px-3 text-right text-[11px] font-bold font-mono text-slate-900">{fmtCurrency(vol)}</div>
 
-            {/* Dominance (Calculated Mathematically) */}
+            {/* Dominance */}
             <div className="px-3 text-right text-[11px] font-bold font-mono text-slate-400">
                 {dominance.toFixed(2)}%
             </div>
@@ -156,7 +169,7 @@ function AssetRow({ rank, symbol, data, pctKey, currency, eurRate, dominance, on
     );
 }
 
-//  Main Panel 
+// ─── Main Panel ──────────────────────────────────────────────────────────────
 export function GainersLosersPanel() {
     const isMobile = useIsMobile();
     const [rawData, setRawData] = useState<any>(null);
@@ -184,21 +197,18 @@ export function GainersLosersPanel() {
             }
         };
         fetchRealData();
-        const interval = setInterval(fetchRealData, 10000); // 10s updates
+        const interval = setInterval(fetchRealData, 15000); // 15s updates
         return () => { isMounted = false; clearInterval(interval); };
     }, []);
 
     const markets = rawData || [];
 
-    const isConnected = !isLoading && !error;
-    const lastUpdate = new Date();
-
-    const [search, setSearch]       = useState('');
-    const [view, setView]           = useState<ViewMode>('all');
+    const [search, setSearch]         = useState('');
+    const [view, setView]             = useState<ViewMode>('all');
     const [timeWindow, setTimeWindow] = useState<TimeWindow>('24h');
-    const [network, setNetwork]     = useState<FilterNetwork>('all');
-    const [currency, setCurrency]   = useState<'USD' | 'EUR'>('USD');
-    const [eurRate, setEurRate]     = useState(0.92);
+    const [network, setNetwork]       = useState<FilterNetwork>('all');
+    const [currency, setCurrency]     = useState<'USD' | 'EUR'>('USD');
+    const [eurRate, setEurRate]       = useState(0.92);
     const [selectedToken, setSelectedToken] = useState<TokenInfoPayload | null>(null);
 
     // Fetch live EUR/USD rate once on mount
@@ -210,11 +220,12 @@ export function GainersLosersPanel() {
     }, []);
 
     const handleRowClick = useCallback((symbol: string, data: any) => {
-        const meta = data.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+        const ticker = stripUSDT(symbol);
+        const meta = data.meta || { name: ticker, network: 'ethereum', mcapRankHint: 999 };
         const netColor = NETWORK_COLORS[meta.network] || NETWORK_COLORS.default;
         setSelectedToken({
-            symbol: stripUSDT(symbol),
-            name: meta.name,
+            symbol: ticker,
+            name: meta.name !== symbol ? meta.name : ticker,
             network: meta.network,
             netColor,
             price: parseFloat(data.lastPrice) || 0,
@@ -225,13 +236,18 @@ export function GainersLosersPanel() {
         });
     }, []);
 
-    // Map market stream data to display rows
+    // Map market stream data to display rows — ONLY tokens from our 568 verified set
     const allRows = useMemo(() => {
         const rows: Array<{ symbol: string; data: any; pct: number; vol: number; meta: any }> = [];
         markets.forEach((marketData: any) => {
             const { symbol } = marketData;
             if (!symbol?.endsWith('USDT')) return;
-            const meta = marketData.meta || { name: symbol, network: 'ethereum', mcapRankHint: 999 };
+
+            const ticker = stripUSDT(symbol);
+            // ⚠️ FILTER: Only show tokens we have a logo for
+            if (!VERIFIED_SYMBOL_SET.has(ticker.toUpperCase())) return;
+
+            const meta = marketData.meta || { name: ticker, network: 'ethereum', mcapRankHint: 999 };
             const pct = parseFloat(marketData.priceChangePercent) || 0;
             const vol = parseFloat(marketData.quoteVolume) || 0;
             rows.push({ symbol, data: marketData, pct, vol, meta });
@@ -261,7 +277,7 @@ export function GainersLosersPanel() {
                 if (view === 'losers')  return a.pct - b.pct;
                 return a.meta.mcapRankHint - b.meta.mcapRankHint;
             });
-            
+
         if (isMobile) {
             res = res.slice(0, 100);
         }
@@ -277,7 +293,7 @@ export function GainersLosersPanel() {
         <div className="w-full h-full min-h-0 flex flex-col p-0 space-y-6 overflow-hidden text-slate-900 font-sans">
             <ModuleHeader moduleId="markets" />
 
-            {/*  Summary Cards  */}
+            {/* Summary Cards */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 shrink-0">
                 {/* Top Gainers */}
                 <div className="bg-white/70 backdrop-blur-3xl border border-slate-200 rounded-2xl p-6 shadow-[0_8px_30px_rgba(0,0,0,0.03)] hover:shadow-[0_12px_40px_rgba(0,0,0,0.05)] transition-shadow">
@@ -292,24 +308,30 @@ export function GainersLosersPanel() {
                                 <Loader2 className="animate-spin mb-3" size={20} />
                                 <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 animate-pulse">SYNCHRONIZING TELEMETRY</span>
                             </div>
-                        ) : topGainers.map((r, i) => (
-                            <div key={r.symbol} className="flex items-center justify-between group cursor-default">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-black text-slate-200 w-4 group-hover:text-slate-400 transition-colors">{i + 1}</span>
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm"
-                                        style={{ background: NETWORK_COLORS[r.meta.network] || NETWORK_COLORS.default }}>
-                                        {stripUSDT(r.symbol)[0]}
+                        ) : topGainers.map((r, i) => {
+                            const ticker = stripUSDT(r.symbol);
+                            const logoPath = VERIFIED_LOGO_MAP[ticker.toUpperCase()] || null;
+                            return (
+                                <div key={r.symbol} className="flex items-center justify-between group cursor-default">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[10px] font-black text-slate-200 w-4 group-hover:text-slate-400 transition-colors">{i + 1}</span>
+                                        <TokenLogo
+                                            symbol={ticker}
+                                            logoURI={logoPath}
+                                            className="w-8 h-8 rounded-full shadow-sm shrink-0"
+                                            fallbackClassName="w-8 h-8 rounded-full text-[10px] font-black text-white bg-black shrink-0 shadow-sm"
+                                        />
+                                        <div className="flex flex-col justify-center">
+                                            <div className="text-[12px] font-black text-slate-900 leading-none mb-1">{ticker}</div>
+                                            <div className="text-[10px] font-mono text-slate-400 leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col justify-center">
-                                        <div className="text-[12px] font-black text-slate-900 leading-none mb-1">{stripUSDT(r.symbol)}</div>
-                                        <div className="text-[10px] font-mono text-slate-400 leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                    <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-200" style={{ color: '#050505' }}>
+                                        <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-200" style={{ color: '#050505' }}>
-                                    <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
 
@@ -326,32 +348,38 @@ export function GainersLosersPanel() {
                                 <Loader2 className="animate-spin mb-3" size={20} />
                                 <span className="text-[10px] uppercase tracking-[0.2em] font-black text-slate-400 animate-pulse">SYNCHRONIZING TELEMETRY</span>
                             </div>
-                        ) : topLosers.map((r, i) => (
-                            <div key={r.symbol} className="flex items-center justify-between group cursor-default">
-                                <div className="flex items-center gap-3">
-                                    <span className="text-[10px] font-black text-slate-200 w-4 group-hover:text-slate-400 transition-colors">{i + 1}</span>
-                                    <div className="w-8 h-8 rounded-full flex items-center justify-center text-[10px] font-black text-white shrink-0 shadow-sm"
-                                        style={{ background: NETWORK_COLORS[r.meta.network] || NETWORK_COLORS.default }}>
-                                        {stripUSDT(r.symbol)[0]}
+                        ) : topLosers.map((r, i) => {
+                            const ticker = stripUSDT(r.symbol);
+                            const logoPath = VERIFIED_LOGO_MAP[ticker.toUpperCase()] || null;
+                            return (
+                                <div key={r.symbol} className="flex items-center justify-between group cursor-default">
+                                    <div className="flex items-center gap-3">
+                                        <span className="text-[10px] font-black text-slate-200 w-4 group-hover:text-slate-400 transition-colors">{i + 1}</span>
+                                        <TokenLogo
+                                            symbol={ticker}
+                                            logoURI={logoPath}
+                                            className="w-8 h-8 rounded-full shadow-sm shrink-0"
+                                            fallbackClassName="w-8 h-8 rounded-full text-[10px] font-black text-white bg-black shrink-0 shadow-sm"
+                                        />
+                                        <div className="flex flex-col justify-center">
+                                            <div className="text-[12px] font-black text-slate-900 leading-none mb-1">{ticker}</div>
+                                            <div className="text-[10px] font-mono text-slate-400 leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                        </div>
                                     </div>
-                                    <div className="flex flex-col justify-center">
-                                        <div className="text-[12px] font-black text-slate-900 leading-none mb-1">{stripUSDT(r.symbol)}</div>
-                                        <div className="text-[10px] font-mono text-slate-400 leading-none">{fmtPrice(parseFloat(r.data.lastPrice))}</div>
+                                    <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-200" style={{ color: '#64748b' }}>
+                                        <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-1.5 bg-slate-100 px-2 py-1 rounded-md border border-slate-200" style={{ color: '#64748b' }}>
-                                    <span className="text-[12px] font-black font-mono">{pctFmt(r.pct)}</span>
-                                </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
 
-            {/*  Full Ledger Table  */}
+            {/* Full Ledger Table */}
             <div className="flex-1 min-h-0 bg-white/70 backdrop-blur-3xl border border-slate-200 shadow-[0_8px_40px_rgba(0,0,0,0.03)] rounded-2xl overflow-hidden flex flex-col relative">
 
-                {/* Background Gradient for Ledger */}
+                {/* Background Gradient */}
                 <div className="absolute inset-0 pointer-events-none bg-gradient-to-b from-white/40 to-transparent -z-10" />
 
                 {/* Toolbar Row 1 */}
@@ -397,11 +425,10 @@ export function GainersLosersPanel() {
                                         : { background: 'transparent', color: '#64748b' }
                                     }
                                 >
-                                    {c === 'USD' ? '$' : ''} {c}
+                                    {c === 'USD' ? '$' : '€'} {c}
                                 </button>
                             ))}
                         </div>
-                        {/* Stream status */}
                         <div className="flex items-center gap-2 border-l border-slate-200 pl-3">
                             <span className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-widest">
                                 Data Stream
@@ -410,14 +437,14 @@ export function GainersLosersPanel() {
                     </div>
                 </div>
 
-                {/* Toolbar Row 2  Network selector */}
+                {/* Toolbar Row 2 — Network selector */}
                 <div className="shrink-0 px-6 py-2.5 border-b border-slate-200 bg-black/5 backdrop-blur-sm flex items-center gap-2.5 flex-wrap z-10">
                     <span className="text-[9px] font-black text-slate-400 uppercase tracking-[0.2em] mr-2">Topology:</span>
                     {ALL_NETWORKS.map(n => (
                         <button key={n} onClick={() => setNetwork(n)}
                             className={`px-3 py-1.5 rounded-lg text-[9px] font-black uppercase tracking-widest border transition-all shadow-sm`}
                             style={network === n
-                                ? { background: n === 'all' ? '#050505' : NETWORK_COLORS[n] || '#050505', color: '#fff', borderColor: 'transparent' }
+                                ? { background: '#050505', color: '#fff', borderColor: 'transparent' }
                                 : { color: '#64748b', borderColor: 'rgba(0,0,0,0.1)', background: 'rgba(255,255,255,0.8)' }}>
                             {n === 'all' ? 'All Networks' : n.charAt(0).toUpperCase() + n.slice(1)}
                         </button>
@@ -479,7 +506,7 @@ export function GainersLosersPanel() {
                 </div>
             </div>
 
-            {/*  Token Info Modal  */}
+            {/* Token Info Modal */}
             <TokenInfoModal
                 token={selectedToken}
                 currency={currency}
