@@ -4546,10 +4546,12 @@ export const NETWORK_NATIVE_TOKENS: Record<string, { name: string; ticker: strin
     ],
 };
 
+import { isTokenAllowed, getValidatedLogo } from './allowed-tokens';
+
 // Quick runtime parser  deterministic round-robin network assignment (guarantees every network appears)
 export function getParsedMarkets() {
     const lines = RAW_TOKENS_STRING.trim().split('\n');
-    const tokens: any[] = [];
+    const allTokens: any[] = [];
     let current: string[] = [];
     let netIdx = 0;
 
@@ -4557,7 +4559,7 @@ export function getParsedMarkets() {
         if (line.trim() === '') continue;
         current.push(line.trim());
         if (current.length === 8) {
-            tokens.push({
+            allTokens.push({
                 name: current[0],
                 ticker: current[1],
                 price: current[2],
@@ -4578,11 +4580,11 @@ export function getParsedMarkets() {
     for (const [network, nativeList] of Object.entries(NETWORK_NATIVE_TOKENS)) {
         for (const t of nativeList) {
             // Only add if not already present (by ticker+network combo)
-            const alreadyExists = tokens.some(
+            const alreadyExists = allTokens.some(
                 (ex: any) => ex.ticker === t.ticker && ex.network === network
             );
             if (!alreadyExists) {
-                tokens.push({
+                allTokens.push({
                     name: t.name,
                     ticker: t.ticker,
                     price: t.price,
@@ -4597,5 +4599,13 @@ export function getParsedMarkets() {
         }
     }
 
-    return tokens;
+    // Filter to strictly only include tokens that have a validated logo
+    const validTokens = allTokens
+        .filter(t => isTokenAllowed(t.ticker))
+        .map(t => ({
+            ...t,
+            logoUrl: getValidatedLogo(t.ticker)
+        }));
+
+    return validTokens;
 }

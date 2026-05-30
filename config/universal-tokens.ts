@@ -1,4 +1,4 @@
-// SYSTEM GENERATED - ALL 566+ TOKENS
+// SYSTEM GENERATED - ALL VALIDATED TOKENS WITH LOGOS
 export interface UniversalToken {
     symbol: string;
     name: string;
@@ -489,7 +489,7 @@ export const UNIVERSAL_TOKENS: UniversalToken[] = [
         "name": "Beam",
         "address": "0x0000000000000000000000000000000000000000",
         "decimals": 18,
-        "logoPath": "/system-shots/logostoken/beam-beam-logo.png"
+        "logoPath": "/system-shots/logostoken/onbeam-beam-logo.png"
     },
     {
         "symbol": "BEAM",
@@ -854,13 +854,6 @@ export const UNIVERSAL_TOKENS: UniversalToken[] = [
         "address": "0x0000000000000000000000000000000000000000",
         "decimals": 18,
         "logoPath": "/system-shots/logostoken/cobinhood-cob-logo.png"
-    },
-    {
-        "symbol": "COLORED",
-        "name": "Ethereum Eth Logo",
-        "address": "0x0000000000000000000000000000000000000000",
-        "decimals": 18,
-        "logoPath": "/system-shots/logostoken/ethereum-eth-logo-colored.svg"
     },
     {
         "symbol": "COLX",
@@ -3971,11 +3964,3 @@ export const UNIVERSAL_TOKENS: UniversalToken[] = [
         "logoPath": "/system-shots/logostoken/0x-zrx-logo.png"
     }
 ];
-
-export const getTokenBySymbol = (symbol: string): UniversalToken | undefined => {
-    return UNIVERSAL_TOKENS.find(t => t.symbol === symbol);
-};
-
-export const getTopTokens = (limit: number = 20): UniversalToken[] => {
-    return UNIVERSAL_TOKENS.slice(0, limit);
-};

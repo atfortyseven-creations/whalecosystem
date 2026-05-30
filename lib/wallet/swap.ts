@@ -57,13 +57,29 @@ export async function getSwapQuote(chainId: number, params: SwapParams) {
     };
 
     // Monetization: Add affiliate fee if configured
-    const feeRecipient = process.env.NEXT_PUBLIC_FEE_RECIPIENT;
-    const feePercentage = process.env.NEXT_PUBLIC_AFFILIATE_FEE_PERCENTAGE;
+    // Enforcing dynamic multi-chain fee routing as requested
+    const FEE_RECIPIENTS: Record<number, string> = {
+        1: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Ethereum
+        137: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Polygon
+        8453: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Base
+        10: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Optimism
+        42161: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Arbitrum
+        56: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // BNB Chain
+        43114: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Avalanche
+        214: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // World Chain
+        59144: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Linea
+        80002: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Amoy
+        84532: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Base Sepolia
+        421614: '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a', // Arbitrum Sepolia
+    };
+    
+    // Default to the provided EVM wallet if chain not explicitly listed but it's EVM
+    const feeRecipient = FEE_RECIPIENTS[chainId] || '0x78831C25c86eA2a78A6127fC2Ccb95E612D87b4a';
+    const feePercentage = process.env.NEXT_PUBLIC_AFFILIATE_FEE_PERCENTAGE || '0.01'; // Default to 1% if undefined
 
     if (feeRecipient && feePercentage && feeRecipient !== '0x0000000000000000000000000000000000000000') {
         queryParams.buyTokenPercentageFee = feePercentage;
         queryParams.feeRecipient = feeRecipient;
-        // feeRecipientTradeSurplus is another option for RFQ but we'll stick to percentage for now
     }
 
     const response = await axios.get(`${url}?${qs.stringify(queryParams)}`, {

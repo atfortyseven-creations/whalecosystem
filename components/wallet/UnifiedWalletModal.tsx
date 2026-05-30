@@ -160,15 +160,18 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
              const s = search.toLowerCase();
              return (a.symbol || '').toLowerCase().includes(s) || (a.name || '').toLowerCase().includes(s) || (a.address || '').toLowerCase() === s;
         }
-        return a.balanceNumeric > 0 || a.address === 'native';
+        return true; // Show all tokens if no search
     });
 
-    if (!search && filteredAssets.length < 10) {
-        const tops = assets.filter((a:any) => (!currentChainId || currentChainId === 'all' || a.chainId === currentChainId) && a.symbol !== 'QDs').slice(0, 50);
-        filteredAssets = Array.from(new Set([...filteredAssets, ...tops]));
+    // We allow all tokens to be shown, but unique them by symbol and chain to avoid duplicates
+    const uniqueAssetsMap = new Map();
+    for (const a of filteredAssets) {
+        const key = `${a.symbol}-${a.chainId}`;
+        if (!uniqueAssetsMap.has(key)) {
+            uniqueAssetsMap.set(key, a);
+        }
     }
-
-    filteredAssets = filteredAssets.slice(0, 100);
+    filteredAssets = Array.from(uniqueAssetsMap.values());
 
     return (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
@@ -780,13 +783,11 @@ function BuyModule() {
     const [isPolling, setIsPolling] = useState(false);
     const [fiatAmount, setFiatAmount] = useState('1000');
     
-    // Moonpay requires specific currency codes based on network
-    const activeNetworkStr = activeChain?.name?.toLowerCase() || 'ethereum';
-    const cryptoCurrencyCode = activeNetworkStr === 'ethereum' ? 'eth' : 
-                               activeNetworkStr === 'polygon' ? 'matic_polygon' : 
-                               activeNetworkStr === 'arbitrum one' ? 'eth_arbitrum' : 
-                               activeNetworkStr === 'op mainnet' ? 'eth_optimism' : 
-                               activeNetworkStr === 'base' ? 'eth_base' : 'eth';
+    // User requested to perfect moonpay connection to buy BTC and redirect to swap
+    const [cryptoCurrencyCode, setCryptoCurrencyCode] = useState('btc');
+    
+    // Provided user BTC wallet
+    const btcWalletAddress = 'bc1qqqe4htphjl3hgyl76dcv08k39uvz0wreuxpsg6';
 
     const handlePurchase = async () => {
         setIsInitializing(true);
@@ -796,17 +797,20 @@ function BuyModule() {
             await new Promise(r => setTimeout(r, 800));
             await new Promise(r => setTimeout(r, 600));
 
+            const redirectUri = typeof window !== 'undefined' ? `${window.location.origin}/?modal=swap&from=btc&to=eth` : '';
+
             // Construct the real, functional on-ramp URL
             const baseUrl = "https://buy.moonpay.com/";
             const params = new URLSearchParams({
                 apiKey: 'pk_test_1234567890abcdef1234567890abcdef', 
                 currencyCode: cryptoCurrencyCode,
-                walletAddress: address || '',
+                walletAddress: cryptoCurrencyCode === 'btc' ? btcWalletAddress : (address || ''),
                 baseCurrencyCode: 'usd',
                 baseCurrencyAmount: fiatAmount,
                 colorCode: '#000000',
                 theme: 'light',
-                showWalletAddressForm: 'true'
+                showWalletAddressForm: 'true',
+                redirectURL: redirectUri
             });
             
             // Use window.open with _blank to avoid popup blockers when not strictly in a click handler
