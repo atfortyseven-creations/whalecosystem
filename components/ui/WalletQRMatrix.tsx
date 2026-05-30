@@ -171,11 +171,30 @@ function AnimateQRInner({
 
         const row = Math.floor(i / dim);
         const col = i % dim;
-        const threshold = rankOf[i] * 100;
+        // The fade happens over a window of 8 progress units.
+        // The highest threshold is 100 - 8 = 92, meaning the last pixel starts fading at 92% and finishes exactly at 100%.
+        const fadeWindow = 8;
+        const maxThreshold = 100 - fadeWindow;
+        const threshold = rankOf[i] * maxThreshold;
 
         let opacity = 0.04;
-        if (progress > threshold) {
-          opacity = Math.min(0.95, 0.04 + ((progress - threshold) / 12) * 0.91);
+        let scale = 1;
+        let isFullyRevealed = false;
+
+        if (progress >= 100) {
+          opacity = 1;
+          scale = 1;
+          isFullyRevealed = true;
+        } else if (progress > threshold) {
+          const fadeProgress = Math.min(1, (progress - threshold) / fadeWindow);
+          opacity = 0.04 + fadeProgress * 0.96;
+          // While fading, the pixel blooms (scale 1.15). When its fade finishes, it snaps to perfect crisp scale 1.0
+          if (fadeProgress === 1) {
+            scale = 1;
+            isFullyRevealed = true;
+          } else {
+            scale = 1.15;
+          }
         }
 
         return (
@@ -189,12 +208,12 @@ function AnimateQRInner({
               height: cellPx,
               backgroundColor: "#000000",
               opacity,
-              borderRadius: 1,
+              borderRadius: isFullyRevealed ? 0 : 2, // Sharp corners when fully revealed
               willChange: "opacity, transform",
               transition: isPressing
-                ? "opacity 0.35s ease-out, transform 0.35s ease-out"
-                : "opacity 0.15s ease-in",
-              transform: opacity > 0.15 ? "scale(1.12)" : "scale(1)",
+                ? "opacity 0.25s ease-out, transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), border-radius 0.2s"
+                : "opacity 0.15s ease-in, transform 0.15s ease-in",
+              transform: `scale(${scale})`,
             }}
           />
         );

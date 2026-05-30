@@ -115,7 +115,7 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
         }
 
         if (next >= 100 && prev < 100) {
-          setTimeout(() => setPhase("PROOFS"), 800); // 800ms delay to admire the full QR before Transaction Complete Lottie
+          setTimeout(() => setPhase("PROOFS"), 1200); // 1.2s delay to admire the flawless full QR before Transaction Complete Lottie
           return 100;
         }
         
