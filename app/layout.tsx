@@ -1,7 +1,7 @@
 // System layout  No Clerk provider needed (SIWE-native auth)
 import { headers } from 'next/headers'
 import { Inter, Martel, Roboto_Mono } from 'next/font/google'
-import './globals.css'
+import './globals-compiled.css'
 import './smooth-scroll.css'
 import Providers from "@/components/Providers";
 import "@fontsource/space-grotesk/700.css";
@@ -292,7 +292,7 @@ export default async function RootLayout({
   // ── Nuclear Service Worker Purge ─────────────────────────────────────────
   // If the user is stuck with a broken SW returning HTML for CSS (un-styled page)
   // or an old cached HTML, we force an unregister and reload ONCE per session.
-  var NUCLEAR_KEY = 'sw_nuclear_purge_v5';
+  var NUCLEAR_KEY = 'sw_nuclear_purge_v4';
   if (!sessionStorage.getItem(NUCLEAR_KEY)) {
     sessionStorage.setItem(NUCLEAR_KEY, '1');
     if ('serviceWorker' in navigator) {
