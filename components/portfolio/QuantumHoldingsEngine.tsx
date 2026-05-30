@@ -35,6 +35,8 @@ export function QuantumHoldingsEngine({ address, activeNetwork, scannerBase, use
             
             return {
                 ...t,
+                address: userOwned?.address || t.address,
+                chainId: userOwned?.chainId || activeChainId,
                 balance,
                 price,
                 value,
