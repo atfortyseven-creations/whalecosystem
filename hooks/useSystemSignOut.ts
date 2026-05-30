@@ -24,16 +24,9 @@ export function useSystemSignOut() {
             console.warn('[System:Logout] Zustand wallet lock failed:', e);
         }
 
-        // 4. Disconnect Wagmi BEFORE clearing storage so it can access its keys to disconnect
-        try {
-            if (disconnectAsync) {
-                await disconnectAsync();
-            }
-        } catch (e) {
-            console.warn('[System:Logout] Wagmi disconnect failed:', e);
-        }
-
-        // 1. Clear Cookies (Nuclear approach)
+        // 1. Clear Cookies FIRST (Nuclear approach)
+        // Must happen before wagmi disconnect to prevent race where React re-renders
+        // see valid cookies and re-authenticates during the async disconnect.
         try {
             const cookies = document.cookie.split(";");
             for (let i = 0; i < cookies.length; i++) {
@@ -53,7 +46,7 @@ export function useSystemSignOut() {
             console.warn('[System:Logout] Cookie purge failed:', e);
         }
 
-        // 2. Clear LocalStorage (Targeted + Full fallback)
+        // 2. Clear LocalStorage BEFORE wagmi disconnect (same reason as cookies)
         try {
             // Priority targets
             const targets = [
@@ -90,11 +83,28 @@ export function useSystemSignOut() {
             console.warn('[System:Logout] LocalStorage purge failed:', e);
         }
 
-        // 3. Clear SessionStorage
+        // 3. Clear SessionStorage and set disconnect guard BEFORE wagmi disconnect.
+        // Preserves sw_nuclear_purge_v4 so the layout script does NOT trigger
+        // an extra forced reload on the redirect target page.
         try {
+            const swNuclearPurgeFlag = sessionStorage.getItem('sw_nuclear_purge_v4');
             sessionStorage.clear();
             sessionStorage.setItem('__disconnected__', '1'); // Flag to prevent immediate auto-relink
+            if (swNuclearPurgeFlag) {
+                sessionStorage.setItem('sw_nuclear_purge_v4', swNuclearPurgeFlag); // Don't re-trigger forced reload
+            }
         } catch (e) {}
+
+        // 4. Disconnect Wagmi AFTER clearing all storage.
+        // Now any React re-renders triggered by the wagmi state change will see
+        // no valid cookies/localStorage and the __disconnected__ flag already set.
+        try {
+            if (disconnectAsync) {
+                await disconnectAsync();
+            }
+        } catch (e) {
+            console.warn('[System:Logout] Wagmi disconnect failed:', e);
+        }
 
         // 5. NextAuth SignOut (if applicable) - MUST AWAIT to ensure HttpOnly cookies are cleared
         try {

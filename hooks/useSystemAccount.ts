@@ -83,7 +83,11 @@ export function useSystemAccount() {
         // 0. AUTO-RESTORE from system_session_v2 (Humanity Ledger EIP-712 sign-up)
         //    This makes sign-up users identical to MetaMask users on every page load.
         //    sessionStorage is per-tab, so we restore it from the durable localStorage token.
-        if (typeof window !== 'undefined') {
+        //    GUARD: Skip restore if the user just explicitly disconnected in this tab.
+        const justDisconnected = typeof window !== 'undefined' &&
+            sessionStorage.getItem('__disconnected__') === '1';
+
+        if (!justDisconnected && typeof window !== 'undefined') {
             try {
                 const raw = localStorage.getItem('system_session_v2');
                 if (raw) {
