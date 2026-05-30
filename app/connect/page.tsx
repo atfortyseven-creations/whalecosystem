@@ -45,7 +45,7 @@ function RealDeviceRouter() {
           // Mobile → Dashboard (scanner), Desktop → Landing Page
           const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ||
             ('ontouchstart' in window || navigator.maxTouchPoints > 0) && window.screen.width < 768;
-          window.location.replace(isMobile ? '/dashboard' : '/');
+          window.location.replace('/dashboard/portfolio');
         }
       }
     }
@@ -86,7 +86,7 @@ function RealDeviceRouter() {
 
     if (isAlreadyLinked && !hasUuid) {
       const next = urlParams.get('next');
-      const fallback = isMobileDevice ? '/dashboard' : '/';
+      const fallback = '/dashboard/portfolio';
       const destination = next && !next.startsWith('/connect') && !next.startsWith('/sign-up')
         ? next
         : fallback;

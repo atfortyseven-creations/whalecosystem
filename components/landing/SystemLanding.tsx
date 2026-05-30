@@ -162,7 +162,7 @@ export function SystemLanding() {
         </div>
 
         <nav className="hidden md:flex items-center gap-8">
-          <button onClick={() => router.push('/dashboard')} className="text-[12px] font-bold text-white/50 hover:text-white transition-colors">TERMINAL</button>
+          <button onClick={() => router.push('/dashboard/portfolio')} className="text-[12px] font-bold text-white/50 hover:text-white transition-colors">TERMINAL</button>
           <button onClick={() => router.push('/developer')} className="text-[12px] font-bold text-[#9f00ff] hover:text-[#b233ff] transition-colors flex items-center gap-1.5">
             <Code2 size={14} /> LEGACY VIEW
           </button>
@@ -171,7 +171,7 @@ export function SystemLanding() {
         <div className="flex items-center gap-3">
           {isConnected ? (
              <div className="flex items-center gap-3">
-               <button onClick={() => router.push('/dashboard')} className="h-9 px-5 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-lg hover:bg-[#00f5ff] transition-all duration-300">
+               <button onClick={() => router.push('/dashboard/portfolio')} className="h-9 px-5 bg-white text-black text-[11px] font-black uppercase tracking-widest rounded-lg hover:bg-[#00f5ff] transition-all duration-300">
                  Enter Terminal
                </button>
              </div>

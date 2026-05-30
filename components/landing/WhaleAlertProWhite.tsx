@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
@@ -151,7 +151,7 @@ export default function WhaleAlertProWhite() {
   }, []);
 
   const handleEnterTerminal = () => {
-    if (isConnected) router.push('/dashboard');
+    if (isConnected) router.push('/dashboard/portfolio');
     else router.push('/connect');
   };
 
