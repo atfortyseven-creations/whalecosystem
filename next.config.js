@@ -97,7 +97,12 @@ const nextConfig = {
     reactStrictMode: false,
     // devIndicators removed  buildActivity and appIsrStatus are deprecated in Next.js 15
 
-    // swcMinify: REMOVED  always enabled by default in Next.js 15
+    // swcMinify is explicitly set to true to enforce Rust-based minification
+    swcMinify: true,
+    generateEtags: true,
+    httpAgentOptions: {
+        keepAlive: true,
+    },
 
     // Moved from experimental in Next.js 15
     serverExternalPackages: ['@prisma/client', 'prisma', 'ioredis', 'neo4j-driver', 'snarkjs'],
