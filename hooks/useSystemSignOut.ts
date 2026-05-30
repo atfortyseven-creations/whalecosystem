@@ -63,6 +63,7 @@ export function useSystemSignOut() {
                 const lower = key.toLowerCase();
                 if (lower.startsWith('whale_chat_pin_')) return; // Preserve PIN
                 if (lower.includes('whale-system-wallet-registry-v3')) return; // PRESERVE ENCRYPTED VAULT!
+                if (lower === 'system_accounts' || lower === 'system_keystore') return; // PRESERVE ACCOUNTS!
                 
                 if (
                     lower.includes('wagmi') || 
@@ -132,10 +133,9 @@ export function useSystemSignOut() {
             console.warn('[System:Logout] NextAuth signout failed:', e);
         }
 
-        // 6. Force immediate state reset for Zustand wallet store
-        try {
-            useWalletStore.getState().clearWallet();
-        } catch (e) {}
+        // 6. Do NOT clear the wallet state here!
+        // Calling clearWallet() wipes the encrypted vault and passwordHash, destroying the ability to log in.
+        // Step 0 already called lockVault() which safely hides the keys in memory.
 
         // 7. Hard Redirect - Instant
         console.log('%c[System] Session Locked. Redirecting...', 'color:#00A36C');

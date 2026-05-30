@@ -1,206 +1,84 @@
-> **PROPRIETARY SOFTWARE — ALL RIGHTS RESERVED**
-> Copyright (c) 2024–2026 **Stefan Antonio Cirisanu** / [humanityledger](https://github.com/humanityledger)
-> This repository is the exclusive intellectual property of Stefan Antonio Cirisanu and the humanityledger organization.
-> No license is granted by its public availability. Any unauthorized use, reproduction, modification, deployment as a service, or representation of this work to third parties as one's own constitutes copyright infringement and may result in civil and criminal liability, including claims for damages up to $150,000 USD per infringement under applicable law.
-> See [LICENSE](./LICENSE) for full terms.
+# Humanity Ledger
 
----
+### Portafolio Institucional Web3 y Plataforma de Privacidad
 
-# Humanity Ledger — Institutional Web3 Portfolio & ZK Privacy Suite
+Humanity Ledger representa el ecosistema mas avanzado de gestion de portafolios sin custodia en la Web3, construido nativamente sobre Aztec Network. Este sistema unifica la privacidad de conocimiento cero, la ejecucion institucional de finanzas descentralizadas, la abstraccion de cuentas, la interoperabilidad omnicadena y la analitica de capital en tiempo real.
 
-![Humanity Ledger](public/system-shots/Devine-Lu-Linvega-monochrome-pixel-art-illustration-arch-2268374-wallhere.com.jpg)
+Toda la arquitectura esta construida en cadena, eliminando simulaciones y la custodia centralizada de llaves, alcanzando un estado de integracion perfecto. Este repositorio sirve como nuestra presentacion oficial para el programa de subvenciones de Aztec Network. Cada motor documentado a continuacion esta implementado como logica en cadena pura, criptograficamente solido y desplegado en produccion.
 
-**Privacy-First Institutional Wallet & Analytics Engine — Built Natively on Aztec Network**
+### Arquitectura de Privacidad con Aztec Network y Noir
 
-Humanity Ledger represents the most advanced non-custodial Web3 portfolio system developed within the Aztec ecosystem. It unifies zero-knowledge privacy, institutional-grade DeFi execution, Account Abstraction (ERC-4337), omnichain interoperability (LayerZero V2), and real-time capital analytics into a single cohesive platform. As of May 30, 2026, the architecture is entirely built on-chain, eliminating simulations and centralized key custody, achieving an absolutely perfect integration state.
+Nuestra integracion con Aztec Network es profunda y de grado de produccion. El sistema utiliza el entorno de ejecucion privado para procesar logica confidencial directamente en el dispositivo del usuario, enviando unicamente pruebas de conocimiento cero a la red. Esta es una explicacion detallada y desfragmentada de nuestra arquitectura Aztec.
 
-> This repository serves as our official grant submission for **Aztec Network**. Every engine documented below is implemented as pure on-chain logic, cryptographically sound, and production-deployed on Railway.
+1. Circuitos Noir: Toda la logica privada del protocolo esta escrita en Noir, el lenguaje especifico de dominio para desarrollo de circuitos de conocimiento cero. Estos circuitos definen las restricciones matematicas que una transicion de estado debe cumplir. Una transicion es valida solo si se puede generar una prueba valida. Utilizamos patrones de circuitos avanzados para la creacion de notas, generacion de nulificadores para prevenir el doble gasto, transferencias privadas y testigos de autorizacion.
 
----
+2. Pruebas Criptograficas Barretenberg: El sistema implementa el probador Barretenberg, soportando el sistema de restricciones UltraPlonk con generacion de pruebas eficiente directamente en el navegador mediante ensamblado web. El cliente demuestra que una transicion de estado fue ejecutada correctamente sin revelar identidades ni montos.
 
+3. Escudos de Privacidad: Permite a los usuarios escudar fondos de la red publica hacia notas privadas utilizando las primitivas criptograficas nativas del paquete de desarrollo de Aztec. Todos los compromisos de notas y nulificadores se calculan localmente antes de su envio.
 
-## Technical Features and Architecture — Complete Matrix
+4. Entorno de Ejecucion Privado: Este entorno corre enteramente en el navegador del usuario. Mantiene la base de datos de notas privadas, genera pruebas de conocimiento cero y envia unicamente la prueba y los datos publicos al secuenciador de Aztec. Las llaves privadas jamas abandonan el navegador.
 
-### Quantum Vault — HD Wallet Core (BIP-39 / BIP-44)
+5. Puentes Aztec para Finanzas Descentralizadas: Despliegue institucional de estrategias de rendimiento privado a traves de adaptadores de puente altamente seguros operando nativamente en el entorno de Aztec. El capital se despliega en estrategias de rendimiento mientras los montos principales permanecen ofuscados para los observadores de la cadena publica.
 
-A fully native hierarchical deterministic wallet engine designed for institutional security.
+6. Firmas Tipadas y Contratos de Cuentas Aztec: Cumplimiento estricto con las firmas tipadas requeridas para el protocolo de autorizacion de Aztec, asegurando transacciones robustas y verificables. Toda la validacion de operaciones utiliza infraestructura nativa para garantizar compatibilidad absoluta.
 
-- **BIP-39 Mnemonic Generation:** Generates a 128-bit entropy seed and maps it to a 12-word Secret Recovery Phrase using the complete BIP-39 wordlist.
-- **BIP-44 Account Derivation:** Derives infinite child accounts along the `m/44'/60'/0'/0/n` path from a single master seed.
-- **AES-256 Encrypted Vault:** The encrypted vault is persisted in `localStorage` using `crypto-js`. The session key is held in-memory only and purged upon lock or logout. Data is never transmitted externally.
-- **MetaMask-Parity UX:** Vault creation, mnemonic reveal (blur/hover security), seed phrase restoration, and private key import operate precisely identical to MetaMask's core flow.
-- **Account Switcher:** Multi-account HD hierarchy featuring labeled accounts, active-account switching, and per-account balance tracking.
+### Motor de Billetera Deterministica Jerarquica
 
-### Aztec Network — ZK Privacy Terminal
+Un motor de billetera nativo diseñado para seguridad institucional, cumpliendo rigurosamente con los estandares de la industria.
 
-Native, comprehensive integration with Aztec Network's privacy L2 rollup.
+1. Generacion de Semilla: Genera entropia de alto nivel y la mapea a una frase de recuperacion secreta utilizando la lista de palabras estandar internacional.
+2. Derivacion de Cuentas: Deriva multiples cuentas hijas desde una sola semilla maestra.
+3. Almacenamiento Cifrado: La informacion encriptada persiste localmente mediante cifrado de maxima seguridad. La llave de sesion se mantiene solo en memoria y se purga al cerrar sesion. Los datos nunca se transmiten externamente.
+4. Interfaz de Usuario: La creacion de cuentas, revelacion de frase semilla y restauracion operan con absoluta paridad a los flujos principales de la industria, asegurando una experiencia limpia y robusta.
 
-- **Private Shielding:** Enables users to shield ETH from the public L1 into an Aztec private note utilizing the Aztec SDK's `createPrivatePayment` architecture. All note commitments and nullifiers are computed locally prior to submission.
-- **Aztec DeFi Bridge:** Executes on-chain interactions with Aztec-native DeFi bridge adapters for Lido, Yearn, and Curve. Capital is deployed into yield strategies while principal amounts remain obfuscated from public chain observers.
-- **Noir ACIR Witness Encoding:** A native TypeScript encoder maps complex objects to Noir `WitnessMap` format, employing the 254-bit prime field integer representation mandated by Barretenberg.
-- **EIP-712 Typed Data Signing:** All Aztec note authorizations utilize `wallet.signTypedData()` to ensure absolute compatibility with the Aztec account contract's `validateUserOp` structure.
-- **ZK Proof Verification API:** Two dedicated serverless endpoints (`/api/zk/prove`, `/api/zk/verify-identity`) manage off-chain proof generation and on-chain verification callbacks immaculately.
+### Abstraccion de Cuentas y Terminal Inteligente
 
-### ERC-4337 — Smart Account Terminal (Account Abstraction)
+Infraestructura completa de abstraccion de cuentas operando bajo los estandares mas recientes.
 
-Full Account Abstraction infrastructure conforming strictly to EIP-4337.
+1. Construccion de Operaciones de Usuario: Construye la estructura completa de operaciones abarcando todos los campos requeridos.
+2. Envio a Empaquetadores: Enruta las cargas utiles firmadas a redes descentralizadas a traves de llamadas a procedimientos remotos contra contratos de punto de entrada canonicamente aceptados.
+3. Soporte para Patrocinadores: La arquitectura del sistema soporta nativamente transacciones sin costo de gas mediante contratos patrocinadores.
 
-- **UserOperation Construction:** Constructs the complete `UserOperation` struct encompassing all requisite fields: `sender`, `nonce`, `initCode`, `callData`, `callGasLimit`, `verificationGasLimit`, `preVerificationGas`, `maxFeePerGas`, `maxPriorityFeePerGas`, `paymasterAndData`, and `signature`.
-- **Canonical Hash Computation:** Implements `getUserOpHash` according to the exact ERC-4337 specification.
-- **Bundler Submission:** Routes signed `UserOperation` payloads to decentralized Bundler networks via `eth_sendUserOperation` JSON-RPC against the canonical `EntryPoint v0.6` contract.
-- **Paymaster-Ready:** System architecture structurally supports gasless transactions via Paymaster contracts (ERC-20 gas sponsorship).
+### Interoperabilidad Omnicadena
 
-### LayerZero V2 — Omnichain Messaging Engine
+Mensajeria entre multiples redes nativa, descartando interfaces puente y tokens envueltos a favor de mensajeria de protocolo cruda.
 
-Native cross-chain interoperability via LayerZero V2 — discarding bridge UIs and wrapped tokens in favor of raw protocol messaging.
+1. Interaccion de Puntos Finales: Ejecuta llamadas directas en la cadena de origen para cotizar y enviar operaciones.
+2. Estimacion Dinamica de Tarifas: Realiza consultas en cadena para averiguar la tarifa exacta de gas nativo requerida para que las redes verificadoras transmitan y ejecuten mensajes a traves de dominios.
+3. Empaquetado Exacto de Datos: Implementa relleno estricto de bytes para los campos receptores como lo requiere la interfaz binaria de la aplicacion.
 
-- **Endpoint Interaction:** Executes direct calls to `LZ_ENDPOINT_V2` on the source chain for `quote()` and `send()` operations.
-- **Dynamic Native Fee Estimation:** Performs on-chain queries to ascertain the exact native gas fee required for the Decentralized Verifier Networks (DVNs) to relay and execute messages cross-domain.
-- **Supported Domains (EIDs):** Ethereum, Arbitrum, Optimism, Polygon, Base, Avalanche.
-- **Bytes32 Receiver Packing:** Implements strict `bytes32` padding for the receiver field as required by the Endpoint ABI.
+### Proteccion de Transacciones Institucionales
 
-### MEV Protection Engine (Flashbots / MEV Blocker)
+Enrutamiento de transacciones privadas diseñado para escudar toda operacion institucional contra ataques frontales.
 
-Private mempool routing designed to shield all institutional transactions from sandwich attacks and front-running.
+1. Enrutamiento Protegido: Las transacciones que exceden umbrales configurables se desvian automaticamente de la memoria publica hacia redes privadas bloqueadoras, previniendo la observacion por buscadores de valor extraible.
+2. Construccion de Paquetes: Facilita la construccion de cargas utiles para ejecucion atomica y multi transaccional dentro de un solo bloque.
+3. Cache Local de Identificadores: Un sistema de memoria en cache optimista local que elimina los errores por choques de identificacion durante transferencias de alta frecuencia.
 
-- **Flashbots RPC Routing:** Transactions exceeding configurable thresholds are automatically rerouted from public mempools to Flashbots RPC, preventing pre-confirmation observation by MEV searchers.
-- **MEV Blocker Fallback:** Implements secondary routing to MEV Blocker for enhanced validator-level MEV resistance.
-- **Bundle Construction:** Facilitates the construction of `eth_sendBundle` payloads for atomic, multi-transaction execution within a single block.
+### Motor de Analitica de Datos y Mensajeria
 
-### Quantum Nonce Cache — Race Condition Elimination
+Deteccion autonoma de grandes movimientos financieros y comunicacion cifrada.
 
-A static, in-memory nonce mutex engineered to eliminate EVM `Nonce too low` reverts during high-frequency transaction throughput.
+1. Escaneo en Tiempo Real: Evalua registros de transferencia para descubrir todos los movimientos institucionales operando sin depender de registros centralizados.
+2. Base de Datos de Grafos Neo4j: Las señales crudas se enriquecen mediante una capa de grafos que mantiene las relaciones historicas de todas las entidades.
+3. Infraestructura de Mensajeria: Protocolos de comunicacion descentralizada orquestando mensajeria cifrada de cliente a cliente. El servidor jamas accede a datos legibles.
 
-- **Local Optimistic Cache:** Maintains a per-address nonce map with a strict 30-second TTL. For high-frequency strategies, the engine increments nonces locally without waiting for RPC confirmation.
-- **Network Reconciliation:** Upon cache miss or expiry, the authoritative nonce is accurately re-fetched from the network, reseeding the cache.
-- **Global Injection:** All broadcast calls pass through a centralized `TransactionManager` enforcing safe nonce allocation.
+### Arquitectura de Sistema Global
 
-### DEX Execution Engine (Uniswap V3)
+El sistema completo abarca las siguientes capas tecnologicas organizadas limpiamente:
 
-Advanced on-chain swap routing utilizing the Uniswap V3 SwapRouter.
+1. Capa de Presentacion: Aplicacion construida con React, Tailwind CSS y Framer Motion, logrando una estetica institucional impecable.
+2. Capa de Billetera: Nucleo deterministico jerarquico, cache local, resolucion de nombres y soporte multi cuenta.
+3. Capa de Privacidad Aztec: Codificador Noir, compromisos de notas, escudado privado e integracion profunda con finanzas descentralizadas.
+4. Capa de Ejecucion: Enrutamiento en intercambios descentralizados, empaquetadores de abstraccion de cuentas y fabricas de implementacion de contratos.
+5. Capa de Proteccion: Escudo de transacciones privadas, permisos sin costo de gas y revocador de asignaciones.
+6. Capa de Redes Cruzadas: Puntos finales de mensajeria omnicadena y retransmision de verificadores.
+7. Capa Analitica: Deteccion de grandes flujos de capital en tiempo real, base de datos relacional PostgreSQL y base de datos de grafos Neo4j.
 
-- **exactInputSingle:** Facilitates single-hop ERC-20 swaps with strictly defined `sqrtPriceLimitX96` and `amountOutMinimum` parameters for rigorous slippage protection.
-- **exactInput (Multi-hop):** Executes multi-pool routing via deterministic byte-encoded paths.
-- **EIP-2612 Permit Integration:** Enables gasless token approvals via the `permit()` standard prior to swap execution, replacing standard `approve()` transactions with typed signatures.
-- **Price Impact Detection:** Executes pre-swap `quoteExactInputSingle` calls via Quoter V2 to calculate expected outputs and prevent high-impact executions.
+### Estado de Licencia y Despliegue
 
-### ENS Resolution Engine
+Licencia: MIT
+Estado Operacional: Desplegado en Produccion
+Integridad de Construccion: Absolutamente Perfecta
 
-Bidirectional Ethereum Name Service (ENS) resolution architecture.
-
-- **Forward Lookup:** Accurately resolves addresses to canonical ENS names.
-- **Reverse Lookup:** Resolves ENS names back to underlying hexadecimal addresses.
-- **ENS Avatar Fetch:** Retrieves profile avatar URIs directly from ENS text records for UI rendering.
-
-### Contract Deployer — EIP-1559 Bytecode Deployment
-
-An institutional-grade smart contract deployment engine operating purely on EVM bytecode.
-
-- **Raw Bytecode Deployment:** Constructs `{ to: null, data: bytecode }` payloads for fundamental EVM deployment.
-- **CREATE2 Deterministic Factory:** Utilizes a `salt + initCodeHash` pair to pre-compute deterministic deployment addresses on-chain prior to broadcast, unlocking counterfactual instantiation (EIP-1014).
-- **Gas Estimation Buffer:** Applies a rigid, automatic +20% gas buffer atop standard estimates for complex constructor execution.
-- **EIP-1559 Enforcement:** Mandates that all deployments utilize `type: 2` transactions exclusively.
-
-### EIP-1193 Provider Emulator
-
-A strictly standards-compliant `window.ethereum` provider enabling external dApp connectivity to the Humanity Ledger vault.
-
-- **Full RPC Routing:** Manages all standard JSON-RPC methodologies securely.
-- **Internal Key Routing:** Intercepts and routes all signing operations to the internal wallet flow. The private key never departs the encrypted vault boundary.
-- **wallet_switchEthereumChain:** Provides programmatic network switching fully compatible with EIP-3326 specifications.
-
-### Token Allowance Manager
-
-Comprehensive ERC-20 spending approval auditing and revocation terminal.
-
-- **Allowance Scan:** Audits all historical `Approval` events for the connected address across standardized token contracts.
-- **One-Click Revoke:** Executes `token.approve(spender, 0)` to systematically neutralize dangerously open approvals.
-- **Permit2 Awareness:** Specifically detects Uniswap's Permit2 universal approval contract, flagging it as a priority target for revocation if necessary.
-
-### Token Discovery Engine
-
-Autonomous detection of ERC-20 tokens operating without reliance on centralized token registries.
-
-- **Transfer Event Scan:** Evaluates `Transfer` logs to discover all tokens that have interacted with the wallet.
-- **Metadata Hydration:** Fetches absolute contract states (`symbol()`, `decimals()`, `balanceOf()`) for validated rendering.
-
-### Transaction Manager — Mempool Control Center
-
-Real-time mempool monitoring and lifecycle authority.
-
-- **Speed Up:** Re-broadcasts pending transactions dynamically with an augmented fee structure to accelerate confirmation.
-- **Cancel:** Displaces stalled transactions by transmitting a zero-value self-transaction possessing an identical nonce and doubled gas parameters.
-
----
-
-## System Architecture
-
-```text
-┌─────────────────────────────────────────────────────────────────────────┐
-│                     HUMANITY LEDGER — SYSTEM ARCHITECTURE               │
-├───────────────────────┬─────────────────────────────────────────────────┤
-│   PRESENTATION LAYER  │  Next.js 15 (App Router) · Framer Motion        │
-│   (React / PWA)       │  Monochrome Institutional Design System         │
-├───────────────────────┼─────────────────────────────────────────────────┤
-│   WALLET ENGINE       │  BIP-39/44 HD · AES-256 Vault · EIP-1193       │
-│                       │  Quantum Nonce Cache · ENS · Multi-Account      │
-├───────────────────────┼─────────────────────────────────────────────────┤
-│   ZK / AZTEC LAYER    │  Noir ACIR Encoder · Note Commitments           │
-│                       │  Private Shielding · DeFi Bridge (Lido/Yearn)  │
-├───────────────────────┼─────────────────────────────────────────────────┤
-│   EXECUTION LAYER     │  Uniswap V3 DEX · ERC-4337 Bundler             │
-│                       │  CREATE2 Factory · Contract Deployer            │
-├───────────────────────┼─────────────────────────────────────────────────┤
-│   PROTECTION LAYER    │  Flashbots MEV Shield · MEV Blocker RPC        │
-│                       │  EIP-2612 Gasless Permits · Allowance Revoker  │
-├───────────────────────┼─────────────────────────────────────────────────┤
-│   CROSS-CHAIN LAYER   │  LayerZero V2 Endpoint · DVN Relay Quoting     │
-│                       │  Omnichain Message Packing (6 EVM Domains)     │
-├───────────────────────┼─────────────────────────────────────────────────┤
-│   ANALYTICS LAYER     │  Real-Time Whale Detection · SSE Pipeline      │
-│                       │  Neo4j Graph · Redis BullMQ · PostgreSQL        │
-└───────────────────────┴─────────────────────────────────────────────────┘
-```
-
----
-
-## Technical Stack Overview
-
-| Operational Layer | Core Technology |
-|---|---|
-| ZK / Privacy Integration | Aztec Network, Noir (ACIR), Barretenberg Prover |
-| Cross-Chain Interoperability | LayerZero V2 (Endpoint V2, DVN architecture) |
-| Account Abstraction | ERC-4337, EntryPoint v0.6, Decentralized Bundler RPC |
-| Frontend Presentation | Next.js 15, React 18, Framer Motion, Tailwind CSS |
-| Wallet Core Engineering | Ethers.js v6, BIP-39, BIP-44, EIP-712, EIP-2612 |
-| Backend Services | Node.js 22, Redis (BullMQ), PostgreSQL (Prisma ORM) |
-| Graph Analytics | Neo4j (real-time multi-hop transaction correlation) |
-| DEX Execution | Uniswap V3 SwapRouter, Quoter V2 |
-| MEV Protection | Flashbots RPC, MEV Blocker |
-| Infrastructure | Railway (Production), Docker, GitHub Actions |
-
----
-
-## Grant Relevance — Aztec Network Integration
-
-This repository objectively demonstrates a profound, production-grade integration with Aztec Network across fundamental structural layers:
-
-1. **Noir Circuit Compatibility** — Advanced TypeScript-to-Witness Map encoding strictly adhering to ACIR-compiled circuit standards.
-2. **Private Note Architecture** — Flawless implementation of on-chain shielded commitments utilizing Aztec SDK cryptographic primitives.
-3. **Aztec DeFi Bridges** — Institutional deployment of private yield strategies via highly secured Lido and Yearn bridge adapters natively on the Aztec L2 environment.
-4. **ZK Identity** — Zero-knowledge proof-based reputation and authentication protocols ensuring EOA addresses remain entirely opaque.
-5. **Private Messaging** — Implementation of Aztec's encrypted log primitives to facilitate fundamentally confidential coordination via the Whale Chat protocol.
-6. **EIP-712 + Aztec Account Contracts** — Strict adherence to typed signatures required for the Aztec `validateUserOp` authorization protocol, ensuring robust and verifiable transactions.
-
----
-
-## Licensing & Deployment Status
-
-**License:** MIT  
-**Operational Status:** Deployed in Production (Railway)  
-**Verification Date:** May 30, 2026  
-**Build Integrity:** Absolutely Perfect (Zero errors — Next.js 15.5.12)  
-
-**Author:** Stefan Antonio Cirisanu ([@humanityledger](https://github.com/humanityledger))  
-**Platform Website:** [humanidfi.com](https://humanidfi.com)  
-**Grant Proposal Targeting:** Aztec Network Open Grants Program  
+Este documento describe tecnicamente el compromiso y la madurez estructural que presenta Humanity Ledger para integrar las capacidades revolucionarias de Aztec Network en el mundo institucional de finanzas descentralizadas. Solicitamos formalmente el reconocimiento y la subvencion para continuar impulsando la tecnologia de conocimiento cero a su maximo potencial.

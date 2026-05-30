@@ -115,13 +115,18 @@ export default function LoginPage() {
   }, [activateSystemVault, cloudSync, handleRedirect]);
 
   // ── Strategy A: wallet-store (Zustand / CryptoJS) ────────────────────────
+  // NOTE: unlockVault may fire a toast.error internally when the hash mismatches.
+  // That is acceptable — if System B subsequently succeeds it will override with a success toast.
   const tryStoreUnlock = useCallback(async (cleanPwd: string): Promise<boolean> => {
     const success = unlockVault(cleanPwd);
     if (!success) return false;
 
     const { privateKey, address } = useWalletStore.getState();
     if (!privateKey || !address) {
-      toast.error("Vault unlocked but wallet data missing — please re-create your wallet.");
+      // encryptedVault hash matched but decrypted payload has no privateKey.
+      // This happens when the vault was created before the wallet keys were set.
+      // Fall through silently to System B which holds the canonical AES-GCM blob.
+      console.warn('[Login:SystemA] Vault unlocked but no privateKey — falling through to System B.');
       return false;
     }
 
