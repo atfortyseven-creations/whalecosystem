@@ -7,7 +7,8 @@ import { toast } from "sonner";
 import { useWalletStore } from "@/lib/store/wallet-store";
 import { encryptWithPassword, tryDecryptAny } from "@/lib/wallet-security";
 import { useSystemConnect } from "@/hooks/useSystemConnect";
-import { Lock, Hash, Wallet, EyeOff, Eye, UserPlus } from "lucide-react";
+import { Lock, Hash, Wallet, EyeOff, Eye, UserPlus, Fingerprint } from "lucide-react";
+import { WalletQRMatrix, useIlluminationOrder } from "@/components/ui/WalletQRMatrix";
 import { OptimizedLocalLottie } from "@/components/landing/OptimizedLocalLottie";
 import { RemoteLottie } from "@/components/ui/RemoteLottie";
 
@@ -65,43 +66,68 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
   // --------------------------------------------------------
   const [hardwareHex, setHardwareHex] = useState<string>("0x0000000000000000");
 
+  // Pre-generate a stable shuffled illumination order for the QR pixel animation.
+  // 1681 covers a 41×41 QR (Version 6, EC=M). Excess indices are ignored by the component.
+  const illuminationOrder = useIlluminationOrder(1681);
+
+  // Address to encode: use the store address once available.
+  // Pass null when no address yet — WalletQRMatrix will show a skeleton.
+  const scanAddress = useWalletStore(s => s.address) ?? null;
+
+  // SSR-safe screen size: initialise as 320 (desktop default), update after mount
+  const [qrSize, setQrSize] = useState(320);
+  useEffect(() => {
+    const update = () => setQrSize(window.innerWidth < 640 ? 240 : 320);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
+  const [isPressing, setIsPressing] = useState(false);
+
   useEffect(() => {
     if (phase !== "ENTROPY") return;
+    
     let animationFrameId: number;
     let lastTime = performance.now();
-    let accumulatedEntropy = 0;
-
-    const extractEntropy = (time: number) => {
-      // Delta time jitter (sub-millisecond hardware drift)
+    
+    const tick = (time: number) => {
       const delta = time - lastTime;
       lastTime = time;
 
-      // Extract 32 bytes of high-quality cryptographic noise from OS via Web Crypto API
-      const randomValues = new Uint8Array(32);
-      window.crypto.getRandomValues(randomValues);
-      
-      // Visualize the entropy extraction
-      const hexString = "0x" + Array.from(randomValues).slice(0, 8).map(b => b.toString(16).padStart(2, '0')).join('');
-      setHardwareHex(hexString);
-
-      // Accumulate progress (drift + raw values)
-      accumulatedEntropy += (delta * 0.05) + (randomValues[0] / 255) * 0.5;
-
       setEntropyProgress(prev => {
-        const next = prev + (accumulatedEntropy > 100 ? 100 : accumulatedEntropy) * 0.01;
-        if (next >= 100) {
-          setPhase("PROOFS");
+        let next = prev;
+        
+        if (isPressing) {
+          // Increase progress over 8 seconds (100% / 8000ms = 0.0125 per ms)
+          next = prev + (delta * 0.0125);
+          
+          // Generate actual entropy while pressing
+          const randomValues = new Uint8Array(8);
+          window.crypto.getRandomValues(randomValues);
+          const hexString = "0x" + Array.from(randomValues).map(b => b.toString(16).padStart(2, '0')).join('');
+          setHardwareHex(hexString);
+        } else {
+          // Decay progress if released before 100% to force a continuous hold
+          if (prev > 0 && prev < 100) {
+            next = Math.max(0, prev - (delta * 0.03)); // Decay slightly slower to match 8s scale
+          }
+        }
+
+        if (next >= 100 && prev < 100) {
+          setTimeout(() => setPhase("PROOFS"), 800); // 800ms delay to admire the full QR before Transaction Complete Lottie
           return 100;
         }
-        return next;
+        
+        return Math.min(100, next);
       });
 
-      animationFrameId = requestAnimationFrame(extractEntropy);
+      animationFrameId = requestAnimationFrame(tick);
     };
 
-    animationFrameId = requestAnimationFrame(extractEntropy);
+    animationFrameId = requestAnimationFrame(tick);
     return () => cancelAnimationFrame(animationFrameId);
-  }, [phase]);
+  }, [phase, isPressing]);
 
   // --------------------------------------------------------
   // PHASE: CORE PROOFS (Complex operations)
@@ -425,37 +451,49 @@ export function QuantumVaultOnboarding({ onComplete }: { onComplete: () => void 
           )}
 
           {phase === "ENTROPY" && (
-            <motion.div key="entropy" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} className="flex flex-col items-center w-full px-2 text-center">
+            <motion.div 
+              key="entropy" 
+              initial={{ opacity: 0, scale: 0.95 }} 
+              animate={{ opacity: 1, scale: 1 }} 
+              exit={{ opacity: 0 }} 
+              className="flex flex-col items-center w-full px-2 text-center select-none"
+              style={{ touchAction: 'none', WebkitUserSelect: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
+            >
+              <div 
+                className={`w-32 h-32 md:w-40 md:h-40 border-4 rounded-full flex items-center justify-center mb-8 shadow-2xl cursor-pointer transition-all duration-300 ${isPressing ? 'border-black bg-black/10 scale-95' : 'border-black/20 bg-transparent scale-100 hover:border-black/50'}`}
+                onPointerDown={(e) => { e.currentTarget.setPointerCapture(e.pointerId); setIsPressing(true); }}
+                onPointerUp={(e) => { e.currentTarget.releasePointerCapture(e.pointerId); setIsPressing(false); }}
+                onPointerCancel={() => setIsPressing(false)}
+                onContextMenu={(e) => e.preventDefault()}
+              >
+                <Fingerprint size={64} className={`transition-all duration-300 ${isPressing ? 'text-black scale-110' : 'text-black/30'}`} strokeWidth={isPressing ? 2 : 1.5} />
+              </div>
               <h2 className="text-[13px] md:text-[20px] font-black uppercase tracking-widest text-black mb-2 drop-shadow-sm">Generating Secure Identity</h2>
-              <p className="text-[10px] md:text-[12px] font-mono uppercase tracking-widest text-black/50 mb-8 md:mb-11">Extracting device entropy</p>
+              <p className={`text-[10px] md:text-[12px] font-mono uppercase tracking-widest mb-8 md:mb-11 transition-colors ${isPressing ? 'text-black font-bold animate-pulse' : 'text-black/50'}`}>
+                {isPressing ? "Extracting quantum entropy..." : "Hold fingerprint to verify identity"}
+              </p>
               
               <div className="w-full max-w-xl bg-black/5 h-1.5 mb-5 overflow-hidden rounded-full backdrop-blur-sm">
-                <div className="h-full bg-black transition-all duration-75 ease-linear rounded-full" style={{ width: `${entropyProgress}%` }} />
+                <div className="h-full bg-black transition-all duration-75 ease-linear rounded-full" style={{ width: `${Math.min(100, entropyProgress)}%` }} />
               </div>
               
-              <div className="font-mono text-[56px] md:text-[98px] font-black tracking-tighter text-black/10 tabular-nums leading-none">
-                {entropyProgress.toFixed(1)}%
+              <div className="font-mono text-[56px] md:text-[98px] font-black tracking-tighter text-black/10 tabular-nums leading-none transition-all" style={{ opacity: isPressing ? 1 : 0.5 }}>
+                {Math.min(100, entropyProgress).toFixed(1)}%
               </div>
               
               <div className="mt-4 font-mono text-[10px] md:text-[14px] text-black/40 tracking-widest uppercase">
                 Entropy Hash: {hardwareHex}
               </div>
               
-              <div className="grid grid-cols-10 md:grid-cols-20 gap-2 mt-8 w-full max-w-3xl opacity-30">
-                {Array.from({ length: 200 }).map((_, i) => {
-                  // Stable fill: cell is "on" if its index falls below the filled proportion
-                  // This avoids Math.random() re-evaluating on every mouse move (massive repaint)
-                  const threshold = Math.floor((entropyProgress / 100) * 200);
-                  const isOn = i < threshold;
-                  return (
-                    <div
-                      key={i}
-                      className="aspect-square bg-black rounded-sm transition-opacity duration-300"
-                      style={{ opacity: isOn ? 0.8 : 0.05 }}
-                    />
-                  );
-                })}
-              </div>
+              <WalletQRMatrix
+                address={scanAddress ?? ""}
+                mode="animate"
+                progress={entropyProgress}
+                isPressing={isPressing}
+                illuminationOrder={illuminationOrder}
+                size={qrSize}
+                className="mt-8 mx-auto"
+              />
             </motion.div>
           )}
 

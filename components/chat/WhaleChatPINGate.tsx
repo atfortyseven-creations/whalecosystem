@@ -6,10 +6,11 @@ import { useAppKit } from '@reown/appkit/react';
 import { useDisconnect } from 'wagmi';
 import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { useWalletStore } from '@/lib/store/wallet-store';
-import { ArrowLeft, Delete, LogOut, RefreshCw, ShieldCheck, AlertTriangle } from 'lucide-react';
+import { ArrowLeft, Delete, LogOut, RefreshCw, ShieldCheck, AlertTriangle, QrCode, X } from 'lucide-react';
 import { toast } from 'sonner';
 import { useSystemSignOut } from '@/hooks/useSystemSignOut';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
+import { WalletQRDisplay } from '@/components/wallet/WalletQRDisplay';
 import CryptoJS from 'crypto-js';
 import { useEnsName } from 'wagmi';
 
@@ -389,6 +390,7 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
   const [shake, setShake] = useState(false);
   const [attempts, setAttempts] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
+  const [showQR, setShowQR] = useState(false);
 
   // On mount / address change: async check for existing PIN across all layers
   useEffect(() => {
@@ -648,6 +650,39 @@ export default function WhaleChatPINGate({ onEnter }: Props) {
                   <RefreshCw size={15} />
                   Connect another wallet
                 </button>
+
+                {/* QR Code share button */}
+                <button
+                  onClick={() => setShowQR(v => !v)}
+                  className="w-full py-4 rounded-[20px] bg-white border border-black/10 text-[#050505] font-bold tracking-widest text-[13px] uppercase hover:border-black/25 hover:bg-black/[0.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2.5"
+                >
+                  {showQR ? <X size={15} /> : <QrCode size={15} />}
+                  {showQR ? 'Hide QR Code' : 'Show my QR Code'}
+                </button>
+
+                <AnimatePresence>
+                  {showQR && (
+                    <motion.div
+                      key="qr-panel"
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-3 flex flex-col items-center gap-2">
+                        <WalletQRDisplay
+                          address={address}
+                          size={200}
+                          showAddress
+                          withFrame
+                        />
+                        <p className="text-[10px] text-black/35 font-mono uppercase tracking-widest text-center px-4">
+                          Scan with any Ethereum wallet to send to this address
+                        </p>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
             )}
 
