@@ -10,27 +10,14 @@ export interface TokenLogoProps {
 }
 
 export function resolveTokenLogo(asset: { symbol?: string; address?: string; logoURI?: string | null }) {
-    if (asset.logoURI) return asset.logoURI;
-    const sym = asset.symbol?.toUpperCase();
-    if (sym === 'ETH' || asset.address === 'native') {
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/info/logo.png';
-    }
-    if (sym === 'USDC') {
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png';
-    }
-    if (sym === 'USDT') {
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xdAC17F958D2ee523a2206206994597C13D831ec7/logo.png';
-    }
-    if (sym === 'WBTC') {
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x2260FAC5E5542a773Aa44fBCfeDf7C193bc2C599/logo.png';
-    }
-    if (sym === 'DAI') {
-        return 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png';
-    }
-    if (asset.address && asset.address.startsWith('0x') && asset.address.length === 42) {
-        return `https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${asset.address}/logo.png`;
-    }
-    return null;
+    if (asset.logoURI && asset.logoURI.startsWith('http')) return asset.logoURI;
+    
+    // Construct the URL to our new internal proprietary API
+    const params = new URLSearchParams();
+    if (asset.symbol) params.append('symbol', asset.symbol);
+    if (asset.address) params.append('address', asset.address);
+    
+    return `/api/token-logo?${params.toString()}`;
 }
 
 export const TokenLogo: React.FC<TokenLogoProps> = ({ symbol, address, logoURI, className, fallbackClassName }) => {
@@ -44,7 +31,7 @@ export const TokenLogo: React.FC<TokenLogoProps> = ({ symbol, address, logoURI, 
 
     if (!imgSrc || hasError) {
         return (
-            <div className={cn("flex items-center justify-center font-black uppercase tracking-tight bg-black/5  text-black/60 ", className, fallbackClassName)}>
+            <div className={cn("flex items-center justify-center font-black uppercase tracking-tight bg-black text-white", className, fallbackClassName)}>
                 {typeof symbol === 'string' ? symbol.slice(0, 2) : '?'}
             </div>
         );

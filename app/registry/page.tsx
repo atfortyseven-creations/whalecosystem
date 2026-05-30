@@ -41,7 +41,7 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { RealWorldMap } from "@/components/landing/RealWorldMap";
-import { DownheadSection } from "@/components/landing/DownheadSection";
+import { SystemFooter } from "@/components/landing/SystemFooter";
 
 // ─── Chain Configurations ──────────────────────────────────────────────────────
 
@@ -2210,7 +2210,7 @@ export default function RegistryPage() {
             </motion.div>
           )}
         </AnimatePresence>
-        <DownheadSection />
+        <SystemFooter />
       </div>
     </div>
   );
