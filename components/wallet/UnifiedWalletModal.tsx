@@ -723,10 +723,27 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
                 const minOut = parsedOut * BigInt(Math.floor((100 - parseFloat(slippage)) * 100)) / 10000n;
                 const parsedIn = parseUnits(payAmount, payToken.decimals);
                 
-                const wethFallback = WRAPPED_NATIVE_MAP[fromChain.id] || WRAPPED_NATIVE_MAP[1];
-                const pathFrom = isPayTokenNative ? wethFallback : payToken.address;
-                const pathTo = isReceiveTokenNative ? wethFallback : receiveToken.address;
-                const path = [pathFrom as `0x${string}`, pathTo as `0x${string}`];
+                // CRITICAL: Uniswap V2 does NOT have direct pools for most token pairs.
+                // All token-to-token swaps MUST route through WETH as the intermediate:
+                //   Token A → WETH → Token B
+                // Skipping WETH causes "INSUFFICIENT_LIQUIDITY" reverts on-chain.
+                const wethAddress = (WRAPPED_NATIVE_MAP[fromChain.id] || WRAPPED_NATIVE_MAP[1]) as `0x${string}`;
+                const pathFrom = isPayTokenNative ? wethAddress : payToken.address as `0x${string}`;
+                const pathTo = isReceiveTokenNative ? wethAddress : receiveToken.address as `0x${string}`;
+
+                // Build path: direct only when one side is native (already routes via WETH internally)
+                // For token→token, always insert WETH in the middle
+                let path: `0x${string}`[];
+                if (isPayTokenNative || isReceiveTokenNative) {
+                    // Native→Token or Token→Native: 2-hop, Uniswap handles WETH wrapping
+                    path = [pathFrom, pathTo];
+                } else if (pathFrom.toLowerCase() === wethAddress.toLowerCase() || pathTo.toLowerCase() === wethAddress.toLowerCase()) {
+                    // One side IS WETH already
+                    path = [pathFrom, pathTo];
+                } else {
+                    // Token→Token: must go through WETH
+                    path = [pathFrom, wethAddress, pathTo];
+                }
 
                 const routerAddress = SWAP_ROUTER_MAP[fromChain.id] || SWAP_ROUTER_MAP[1];
 
@@ -990,14 +1007,14 @@ function BuyModule() {
             toast.error("No wallet address available. Please connect a wallet first.");
             return;
         }
-        
+
         setIsInitializing(true);
         setErrorMsg('');
         toast.loading("Generating encrypted payload...", { id: "fiat-tx" });
 
         try {
-            const redirectUri = typeof window !== 'undefined' 
-                ? `${window.location.origin}/?modal=swap&from=${cryptoCurrencyCode}&to=eth` 
+            const redirectUri = typeof window !== 'undefined'
+                ? `${window.location.origin}/?modal=swap&from=${cryptoCurrencyCode}&to=eth`
                 : '';
 
             const res = await fetch('/api/wallet/moonpay/sign', {
@@ -1013,22 +1030,24 @@ function BuyModule() {
             });
 
             const data = await res.json();
-            
+
+            // Show in-app error if API key is not configured — do NOT open MoonPay
             if (!res.ok || !data.url) {
-                throw new Error(data.error || `Server error ${res.status}`);
+                const msg = data.error || `Server error ${res.status}`;
+                setErrorMsg(msg);
+                toast.error("MoonPay Error", { id: "fiat-tx", description: msg });
+                return;
             }
-            
+
             toast.success("Terminal Ready", { id: "fiat-tx" });
-            
+
             const moonpayWindow = window.open(data.url, '_blank');
             if (!moonpayWindow) {
-                // Popup blocked — navigate directly
                 window.location.href = data.url;
                 return;
             }
-            
+
             setIsPolling(true);
-            
             let attempts = 0;
             const pollInterval = setInterval(() => {
                 attempts++;
