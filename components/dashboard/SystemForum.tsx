@@ -508,7 +508,7 @@ function ForumHomeContent() {
             <div className="flex items-center gap-4">
               <div>
                 <h1 className="text-[24px] md:text-[32px] font-black tracking-tight text-slate-900 leading-none mb-1 uppercase">
-                  SystemForum
+                  Whale Network Forum
                 </h1>
                 <p className="text-[13px] text-slate-500 font-medium max-w-xl leading-relaxed hidden sm:block">
                   Discuss protocol upgrades, Noir circuits, Aztec testnets, and QDs economics.
