@@ -9,44 +9,57 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
     }
 
-    const apiKey = process.env.NEXT_PUBLIC_MOONPAY_KEY || 'pk_test_1234567890abcdef';
-    const secretKey = process.env.STRIPE_SECRET_KEY || process.env.MOONPAY_SECRET_KEY; // For safety, fallback if user used Stripe's secret field
+    const apiKey = process.env.NEXT_PUBLIC_MOONPAY_KEY || process.env.MOONPAY_API_KEY || '';
+    const secretKey = process.env.MOONPAY_SECRET_KEY || process.env.STRIPE_SECRET_KEY || '';
 
-    // Base URL construction
-    const baseUrl = 'https://buy.moonpay.com';
+    if (!apiKey) {
+      return NextResponse.json(
+        { error: 'MoonPay API key not configured. Set MOONPAY_API_KEY in Railway environment variables.' },
+        { status: 500 }
+      );
+    }
+
+    // Use sandbox URL for test keys (pk_test_...), production URL for live keys (pk_live_...)
+    const isSandbox = apiKey.startsWith('pk_test_');
+    const baseUrl = isSandbox ? 'https://buy-sandbox.moonpay.com' : 'https://buy.moonpay.com';
+
     const params = new URLSearchParams({
       apiKey,
       currencyCode: currencyCode.toLowerCase(),
       baseCurrencyCode: (baseCurrencyCode || 'usd').toLowerCase(),
       baseCurrencyAmount: baseCurrencyAmount.toString(),
       walletAddress,
-      colorCode: '#FFFFFF', // Institutional Ivory match
-      theme: 'light'
+      theme: 'light',
     });
+
+    // colorCode must NOT contain '#' in the URLSearchParams value
+    // MoonPay expects it as %23FFFFFF not %2523FFFFFF
+    params.append('colorCode', encodeURIComponent('#FFFFFF'));
 
     if (redirectURL) {
       params.append('redirectURL', redirectURL);
     }
 
-    const urlToSign = `${baseUrl}?${params.toString()}`;
+    const queryString = `?${params.toString()}`;
+    const urlToSign = `${baseUrl}${queryString}`;
 
-    // If no secret key is found in environment, we return the unsigned URL (Sandbox mode)
+    // If no secret key, return the unsigned URL (works in sandbox mode without signature)
     if (!secretKey) {
-        console.warn('[MoonPay] No secure secret key configured. Returning unsigned Sandbox URL.');
-        return NextResponse.json({ url: urlToSign });
+      console.warn('[MoonPay] No MOONPAY_SECRET_KEY configured — returning unsigned URL (sandbox only).');
+      return NextResponse.json({ url: urlToSign, sandbox: isSandbox });
     }
 
-    // HMAC SHA256 Signature for production authentication
+    // HMAC SHA256 — MoonPay signs only the query string portion (including the leading '?')
     const signature = crypto
       .createHmac('sha256', secretKey)
-      .update(new URL(urlToSign).search)
+      .update(queryString)
       .digest('base64');
-      
+
     const signedUrl = `${urlToSign}&signature=${encodeURIComponent(signature)}`;
 
-    return NextResponse.json({ url: signedUrl });
+    return NextResponse.json({ url: signedUrl, sandbox: isSandbox });
   } catch (error: any) {
     console.error('[MoonPay API] Signature generation failed:', error);
-    return NextResponse.json({ error: 'Signature generation failed' }, { status: 500 });
+    return NextResponse.json({ error: 'Signature generation failed: ' + error.message }, { status: 500 });
   }
 }

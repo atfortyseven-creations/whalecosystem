@@ -437,16 +437,58 @@ const SWAP_ROUTER_MAP: Record<number, string> = {
 };
 
 const WRAPPED_NATIVE_MAP: Record<number, string> = {
-    1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2", // WETH Mainnet
-    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270", // WMATIC Polygon
-    42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1", // WETH Arbitrum
-    10: "0x4200000000000000000000000000000000000006", // WETH Optimism
-    8453: "0x4200000000000000000000000000000000000006", // WETH Base
-    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c", // WBNB BSC
-    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7", // WAVAX Avalanche
+    1: "0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2",
+    137: "0x0d500B1d8E8eF31E21C99d1Db9A6444d3ADf1270",
+    42161: "0x82aF49447D8a07e3bd95BD0d56f35241523fBab1",
+    10: "0x4200000000000000000000000000000000000006",
+    8453: "0x4200000000000000000000000000000000000006",
+    56: "0xbb4CdB9CBd36B01bD1cBaEBF2De08d9173bc095c",
+    43114: "0xB31f66AA3C1e785363F0875A1B74E27b85FD66c7",
 };
 
 const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98"; // Stargate Router Mainnet
+
+// ─── Token whitelists ────────────────────────────────────────────────────────
+// SWAP: only ERC-20 tokens with verified Uniswap V2 / fork liquidity pools.
+// Tokens not on this list cannot be swapped — there is no on-chain pool for them.
+// Native gas tokens (ETH, MATIC, BNB, AVAX) are always included via NATIVE_ADDRESS.
+const SWAPPABLE_SYMBOLS = new Set([
+    'ETH', 'WETH', 'MATIC', 'WMATIC', 'BNB', 'WBNB', 'AVAX', 'WAVAX',
+    'USDC', 'USDT', 'DAI', 'WBTC', 'BUSD', 'FRAX', 'USDD', 'TUSD',
+    'LINK', 'UNI', 'AAVE', 'MKR', 'COMP', 'SNX', 'CRV', 'LDO',
+    'GRT', 'ENS', 'SUSHI', 'BAL', 'YFI', '1INCH', 'DYDX',
+    'ARB', 'OP', 'STG', 'GMX', 'PENDLE', 'RDNT',
+    'CAKE', 'JOE', 'QUICK', 'BIFI', 'BANANA',
+]);
+
+// BRIDGE: Stargate only supports these tokens across chains.
+// Attempting to bridge unsupported tokens will fail on-chain.
+const BRIDGEABLE_SYMBOLS = new Set([
+    'ETH', 'WETH', 'USDC', 'USDT', 'DAI', 'FRAX', 'LUSD', 'MAI', 'METIS', 'METIS',
+    'MATIC', 'BNB', 'AVAX',
+]);
+
+// Helper: filter a token list to only include swappable/bridgeable tokens
+function filterSwappableTokens(tokens: any[]): any[] {
+    return tokens.filter((t: any) => {
+        if (!t?.symbol) return false;
+        const sym = t.symbol.toUpperCase();
+        // Always allow native gas tokens
+        if (t.address === NATIVE_ADDRESS || t.address === 'native') return true;
+        // Always allow WETH/wrapped natives
+        if (sym.startsWith('W') && sym.length <= 5) return true;
+        return SWAPPABLE_SYMBOLS.has(sym);
+    });
+}
+
+function filterBridgeableTokens(tokens: any[]): any[] {
+    return tokens.filter((t: any) => {
+        if (!t?.symbol) return false;
+        const sym = t.symbol.toUpperCase();
+        if (t.address === NATIVE_ADDRESS || t.address === 'native') return true;
+        return BRIDGEABLE_SYMBOLS.has(sym);
+    });
+}
 
 const UNISWAP_V2_ROUTER_ABI = parseAbi([
   "function swapExactETHForTokens(uint amountOutMin, address[] calldata path, address to, uint deadline) external payable returns (uint[] memory amounts)",
@@ -515,7 +557,13 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
         network: c.name
     }));
 
-    const availableFromAssets = userAssets.filter((a: any) => a.chainId === fromChain.id && a.symbol !== 'QDs');
+    const rawFromAssets = userAssets.filter((a: any) => a.chainId === fromChain.id && a.symbol !== 'QDs');
+    // For SWAP/BRIDGE: only show tokens the DEX/bridge actually supports.
+    const availableFromAssets = mode === 'SWAP'
+        ? filterSwappableTokens(rawFromAssets)
+        : mode === 'BRIDGE'
+            ? filterBridgeableTokens(rawFromAssets)
+            : rawFromAssets;
     const fallbackNativeToken = DEFAULT_TOKENS.find((t: any) => t.chainId === fromChain.id) || DEFAULT_TOKENS[0];
     
     const initialPayToken = useMemo(() => {
@@ -870,8 +918,47 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
             </button>
 
             <AnimatePresence>
-                {showFromSelect && <TokenSelector assets={[...availableFromAssets, ...UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 }))]} currentChainId={fromChain.id} onClose={() => setShowFromSelect(false)} onSelect={setPayToken} />}
-                {showToSelect && <TokenSelector assets={[...DEFAULT_TOKENS, ...userAssets, ...UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: mode === 'BRIDGE' ? toChain.id : fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 }))]} currentChainId={mode === 'BRIDGE' ? toChain.id : fromChain.id} onClose={() => setShowToSelect(false)} onSelect={setReceiveToken} />}
+                {showFromSelect && (
+                    <TokenSelector
+                        assets={[
+                            // User's own tokens on this chain, filtered for the operation
+                            ...availableFromAssets,
+                            // Universal tokens not already in user's list
+                            ...(mode === 'SWAP'
+                                ? filterSwappableTokens(UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 })))
+                                : mode === 'BRIDGE'
+                                    ? filterBridgeableTokens(UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 })))
+                                    : UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 }))
+                            )
+                        ]}
+                        currentChainId={fromChain.id}
+                        onClose={() => setShowFromSelect(false)}
+                        onSelect={setPayToken}
+                    />
+                )}
+                {showToSelect && (
+                    <TokenSelector
+                        assets={[
+                            ...DEFAULT_TOKENS.filter((t: any) => t.chainId === (mode === 'BRIDGE' ? toChain.id : fromChain.id)),
+                            // Receive tokens: same filter rules
+                            ...(mode === 'SWAP'
+                                ? filterSwappableTokens(userAssets.filter((a: any) => a.chainId === fromChain.id))
+                                : mode === 'BRIDGE'
+                                    ? filterBridgeableTokens(userAssets.filter((a: any) => a.chainId === toChain.id))
+                                    : userAssets
+                            ),
+                            ...(mode === 'SWAP'
+                                ? filterSwappableTokens(UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 })))
+                                : mode === 'BRIDGE'
+                                    ? filterBridgeableTokens(UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: toChain.id, logoURI: t.logoPath, balanceNumeric: 0 })))
+                                    : UNIVERSAL_TOKENS.map((t: any) => ({ ...t, chainId: fromChain.id, logoURI: t.logoPath, balanceNumeric: 0 }))
+                            )
+                        ]}
+                        currentChainId={mode === 'BRIDGE' ? toChain.id : fromChain.id}
+                        onClose={() => setShowToSelect(false)}
+                        onSelect={setReceiveToken}
+                    />
+                )}
             </AnimatePresence>
         </motion.div>
     );
