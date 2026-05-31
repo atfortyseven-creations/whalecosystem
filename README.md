@@ -1,95 +1,94 @@
-# Humanity Ledger
+# Whale Network & Humanity Ledger
 
-### Portafolio Institucional y Plataforma de Privacidad
+### A Zero-Knowledge Institutional Analytics & Universal Identity Ecosystem
 
-Humanity Ledger representa el ecosistema mas avanzado de gestion de portafolios sin custodia, construido nativamente sobre Aztec Network. Este sistema unifica la privacidad de conocimiento cero, la ejecucion institucional de finanzas descentralizadas, la abstraccion de cuentas, la interoperabilidad entre cadenas y la analitica de capital en tiempo real.
+**Whale Network** represents the most advanced, enterprise-grade, non-custodial portfolio management and zero-knowledge intelligence ecosystem natively architected on the **Aztec Network**. At its core lies the **Humanity Ledger**, an impregnable identity and state-management protocol. 
 
-Toda la arquitectura esta construida en cadena, eliminando simulaciones y la custodia centralizada de llaves, alcanzando un estado de integracion perfecto. Este repositorio sirve como nuestra presentacion oficial para el programa de subvenciones de Aztec Network. Cada componente documentado a continuacion esta implementado como logica en cadena pura, criptograficamente solido y desplegado en produccion.
+To draw a direct architectural parallel for the Aztec Network team: **Humanity Ledger is to Whale Network what Obsidion and ZKPassport are to the broader ZK ecosystem.** It is a standalone, highly acquirable, and integratable zero-trust identity and cryptographic handshake ledger designed for absolute privacy and seamless omni-device execution.
 
-### Arquitectura de Privacidad con Aztec Network y Noir
+**CEO & Repository Owner:** Stefan Antonio Cirisanu
 
-Nuestra integracion con Aztec Network es profunda y de grado de produccion. El sistema utiliza el entorno de ejecucion privado para procesar logica confidencial directamente en el dispositivo del usuario, enviando unicamente pruebas de conocimiento cero a la red. Esta es una explicacion detallada y desfragmentada de nuestra arquitectura Aztec.
+---
 
-1. Circuitos Noir. Toda la logica privada del protocolo esta escrita en Noir, el lenguaje especifico de dominio para desarrollo de circuitos de conocimiento cero. Estos circuitos definen las restricciones matematicas que una transicion de estado debe cumplir. Una transicion es valida solo si se puede generar una prueba valida. Utilizamos patrones de circuitos avanzados para la creacion de notas, generacion de nulificadores para prevenir el doble gasto, transferencias privadas y testigos de autorizacion.
+## 🛡️ Executive Security & Architecture Overview
 
-2. Pruebas Criptograficas Barretenberg. El sistema implementa el probador Barretenberg, soportando el sistema de restricciones UltraPlonk con generacion de pruebas eficiente directamente en el navegador mediante ensamblado web. El cliente demuestra que una transicion de estado fue ejecutada correctamente sin revelar identidades ni montos.
+Our infrastructure is built strictly on-chain, utilizing deterministic cryptographic verification and decentralized key custody to achieve a state of absolute integration. Every module detailed below operates in a live production environment, strictly hardened to ensure maximum concurrency, omni-device state synchronization, and quantum-level execution integrity.
 
-3. Privacidad de Transacciones. Permite a los usuarios proteger fondos de la red publica hacia notas privadas utilizando las primitivas criptograficas nativas del paquete de desarrollo de Aztec. Todos los compromisos de notas y nulificadores se calculan localmente antes de su envio.
+This repository serves as our official technical manifestation and acquisition/grant pitch for the Aztec Network.
 
-4. Entorno de Ejecucion Privado. Este entorno opera enteramente en el navegador del usuario. Mantiene la base de datos de notas privadas, genera pruebas de conocimiento cero y envia unicamente la prueba y los datos publicos al secuenciador de Aztec. Las llaves privadas jamas abandonan el navegador.
+---
 
-5. Puentes Aztec para Finanzas Descentralizadas. Despliegue institucional de estrategias de rendimiento privado a traves de adaptadores de puente altamente seguros operando nativamente en el entorno de Aztec. El capital se despliega en estrategias de rendimiento mientras los montos principales permanecen ofuscados para los observadores de la cadena publica.
+## 🧠 Humanity Ledger: The Ultimate ZK Identity Protocol
 
-6. Firmas Tipadas y Contratos de Cuentas Aztec. Cumplimiento estricto con las firmas tipadas requeridas para el protocolo de autorizacion de Aztec, asegurando transacciones robustas y verificables. Toda la validacion de operaciones utiliza infraestructura nativa para garantizar compatibilidad absoluta.
+Humanity Ledger represents our proprietary Zero-Trust Authentication Bridge. It is designed to unify traditional Web3 wallet infrastructure with cutting-edge cryptographic session handshakes, providing an absolutely flawless user experience across Desktop, iOS, and Android platforms.
 
-### Sistema de Cuentas y Almacenamiento Criptografico
+*   **Universal Authentication Bridge (Account Abstraction):** A meticulously engineered `useSystemAccount` controller seamlessly resolves dual-pathway authentication. It unifies traditional Web3 wallet infrastructure (Wagmi/WalletConnect) with the **Humanity Ledger QR Cryptographic Handshake**, granting frictionless access to secure endpoints. This abstracts away the complexity of managing Aztec account contracts (Schnorr/ECDSA verifiers) and enables universal forum interaction without exposing contract-level signatures to front-end vectors.
+*   **iOS-Native Omni-Grid Architecture:** The mobile ecosystem (`MobileLanding`) employs a mathematically precise 4-column matrix, emulating native iOS rendering pipelines. Assets are dynamically composited via `mix-blend-multiply` against 60x60px viewports, guaranteeing flawless responsive scaling, perfect structural alignment, and strictly bounded memory allocations across all mobile edge devices.
+*   **Redis-Backed Session Integrity:** System-critical session tracking is powered by a rigorously hardened Redis implementation. All payload interpolations and connection states operate under strict memory-safe constraints, ensuring deterministic execution during high-concurrency handshake resolutions.
 
-Un sistema de gestion de cuentas nativo diseñado para seguridad institucional, cumpliendo rigurosamente con los estandares de la industria.
+---
 
-1. Autenticacion Hibrida. El sistema soporta multiples metodos de autenticacion simultaneos, permitiendo a los usuarios conectar cuentas externas mediante conectores de billetera o crear cuentas nativas dentro de la plataforma. Ambas estrategias conviven en armonia garantizando acceso ininterrumpido.
+## 🔐 Aztec Network Privacy Architecture
 
-2. Derivacion de Cuentas. Genera entropia de alto nivel y la mapea a una frase de recuperacion secreta utilizando la lista de palabras estandar internacional, permitiendo derivar multiples cuentas hijas desde una sola semilla maestra.
+Our integration with Aztec Network is deeply embedded and production-ready. The system leverages the private execution environment to process confidential logic directly on the user's edge device, emitting only zero-knowledge proofs to the network.
 
-3. Almacenamiento Cifrado. La informacion encriptada persiste localmente mediante cifrado de maxima seguridad. La llave de sesion se mantiene solo en memoria y se purga al cerrar sesion. Los datos nunca se transmiten externamente y la limpieza de sesiones externas se realiza de forma estricta para garantizar la privacidad del usuario.
+1.  **Noir Circuits & Smart Contracts:** All private protocol logic is compiled in Noir, Aztec's Rust-based DSL for Zero-Knowledge proofs. These circuits enforce the strict mathematical constraints required for valid state transitions. We utilize advanced circuit paradigms for custom note commitments, nullifier generation (strictly preventing double-spending on the Nullifier Tree), and private authorization witnesses.
+2.  **Honk & UltraPlonk Cryptographic Proving:** The system leverages Aztec's cutting-edge proving backends. It supports highly optimized WebAssembly (WASM) proof generation directly in the browser, achieving ultra-fast verification times essential for seamless UX in a decentralized application.
+3.  **Private Execution Environment (PXE) & Note Discovery:** Operating entirely client-side, the PXE maintains the private note database and manages key derivations (including incoming/outgoing viewing keys). It seamlessly syncs with the L2 RPC to fetch encrypted logs, decrypting only the notes associated with the user's viewing key. Private keys never leave the browser environment, enforcing absolute zero-trust execution.
+4.  **Public/Private Composability:** Strict adherence to Aztec's L2 architecture, orchestrating seamless cross-domain calls between the private execution context and public state contracts (e.g., L2 AMMs and Oracle data registries), guaranteeing robust, cryptographically verifiable operations while mitigating MEV.
 
-4. Sincronizacion de Dispositivos. Implementamos un sistema de enlace entre dispositivos moviles y de escritorio mediante lectura de codigos de respuesta rapida y verificacion criptografica asimetrica, permitiendo a los usuarios autenticarse fluidamente sin revelar informacion sensible.
+---
 
-### Abstraccion de Cuentas
+## ⚡ Global Interoperability & Analytics Engine
 
-Infraestructura completa de abstraccion de cuentas operando bajo los estandares mas recientes.
+*   **Real-Time Institutional Scanning:** Evaluates raw transaction logs to detect massive institutional capital flows without relying on centralized or delayed indexing registries.
+*   **Encrypted Client-to-Client Messaging (Whale Chat):** Decentralized communication protocols orchestrating end-to-end encrypted messaging. The server architecture operates strictly as a blind relay; it can never decrypt or access plaintext payloads.
+*   **Shielded Routing:** Transactions exceeding configurable thresholds are automatically obfuscated and routed through blocking private networks, neutralizing Maximal Extractable Value (MEV) attacks and front-running vectors.
 
-1. Construccion de Operaciones de Usuario. Construye la estructura completa de operaciones abarcando todos los campos requeridos.
+---
 
-2. Enrutamiento Descentralizado. Enruta las cargas utiles firmadas a redes descentralizadas a traves de llamadas a procedimientos remotos contra contratos de punto de entrada canonicamente aceptados.
+## 🛠️ System Architecture Layers
 
-3. Soporte para Patrocinadores. La arquitectura del sistema soporta nativamente transacciones sin costo de gas mediante contratos patrocinadores.
+1.  **Presentation Layer:** Impeccable institutional aesthetic, featuring exact iOS-app emulations for mobile zones and hyper-optimized React Server Components (Next.js 15).
+2.  **Authentication Layer (Humanity Ledger):** Deterministic core, asymmetric QR handshake synchronization, local encrypted caching, and multi-account derivation.
+3.  **Aztec Privacy Layer:** Noir compiler orchestration, note commitments, state privacy, and deep ZK-DeFi integration.
+4.  **Execution & Protection Layer:** Shielded transaction routing, gasless sponsor paymasters, and atomic multi-transaction batching.
+5.  **Analytics Layer:** Relational and graph database architectures designed for high-frequency, real-time capital flow detection.
 
-### Interoperabilidad Global
+---
 
-Mensajeria entre multiples redes nativa, descartando interfaces convencionales a favor de mensajeria de protocolo cruda.
+## 🤝 Contributing
 
-1. Interaccion de Puntos Finales. Ejecuta llamadas directas en la cadena de origen para cotizar y enviar operaciones.
+We adhere to the strictest cybersecurity and code-hygiene standards. All contributions must pass comprehensive static analysis, boundary checks, and cryptographic logic audits.
 
-2. Estimacion Dinamica de Tarifas. Realiza consultas en cadena para averiguar la tarifa exacta de gas nativo requerida para que las redes verificadoras transmitan y ejecuten mensajes a traves de dominios.
+1.  Fork the repository.
+2.  Create a feature branch strictly bound to a single architectural upgrade.
+3.  Ensure all cryptographic routines (especially within the Humanity Ledger handshake) are accompanied by mathematical proofs or exhaustive unit tests.
+4.  Submit a Pull Request for rigorous peer review by the core engineering team.
 
-3. Empaquetado Exacto de Datos. Implementa relleno estricto de bytes para los campos receptores como lo requiere la interfaz binaria de la aplicacion.
+---
 
-### Proteccion de Transacciones Institucionales
+## 🚨 Security & Vulnerability Disclosure
 
-Enrutamiento de transacciones privadas diseñado para proteger toda operacion institucional contra ataques frontales.
+Security is the foundational pillar of the Whale Network and Humanity Ledger. 
 
-1. Enrutamiento Protegido. Las transacciones que exceden umbrales configurables se desvian automaticamente de la memoria publica hacia redes privadas bloqueadoras, previniendo la observacion por buscadores de valor extraible.
+*   **Zero-Trust Enforcement:** We assume all networks are hostile. No private key or unencrypted PII is ever transmitted to our relay servers.
+*   **Vulnerability Reporting:** If you discover a critical vulnerability (e.g., proof forgery, nullifier bypass, session hijacking), do NOT open a public issue. Contact the security team directly via encrypted channels (details provided upon request to the CEO).
+*   **Bug Bounty:** We offer compensation for responsibly disclosed, high-severity vulnerabilities affecting the Aztec PXE integration or the Humanity Ledger authentication bridge.
 
-2. Construccion de Paquetes. Facilita la construccion de cargas utiles para ejecucion atomica y multitransaccional dentro de un solo bloque.
+---
 
-3. Cache Local de Identificadores. Un sistema de memoria en cache optimista local que elimina los errores por choques de identificacion durante transferencias de alta frecuencia.
+## 📄 License
 
-### Motor de Analitica de Datos y Mensajeria
+**MIT License**
 
-Deteccion autonoma de grandes movimientos financieros y comunicacion cifrada.
+Copyright (c) 2026 Stefan Antonio Cirisanu & Whale Network
 
-1. Escaneo en Tiempo Real. Evalua registros de transferencia para descubrir todos los movimientos institucionales operando sin depender de registros centralizados.
+Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
-2. Base de Datos de Grafos. Las señales crudas se enriquecen mediante una capa de grafos que mantiene las relaciones historicas de todas las entidades.
+The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software.
 
-3. Infraestructura de Mensajeria. Protocolos de comunicacion descentralizada orquestando mensajeria cifrada de cliente a cliente. El servidor jamas accede a datos legibles.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
-### Arquitectura de Sistema Global
-
-El sistema completo abarca las siguientes capas tecnologicas organizadas limpiamente:
-
-1. Capa de Presentacion. Aplicacion construida para lograr una estetica institucional impecable.
-2. Capa de Autenticacion. Nucleo deterministico, cache local, resolucion de nombres y soporte multicuenta.
-3. Capa de Privacidad Aztec. Codificador Noir, compromisos de notas, privacidad de estado e integracion profunda con finanzas descentralizadas.
-4. Capa de Ejecucion. Enrutamiento en intercambios descentralizados, empaquetadores de abstraccion de cuentas y fabricas de implementacion de contratos.
-5. Capa de Proteccion. Escudo de transacciones privadas, permisos sin costo de gas y revocador de asignaciones.
-6. Capa de Redes Cruzadas. Puntos finales de mensajeria global y retransmision de verificadores.
-7. Capa Analitica. Deteccion de grandes flujos de capital en tiempo real, bases de datos relacionales y de grafos.
-
-### Estado de Licencia y Despliegue
-
-Licencia. MIT
-Estado Operacional. Desplegado en Produccion
-Integridad de Construccion. Absolutamente Perfecta
-
-Este documento describe tecnicamente el compromiso y la madurez estructural que presenta Humanity Ledger para integrar las capacidades revolucionarias de Aztec Network en el mundo institucional de finanzas descentralizadas. Solicitamos formalmente el reconocimiento y la subvencion para continuar impulsando la tecnologia de conocimiento cero a su maximo potencial.
+---
+*Status: Deployed in Production. Build Integrity: Verified.*

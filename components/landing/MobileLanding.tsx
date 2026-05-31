@@ -16,7 +16,7 @@ import {
   Scan, MessageSquare, LogOut, MessageCircle, ScanLine, 
   Fingerprint, ChevronDown, CheckCircle, Zap, Shield, Menu,
   ArrowRight, Loader2, CheckCircle2, AlertCircle, RefreshCw, Mail, Info, X, PieChart,
-  Newspaper, GraduationCap, Briefcase, Activity, TrendingUp, Package
+  Newspaper, GraduationCap, Briefcase, Activity, TrendingUp, Package, LayoutDashboard, Target
 } from 'lucide-react';
 import { RemoteLottie } from '@/components/ui/RemoteLottie';
 import { ATOM_PNGTREE } from '@/lib/constants/systemAssets';
@@ -441,175 +441,63 @@ function ConnectedScreen({
         </motion.div>
 
 
-
-        {/*  SCAN QR PC (session sync)  */}
+        {/*  APPS GRID (iOS Style)  */}
         <motion.div
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4, duration: 0.5 }}
-          className="w-full mb-3"
+          className="w-full grid grid-cols-4 gap-y-6 gap-x-2 mb-8 px-1"
         >
-          <button
-            type="button"
-            onClick={onScan}
-            className="w-full flex items-center justify-between py-4 px-6 rounded-2xl border border-black/10 bg-black text-white hover:bg-black/90 active:scale-[0.98] transition-all"
-          >
-            <div className="flex items-center gap-3">
-              <Scan size={16} className="text-white/70" />
-              <span className="text-[14px] font-medium text-white">Link New PC Session</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-white/50">Multi-Sync</span>
-          </button>
-        </motion.div>
+          {[
+            { label: 'Dashboard', href: '/dashboard', img: '/system-shots/licencia-de-conducir.png' },
+            { label: 'Link New PC Session', action: onScan, icon: Scan, isLucide: true },
+            { label: 'Studio Provenance Beta', href: '/studio/provenance', img: '/system-shots/paquete-o-empaquetar.png' },
+            { label: 'Whale Forum', href: '/forum', img: '/system-shots/charla.png' },
+            { label: 'Whale Chat', href: '/chat', img: '/system-shots/burbuja-de-dialogo.png' },
+            { label: 'Portfolio', href: '/portfolio', img: '/system-shots/bitcoin.png' },
+            { label: 'News', href: '/news', img: '/system-shots/periodico.png' },
+            { label: 'Academy', href: '/academy', img: '/system-shots/academy.png' },
+            { label: 'System Status', href: '/status', img: '/system-shots/estadistico.png' },
+            { label: 'Privacy Protocol', href: '/privacy', img: '/system-shots/candado.png' },
+            { label: 'Registry', href: '/registry', icon: Target, isLucide: true },
+          ].map((app, i) => {
+            const InnerContent = (
+              <>
+                <div className="w-[60px] h-[60px] bg-white rounded-[16px] flex items-center justify-center overflow-hidden active:scale-95 transition-transform shadow-[0_2px_12px_rgba(0,0,0,0.06)] border border-black/5">
+                  {app.isLucide ? (
+                    <app.icon size={26} strokeWidth={1.5} className="text-black/80" />
+                  ) : (
+                    <img src={app.img} alt={app.label} className="w-[75%] h-[75%] object-contain mix-blend-multiply" />
+                  )}
+                </div>
+                <span 
+                  className="mt-2 text-black font-medium"
+                  style={{ fontSize: '9px', lineHeight: '1.2', maxWidth: '64px', textAlign: 'center' }}
+                >
+                  {app.label}
+                </span>
+              </>
+            );
 
-
-
-        {/*  PROVENANCE STUDIO BETA  */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.44, duration: 0.5 }}
-          className="w-full mb-3"
-        >
-          <Link
-            href="/studio/provenance"
-            className="w-full flex items-center justify-between py-4 px-6 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all"
-          >
-            <div className="flex items-center gap-3 min-w-0">
-              <Package size={16} className="text-black/40 shrink-0" />
-              <div className="flex flex-col min-w-0">
-                <span className="text-[14px] font-medium text-black truncate">Try Studio Provenance Beta</span>
-                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">Create · QR · Anchor</span>
-              </div>
-            </div>
-            <span className="shrink-0 text-[9px] font-black uppercase tracking-[0.15em] px-2 py-0.5 rounded-full bg-black/5 text-black/50">
-              Beta
-            </span>
-          </Link>
-        </motion.div>
-
-        {/*  SECONDARY ACTIONS  */}
-        <motion.div
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.45, duration: 0.5 }}
-          className="w-full flex flex-col gap-2 mb-6"
-        >
-          {/* Forum */}
-          <Link
-            href="/forum"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <MessageSquare size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <span className="text-[14px] font-medium text-black">Whale Alert Forum</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Access</span>
-          </Link>
-
-          {/* Whale Chat */}
-          <Link
-            href="/chat"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <MessageCircle size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <div className="flex flex-col">
-                <span className="text-[14px] font-medium text-black">Whale Chat</span>
-                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">End-to-End Encrypted</span>
-              </div>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Enter</span>
-          </Link>
-
-          {/* Portfolio */}
-          <Link
-            href="/portfolio"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <PieChart size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <span className="text-[14px] font-medium text-black">Portfolio</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">View</span>
-          </Link>
-
-          {/* News */}
-          <Link
-            href="/news"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <Newspaper size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <span className="text-[14px] font-medium text-black">News</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Read</span>
-          </Link>
-
-          {/* Academy */}
-          <Link
-            href="/academy"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <GraduationCap size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <span className="text-[14px] font-medium text-black">Academy</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Learn</span>
-          </Link>
-
-
-          {/* Status */}
-          <Link
-            href="/status"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <Activity size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <span className="text-[14px] font-medium text-black">System Status</span>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Nodes</span>
-          </Link>
-
-          {/* Privacy */}
-          <Link
-            href="/privacy"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <Shield size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <div className="flex flex-col">
-                <span className="text-[14px] font-medium text-black">Privacy Protocol</span>
-                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">Zero-Knowledge</span>
-              </div>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">Audit</span>
-          </Link>
-        </motion.div>
-
-        {/*  DIVIDER  */}
-        <div className="w-full border-t border-black/8 mb-6" />
-
-        {/*  SEED EQUITY  */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.5 }}
-          className="w-full mb-3"
-        >
-          <Link
-            href="/pitch_deck.html"
-            className="w-full flex items-center justify-between py-4 px-5 rounded-2xl border border-black/10 bg-white hover:bg-black/[0.02] active:scale-[0.98] transition-all group"
-          >
-            <div className="flex items-center gap-3">
-              <TrendingUp size={16} className="text-black/40 group-hover:text-black transition-colors" />
-              <div className="flex flex-col">
-                <span className="text-[14px] font-medium text-black">Seed Equity</span>
-                <span className="font-mono text-[8px] uppercase tracking-[0.2em] text-black/30">Investor Relations</span>
-              </div>
-            </div>
-            <span className="font-mono text-[9px] uppercase tracking-[0.2em] text-black/30">View</span>
-          </Link>
+            return app.action ? (
+              <button
+                key={i}
+                type="button"
+                onClick={app.action}
+                className="flex flex-col items-center justify-start w-full cursor-pointer"
+              >
+                {InnerContent}
+              </button>
+            ) : (
+              <Link
+                key={i}
+                href={app.href!}
+                className="flex flex-col items-center justify-start w-full cursor-pointer"
+              >
+                {InnerContent}
+              </Link>
+            );
+          })}
         </motion.div>
 
         {/*  DISCONNECT  */}

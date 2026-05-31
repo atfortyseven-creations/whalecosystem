@@ -64,8 +64,8 @@ function getSanitizedRedisUrl(): string {
     const rawUrl = (process.env.REDIS_URL || '').toString().trim().replace(/^["']|["']$/g, '');
     
     // If properly formatted, return it
-    if (rawUrl.startsWith('redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@` : '';
-        return `${protocol}://${auth}${host}:${port}`;
+    if (rawUrl.startsWith('redis://') || rawUrl.startsWith('rediss://')) {
+        return rawUrl;
     }
 
     // Do not guess proxy URL port to prevent silent ETIMEDOUT when port differs. Let the client fail fast.
@@ -95,22 +95,49 @@ export function createRedisClient(config: { name?: string; isSubscriber?: boolea
         return createMockRedis(config.name);
     }
 
-    // Robust validation
-    const hasProtocol = REDIS_URL.startsWith('redis://[REDACTED_REDIS_USER]:[REDACTED_REDIS_PASS]@]*@/, ':***@');
-                    console.error(`[Redis:Main]  Critical Connection Failure for ${maskedUrl}:`, err.message);
-                    if (err.message.includes('ENOTFOUND')) {
-                        console.error(`[Redis:Main]  DNS RESOLUTION FAILED. Check if host has invalid characters (e.g. underscores).`);
-                    }
-                    redisClient.__errorLogged = true;
-                }
-            });
+    const Redis = require('ioredis').default || require('ioredis');
+    const client = new Redis(REDIS_URL, {
+        maxRetriesPerRequest: 3,
+        retryStrategy(times: number) {
+            if (times > 3) return null;
+            return Math.min(times * 200, 1000);
+        },
+        ...config
+    });
+    client.on('error', (err: any) => {
+        console.error(`[Redis:${config.name || 'Factory'}] Error:`, err.message);
+    });
+    return client;
+}
 
-            redisClient.on('connect', () => {
-                redisClient.__errorLogged = false;
-                const masked = (REDIS_URL || '').replace(/:\/\/[^@]*@/, '://***@');
-                console.log(`[Redis:Main]  Status: LEGENDARY  Connected to cluster: ${masked}`);
-            });
-        }
+let redisClient: any;
+try {
+    if (REDIS_URL && !IS_EDGE && !IS_BUILDING) {
+        const Redis = require('ioredis').default || require('ioredis');
+        redisClient = new Redis(REDIS_URL, {
+            maxRetriesPerRequest: 3,
+            retryStrategy(times: number) {
+                if (times > 3) return null;
+                return Math.min(times * 200, 1000);
+            }
+        });
+
+        redisClient.on('error', (err: any) => {
+            if (!redisClient.__errorLogged) {
+                const maskedUrl = (REDIS_URL || '').replace(/:\/\/[^@]*@/, '://***@');
+                console.error(`[Redis:Main]  Critical Connection Failure for ${maskedUrl}:`, err.message);
+                if (err.message.includes('ENOTFOUND')) {
+                    console.error(`[Redis:Main]  DNS RESOLUTION FAILED. Check if host has invalid characters (e.g. underscores).`);
+                }
+                redisClient.__errorLogged = true;
+            }
+        });
+
+        redisClient.on('connect', () => {
+            redisClient.__errorLogged = false;
+            const masked = (REDIS_URL || '').replace(/:\/\/[^@]*@/, '://***@');
+            console.log(`[Redis:Main]  Status: LEGENDARY  Connected to cluster: ${masked}`);
+        });
     } else {
         // [RESILIENCE] Never throw  a missing REDIS_URL must not kill the server process.
         // Features requiring Redis (rate-limiting, caching) will degrade gracefully.
