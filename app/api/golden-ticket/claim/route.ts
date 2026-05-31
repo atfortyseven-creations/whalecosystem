@@ -231,30 +231,31 @@ export async function POST(req: NextRequest) {
             create: { walletAddress: address }
         });
 
-        //  On-Chain Payment Verification (Optimism) 
-        // Verifies the txHash actually transferred ETH to TREASURY_WALLET.
-        // graceMode: if RPC is down, we allow through to avoid blocking legitimate users.
+        //  On-Chain Payment Verification (Optimism) [STRICT ENFORCEMENT]
+        // Verifies the txHash actually transferred 0.00111 ETH to TREASURY_WALLET.
+        if (!txHash || typeof txHash !== 'string' || !txHash.startsWith('0x')) {
+            console.warn(JSON.stringify({ level: 'SECURITY', event: 'NO_TX_HASH_PROVIDED', address }));
+            return NextResponse.json({
+                error: 'Missing transaction hash. You must pay the 0.00111 ETH fee on Optimism to mint the ticket.',
+            }, { status: 402 });
+        }
+
         let paymentVerified = false;
         let paymentGraceMode = false;
-        if (txHash && typeof txHash === 'string') {
-            const paymentCheck = await verifyOnChainPayment(txHash, address);
-            if (paymentCheck.verified) {
-                paymentVerified = true;
-                console.log(JSON.stringify({ level: 'INFO', event: 'PAYMENT_CONFIRMED', address, txHash }));
-            } else if (paymentCheck.graceMode) {
-                paymentGraceMode = true;
-                console.warn(JSON.stringify({ level: 'WARN', event: 'PAYMENT_GRACE_MODE', address, txHash, reason: paymentCheck.reason }));
-            } else {
-                console.warn(JSON.stringify({ level: 'SECURITY', event: 'PAYMENT_REJECTED', address, txHash, reason: paymentCheck.reason }));
-                return NextResponse.json({
-                    error: `Payment verification failed: ${paymentCheck.reason}. Ensure you sent 0.00111 ETH on Optimism to the treasury.`,
-                    txHash,
-                }, { status: 402 });
-            }
-        } else {
-            // No txHash provided — still allow (ECDSA signature is sufficient proof)
+        const paymentCheck = await verifyOnChainPayment(txHash, address);
+        
+        if (paymentCheck.verified) {
+            paymentVerified = true;
+            console.log(JSON.stringify({ level: 'INFO', event: 'PAYMENT_CONFIRMED', address, txHash }));
+        } else if (paymentCheck.graceMode) {
             paymentGraceMode = true;
-            console.warn(JSON.stringify({ level: 'WARN', event: 'NO_TX_HASH_PROVIDED', address }));
+            console.warn(JSON.stringify({ level: 'WARN', event: 'PAYMENT_GRACE_MODE', address, txHash, reason: paymentCheck.reason }));
+        } else {
+            console.warn(JSON.stringify({ level: 'SECURITY', event: 'PAYMENT_REJECTED', address, txHash, reason: paymentCheck.reason }));
+            return NextResponse.json({
+                error: `Payment verification failed: ${paymentCheck.reason}. Ensure you sent 0.00111 ETH on Optimism to the treasury.`,
+                txHash,
+            }, { status: 402 });
         }
 
 

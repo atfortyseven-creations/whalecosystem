@@ -427,8 +427,8 @@ export function GoldTicketPanel() {
           },
           onError: async (err: any) => {
             toast.dismiss(signToastId);
-            toast.info('Ledger signature skipped  registering with transaction proof...');
-            await performClaim(undefined, txHash);
+            toast.error('Signature rejected. You must sign the message to claim your ticket.');
+            setIsMinting(false);
           }
         }
       );
