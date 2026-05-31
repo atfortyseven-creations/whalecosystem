@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 /**
  * PortfolioView  Enterprise TERMINAL v5
@@ -42,6 +42,7 @@ import {
 import { useAppKitAccount } from "@reown/appkit/react";
 import { useChainId, useSwitchChain } from "wagmi";
 import { useSystemAccount } from "@/hooks/useSystemAccount";
+import { useSystemSignOut } from "@/hooks/useSystemSignOut";
 
 import { useState, useEffect, useCallback } from "react";
 import { LegendaryTransactionModal } from "./LegendaryTransactionModal";
@@ -363,6 +364,7 @@ export default function PortfolioView({
   const [isDark, setIsDark] = useState(true);
 
   const { address: userAddress, isConnected } = useSystemAccount();
+  const { nuclearDisconnect } = useSystemSignOut();
   const { mutate } = useSWRConfig();
   const { lastTx, connected: wsConnected } = useSmartWebSockets(userAddress || undefined);
 
@@ -517,10 +519,7 @@ export default function PortfolioView({
                 </div>
             </div>
             <button
-                onClick={() => {
-                    document.cookie = 'system_handshake=; path=/; expires=Thu, 01 Jan 1970 00:00:01 GMT;';
-                    window.location.reload();
-                }}
+                onClick={() => nuclearDisconnect()}
                 className="w-8 h-8 rounded-lg bg-white/5 flex items-center justify-center hover:bg-red-500/20 group transition-all border border-white/10"
             >
                 <X size={14} className="text-white/40 group-hover:text-red-400" />

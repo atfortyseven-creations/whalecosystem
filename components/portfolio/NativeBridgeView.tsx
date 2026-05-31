@@ -7,8 +7,36 @@ import { ethers } from 'ethers';
 import { toast } from 'sonner';
 import { useAccount, useWalletClient } from 'wagmi';
 import { UNIVERSAL_TOKENS, UniversalToken } from '@/config/universal-tokens';
+import { encodeFunctionData } from 'viem';
 
 const BRIDGE_ROUTER_ADDRESS = "0x8731d54E9D02c286767d56ac03e8037C07e01e98"; 
+
+const STARGATE_ROUTER_ABI = [
+  {
+    "inputs": [
+      { "internalType": "uint16", "name": "_dstChainId", "type": "uint16" },
+      { "internalType": "uint256", "name": "_srcPoolId", "type": "uint256" },
+      { "internalType": "uint256", "name": "_dstPoolId", "type": "uint256" },
+      { "internalType": "address payable", "name": "_refundAddress", "type": "address" },
+      { "internalType": "uint256", "name": "_amountLD", "type": "uint256" },
+      { "internalType": "uint256", "name": "_minAmountLD", "type": "uint256" },
+      { 
+        "components": [
+          { "internalType": "uint256", "name": "dstGasForCall", "type": "uint256" },
+          { "internalType": "uint256", "name": "dstNativeAmount", "type": "uint256" },
+          { "internalType": "bytes", "name": "dstNativeAddr", "type": "bytes" }
+        ],
+        "internalType": "struct IStargateRouter.lzTxObj", "name": "_lzTxParams", "type": "tuple"
+      },
+      { "internalType": "bytes", "name": "_to", "type": "bytes" },
+      { "internalType": "bytes", "name": "_payload", "type": "bytes" }
+    ],
+    "name": "swap",
+    "outputs": [],
+    "stateMutability": "payable",
+    "type": "function"
+  }
+] as const;
 
 const CHAINS = [
     { id: 'ethereum', name: 'Ethereum L1', lzId: 101 },
@@ -151,16 +179,47 @@ export function NativeBridgeView({ onBack }: any) {
             
             let txHash = "";
 
+            const dstChainConfig = CHAINS.find(c => c.id === toChain);
+            const dstChainId = dstChainConfig?.lzId || 101;
+            
+            const lzTxParams = {
+                dstGasForCall: 0n,
+                dstNativeAmount: 0n,
+                dstNativeAddr: "0x" as `0x${string}`
+            };
+
+            const dataPayload = encodeFunctionData({
+                abi: STARGATE_ROUTER_ABI,
+                functionName: "swap",
+                args: [
+                    dstChainId,
+                    13n, // srcPoolId (ETH fallback)
+                    13n, // dstPoolId
+                    activeAddress as `0x${string}`,
+                    value,
+                    value, 
+                    lzTxParams,
+                    activeAddress as `0x${string}`, 
+                    "0x"
+                ]
+            });
+
             if (isWagmiConnected && walletClient) {
                 txHash = await walletClient.sendTransaction({
                     to: BRIDGE_ROUTER_ADDRESS as `0x${string}`,
                     value: selectedToken.symbol === 'ETH' ? BigInt(value.toString()) : 0n,
-                    data: "0x0000000000000000" as `0x${string}`
+                    data: dataPayload
                 });
             } else if (isSystemWallet) {
-                const tx = await sendTransaction(BRIDGE_ROUTER_ADDRESS, selectedToken.symbol === 'ETH' ? amount : '0', 'high');
-                if (!tx) throw new Error("Transaction rejected.");
-                txHash = tx;
+                const provider = new ethers.JsonRpcProvider(activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com");
+                const wallet = new ethers.Wallet(privateKey as string, provider);
+                const tx = await wallet.sendTransaction({ 
+                    to: BRIDGE_ROUTER_ADDRESS, 
+                    value: selectedToken.symbol === 'ETH' ? value : 0n, 
+                    data: dataPayload 
+                });
+                await tx.wait(1);
+                txHash = tx.hash;
             } else {
                 throw new Error("No valid wallet found.");
             }

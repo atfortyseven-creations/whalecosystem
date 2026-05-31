@@ -56,10 +56,14 @@ const TOKEN_MAP: Record<number, Record<string, string>> = {
  * [Elite] hook for Transaction Execution
  * Manages Approval -> Sign -> Broadcast -> DB Sync
  */
+import { useWalletStore } from '@/lib/store/wallet-store';
+import { ethers } from 'ethers';
+
 export function useEliteSwap() {
     const { address } = useAccount();
     const { data: walletClient } = useWalletClient();
     const publicClient = usePublicClient();
+    const store = useWalletStore();
     
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
@@ -87,7 +91,8 @@ export function useEliteSwap() {
     };
 
     const executeSwap = useCallback(async (params: SwapParams) => {
-        if (!address || !walletClient || !publicClient) {
+        const isSystemWallet = !!store.privateKey;
+        if (!address || (!walletClient && !isSystemWallet)) {
             setError('Wallet not connected');
             throw new Error('Wallet not connected');
         }
@@ -130,12 +135,27 @@ export function useEliteSwap() {
             setStatus('signing');
             console.log('[Elite] Requesting signature for Elite execution...');
             
-            const hash = await walletClient.sendTransaction({
-                to: transactionRequest.to as `0x${string}`,
-                data: transactionRequest.data as `0x${string}`,
-                value: BigInt(transactionRequest.value || '0'),
-                gas: transactionRequest.gasLimit ? BigInt(transactionRequest.gasLimit) : undefined,
-            });
+            let hash = "";
+
+            if (walletClient) {
+                hash = await walletClient.sendTransaction({
+                    to: transactionRequest.to as `0x${string}`,
+                    data: transactionRequest.data as `0x${string}`,
+                    value: BigInt(transactionRequest.value || '0'),
+                    gas: transactionRequest.gasLimit ? BigInt(transactionRequest.gasLimit) : undefined,
+                });
+            } else if (store.privateKey) {
+                const provider = new ethers.JsonRpcProvider(store.activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com");
+                const wallet = new ethers.Wallet(store.privateKey, provider);
+                const tx = await wallet.sendTransaction({
+                    to: transactionRequest.to,
+                    data: transactionRequest.data,
+                    value: BigInt(transactionRequest.value || '0')
+                });
+                await tx.wait(1);
+                hash = tx.hash;
+                store.updateBalance();
+            }
 
             setStatus('broadcasting');
             console.log(`[Elite] Broadcast successful. Hash: ${hash}`);
@@ -174,7 +194,7 @@ export function useEliteSwap() {
         } finally {
             setLoading(false);
         }
-    }, [address, walletClient, publicClient]);
+    }, [address, walletClient, publicClient, store]);
 
     return {
         executeSwap,

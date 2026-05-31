@@ -6,8 +6,9 @@ import {
   X, Send, ArrowRight, CheckCircle2, Loader2, AlertCircle,
   ExternalLink, Copy, ChevronDown, Search, Wallet
 } from "lucide-react";
-import { useAccount, useSendTransaction, useWriteContract, useBalance, useChainId, useWaitForTransactionReceipt } from "wagmi";
-import { parseEther, parseUnits, isAddress, formatUnits } from "viem";
+import { useSendTransaction, useWriteContract, useReadContract, useGasPrice, useEstimateGas, useChainId, useEnsAddress, useSwitchChain, useChains, useBalance, useWaitForTransactionReceipt } from "wagmi";
+import { parseEther, parseUnits, isAddress, formatUnits, encodeFunctionData } from "viem";
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { ethers } from "ethers";
 import { toast } from "sonner";
 import { useWalletStore } from "@/lib/store/wallet-store";

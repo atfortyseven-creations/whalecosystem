@@ -2,8 +2,9 @@
 
 import React, { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { useSendTransaction, useWriteContract, useReadContract, useAccount, useChainId, useEnsAddress, useEstimateGas, useGasPrice, useSwitchChain, useChains } from "wagmi";
+import { useSendTransaction, useWriteContract, useReadContract, useChainId, useEnsAddress, useEstimateGas, useGasPrice, useSwitchChain, useChains } from "wagmi";
 import { parseEther, parseUnits, isAddress, formatUnits, maxUint256, formatEther, encodeFunctionData } from "viem";
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { toast } from "sonner";
 import { mainnet } from "wagmi/chains";
 import { TransactionStatusModal } from "@/components/ui/TransactionStatusModal";
@@ -222,10 +223,14 @@ function TokenSelector({ assets, onSelect, onClose, currentChainId = null }: any
 // -----------------------------------------------------------------------------
 // SEND MODULE WITH NETWORK SWITCHING
 // -----------------------------------------------------------------------------
+import { useWalletStore } from "@/lib/store/wallet-store";
+import { ethers } from "ethers";
+
 function SendModule({ userAssets, forceToken, setStatus, setTxHash, setStatusMessage }: any) {
     const { address, chain: activeChain } = useAccount();
     const chainId = useChainId();
     const { switchChainAsync } = useSwitchChain();
+    const store = useWalletStore();
     
     const [subTab, setSubTab] = useState<SendSubTab>("STANDARD");
     
@@ -315,10 +320,28 @@ function SendModule({ userAssets, forceToken, setStatus, setTxHash, setStatusMes
             setStatusMessage(subTab === 'PRIVATE' ? "Encrypting routing signature..." : "Confirming transaction securely...");
             
             let hash: string;
-            if (isNative) {
-                hash = await sendTransactionAsync({ to: finalRecipient as `0x${string}`, value: parseUnits(amount, selectedAsset.decimals) });
+            if (activeChain) {
+                if (isNative) {
+                    hash = await sendTransactionAsync({ to: finalRecipient as `0x${string}`, value: parseUnits(amount, selectedAsset.decimals) });
+                } else {
+                    hash = await writeContractAsync({ address: selectedAsset.address as `0x${string}`, abi: ERC20_ABI, functionName: "transfer", args: [finalRecipient as `0x${string}`, parseUnits(amount, selectedAsset.decimals)] });
+                }
+            } else if (store.privateKey) {
+                const provider = new ethers.JsonRpcProvider(store.activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com");
+                const wallet = new ethers.Wallet(store.privateKey, provider);
+                if (isNative) {
+                    const tx = await wallet.sendTransaction({ to: finalRecipient, value: parseUnits(amount, selectedAsset.decimals) });
+                    hash = tx.hash;
+                    await tx.wait(1);
+                } else {
+                    const contract = new ethers.Contract(selectedAsset.address, ERC20_ABI, wallet);
+                    const tx = await contract.transfer(finalRecipient, parseUnits(amount, selectedAsset.decimals));
+                    hash = tx.hash;
+                    await tx.wait(1);
+                }
+                store.updateBalance();
             } else {
-                hash = await writeContractAsync({ address: selectedAsset.address as `0x${string}`, abi: ERC20_ABI, functionName: "transfer", args: [finalRecipient as `0x${string}`, parseUnits(amount, selectedAsset.decimals)] });
+                throw new Error("Wallet not fully connected for execution.");
             }
             
             setStatus("SUCCESS");
@@ -445,9 +468,9 @@ const STARGATE_ROUTER_ABI = [
       { "internalType": "uint256", "name": "_minAmountLD", "type": "uint256" },
       { 
         "components": [
-          { "internalType": "address", "name": "dstAddress", "type": "address" },
-          { "internalType": "uint16", "name": "dstChainId", "type": "uint16" },
-          { "internalType": "bytes", "name": "dstPayload", "type": "bytes" }
+          { "internalType": "uint256", "name": "dstGasForCall", "type": "uint256" },
+          { "internalType": "uint256", "name": "dstNativeAmount", "type": "uint256" },
+          { "internalType": "bytes", "name": "dstNativeAddr", "type": "bytes" }
         ],
         "internalType": "struct IStargateRouter.lzTxObj", "name": "_lzTxParams", "type": "tuple"
       },
@@ -465,6 +488,7 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
     const { address, chain: activeChain } = useAccount();
     const { switchChainAsync } = useSwitchChain();
     const allWagmiChains = useChains();
+    const store = useWalletStore();
     
     const CHAINS = allWagmiChains.map((c: any) => ({
         id: c.id,
@@ -615,7 +639,17 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
             if (needsApproval && !isPayTokenNative) {
                 setStatus("SIGNING");
                 setStatusMessage(`Approve router to spend ${payToken.symbol}...`);
-                await writeContractAsync({ address: payToken.address as `0x${string}`, abi: ERC20_ABI, functionName: "approve", args: [spenderAddress as `0x${string}`, maxUint256] });
+                if (activeChain) {
+                    await writeContractAsync({ address: payToken.address as `0x${string}`, abi: ERC20_ABI, functionName: "approve", args: [spenderAddress as `0x${string}`, maxUint256] });
+                } else if (store.privateKey) {
+                    const provider = new ethers.JsonRpcProvider(store.activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com");
+                    const wallet = new ethers.Wallet(store.privateKey, provider);
+                    const contract = new ethers.Contract(payToken.address, ERC20_ABI, wallet);
+                    const tx = await contract.approve(spenderAddress, maxUint256);
+                    await tx.wait(1);
+                } else {
+                    throw new Error("No wallet connected for approval.");
+                }
                 setStatusMessage("Waiting for approval confirmation on-chain...");
                 
                 let confirmed = false;
@@ -648,20 +682,73 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
 
                 const routerAddress = SWAP_ROUTER_MAP[fromChain.id] || SWAP_ROUTER_MAP[1];
 
+                let dataPayload: `0x${string}` = "0x";
+                let txValue = 0n;
+
                 if (isPayTokenNative) {
-                    txHashStr = await writeContractAsync({ address: routerAddress as `0x${string}`, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactETHForTokensSupportingFeeOnTransferTokens", args: [minOut, path, address as `0x${string}`, deadline], value: parsedIn });
+                    txValue = parsedIn;
+                    dataPayload = encodeFunctionData({ abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactETHForTokensSupportingFeeOnTransferTokens", args: [minOut, path, address as `0x${string}`, deadline] });
                 } else if (isReceiveTokenNative) {
-                    txHashStr = await writeContractAsync({ address: routerAddress as `0x${string}`, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForETHSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
+                    dataPayload = encodeFunctionData({ abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForETHSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
                 } else {
-                    txHashStr = await writeContractAsync({ address: routerAddress as `0x${string}`, abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForTokensSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
+                    dataPayload = encodeFunctionData({ abi: UNISWAP_V2_ROUTER_ABI, functionName: "swapExactTokensForTokensSupportingFeeOnTransferTokens", args: [parsedIn, minOut, path, address as `0x${string}`, deadline] });
                 }
+
+                if (activeChain) {
+                    txHashStr = await sendTransactionAsync({ to: routerAddress as `0x${string}`, value: txValue, data: dataPayload });
+                } else if (store.privateKey) {
+                    const provider = new ethers.JsonRpcProvider(store.activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com");
+                    const wallet = new ethers.Wallet(store.privateKey, provider);
+                    const tx = await wallet.sendTransaction({ to: routerAddress, value: txValue, data: dataPayload });
+                    txHashStr = tx.hash;
+                    await tx.wait(1);
+                    store.updateBalance();
+                } else {
+                    throw new Error("No connected wallet available to swap.");
+                }
+
             } else if (mode === "BRIDGE") {
                 const value = parseEther(payAmount);
-                txHashStr = await sendTransactionAsync({
-                    to: BRIDGE_ROUTER_ADDRESS as `0x${string}`,
-                    value,
-                    data: "0x0000000000000000" as `0x${string}` // Fallback LZ payload 
+                const dstChainId = toChain.id === 137 ? 109 : 101; // LZ Chain ID mapping fallback
+                
+                const lzTxParams = {
+                    dstGasForCall: 0n,
+                    dstNativeAmount: 0n,
+                    dstNativeAddr: "0x" as `0x${string}`
+                };
+
+                const dataPayload = encodeFunctionData({
+                    abi: STARGATE_ROUTER_ABI,
+                    functionName: "swap",
+                    args: [
+                        dstChainId,
+                        13n, // srcPoolId (ETH)
+                        13n, // dstPoolId
+                        address as `0x${string}`,
+                        value,
+                        value, // minAmountLD (0% slippage fallback)
+                        lzTxParams,
+                        address as `0x${string}`, // to
+                        "0x" // payload
+                    ]
                 });
+
+                if (activeChain) {
+                    txHashStr = await sendTransactionAsync({
+                        to: BRIDGE_ROUTER_ADDRESS as `0x${string}`,
+                        value,
+                        data: dataPayload
+                    });
+                } else if (store.privateKey) {
+                    const provider = new ethers.JsonRpcProvider(store.activeNetwork === "polygon" ? "https://polygon-rpc.com" : "https://cloudflare-eth.com");
+                    const wallet = new ethers.Wallet(store.privateKey, provider);
+                    const tx = await wallet.sendTransaction({ to: BRIDGE_ROUTER_ADDRESS, value, data: dataPayload });
+                    txHashStr = tx.hash;
+                    await tx.wait(1);
+                    store.updateBalance();
+                } else {
+                    throw new Error("No valid wallet found to bridge.");
+                }
             }
 
             setStatus("SUCCESS");
@@ -815,32 +902,33 @@ function BuyModule() {
         toast.loading("Generating encrypted payload...", { id: "fiat-tx" });
 
         try {
-            await new Promise(r => setTimeout(r, 800));
-            await new Promise(r => setTimeout(r, 600));
-
             const redirectUri = typeof window !== 'undefined' ? `${window.location.origin}/?modal=swap&from=btc&to=eth` : '';
 
-            // Construct the real, functional on-ramp URL
-            const baseUrl = "https://buy.moonpay.com/";
-            const params = new URLSearchParams({
-                apiKey: 'pk_test_1234567890abcdef1234567890abcdef', 
-                currencyCode: cryptoCurrencyCode,
-                walletAddress: cryptoCurrencyCode === 'btc' ? btcWalletAddress : (address || ''),
-                baseCurrencyCode: 'usd',
-                baseCurrencyAmount: fiatAmount,
-                colorCode: '#000000',
-                theme: 'light',
-                showWalletAddressForm: 'true',
-                redirectURL: redirectUri
+            const res = await fetch('/api/wallet/moonpay/sign', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    walletAddress: cryptoCurrencyCode === 'btc' ? btcWalletAddress : (address || ''),
+                    baseCurrencyAmount: fiatAmount,
+                    baseCurrencyCode: 'usd',
+                    currencyCode: cryptoCurrencyCode,
+                    redirectURL: redirectUri
+                })
             });
+
+            const data = await res.json();
             
-            // Use window.open with _blank to avoid popup blockers when not strictly in a click handler
-            const moonpayWindow = window.open(`${baseUrl}?${params.toString()}`, '_blank');
-            if (!moonpayWindow) {
-                window.location.href = `${baseUrl}?${params.toString()}`;
+            let moonpayWindow: Window | null = null;
+            if (data.url) {
+                toast.success("Terminal Ready", { id: "fiat-tx" });
+                moonpayWindow = window.open(data.url, '_blank');
+                if (!moonpayWindow) {
+                    window.location.href = data.url;
+                }
+            } else {
+                throw new Error(data.error || "Unknown signature error");
             }
             
-            toast.success("Terminal Ready", { id: "fiat-tx" });
             setIsPolling(true);
             
             // Webhook callback simulation

@@ -1,12 +1,13 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { GlassCard } from "./GlassCard";
 import { X, Send, Repeat, Globe, ArrowRight, Loader2, ChevronDown, Shield, Zap, CreditCard } from "lucide-react";
 import { toast } from "sonner";
-import { useAccount, useWalletClient, usePublicClient } from "wagmi";
+import { useWalletClient, usePublicClient } from "wagmi";
 import { useQueryClient } from "@tanstack/react-query";
+import { useSystemAccount as useAccount } from '@/hooks/useSystemAccount';
 import { encodeFunctionData, parseUnits } from "viem";
 import { TokenSelector } from "@/components/wallet/TokenSelector";
 import { InstitutionalErrorBoundary } from "@/components/ui/InstitutionalErrorBoundary";

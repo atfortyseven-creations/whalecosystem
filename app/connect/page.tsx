@@ -58,20 +58,11 @@ function RealDeviceRouter() {
     const urlParams = new URLSearchParams(window.location.search);
     const hasUuid = urlParams.has('uuid');
 
-    // Session detection: check both cookie AND localStorage.
-    // Cookie (system_handshake) expires in 7 days; localStorage session 30 days.
+    // Session detection: check cookie only for instant redirection.
+    // Local session (Humanity Ledger) is handled by the isConnected effect above.
     const hasCookie = document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x'));
 
-    let hasLocalSession = false;
-    try {
-      const stored = localStorage.getItem('system_session_v2');
-      if (stored) {
-        const parsed = JSON.parse(stored);
-        hasLocalSession = !!(parsed?.exp && parsed.exp > Date.now());
-      }
-    } catch {}
-
-    const isAlreadyLinked = hasCookie || hasLocalSession;
+    const isAlreadyLinked = hasCookie;
 
     // Detect device type early — needed for both the early redirect and the view setting
     const isUaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini/i.test(navigator.userAgent.toLowerCase());

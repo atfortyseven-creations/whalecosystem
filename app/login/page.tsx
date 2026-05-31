@@ -34,6 +34,7 @@ export default function LoginPage() {
   const [mounted, setMounted] = useState(false);
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [authMethod, setAuthMethod] = useState<'select' | 'humanity'>('select');
 
   // Detect which auth system has data
   const [hasStoreVault, setHasStoreVault]       = useState(false);
@@ -245,11 +246,39 @@ export default function LoginPage() {
       {/* Login Box */}
       <div className="relative z-10 w-[90%] max-w-[420px] bg-white p-6 md:p-12 border-[3px] border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] md:shadow-[12px_12px_0px_0px_rgba(0,0,0,1)] flex flex-col items-center">
         <h1 className="text-3xl font-black uppercase tracking-tighter text-black mb-2 text-center">
-          Sign In
+          {authMethod === 'select' ? "ACCESS GATEWAY" : "Sign In"}
         </h1>
         <p className="text-xs font-bold text-black mb-6 text-center uppercase tracking-widest">
-          Enter your password to access
+          {authMethod === 'select' ? "Select your connection method" : "Enter your password to access"}
         </p>
+
+        {authMethod === 'select' ? (
+          <div className="flex flex-col gap-4 w-full">
+            <button
+              onClick={() => setAuthMethod('humanity')}
+              className="bg-black text-white font-black uppercase tracking-widest hover:bg-black/80 transition-colors w-full"
+              style={{ padding: "16px 32px", border: "2px solid black" }}
+            >
+              CONTINUE WITH HUMANITY LEDGER
+            </button>
+            <Link
+              href="/connect"
+              className="bg-white text-black font-black uppercase tracking-widest hover:bg-black/5 transition-colors w-full text-center"
+              style={{ padding: "16px 32px", border: "2px solid black" }}
+            >
+              CONTINUE WITH WALLETCONNECT
+            </Link>
+            <div className="mt-4 flex flex-col items-center gap-2 w-full">
+              <Link
+                href="/sign-up"
+                className="text-[11px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
+              >
+                No account? Create one →
+              </Link>
+            </div>
+          </div>
+        ) : (
+          <>
 
         {/* Account selector — shown when multiple CoreAuthGate accounts exist */}
         {systemAccounts.length > 1 && (
@@ -302,21 +331,15 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-8 flex flex-col items-center gap-2 w-full">
-          <Link
-            href="/connect"
-            className="w-full bg-white text-black font-black text-center text-[10px] uppercase tracking-[0.2em] hover:bg-black/5 transition-colors mx-auto mb-4"
-            style={{ padding: "16px 32px", border: "2px solid black" }}
+          <button
+            onClick={() => setAuthMethod('select')}
+            className="text-[11px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors mb-4"
           >
-            Acceder a portfolio con cuenta de WalletConnect
-          </Link>
-
-          <Link
-            href="/sign-up"
-            className="text-[11px] font-black uppercase tracking-widest text-black/40 hover:text-black transition-colors"
-          >
-            No account? Create one →
-          </Link>
+            ← Back to Connection Options
+          </button>
         </div>
+        </>
+        )}
       </div>
     </div>
   );

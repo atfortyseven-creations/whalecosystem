@@ -141,7 +141,7 @@ export function useSystemSignOut() {
         
         // Force the window to reload to completely wipe memory state
         window.location.href = '/';
-    }, [disconnect]);
+    }, [disconnect, disconnectAsync]);
 
     return { nuclearDisconnect };
 }

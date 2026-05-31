@@ -5,7 +5,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { getExplorerAddressUrl } from '@/lib/wallet/chains';
 import { UNIVERSAL_TOKENS } from '@/config/universal-tokens';
 import { TokenLogo } from '@/components/ui/TokenLogo';
-import { useAccount } from 'wagmi';
+import { useSystemAccount } from '@/hooks/useSystemAccount';
 
 interface ReceiveHubProps {
     addresses: {
@@ -20,9 +20,9 @@ interface ReceiveHubProps {
 export default function ReceiveHub({ addresses = [] }: ReceiveHubProps) {
     const [selectedIdx, setSelectedIdx] = useState(0);
     const [copied, setCopied] = useState(false);
-    const { address: wagmiAddress } = useAccount();
+    const { address: systemAddress } = useSystemAccount();
 
-    const baseAddress = wagmiAddress || addresses[0]?.address || '0x...';
+    const baseAddress = systemAddress || addresses[0]?.address || '0x...';
 
     // Merge explicitly provided addresses with universal tokens
     const allAddresses = [
