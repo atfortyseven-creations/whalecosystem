@@ -1,9 +1,9 @@
-﻿import { NextRequest, NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import crypto from 'crypto';
 
 export async function POST(req: NextRequest) {
   try {
-    const { walletAddress, baseCurrencyAmount, baseCurrencyCode, currencyCode } = await req.json();
+    const { walletAddress, baseCurrencyAmount, baseCurrencyCode, currencyCode, redirectURL } = await req.json();
 
     if (!walletAddress || !baseCurrencyAmount || !currencyCode) {
       return NextResponse.json({ error: 'Missing required parameters' }, { status: 400 });
@@ -23,6 +23,10 @@ export async function POST(req: NextRequest) {
       colorCode: '#FFFFFF', // Institutional Ivory match
       theme: 'light'
     });
+
+    if (redirectURL) {
+      params.append('redirectURL', redirectURL);
+    }
 
     const urlToSign = `${baseUrl}?${params.toString()}`;
 

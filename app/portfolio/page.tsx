@@ -24,12 +24,24 @@ export default function PortfolioPage() {
     } catch(e) {}
   }, []);
 
-  if (!mounted || isSystemChecking) return null;
+  // CRITICAL FIX: Never return null here — TitaniumGate sees a blank page and
+  // redirects to /connect, which then redirects back to /portfolio → infinite loop.
+  // Instead render a proper loading screen that TitaniumGate won't misinterpret.
+  if (!mounted || isSystemChecking) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-[10px] font-black uppercase tracking-[0.3em] text-black/30 animate-pulse">
+          Loading...
+        </div>
+      </div>
+    );
+  }
 
   if (isLocked && passwordHash) {
       return <UnlockVaultScreen />;
   }
 
+  // Gate: require wallet connection OR session storage unlock token
   const needsGate = !isSystemConnected && !sessionUnlocked;
 
   if (needsGate) {
@@ -39,14 +51,11 @@ export default function PortfolioPage() {
           <span className="font-mono text-[11px] font-black text-black/40">[&lt;]</span>
         </Link>
         <QuantumVaultOnboarding onComplete={() => {
-          // QuantumVaultOnboarding already writes sessionStorage internally.
-          // We only need to flip the local state to unmount the gate.
           setSessionUnlocked(true);
         }} />
       </div>
     );
   }
 
-  // The new minimalist black and white Quantum design requested by the user
   return <InstitutionalPortfolioView />;
 }

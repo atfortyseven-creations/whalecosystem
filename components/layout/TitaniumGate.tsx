@@ -89,7 +89,11 @@ export function TitaniumGate({ children }: TitaniumGateProps) {
             // Must have real 0x address prefix — empty/expired values are rejected.
             const hasHandshake = typeof document !== 'undefined'
                 && document.cookie.split('; ').some(r => r.startsWith('system_handshake=0x'));
-            if (hasHandshake) {
+            
+            // Priority 3.5: Local System Wallet session storage fallback
+            const isLocalUnlocked = typeof window !== 'undefined' && sessionStorage.getItem('portfolio_unlocked') === 'true';
+
+            if (hasHandshake || isLocalUnlocked) {
                 setState('APP');
                 return;
             }

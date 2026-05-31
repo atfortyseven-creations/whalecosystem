@@ -877,38 +877,47 @@ function AdvancedRouterModule({ mode, userAssets, forceToken, setStatus, setTxHa
     );
 }
 
-
 // -----------------------------------------------------------------------------
 // BUY MODULE (Fiat On-Ramp) - Restored Backend Logic
 // -----------------------------------------------------------------------------
 function BuyModule() {
-    const { address } = useAccount();
+    // useAccount is aliased to useSystemAccount — works for both wagmi and local wallets
+    const { address: systemAddress } = useAccount();
     const chainId = useChainId();
-    const allWagmiChains = useChains();
-    const activeChain = allWagmiChains.find(c => c.id === chainId);
     
     const [isInitializing, setIsInitializing] = useState(false);
     const [isPolling, setIsPolling] = useState(false);
-    const [fiatAmount, setFiatAmount] = useState('1000');
+    const [fiatAmount, setFiatAmount] = useState('100');
+    const [cryptoCurrencyCode, setCryptoCurrencyCode] = useState('eth');
+    const [errorMsg, setErrorMsg] = useState('');
     
-    // User requested to perfect moonpay connection to buy BTC and redirect to swap
-    const [cryptoCurrencyCode, setCryptoCurrencyCode] = useState('btc');
-    
-    // Provided user BTC wallet
+    // User's provided BTC wallet for BTC purchases
     const btcWalletAddress = 'bc1qqqe4htphjl3hgyl76dcv08k39uvz0wreuxpsg6';
 
+    // Determine the destination wallet address for the selected currency
+    const destinationAddress = cryptoCurrencyCode === 'btc' ? btcWalletAddress : (systemAddress || '');
+    const hasDestination = !!destinationAddress;
+
     const handlePurchase = async () => {
+        if (!hasDestination) {
+            toast.error("No wallet address available. Please connect a wallet first.");
+            return;
+        }
+        
         setIsInitializing(true);
+        setErrorMsg('');
         toast.loading("Generating encrypted payload...", { id: "fiat-tx" });
 
         try {
-            const redirectUri = typeof window !== 'undefined' ? `${window.location.origin}/?modal=swap&from=btc&to=eth` : '';
+            const redirectUri = typeof window !== 'undefined' 
+                ? `${window.location.origin}/?modal=swap&from=${cryptoCurrencyCode}&to=eth` 
+                : '';
 
             const res = await fetch('/api/wallet/moonpay/sign', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    walletAddress: cryptoCurrencyCode === 'btc' ? btcWalletAddress : (address || ''),
+                    walletAddress: destinationAddress,
                     baseCurrencyAmount: fiatAmount,
                     baseCurrencyCode: 'usd',
                     currencyCode: cryptoCurrencyCode,
@@ -918,20 +927,21 @@ function BuyModule() {
 
             const data = await res.json();
             
-            let moonpayWindow: Window | null = null;
-            if (data.url) {
-                toast.success("Terminal Ready", { id: "fiat-tx" });
-                moonpayWindow = window.open(data.url, '_blank');
-                if (!moonpayWindow) {
-                    window.location.href = data.url;
-                }
-            } else {
-                throw new Error(data.error || "Unknown signature error");
+            if (!res.ok || !data.url) {
+                throw new Error(data.error || `Server error ${res.status}`);
+            }
+            
+            toast.success("Terminal Ready", { id: "fiat-tx" });
+            
+            const moonpayWindow = window.open(data.url, '_blank');
+            if (!moonpayWindow) {
+                // Popup blocked — navigate directly
+                window.location.href = data.url;
+                return;
             }
             
             setIsPolling(true);
             
-            // Webhook callback simulation
             let attempts = 0;
             const pollInterval = setInterval(() => {
                 attempts++;
@@ -940,8 +950,6 @@ function BuyModule() {
                     setIsPolling(false);
                     return;
                 }
-
-                // Simulate successful deposit after 12 intervals (approx 24 seconds) if terminal stays open
                 if (attempts > 12) {
                     clearInterval(pollInterval);
                     setIsPolling(false);
@@ -950,24 +958,48 @@ function BuyModule() {
             }, 2000);
 
         } catch (e: any) {
-            toast.error("Initialization Failed", { id: "fiat-tx" });
+            console.error('[MoonPay]', e);
+            const msg = e?.message || "Unknown error";
+            setErrorMsg(msg);
+            toast.error("Initialization Failed", { id: "fiat-tx", description: msg });
         } finally {
             setIsInitializing(false);
         }
     };
 
+    const CURRENCIES = [
+        { code: 'eth', label: 'Ethereum', symbol: 'ETH' },
+        { code: 'btc', label: 'Bitcoin', symbol: 'BTC' },
+        { code: 'usdc', label: 'USD Coin', symbol: 'USDC' },
+        { code: 'matic', label: 'Polygon', symbol: 'MATIC' },
+    ];
+
     return (
-        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="space-y-6 flex flex-col items-center justify-center py-6 text-center">
+        <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 10 }} className="space-y-5 flex flex-col items-center justify-center py-6 text-center">
             <div className="border border-black/10 px-4 py-2 inline-block">
                 <span className="text-[10px] font-black uppercase tracking-widest text-black">FIAT ON-RAMP</span>
             </div>
             
-            <div className="space-y-3 max-w-[280px]">
+            <div className="space-y-2 max-w-[280px]">
                 <h3 className="font-black text-black text-lg uppercase tracking-tight">Direct Deposit</h3>
-                <p className="text-xs text-black/50 font-medium leading-relaxed">Convert fiat to crypto instantly. Assets are delivered directly to your on-chain system address.</p>
+                <p className="text-xs text-black/50 font-medium leading-relaxed">Convert fiat to crypto instantly via MoonPay. Assets delivered to your on-chain address.</p>
             </div>
 
-            <div className="w-full bg-white border border-black/5 rounded-[24px] p-5 shadow-sm space-y-4 hover:border-black/30 transition-colors mt-2 text-left">
+            {/* Currency selector */}
+            <div className="w-full grid grid-cols-4 gap-1.5">
+                {CURRENCIES.map(c => (
+                    <button
+                        key={c.code}
+                        onClick={() => setCryptoCurrencyCode(c.code)}
+                        className={`py-2.5 text-[9px] font-black uppercase tracking-widest border transition-all ${cryptoCurrencyCode === c.code ? 'bg-black text-white border-black' : 'bg-white text-black/50 border-black/10 hover:border-black/30'}`}
+                    >
+                        {c.symbol}
+                    </button>
+                ))}
+            </div>
+
+            {/* Amount input */}
+            <div className="w-full bg-white border border-black/5 rounded-[24px] p-5 shadow-sm space-y-2 hover:border-black/30 transition-colors text-left">
                 <label className="text-[10px] font-black text-black/40 uppercase tracking-widest block">Fiat Allocation</label>
                 <div className="flex items-center gap-4">
                     <span className="text-2xl font-black text-black/30">$</span>
@@ -975,24 +1007,43 @@ function BuyModule() {
                         type="number" 
                         value={fiatAmount} 
                         onChange={(e) => setFiatAmount(e.target.value)} 
-                        placeholder="1000" 
+                        placeholder="100" 
+                        min="20"
                         className="w-full bg-transparent text-4xl font-black text-black placeholder:text-black/10 focus:outline-none tabular-nums" 
                     />
                     <span className="text-sm font-black text-black/40">USD</span>
                 </div>
             </div>
 
-            <div className="bg-black/5 border border-black/10 p-3 w-full flex items-center justify-between mt-2">
-                <span className="text-[10px] font-black uppercase tracking-widest text-black/50">Destination Wallet</span>
-                <span className="text-xs font-mono font-bold text-black bg-white px-2 py-1 border border-black/5">{address ? `${address.slice(0,6)}...${address.slice(-4)}` : 'Not Connected'}</span>
+            {/* Destination wallet */}
+            <div className="bg-black/5 border border-black/10 p-3 w-full space-y-1">
+                <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-black/50">
+                        {cryptoCurrencyCode === 'btc' ? 'Bitcoin Wallet' : 'Destination Wallet'}
+                    </span>
+                    <span className={`text-xs font-mono font-bold px-2 py-1 border ${hasDestination ? 'text-black bg-white border-black/5' : 'text-red-500 bg-red-50 border-red-100'}`}>
+                        {hasDestination 
+                            ? `${destinationAddress.slice(0, 8)}...${destinationAddress.slice(-6)}`
+                            : 'No wallet connected'}
+                    </span>
+                </div>
+                {cryptoCurrencyCode === 'btc' && (
+                    <p className="text-[9px] text-black/40 font-bold uppercase tracking-widest text-left">Native BTC address · Not your ETH address</p>
+                )}
             </div>
+            
+            {errorMsg && (
+                <div className="w-full bg-red-50 border border-red-200 p-3 text-left">
+                    <p className="text-[10px] font-bold text-red-600 uppercase tracking-widest">[ERROR] {errorMsg}</p>
+                </div>
+            )}
             
             <button 
                 onClick={handlePurchase}
-                disabled={isInitializing || isPolling || !fiatAmount || parseFloat(fiatAmount) <= 0}
-                className="w-full py-4 bg-black text-white font-black text-[11px] uppercase tracking-[0.2em] hover:bg-black/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-50"
+                disabled={isInitializing || isPolling || !fiatAmount || parseFloat(fiatAmount) <= 0 || !hasDestination}
+                className="w-full py-4 bg-black text-white font-black text-[11px] uppercase tracking-[0.2em] hover:bg-black/80 active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed"
             >
-                {isPolling ? 'Awaiting Settlement...' : 'Initialize Secure Ingress'} <span className="text-[10px] font-black">-&gt;</span>
+                {isInitializing ? 'Generating...' : isPolling ? 'Awaiting Settlement...' : 'Initialize Secure Ingress'} <span className="text-[10px] font-black">-&gt;</span>
             </button>
         </motion.div>
     );
