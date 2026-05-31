@@ -102,7 +102,6 @@ const SUSPICIOUS_HEADERS = [
   'x-original-url',           // IIS/nginx URL override  used for auth bypass
   'x-rewrite-url',            // Apache mod_rewrite override
   'x-custom-ip-authorization',// IP spoofing attempt
-  'x-forwarded-host',         // Host header injection via proxy headers
   'x-host',                   // Duplicate host injection
   'x-cluster-client-ip',      // Legacy proxy header  abused in SSRF chains
   'x-forwarded-server',       // Server identity spoofing
